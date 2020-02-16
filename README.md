@@ -1,6 +1,6 @@
 <h1 align="center">ProtonVPN Linux GUI</h1>
 <p align="center">
-  <!-- <img src="https://i.imgur.com/tDrwkX5l.png" alt="Logo"></img> -->
+  <img src="https://i.imgur.com/rjMuf7p.png" alt="Logo"></img>
 </p>
 
 <h3 align="center">An <b>unofficial</b> Linux GUI for ProtonVPN, written in Python. Layout designed in Glade.</h3>
