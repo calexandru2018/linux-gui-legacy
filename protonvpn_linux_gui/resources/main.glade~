@@ -246,7 +246,6 @@ ProtonVPN Unofficial GUI: calexandru2018</property>
                     <property name="width_request">477</property>
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="halign">center</property>
                     <property name="margin_left">15</property>
                     <property name="margin_right">15</property>
                     <property name="margin_bottom">40</property>
@@ -362,6 +361,7 @@ ProtonVPN Unofficial GUI: calexandru2018</property>
                     <property name="width_request">400</property>
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
+                    <property name="margin_left">15</property>
                     <property name="margin_right">30</property>
                     <property name="margin_bottom">40</property>
                     <property name="row_spacing">5</property>
@@ -478,7 +478,6 @@ ProtonVPN Unofficial GUI: calexandru2018</property>
                     <property name="width_request">477</property>
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="halign">center</property>
                     <property name="margin_left">15</property>
                     <property name="margin_right">15</property>
                     <property name="margin_bottom">40</property>
@@ -571,7 +570,6 @@ ProtonVPN Unofficial GUI: calexandru2018</property>
                   <object class="GtkGrid" id="split_tunneling_grid">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="halign">center</property>
                     <property name="margin_left">15</property>
                     <property name="margin_right">15</property>
                     <property name="margin_bottom">40</property>
@@ -657,7 +655,6 @@ ProtonVPN Unofficial GUI: calexandru2018</property>
                     <property name="width_request">477</property>
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="halign">center</property>
                     <property name="margin_left">15</property>
                     <property name="margin_right">15</property>
                     <property name="margin_bottom">40</property>
@@ -1249,9 +1246,6 @@ ProtonVPN Unofficial GUI: calexandru2018</property>
                 <property name="top_attach">0</property>
                 <property name="width">4</property>
               </packing>
-            </child>
-            <child>
-              <placeholder/>
             </child>
           </object>
           <packing>
