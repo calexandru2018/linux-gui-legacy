@@ -11,10 +11,8 @@ from setuptools import setup
 #     re.M
 #     ).group(2)
 
-version = "1.0.0"
-
 long_descr = """
-The UNofficial Linux GUI for ProtonVPN.
+The Unofficial Linux GUI for ProtonVPN.
 
 For further information and a usage guide, please view the project page:
 
@@ -28,9 +26,10 @@ setup(
     entry_points={
             "console_scripts": "protonvpn-gui = protonvpn_linux_gui.gui:initialize_gui"
         },
-    version=version,
-    description="Linux GUI client for ProtonVPN",
+    version="1.0.0",
+    description="Unofficial Linux GUI client for ProtonVPN",
     long_description=long_descr,
+    author="calexandru2018",
     license="GPLv3",
     url="https://github.com/calexandru2018/protonvpn-linux-gui",
     install_requires=[
@@ -39,6 +38,7 @@ setup(
     ],
     python_requires=">=3.5",
     classifiers=[
+        "Development Status :: 4 - Beta",
         "Environment :: Console",
         "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
         "Programming Language :: Python",
