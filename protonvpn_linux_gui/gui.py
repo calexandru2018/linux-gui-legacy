@@ -2,7 +2,6 @@
 import os
 import sys
 
-
 # ProtonVPN base CLI package import
 from protonvpn_cli_ng.protonvpn_cli.constants import (USER, CONFIG_FILE, CONFIG_DIR, VERSION)
 from protonvpn_cli_ng.protonvpn_cli import cli

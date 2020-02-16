@@ -21,8 +21,8 @@ https://github.com/calexandru2018/protonvpn-linux-gui
 
 
 setup(
-    name="protonvpn-linux-gui",
-    packages=["protonvpn_linux_gui", "protonvpn-cli-ng"],
+    name="protonvpn-linux-gui-calexandru2018",
+    packages=["protonvpn_linux_gui", "protonvpn_cli_ng"],
     entry_points={
             "console_scripts": "protonvpn-gui = protonvpn_linux_gui.gui:initialize_gui"
         },
@@ -40,6 +40,7 @@ setup(
     classifiers=[
         "Development Status :: 4 - Beta",
         "Environment :: Console",
+        "Environment :: X11 Applications :: GTK",
         "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
         "Programming Language :: Python",
         "Programming Language :: Python :: 3",
