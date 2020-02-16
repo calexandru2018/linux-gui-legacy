@@ -38,7 +38,19 @@ If you have already installed <a href="https://github.com/ProtonVPN/protonvpn-cl
 |Arch Linux/Manjaro                       | `sudo pacman -S python-gobject gtk3`                                                      |
 
 
-## Manual Installation from source
+## Installing ProtonVPN Linux GUI
+
+You can either install via <b>PIP</b> or by cloning the repository.
+
+*Note: Make sure to run pip with sudo*
+
+`sudo pip3 install protonvpn-linux-gui-calexandru2018`
+
+### To update to a new version
+
+`sudo pip3 install protonvpn-linux-gui-calexandru2018 --upgrade`
+
+## Manual Installation
 
 1. Clone this repository
 
@@ -50,7 +62,7 @@ If you have already installed <a href="https://github.com/ProtonVPN/protonvpn-cl
 
 3. Install
 
-    `sudo pip3 install -e .`
+    `sudo python3 setup.py install`
 
 ### How to use
 
