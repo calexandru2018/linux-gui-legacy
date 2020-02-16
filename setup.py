@@ -26,7 +26,7 @@ setup(
     entry_points={
             "console_scripts": "protonvpn-gui = protonvpn_linux_gui.gui:initialize_gui"
         },
-    version="1.0.0",
+    version="1.0.1",
     description="Unofficial Linux GUI client for ProtonVPN",
     long_description=long_descr,
     author="calexandru2018",
