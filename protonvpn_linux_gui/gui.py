@@ -1,14 +1,15 @@
 # Default package import
 import os
 import sys
+import pathlib
 
 # ProtonVPN base CLI package import
-from .protonvpn_cli_ng.protonvpn_cli.constants import (USER, CONFIG_FILE, CONFIG_DIR, VERSION)
-from .protonvpn_cli_ng.protonvpn_cli import cli
-from .protonvpn_cli_ng.protonvpn_cli import connection
+from protonvpn_cli_ng.protonvpn_cli.constants import (USER, CONFIG_FILE, CONFIG_DIR, VERSION)
+from protonvpn_cli_ng.protonvpn_cli import cli
+from protonvpn_cli_ng.protonvpn_cli import connection
 
 # ProtonVPN helper funcitons
-from .protonvpn_cli_ng.protonvpn_cli.utils import (
+from protonvpn_cli_ng.protonvpn_cli.utils import (
     get_config_value,
     set_config_value,
     check_root,
@@ -253,10 +254,17 @@ class initialize_gui:
     def __init__(self):
         check_root()
         interface = Gtk.Builder()
-        path = os.path.expanduser("~{0}".format(USER))
-        path = path + "/protonvpn-linux-gui/protonvpn_linux_gui/resources/main.glade"
 
-        interface.add_from_file(path)
+        posixPath = pathlib.PurePath(pathlib.Path(__file__).parent.absolute().joinpath("resources/main.glade"))
+        glade_path = ''
+        
+        for path in posixPath.parts:
+            if path == '/':
+                glade_path = glade_path + path
+            else:
+                glade_path = glade_path + path + "/"
+                
+        interface.add_from_file(glade_path[:-1])
         interface.connect_signals(Handler(interface))
 
         if not os.path.isfile(CONFIG_FILE):
