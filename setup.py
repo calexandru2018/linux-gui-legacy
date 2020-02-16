@@ -24,9 +24,9 @@ setup(
     name="protonvpn-linux-gui-calexandru2018",
     packages=["protonvpn_linux_gui", "protonvpn_cli_ng"],
     entry_points={
-            "console_scripts": ["protonvpn-gui = protonvpn_linux_gui.gui:main"]
+            "console_scripts": ["protonvpn-gui = protonvpn_linux_gui.gui:initialize_gui"]
         },
-    version="1.0.2",
+    version="1.0.3",
     description="Unofficial Linux GUI client for ProtonVPN",
     long_description=long_descr,
     author="calexandru2018",
