@@ -105,7 +105,7 @@ class Handler:
         """Button to open About dialog
         """
         about_dialog = self.interface.get_object("AboutDialog")
-        version = "v."+VERSION
+        version = "v1.0.0"
         about_dialog.set_version(version)
         about_dialog.show()
 
