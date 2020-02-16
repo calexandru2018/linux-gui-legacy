@@ -4,12 +4,8 @@
 import re
 from setuptools import setup
 
+from protonvpn_linux_gui.constants import VERSION
 
-# version = re.search(
-#     r'(VERSION = "(\d.\d.\d)")',
-#     open("protonvpn_cli/constants.py").read(),
-#     re.M
-#     ).group(2)
 
 long_descr = """
 The Unofficial Linux GUI for ProtonVPN.
@@ -22,11 +18,11 @@ https://github.com/calexandru2018/protonvpn-linux-gui
 
 setup(
     name="protonvpn-linux-gui-calexandru2018",
-    packages=["protonvpn_linux_gui", "protonvpn_cli_ng"],
+    packages=["protonvpn_linux_gui"],
     entry_points={
             "console_scripts": ["protonvpn-gui = protonvpn_linux_gui.gui:initialize_gui"]
         },
-    version="1.0.3",
+    version=VERSION,
     description="Unofficial Linux GUI client for ProtonVPN",
     long_description=long_descr,
     author="calexandru2018",

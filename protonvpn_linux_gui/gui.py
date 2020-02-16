@@ -23,6 +23,8 @@ from .utils import (
     load_configurations
 )
 
+from .constants import VERSION
+
 # PyGObject import
 import gi
 
@@ -104,8 +106,7 @@ class Handler:
         """Button to open About dialog
         """
         about_dialog = self.interface.get_object("AboutDialog")
-        version = "v1.0.0"
-        about_dialog.set_version(version)
+        about_dialog.set_version(VERSION)
         about_dialog.show()
 
     def configuration_menu_button_clicked(self, button):
