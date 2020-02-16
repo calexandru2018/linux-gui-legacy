@@ -55,3 +55,29 @@ If you have already installed <a href="https://github.com/ProtonVPN/protonvpn-cl
 ### How to use
 
  `sudo protonvpn-gui`
+
+After connecting to a server, if you want to close the GUI and the terminal, then do not <b>CTRL+C!</b> This will cause the process to be interrupted, instead just close the terminal by pressing on the <b>X</b> in the terminal and the process will continue to work in the background.
+
+### Not yet implemented:
+
+- Split Tunneling
+- Kill Switch
+- Start on Boot (only for systemd OS's)
+
+## GUI Layout
+<p align="center">
+  <img src="https://i.imgur.com/Dxe9vRH.png" alt="Logo"></img>
+</p>
+
+<p align="center">
+  <img src="https://i.imgur.com/ToooLUV.png" alt="Logo"></img>
+</p>
+
+<p align="center">
+  <img src="https://i.imgur.com/nVU65pO.png" alt="Logo"></img>
+</p> 
+
+<p align="center">
+  <img src="https://i.imgur.com/UdKoMGC.png" alt="Logo"></img>
+</p>
+ 
