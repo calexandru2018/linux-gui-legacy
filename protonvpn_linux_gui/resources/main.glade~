@@ -13,11 +13,13 @@
     <property name="accept_focus">False</property>
     <property name="focus_on_map">False</property>
     <property name="gravity">center</property>
-    <property name="program_name">Proton Technologies AG</property>
-    <property name="version">2.2.2</property>
-    <property name="comments" translatable="yes">contact@protonvpn.com</property>
-    <property name="website">https://protonvpn.com/</property>
-    <property name="website_label" translatable="yes">www.protonvpn.com</property>
+    <property name="program_name">Unofficial ProntVPN GUI for Linux</property>
+    <property name="version">1.0.0</property>
+    <property name="comments" translatable="yes">Based on protonvpn-cli-ng</property>
+    <property name="website">https://github.com/calexandru2018/protonvpn-linux-gui</property>
+    <property name="website_label" translatable="yes">Github</property>
+    <property name="authors">ProtonVPN CLI: Rafficer and ProtonVPN
+ProtonVPN Unofficial GUI: calexandru2018</property>
     <property name="logo">protonvpn_logo_full.png</property>
     <property name="license_type">gpl-3-0</property>
     <signal name="delete-event" handler="AboutDialog_delete_event" swapped="no"/>
@@ -630,6 +632,7 @@
                         <property name="halign">center</property>
                         <property name="valign">end</property>
                         <property name="margin_top">10</property>
+                        <signal name="clicked" handler="update_split_tunneling_button_clicked" swapped="no"/>
                       </object>
                       <packing>
                         <property name="left_attach">1</property>
@@ -828,6 +831,19 @@
               </packing>
             </child>
             <child>
+              <object class="GtkImage">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="margin_top">30</property>
+                <property name="margin_bottom">40</property>
+                <property name="pixbuf">protonvpn_logo_full.png</property>
+              </object>
+              <packing>
+                <property name="left_attach">0</property>
+                <property name="top_attach">0</property>
+              </packing>
+            </child>
+            <child>
               <object class="GtkLabel">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
@@ -846,20 +862,22 @@
               </packing>
             </child>
             <child>
-              <object class="GtkImage">
+              <object class="GtkLabel">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="margin_top">30</property>
-                <property name="margin_bottom">40</property>
-                <property name="pixbuf">protonvpn_logo_full.png</property>
+                <property name="margin_top">10</property>
+                <property name="margin_bottom">30</property>
+                <property name="label" translatable="yes">Unofficial ProtonVPN Linux GUI </property>
+                <property name="justify">fill</property>
+                <attributes>
+                  <attribute name="weight" value="bold"/>
+                  <attribute name="size" value="15000"/>
+                </attributes>
               </object>
               <packing>
                 <property name="left_attach">0</property>
-                <property name="top_attach">0</property>
+                <property name="top_attach">1</property>
               </packing>
-            </child>
-            <child>
-              <placeholder/>
             </child>
           </object>
           <packing>
@@ -1231,6 +1249,9 @@
                 <property name="top_attach">0</property>
                 <property name="width">4</property>
               </packing>
+            </child>
+            <child>
+              <placeholder/>
             </child>
           </object>
           <packing>
