@@ -50,7 +50,7 @@ If you have already installed <a href="https://github.com/ProtonVPN/protonvpn-cl
 
 3. Install
 
-    `pip3 install -e .`
+    `sudo pip3 install -e .`
 
 ### How to use
 
