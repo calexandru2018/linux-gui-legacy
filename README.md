@@ -1,4 +1,4 @@
-<h1 align="center">ProtonVPN Linux GUI</h1>
+<h1 align="center">Unofficial ProtonVPN Linux GUI</h1>
 <p align="center">
   <!-- <img src="https://i.imgur.com/tDrwkX5l.png" alt="Logo"></img> -->
 </p>
@@ -28,8 +28,7 @@ If you have <b>NOT</b> previously installed ProtonVPN-CLI, then install the foll
 
 
 
-
-If you have already installed <a href="https://github.com/ProtonVPN/protonvpn-cli-ng"><b>protonvpn-cli-ng</b></a>, then you will only need to install the following dependencies for the GUI:
+If you have already installed <a href="https://github.com/ProtonVPN/protonvpn-cli-ng"><b>protonvpn-cli-ng</b></a> and used the CLI, then you will only need to install the following dependencies for the GUI:
 
 | **Distro**                              | **Command**                                                                               |
 |:----------------------------------------|:--------------------------------------------------------------------                      |
@@ -58,4 +57,4 @@ If you have already installed <a href="https://github.com/ProtonVPN/protonvpn-cl
 
 ### How to use
 
- `protonvpn-gui`
+ `sudo protonvpn-gui`
