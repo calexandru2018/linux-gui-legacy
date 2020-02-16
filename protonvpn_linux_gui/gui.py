@@ -4,19 +4,19 @@ import sys
 
 
 # ProtonVPN base CLI package import
-from protonvpn_cli.constants import (USER, CONFIG_FILE, CONFIG_DIR, VERSION)
-from protonvpn_cli import cli
-from protonvpn_cli import connection
+from protonvpn_cli_ng.protonvpn_cli.constants import (USER, CONFIG_FILE, CONFIG_DIR, VERSION)
+from protonvpn_cli_ng.protonvpn_cli import cli
+from protonvpn_cli_ng.protonvpn_cli import connection
 
 # ProtonVPN helper funcitons
-from protonvpn_cli.utils import (
+from protonvpn_cli_ng.protonvpn_cli.utils import (
     get_config_value,
     set_config_value,
     check_root,
 )
 
 # Custom helper functions
-from .utils.utils import (
+from .utils import (
     update_labels_status,
     populate_server_list,
     prepare_initilizer,
@@ -254,7 +254,7 @@ class initialize_gui:
         check_root()
         interface = Gtk.Builder()
         path = os.path.expanduser("~{0}".format(USER))
-        path = path + "/protonvpn-cli-ng/gui/main.glade"
+        path = path + "/protonvpn-linux-gui/protonvpn_linux_gui/resources/main.glade"
 
         interface.add_from_file(path)
         interface.connect_signals(Handler(interface))

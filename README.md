@@ -1,9 +1,9 @@
-<h1 align="center">Unofficial ProtonVPN Linux GUI</h1>
+<h1 align="center">ProtonVPN Linux GUI</h1>
 <p align="center">
   <!-- <img src="https://i.imgur.com/tDrwkX5l.png" alt="Logo"></img> -->
 </p>
 
-<h3 align="center">An <b>UNOFFICIAL</b> Linux GUI for ProtonVPN. Written in Python.</h3>
+<h3 align="center">An <b>unofficial</b> Linux GUI for ProtonVPN, written in Python. Layout designed in Glade.</h3>
 
 Protonvpn-linux-gui is based on <a href="https://github.com/ProtonVPN/protonvpn-cli-ng"><b>protonvpn-cli-ng</b></a> code. This was achieved by slightly modifying ProtonVPN's original Python code and adding a new layer on top of it for the GUI.
 
@@ -17,7 +17,7 @@ Protonvpn-linux-gui is based on <a href="https://github.com/ProtonVPN/protonvpn-
 - setuptools for python3 (python3-setuptools)
 - PyGObject
 
-If you have <b>NOT</b> previously installed ProtonVPN-CLI, then install the following dependencies, based on your distribution:
+If you have <b>NOT</b> previously installed <b><a href="https://github.com/ProtonVPN/protonvpn-cli-ng">protonvpn-cli-ng</b></a>, then install the following dependencies, based on your distribution:
 
 | **Distro**                              | **Command**                                                                                                                           |
 |:----------------------------------------|:---------------------------------------------------------------------------------------------------------                             |
@@ -40,20 +40,17 @@ If you have already installed <a href="https://github.com/ProtonVPN/protonvpn-cl
 
 ## Manual Installation from source
 
-*Note: Make sure to run pip with sudo, so it installs globally and recognizes the command with sudo*
-
 1. Clone this repository
 
-    `git clone https://github.com/protonvpn/protonvpn-cli-ng`
+    `git clone https://github.com/calexandru2018/protonvpn-linux-gui`
 
 2. Step into the directory
 
-   `cd protonvpn-cli-ng`
+   `cd protonvpn-linux-gui`
 
 3. Install
 
     `pip3 install -e .`
-
 
 ### How to use
 

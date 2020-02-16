@@ -1,5 +1,5 @@
 
-from protonvpn_cli.utils import (
+from protonvpn_cli_ng.protonvpn_cli.utils import (
     pull_server_data,
     get_servers,
     get_country_name,
