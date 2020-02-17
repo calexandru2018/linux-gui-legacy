@@ -645,7 +645,7 @@ def set_split_tunnel(gui_enabled=False, user_data=False):
 
             set_config_value("USER", "split_tunnel", 1)
 
-            with open(SPLIT_TUNNEL_FILE, "a") as f:
+            with open(SPLIT_TUNNEL_FILE, "w") as f:
                 for ip in user_data:
                     f.write("\n{0}".format(ip))
 
