@@ -623,57 +623,88 @@ def set_killswitch():
     print("Kill Switch configuration updated.")
 
 
-def set_split_tunnel():
+def set_split_tunnel(gui_enabled=False, user_data=False):
     """Enable or disable split tunneling"""
 
     print()
-    user_choice = input("Enable split tunneling? [y/N]: ")
 
-    if user_choice.strip().lower() == "y":
-        if int(get_config_value("USER", "killswitch")):
-            set_config_value("USER", "killswitch", 0)
-            print()
-            print(
-                "[!] Split Tunneling can't be used with Kill Switch.\n" +
-                "[!] Kill Switch has been disabled.\n"
-            )
-            time.sleep(1)
-
-        set_config_value("USER", "split_tunnel", 1)
-
-        while True:
-            ip = input(
-                "Please enter an IP or CIDR to exclude from VPN.\n"
-                "Or leave empty to stop: "
-            ).strip()
-
-            if ip == "":
-                break
-
-            if not is_valid_ip(ip):
-                print("[!] Invalid IP")
+    if gui_enabled == True:
+        if len(user_data) == 0:
+            set_config_value("USER", "split_tunnel", 0)
+            if os.path.isfile(SPLIT_TUNNEL_FILE):
+                os.remove(SPLIT_TUNNEL_FILE)
+        else:
+            if int(get_config_value("USER", "killswitch")):
+                set_config_value("USER", "killswitch", 0)
                 print()
-                continue
+                print(
+                    "[!] Split Tunneling can't be used with Kill Switch.\n" +
+                    "[!] Kill Switch has been disabled.\n"
+                )
+                time.sleep(1)
+
+            set_config_value("USER", "split_tunnel", 1)
 
             with open(SPLIT_TUNNEL_FILE, "a") as f:
-                f.write("\n{0}".format(ip))
+                for ip in user_data:
+                    f.write("\n{0}".format(ip))
 
-        if os.path.isfile(SPLIT_TUNNEL_FILE):
-            change_file_owner(SPLIT_TUNNEL_FILE)
+            if os.path.isfile(SPLIT_TUNNEL_FILE):
+                change_file_owner(SPLIT_TUNNEL_FILE)
+            else:
+                # If no no config file exists,
+                # split tunneling should be disabled again
+                logger.debug("No split tunneling file existing.")
+                set_config_value("USER", "split_tunnel", 0)
+    else:
+        user_choice = input("Enable split tunneling? [y/N]: ")
+
+        if user_choice.strip().lower() == "y":
+            if int(get_config_value("USER", "killswitch")):
+                set_config_value("USER", "killswitch", 0)
+                print()
+                print(
+                    "[!] Split Tunneling can't be used with Kill Switch.\n" +
+                    "[!] Kill Switch has been disabled.\n"
+                )
+                time.sleep(1)
+
+            set_config_value("USER", "split_tunnel", 1)
+
+
+            while True:
+                ip = input(
+                    "Please enter an IP or CIDR to exclude from VPN.\n"
+                    "Or leave empty to stop: "
+                ).strip()
+
+                if ip == "":
+                    break
+
+                if not is_valid_ip(ip):
+                    print("[!] Invalid IP")
+                    print()
+                    continue
+
+                with open(SPLIT_TUNNEL_FILE, "a") as f:
+                    f.write("\n{0}".format(ip))
+
+            if os.path.isfile(SPLIT_TUNNEL_FILE):
+                change_file_owner(SPLIT_TUNNEL_FILE)
+            else:
+                # If no no config file exists,
+                # split tunneling should be disabled again
+                logger.debug("No split tunneling file existing.")
+                set_config_value("USER", "split_tunnel", 0)
+
         else:
-            # If no no config file exists,
-            # split tunneling should be disabled again
-            logger.debug("No split tunneling file existing.")
             set_config_value("USER", "split_tunnel", 0)
 
-    else:
-        set_config_value("USER", "split_tunnel", 0)
+            if os.path.isfile(SPLIT_TUNNEL_FILE):
+                clear_config = input("Remove split tunnel configuration? [y/N]: ")
 
-        if os.path.isfile(SPLIT_TUNNEL_FILE):
-            clear_config = input("Remove split tunnel configuration? [y/N]: ")
-
-            if clear_config.strip().lower() == "y":
-                os.remove(SPLIT_TUNNEL_FILE)
+                if clear_config.strip().lower() == "y":
+                    os.remove(SPLIT_TUNNEL_FILE)
 
     print()
     print("Split tunneling configuration updated.")
