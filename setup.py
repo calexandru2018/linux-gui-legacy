@@ -15,10 +15,14 @@ For further information and a usage guide, please view the project page:
 https://github.com/calexandru2018/protonvpn-linux-gui
 """
 
-
 setup(
     name="protonvpn-linux-gui-calexandru2018",
-    packages=["protonvpn_linux_gui", "protonvpn_linux_gui.resources", "protonvpn_cli_ng", "protonvpn_cli_ng.protonvpn_cli"],
+    packages=[
+        "protonvpn_linux_gui",
+        "protonvpn_linux_gui.resources",
+        "protonvpn_cli_ng",
+        "protonvpn_cli_ng.protonvpn_cli"
+        ],
     entry_points={
             "console_scripts": ["protonvpn-gui = protonvpn_linux_gui.gui:initialize_gui"]
         },

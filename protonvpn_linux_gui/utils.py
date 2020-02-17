@@ -11,6 +11,8 @@ from protonvpn_cli_ng.protonvpn_cli.utils import (
     get_ip_info
 )
 
+from protonvpn_cli_ng.protonvpn_cli.constants import SPLIT_TUNNEL_FILE
+
 def prepare_initilizer(username_field, password_field, interface):
     """Collects and prepares user input from login window.
     Returns:
@@ -140,11 +142,28 @@ def load_configurations(interface):
 
     # Populate OpenVPN Protocol        
     interface.get_object("protocol_tcp_update_checkbox").set_active(True) if default_protocol == "tcp" else interface.get_object("protocol_udp_update_checkbox").set_active(True)
-    pref_dialog.show()
 
-    # To-do Split Tunelling
+    # Populate Split Tunelling
+    split_tunneling_buffer = interface.get_object("split_tunneling_textview").get_buffer()
+    content = ""
+    try:
+        with open(SPLIT_TUNNEL_FILE) as f:
+            lines = f.readlines()
+
+            for line in lines:
+                content = content + line
+
+            split_tunneling_buffer.set_text(content)
+
+    except FileNotFoundError:
+        print("No split tunnel file presente")
+        split_tunneling_buffer.set_text(content)
+
 
     # To-do Purge Configurations
+    # Button to be red .set_property('background', 'red')
+
+    pref_dialog.show()
 
 def populate_server_list(server_list_object):
     """Populates the list with all servers.
