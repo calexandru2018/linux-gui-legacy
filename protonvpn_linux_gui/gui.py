@@ -287,7 +287,7 @@ class initialize_gui:
             window = interface.get_object("LoginWindow")
         else:
             window = interface.get_object("Dashboard")
-            load_on_start(interface)        
+            load_on_start(interface)
         
         window.show()
         Gtk.main()
