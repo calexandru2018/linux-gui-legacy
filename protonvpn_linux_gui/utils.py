@@ -145,7 +145,7 @@ def load_configurations(interface):
     # To-do Split Tunelling
 
     # To-do Purge Configurations
-
+    # Button to be red .set_property('background', 'red')
 def populate_server_list(server_list_object):
     """Populates the list with all servers.
     """
