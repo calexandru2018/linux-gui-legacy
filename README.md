@@ -3,6 +3,11 @@
   <img src="https://i.imgur.com/rjMuf7p.png" alt="Logo"></img>
 </p>
 
+<p align="center">
+    <a href="https://pepy.tech/project/protonvpn-linux-gui-calexandru2018"><img alt="Downloads" src="https://pepy.tech/badge/protonvpn-linux-gui-calexandru2018"></a>   
+    <a href="https://pepy.tech/project/protonvpn-linux-gui-calexandru2018/week"><img alt="Downloads per Week" src="https://pepy.tech/badge/protonvpn-linux-gui-calexandru2018/week"></a>
+</p>
+
 <h3 align="center">An <b>unofficial</b> Linux GUI for ProtonVPN, written in Python. Layout designed in Glade.</h3>
 
 Protonvpn-linux-gui is based on <a href="https://github.com/ProtonVPN/protonvpn-cli-ng"><b>protonvpn-cli-ng</b></a> code. This was achieved by slightly modifying ProtonVPN's original Python code and adding a new layer on top of it for the GUI.
