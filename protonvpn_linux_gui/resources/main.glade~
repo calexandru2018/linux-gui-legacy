@@ -1570,7 +1570,6 @@ ProtonVPN Unofficial GUI: calexandru2018</property>
                 <property name="margin_bottom">15</property>
                 <property name="hexpand">True</property>
                 <property name="vexpand">True</property>
-                <property name="hscrollbar_policy">never</property>
                 <property name="vscrollbar_policy">always</property>
                 <property name="shadow_type">in</property>
                 <property name="min_content_height">100</property>
@@ -1781,8 +1780,8 @@ ProtonVPN Unofficial GUI: calexandru2018</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="has_frame">False</property>
-                <property name="placeholder_text" translatable="yes">(server filter)</property>
-                <signal name="key-press-event" handler="server_filter_input_key_press_event" swapped="no"/>
+                <property name="placeholder_text" translatable="yes">Type to filter...</property>
+                <signal name="key-release-event" handler="server_filter_input_key_release" swapped="no"/>
               </object>
               <packing>
                 <property name="left_attach">1</property>

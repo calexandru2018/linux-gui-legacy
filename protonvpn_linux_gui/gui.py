@@ -65,7 +65,29 @@ class Handler:
         print("text changed")
     def server_filter_input_key_release(self, object, event):
         user_filter_input = object.get_text()
-        print(user_filter_input)
+        model = self.interface.get_object("ServerListStore")
+
+        n_filter = model.filter_new()
+
+        n_filter.set_visible_func(self.visible_cb, data=user_filter_input)
+
+        n_filter.refilter()
+
+    def visible_cb(self, model, iter, data=None):
+        treeview = self.interface.get_object("ServerList")
+        search_query = data
+        # active_category = self.catcombo.get_active()
+        # print(data.lower() in model[iter][0].lower())
+        for str in model[iter]:
+            if data.lower() in str.lower():
+                print(str)
+        # return data.lower() in model[iter][2].lower()
+        # for col in range(1,treeview.get_n_columns()):
+        #     value = model.get_value(iter, col).lower()
+        #     print(value)
+        #     if value.startswith(search_query):
+        #         return True if value.startswith(search_query) else False
+        #         print(value)
 
     def connect_to_selected_server_button_clicked(self, button):
         """Button/Event handler to connect to selected server
