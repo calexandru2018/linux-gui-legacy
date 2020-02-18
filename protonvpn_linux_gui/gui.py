@@ -210,14 +210,16 @@ class Handler:
     def update_def_protocol_button_clicked(self, button):
         """Button/Event handler to update OpenVP Protocol  
         """
-        openvpn_protocol = 'tcp' if self.interface.get_object('protocol_tcp_update_checkbox').get_active() else 'udp'
+        openvpn_protocol = 'tcp' if self.interface.get_object('protocol_tcp_update_checkbox').get_active() == True else 'udp'
         
         cli.set_default_protocol(write=True, gui_enabled=True, protoc=openvpn_protocol)
 
     # Kill Switch
     def update_killswtich_button_clicked(self, button):
-        print("To-do update killswtich settings")
-        
+        ks_combobox = self.interface.get_object("killswitch_combobox")
+
+        cli.set_killswitch(gui_enabled=True, user_choice=ks_combobox.get_active())
+
     # Start on boot
 
     def update_split_tunneling_button_clicked(self, button):
