@@ -49,17 +49,11 @@ def prepare_initilizer(username_field, password_field, interface):
     return user_data
 
 def load_on_start(interface):
-    """Loads main window on start
+    """Loads Dashboard content before showing it to the user
     """
     server_list_object = interface.get_object("ServerListStore")
-    killswitch_toggle = interface.get_object("killswitch_toggle_button")
 
     update_labels_status(interface)
-
-    # Set killswitch button to ON or OFF, depending on status
-    killswitch_enabled = get_config_value("USER", "killswitch")
-    if int(killswitch_enabled) == 1:
-        killswitch_toggle.set_active(True)
 
     # Populate server list
     populate_server_list(server_list_object)
