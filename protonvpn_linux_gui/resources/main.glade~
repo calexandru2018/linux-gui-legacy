@@ -94,15 +94,15 @@ ProtonVPN Unofficial GUI: calexandru2018</property>
     <data>
       <row>
         <col id="0">0</col>
-        <col id="1" translatable="yes">Enable Kill Switch (Block access to/from LAN)</col>
+        <col id="1" translatable="yes">Disable Kill Switch</col>
       </row>
       <row>
         <col id="0">1</col>
-        <col id="1" translatable="yes">Enable Kill Switch (Allow access to/from LAN)</col>
+        <col id="1" translatable="yes">Enable Kill Switch (Block access to/from LAN)</col>
       </row>
       <row>
         <col id="0">2</col>
-        <col id="1" translatable="yes">Disable Kill Switch</col>
+        <col id="1" translatable="yes">Enable Kill Switch (Allow access to/from LAN)</col>
       </row>
     </data>
   </object>
@@ -780,7 +780,7 @@ ProtonVPN Unofficial GUI: calexandru2018</property>
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkComboBox" id="dns_preferens_combobox1">
+                      <object class="GtkComboBox" id="killswitch_combobox">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="model">KillSwitchListStore</property>
@@ -818,6 +818,12 @@ ProtonVPN Unofficial GUI: calexandru2018</property>
                         <property name="top_attach">3</property>
                         <property name="width">2</property>
                       </packing>
+                    </child>
+                    <child>
+                      <placeholder/>
+                    </child>
+                    <child>
+                      <placeholder/>
                     </child>
                     <child>
                       <placeholder/>
@@ -1770,6 +1776,7 @@ ProtonVPN Unofficial GUI: calexandru2018</property>
               <object class="GtkEntry" id="server_filter_input">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
+                <property name="has_frame">False</property>
                 <property name="placeholder_text" translatable="yes">(server filter)</property>
               </object>
               <packing>
