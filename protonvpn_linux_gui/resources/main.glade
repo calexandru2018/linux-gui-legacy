@@ -1253,6 +1253,9 @@ ProtonVPN Unofficial GUI: calexandru2018</property>
       <column type="gchararray"/>
     </columns>
   </object>
+  <object class="GtkTreeModelFilter" id="ServerModelFilter">
+    <property name="child_model">ServerListStore</property>
+  </object>
   <object class="GtkApplicationWindow" id="Dashboard">
     <property name="can_focus">True</property>
     <property name="has_focus">True</property>
@@ -1581,7 +1584,7 @@ ProtonVPN Unofficial GUI: calexandru2018</property>
                     <property name="hexpand">False</property>
                     <property name="vexpand">True</property>
                     <property name="hscroll_policy">natural</property>
-                    <property name="model">ServerListStore</property>
+                    <property name="model">ServerModelFilter</property>
                     <property name="search_column">1</property>
                     <property name="fixed_height_mode">True</property>
                     <property name="hover_selection">True</property>
@@ -1779,6 +1782,7 @@ ProtonVPN Unofficial GUI: calexandru2018</property>
                 <property name="can_focus">True</property>
                 <property name="has_frame">False</property>
                 <property name="placeholder_text" translatable="yes">(server filter)</property>
+                <signal name="key-release-event" handler="server_filter_input_key_release" swapped="no"/>
               </object>
               <packing>
                 <property name="left_attach">1</property>

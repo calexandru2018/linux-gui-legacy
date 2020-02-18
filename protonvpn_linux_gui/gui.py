@@ -61,6 +61,12 @@ class Handler:
         user_window.show()
 
     # Dashboard BUTTON HANDLERS
+    def server_filter_input_changed(self, input):
+        print("text changed")
+    def server_filter_input_key_release(self, object, event):
+        user_filter_input = object.get_text()
+        print(user_filter_input)
+
     def connect_to_selected_server_button_clicked(self, button):
         """Button/Event handler to connect to selected server
         """     
