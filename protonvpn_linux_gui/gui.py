@@ -159,7 +159,7 @@ class Handler:
         cli.set_username_password(write=True, gui_enabled=True, user_data=(username_text, password_text))
         password_field.set_text("")
 
-    def dns_preferens_combobox_changed(self, button):
+    def dns_preferens_combobox_changed(self, combobox):
         """Button/Event handler that is triggered whenever combo box value is changed.
         """
         # DNS ComboBox
@@ -169,7 +169,7 @@ class Handler:
 
         dns_custom_input = self.interface.get_object("dns_custom_input")
 
-        if button.get_active() == 0 or button.get_active() == 2:
+        if combobox.get_active() == 0 or combobox.get_active() == 2:
             dns_custom_input.set_property('sensitive', False)
         else:
             dns_custom_input.set_property('sensitive', True)
@@ -215,12 +215,21 @@ class Handler:
         cli.set_default_protocol(write=True, gui_enabled=True, protoc=openvpn_protocol)
 
     # Kill Switch
+    def killswitch_combobox_changed(self, combobox):
+
+        if combobox.get_active() == 0:
+            self.interface.get_object("split_tunneling_textview").set_property('sensitive', True)
+            self.interface.get_object("update_split_tunneling_button").set_property('sensitive', True)
+        else:
+            self.interface.get_object("split_tunneling_textview").set_property('sensitive', False)
+            self.interface.get_object("update_split_tunneling_button").set_property('sensitive', False)
+
     def update_killswtich_button_clicked(self, button):
         ks_combobox = self.interface.get_object("killswitch_combobox")
 
         cli.set_killswitch(gui_enabled=True, user_choice=ks_combobox.get_active())
 
-    # Start on boot
+    # To-do Start on boot
 
     def update_split_tunneling_button_clicked(self, button):
         """Button/Event handler to update Split Tunneling 
@@ -289,6 +298,6 @@ class initialize_gui:
         else:
             window = interface.get_object("Dashboard")
             load_on_start(interface)
-        
+
         window.show()
         Gtk.main()
