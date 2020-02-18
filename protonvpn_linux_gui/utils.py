@@ -21,7 +21,7 @@ def prepare_initilizer(username_field, password_field, interface):
     """
     # Get user specified protocol
     protonvpn_plan = ''
-    openvpn_protocol = 'tcp' if interface.get_object('protocol_tcp_checkbox').get_active() else 'udp'
+    openvpn_protocol = 'tcp' if interface.get_object('protocol_tcp_checkbox').get_active() == True else 'udp'
     
     if len(username_field) == 0 or len(password_field) == 0:
         return
@@ -49,23 +49,17 @@ def prepare_initilizer(username_field, password_field, interface):
     return user_data
 
 def load_on_start(interface):
-    """Loads main window on start
+    """Updates Dashboard labels and populates server list content before showing it to the user
     """
     server_list_object = interface.get_object("ServerListStore")
-    killswitch_toggle = interface.get_object("killswitch_toggle_button")
 
     update_labels_status(interface)
-
-    # Set killswitch button to ON or OFF, depending on status
-    killswitch_enabled = get_config_value("USER", "killswitch")
-    if int(killswitch_enabled) == 1:
-        killswitch_toggle.set_active(True)
 
     # Populate server list
     populate_server_list(server_list_object)
 
 def update_labels_status(interface):
-    """Updates label statuses
+    """Updates labels status
     """
     vpn_status_label = interface.get_object("vpn_status_label")
     dns_status_label = interface.get_object("dns_status_label")
@@ -95,20 +89,22 @@ def update_labels_status(interface):
     country_label.set_markup(country_isp)
 
 def load_configurations(interface):
+    """Set and populate user configurations before showing the configurations window
+    """
     pref_dialog = interface.get_object("ConfigurationsWindow")
-    
-    # Load user configurations before showing the window
+     
     username = get_config_value("USER", "username")
     dns_leak_protection = get_config_value("USER", "dns_leak_protection")
     custom_dns = get_config_value("USER", "custom_dns")
     tier = int(get_config_value("USER", "tier")) + 1
     default_protocol = get_config_value("USER", "default_protocol")
+    killswitch = get_config_value("USER", "killswitch")
 
     # Populate username
     username_field = interface.get_object("update_username_input")
     username_field.set_text(username)
 
-    # To-do DNS combobox
+    # Set DNS combobox
     dns_combobox = interface.get_object("dns_preferens_combobox")
     dns_custom_input = interface.get_object("dns_custom_input")
 
@@ -124,10 +120,10 @@ def load_configurations(interface):
         dns_custom_input.set_property('sensitive', True)
     else:
         dns_combobox.set_active(2)
-
+    
     dns_custom_input.set_text(custom_dns)
 
-    # Populate ProtonVPN Plan
+    # Set ProtonVPN Plan
     protonvpn_plans = {
         1: interface.get_object("member_free_update_checkbox"),
         2: interface.get_object("member_basic_update_checkbox"),
@@ -140,11 +136,23 @@ def load_configurations(interface):
             object.set_active(True)
             break
 
-    # Populate OpenVPN Protocol        
+    # Set OpenVPN Protocol        
     interface.get_object("protocol_tcp_update_checkbox").set_active(True) if default_protocol == "tcp" else interface.get_object("protocol_udp_update_checkbox").set_active(True)
 
+    # Set Kill Switch combobox
+    killswitch_combobox = interface.get_object("killswitch_combobox")
+
+    killswitch_combobox.set_active(int(killswitch))
+
     # Populate Split Tunelling
-    split_tunneling_buffer = interface.get_object("split_tunneling_textview").get_buffer()
+    split_tunneling = interface.get_object("split_tunneling_textview")
+
+    # Check if killswtich is != 0, if it is then disable split tunneling funciton
+    if killswitch != '0':
+        split_tunneling.set_property('sensitive', False)
+        interface.get_object("update_split_tunneling_button").set_property('sensitive', False)
+        
+    split_tunneling_buffer = split_tunneling.get_buffer()
     content = ""
     try:
         with open(SPLIT_TUNNEL_FILE) as f:
@@ -159,14 +167,10 @@ def load_configurations(interface):
         print("No split tunnel file presente")
         split_tunneling_buffer.set_text(content)
 
-
-    # To-do Purge Configurations
-    # Button to be red .set_property('background', 'red')
-
     pref_dialog.show()
 
 def populate_server_list(server_list_object):
-    """Populates the list with all servers.
+    """Populates Dashboard with servers
     """
     pull_server_data(force=True)
 

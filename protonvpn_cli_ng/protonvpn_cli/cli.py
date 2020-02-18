@@ -571,43 +571,49 @@ def set_dns_protection(gui_enabled=False, dns_settings=False):
     print("DNS Management updated.")
 
 
-def set_killswitch():
+def set_killswitch(gui_enabled=True, user_choice=False):
     """Enable or disable the Kill Switch."""
-
-    while True:
-        print()
-        print(
-            "The Kill Switch will block all network traffic\n"
-            "if the VPN connection drops unexpectedly.\n"
-            "\n"
-            "Please note that the Kill Switch assumes only one network interface being active.\n" # noqa
-            "\n"
-            "1) Enable Kill Switch (Block access to/from LAN)\n"
-            "2) Enable Kill Switch (Allow access to/from LAN)\n"
-            "3) Disable Kill Switch"
-        )
-        print()
-        user_choice = input(
-                "Please enter your choice or leave empty to quit: "
-        )
-        user_choice = user_choice.lower().strip()
-        if user_choice == "1":
-            killswitch = 1
-            break
-        elif user_choice == "2":
-            killswitch = 2
-            break
-        elif user_choice == "3":
-            killswitch = 0
-            break
-        elif user_choice == "":
-            print("Quitting configuration.")
-            sys.exit(0)
-        else:
+    
+    if gui_enabled == True:
+        killswitch = user_choice
+    else:
+        while True:
+            print()
             print(
-                "[!] Invalid choice. Please enter the number of your choice.\n"
+                "The Kill Switch will block all network traffic\n"
+                "if the VPN connection drops unexpectedly.\n"
+                "\n"
+                "Please note that the Kill Switch assumes only one network interface being active.\n" # noqa
+                "\n"
+                "1) Enable Kill Switch (Block access to/from LAN)\n"
+                "2) Enable Kill Switch (Allow access to/from LAN)\n"
+                "3) Disable Kill Switch"
             )
-            time.sleep(0.5)
+            print()
+            user_choice = input(
+                    "Please enter your choice or leave empty to quit: "
+            )
+            user_choice = user_choice.lower().strip()
+            # 1) Enable Kill Switch (Block access to/from LAN)
+            if user_choice == "1":
+                killswitch = 1
+                break
+            # 2) Enable Kill Switch (Allow access to/from LAN)
+            elif user_choice == "2":
+                killswitch = 2
+                break
+            # 3) Disable Kill Switch
+            elif user_choice == "3":
+                killswitch = 0
+                break
+            elif user_choice == "":
+                print("Quitting configuration.")
+                sys.exit(0)
+            else:
+                print(
+                    "[!] Invalid choice. Please enter the number of your choice.\n"
+                )
+                time.sleep(0.5)
 
     if killswitch and int(get_config_value("USER", "split_tunnel")):
         set_config_value("USER", "split_tunnel", 0)

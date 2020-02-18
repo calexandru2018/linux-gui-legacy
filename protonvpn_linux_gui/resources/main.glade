@@ -84,6 +84,28 @@ ProtonVPN Unofficial GUI: calexandru2018</property>
       </row>
     </data>
   </object>
+  <object class="GtkListStore" id="KillSwitchListStore">
+    <columns>
+      <!-- column-name ID -->
+      <column type="guint"/>
+      <!-- column-name KillSwitchSetting -->
+      <column type="gchararray"/>
+    </columns>
+    <data>
+      <row>
+        <col id="0">0</col>
+        <col id="1" translatable="yes">Disable Kill Switch</col>
+      </row>
+      <row>
+        <col id="0">1</col>
+        <col id="1" translatable="yes">Enable Kill Switch (Block access to/from LAN)</col>
+      </row>
+      <row>
+        <col id="0">2</col>
+        <col id="1" translatable="yes">Enable Kill Switch (Allow access to/from LAN)</col>
+      </row>
+    </data>
+  </object>
   <object class="GtkWindow" id="ConfigurationsWindow">
     <property name="width_request">680</property>
     <property name="height_request">720</property>
@@ -567,6 +589,75 @@ ProtonVPN Unofficial GUI: calexandru2018</property>
                   </packing>
                 </child>
                 <child>
+                  <object class="GtkGrid" id="purge_conf_grid">
+                    <property name="width_request">477</property>
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="margin_left">15</property>
+                    <property name="margin_right">15</property>
+                    <property name="margin_bottom">40</property>
+                    <property name="row_spacing">15</property>
+                    <property name="column_spacing">15</property>
+                    <property name="column_homogeneous">True</property>
+                    <child>
+                      <object class="GtkLabel">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="margin_top">10</property>
+                        <property name="margin_bottom">10</property>
+                        <property name="label" translatable="yes">Purge Configurations</property>
+                        <attributes>
+                          <attribute name="weight" value="bold"/>
+                          <attribute name="size" value="12000"/>
+                        </attributes>
+                      </object>
+                      <packing>
+                        <property name="left_attach">0</property>
+                        <property name="top_attach">0</property>
+                        <property name="width">4</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkLabel">
+                        <property name="can_focus">False</property>
+                        <property name="label" translatable="yes">[purge disclaimer message]</property>
+                      </object>
+                      <packing>
+                        <property name="left_attach">0</property>
+                        <property name="top_attach">1</property>
+                        <property name="width">4</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkButton" id="purge_configurations_button">
+                        <property name="label" translatable="yes">Purge Configurations</property>
+                        <property name="width_request">150</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="receives_default">True</property>
+                        <property name="halign">center</property>
+                        <property name="margin_top">10</property>
+                        <signal name="clicked" handler="purge_configurations_button_clicked" swapped="no"/>
+                      </object>
+                      <packing>
+                        <property name="left_attach">1</property>
+                        <property name="top_attach">2</property>
+                        <property name="width">2</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <placeholder/>
+                    </child>
+                    <child>
+                      <placeholder/>
+                    </child>
+                  </object>
+                  <packing>
+                    <property name="left_attach">0</property>
+                    <property name="top_attach">8</property>
+                  </packing>
+                </child>
+                <child>
                   <object class="GtkGrid" id="split_tunneling_grid">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
@@ -647,18 +738,16 @@ ProtonVPN Unofficial GUI: calexandru2018</property>
                   </object>
                   <packing>
                     <property name="left_attach">0</property>
-                    <property name="top_attach">5</property>
+                    <property name="top_attach">7</property>
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkGrid" id="purge_conf_grid">
-                    <property name="width_request">477</property>
+                  <object class="GtkGrid" id="dns_management_grid1">
+                    <property name="width_request">400</property>
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="margin_left">15</property>
-                    <property name="margin_right">15</property>
                     <property name="margin_bottom">40</property>
-                    <property name="row_spacing">15</property>
+                    <property name="row_spacing">5</property>
                     <property name="column_spacing">15</property>
                     <property name="column_homogeneous">True</property>
                     <child>
@@ -667,7 +756,7 @@ ProtonVPN Unofficial GUI: calexandru2018</property>
                         <property name="can_focus">False</property>
                         <property name="margin_top">10</property>
                         <property name="margin_bottom">10</property>
-                        <property name="label" translatable="yes">Purge Configurations</property>
+                        <property name="label" translatable="yes">Kill Switch</property>
                         <attributes>
                           <attribute name="weight" value="bold"/>
                           <attribute name="size" value="12000"/>
@@ -681,31 +770,67 @@ ProtonVPN Unofficial GUI: calexandru2018</property>
                     </child>
                     <child>
                       <object class="GtkLabel">
+                        <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="label" translatable="yes">[purge disclaimer message]</property>
+                        <property name="label" translatable="yes">Setting:</property>
                       </object>
                       <packing>
                         <property name="left_attach">0</property>
                         <property name="top_attach">1</property>
-                        <property name="width">4</property>
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkButton" id="purge_configurations_button">
-                        <property name="label" translatable="yes">Purge Configurations</property>
+                      <object class="GtkComboBox" id="killswitch_combobox">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="model">KillSwitchListStore</property>
+                        <property name="active">0</property>
+                        <property name="has_frame">False</property>
+                        <property name="entry_text_column">1</property>
+                        <property name="id_column">0</property>
+                        <signal name="changed" handler="killswitch_combobox_changed" swapped="no"/>
+                        <child>
+                          <object class="GtkCellRendererText"/>
+                          <attributes>
+                            <attribute name="text">1</attribute>
+                          </attributes>
+                        </child>
+                      </object>
+                      <packing>
+                        <property name="left_attach">1</property>
+                        <property name="top_attach">1</property>
+                        <property name="width">3</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkButton" id="update_killswtich_button">
+                        <property name="label" translatable="yes">Update Kill Switch</property>
                         <property name="width_request">150</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="receives_default">True</property>
                         <property name="halign">center</property>
+                        <property name="valign">end</property>
                         <property name="margin_top">10</property>
-                        <signal name="clicked" handler="purge_configurations_button_clicked" swapped="no"/>
+                        <signal name="clicked" handler="update_killswtich_button_clicked" swapped="no"/>
                       </object>
                       <packing>
                         <property name="left_attach">1</property>
-                        <property name="top_attach">2</property>
+                        <property name="top_attach">3</property>
                         <property name="width">2</property>
                       </packing>
+                    </child>
+                    <child>
+                      <placeholder/>
+                    </child>
+                    <child>
+                      <placeholder/>
+                    </child>
+                    <child>
+                      <placeholder/>
+                    </child>
+                    <child>
+                      <placeholder/>
                     </child>
                     <child>
                       <placeholder/>
@@ -716,8 +841,11 @@ ProtonVPN Unofficial GUI: calexandru2018</property>
                   </object>
                   <packing>
                     <property name="left_attach">0</property>
-                    <property name="top_attach">6</property>
+                    <property name="top_attach">5</property>
                   </packing>
+                </child>
+                <child>
+                  <placeholder/>
                 </child>
               </object>
             </child>
@@ -1646,32 +1774,16 @@ ProtonVPN Unofficial GUI: calexandru2018</property>
               </packing>
             </child>
             <child>
-              <object class="GtkToggleButton" id="killswitch_toggle_button">
-                <property name="label" translatable="yes">Kill Switch</property>
+              <object class="GtkEntry" id="server_filter_input">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
-                <property name="receives_default">True</property>
-                <property name="halign">center</property>
-                <signal name="activate" handler="killswitch_toggle_button_activated" swapped="no"/>
-                <signal name="clicked" handler="killswitch_toggle_button_clicked" swapped="no"/>
+                <property name="has_frame">False</property>
+                <property name="placeholder_text" translatable="yes">(server filter)</property>
               </object>
               <packing>
                 <property name="left_attach">1</property>
                 <property name="top_attach">0</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkToggleButton" id="start_on_boot_toggle_button">
-                <property name="label" translatable="yes">Start on Boot</property>
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="receives_default">True</property>
-                <property name="halign">center</property>
-                <signal name="toggled" handler="start_on_boot_toogle_button_clicked" swapped="no"/>
-              </object>
-              <packing>
-                <property name="left_attach">2</property>
-                <property name="top_attach">0</property>
+                <property name="width">2</property>
               </packing>
             </child>
           </object>
