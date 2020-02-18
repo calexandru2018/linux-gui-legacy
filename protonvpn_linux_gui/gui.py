@@ -42,6 +42,8 @@ class Handler:
 
     # Login BUTTON HANDLER
     def on_login_button_clicked(self, button):
+        """Button/Event handler to intialize user account. Calls populate_server_list(server_list_object) to populate server list.
+        """     
         login_window = self.interface.get_object("LoginWindow")
         username_field = self.interface.get_object('username_field').get_text()
         password_field = self.interface.get_object('password_field').get_text()
@@ -60,6 +62,8 @@ class Handler:
 
     # Dashboard BUTTON HANDLERS
     def connect_to_selected_server_button_clicked(self, button):
+        """Button/Event handler to connect to selected server
+        """     
         selected_server = ''
         protocol = get_config_value("USER", "default_protocol")
 
@@ -73,96 +77,75 @@ class Handler:
         update_labels_status(self.interface)
         
     def quick_connect_button_clicked(self, button):
-        """Connecte to the fastest server
+        """Button/Event handler to connect to the fastest server
         """
         protocol = get_config_value("USER", "default_protocol")
         connection.fastest(protocol, gui_enabled=True)
         update_labels_status(self.interface)
     
     def last_connect_button_clicked(self, button):
-        """Reconnects to previously connected server
+        """Button/Event handler to reconnect to previously connected server
         """        
         connection.reconnect()
         update_labels_status(self.interface)
 
     def random_connect_button_clicked(self, button):
-        """Connects to a random server
+        """Button/Event handler to connect to a random server
         """
         protocol = get_config_value("USER", "default_protocol")
         connection.random_c(protocol)
         update_labels_status(self.interface)
 
     def disconnect_button_clicked(self, button):
-        """Disconnects any existing connections
+        """Button/Event handler to disconnect any existing connections
         """
         connection.disconnect()
         update_labels_status(self.interface)
         
     def refresh_server_list_button_clicked(self, button):
-        """Button to refresh/repopulate server list
+        """Button/Event handler to refresh/repopulate server list
         """
         server_list_object = self.interface.get_object("ServerListStore")
         populate_server_list(server_list_object)
 
     def about_menu_button_clicked(self, button):
-        """Button to open About dialog
+        """Button /Event handlerto open About dialog
         """
         about_dialog = self.interface.get_object("AboutDialog")
         about_dialog.set_version(VERSION)
         about_dialog.show()
 
     def configuration_menu_button_clicked(self, button):
-        """Button to open Configurations window
+        """Button/Event handler to open Configurations window
         """
-        load_configurations(self.interface)
-
-    # Dashboard TOGGLE HANDLERS
-    def killswitch_toggle_button_clicked(self, toggle):
-        """Kill switch toggle button. To enable or disable killswitch.
-        """
-        print("To-do killswitch")
-        # print("CLICKED", toggle.get_active())
-
-        # Creates infinite loop, need to find a workaround
-        # if toggle.get_active() == True:
-        #     set_config_value("USER", "killswitch", 0)
-        #     toggle.set_active(False)
-        # else:
-        #     set_config_value("USER", "killswitch", 1)
-        #     toggle.set_active(True)
-        # Check if iptables are backed up; represents killswitch
-        # if os.path.isfile(os.path.join(CONFIG_DIR, "iptables.backup")):
-        #     killswitch_on = True
-        # else:
-        #     killswitch_on = False
-        # killswitch_status = "Enabled" if killswitch_on else "Disabled"
-        
-    def killswitch_toggle_button_activated(self, toggle):
-        """Testing feature.
-        """
-        print("ACTIVATED", toggle.get_active())
-       
-
-    def start_on_boot_toogle_button_clicked(self, checkbox):
-        """Start on boot toggle button. To enable or disable start on boot.
-        """
-        # try with a subprocess, if it fails then it is not systemd cat /proc/1/comm
-        print("To-do start on boot")
+        load_configurations(self.interface)       
 
     # To avoid getting the Preferences window destroyed and not being re-rendered again
     def ConfigurationsWindow_delete_event(self, object, event):
+        """On Delete handler is used to hide the window so it renders next time the dialog is called
+        
+        -Returns:Boolean
+        - It needs to return True, otherwise the content will not re-render after closing the dialog
+        """
         if object.get_property("visible") == True:
             object.hide()
             return True
     
     # To avoid getting the About window destroyed and not being re-rendered again
     def AboutDialog_delete_event(self, object, event):
+        """On Delete handler is used to hide the dialog and that it successfully  renders next time it is called
+        
+        -Returns:Boolean
+        - It needs to return True, otherwise the content will not re-render after closing the window
+        """
         if object.get_property("visible") == True:
             object.hide()
             return True
 
     # Preferences/Configuration menu HANDLERS
     def update_user_pass_button_clicked(self, button):
+        """Button/Event handler to update Username & Password
+        """
         username_field = self.interface.get_object("update_username_input")
         password_field = self.interface.get_object("update_password_input")
 
@@ -177,7 +160,7 @@ class Handler:
         password_field.set_text("")
 
     def dns_preferens_combobox_changed(self, button):
-        """Event handler that is triggered whenever combo box value is changed.
+        """Button/Event handler that is triggered whenever combo box value is changed.
         """
         # DNS ComboBox
         # 0 - Leak Protection Enabled
@@ -192,6 +175,8 @@ class Handler:
             dns_custom_input.set_property('sensitive', True)
 
     def update_dns_button_clicked(self, button):
+        """Button/Event handler to update DNS protection 
+        """
         dns_combobox = self.interface.get_object("dns_preferens_combobox")
 
         dns_leak_protection = 1
@@ -205,6 +190,8 @@ class Handler:
         cli.set_dns_protection(gui_enabled=True, dns_settings=(dns_leak_protection, custom_dns))
 
     def update_pvpn_plan_button_clicked(self, button):
+        """Button/Event handler to update ProtonVPN Plan  
+        """
         protonvpn_plan = 0
         protonvpn_plans = {
             1: self.interface.get_object("member_free_update_checkbox").get_active(),
@@ -221,11 +208,15 @@ class Handler:
         cli.set_protonvpn_tier(write=True, gui_enabled=True, tier=protonvpn_plan)        
 
     def update_def_protocol_button_clicked(self, button):
+        """Button/Event handler to update OpenVP Protocol  
+        """
         openvpn_protocol = 'tcp' if self.interface.get_object('protocol_tcp_update_checkbox').get_active() else 'udp'
         
         cli.set_default_protocol(write=True, gui_enabled=True, protoc=openvpn_protocol)
 
     def update_split_tunneling_button_clicked(self, button):
+        """Button/Event handler to update Split Tunneling 
+        """
         split_tunneling_buffer = self.interface.get_object("split_tunneling_textview").get_buffer()
 
         # Get text takes a start_iter, end_iter and the buffer itself as last param
@@ -244,6 +235,8 @@ class Handler:
 
 
     def purge_configurations_button_clicked(self, button):
+        """Button/Event handler to purge configurations
+        """
         # To-do: Confirm prior to allowing user to do this
         cli.purge_configuration(gui_enabled=True)
 
