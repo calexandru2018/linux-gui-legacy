@@ -21,7 +21,7 @@ def prepare_initilizer(username_field, password_field, interface):
     """
     # Get user specified protocol
     protonvpn_plan = ''
-    openvpn_protocol = 'tcp' if interface.get_object('protocol_tcp_checkbox').get_active() else 'udp'
+    openvpn_protocol = 'tcp' if interface.get_object('protocol_tcp_checkbox').get_active() == True else 'udp'
     
     if len(username_field) == 0 or len(password_field) == 0:
         return
