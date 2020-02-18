@@ -214,6 +214,12 @@ class Handler:
         
         cli.set_default_protocol(write=True, gui_enabled=True, protoc=openvpn_protocol)
 
+    # Kill Switch
+    def update_killswtich_button_clicked(self, button):
+        print("To-do update killswtich settings")
+        
+    # Start on boot
+
     def update_split_tunneling_button_clicked(self, button):
         """Button/Event handler to update Split Tunneling 
         """
