@@ -77,8 +77,9 @@ After connecting to a server, if you want to close the GUI and the terminal, the
 
 ### Not yet implemented:
 
-- Split Tunneling
-- Kill Switch
+- ~~Split Tunneling
+- ~~Kill Switch
+- ~~Filtering servers
 - Start on Boot (only for systemd OS's)
 
 ## GUI Layout
