@@ -23,7 +23,7 @@ from .utils import (
     prepare_initilizer,
     load_on_start,
     load_configurations,
-    start_on_boot
+    manage_autoconnect
 )
 
 from .constants import VERSION
@@ -63,7 +63,10 @@ class Handler:
 
     # Dashboard BUTTON HANDLERS
     def start_on_boot_button_clicked(self, input):
-        start_on_boot()
+        manage_autoconnect('enable')
+
+    def disable_on_boot_button_clicked(self, input):
+        manage_autoconnect('disable')
 
     def server_filter_input_key_release(self, object, event):
         user_filter_input = object.get_text()
