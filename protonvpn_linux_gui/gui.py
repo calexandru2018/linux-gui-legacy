@@ -227,7 +227,10 @@ class Handler:
                 protonvpn_plan = int(k)
                 break
             
-        cli.set_protonvpn_tier(write=True, gui_enabled=True, tier=protonvpn_plan)        
+        cli.set_protonvpn_tier(write=True, gui_enabled=True, tier=protonvpn_plan)
+        print("[!]Refreshing server list")
+        load_on_start(self.interface)        
+        print("[!]Done")
 
     def update_def_protocol_button_clicked(self, button):
         """Button/Event handler to update OpenVP Protocol  
