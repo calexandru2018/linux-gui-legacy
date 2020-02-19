@@ -61,6 +61,29 @@ class Handler:
         user_window.show()
 
     # Dashboard BUTTON HANDLERS
+    def server_filter_input_changed(self, input):
+        print("text changed")
+    def server_filter_input_key_release(self, object, event):
+        user_filter_input = object.get_text()
+        model = self.interface.get_object("ServerListStore")
+        tree = self.interface.get_object("ServerList")
+
+        n_filter = model.filter_new()
+        n_filter.set_visible_func(self.visible_cb, data=user_filter_input)
+        tree.set_model(n_filter)
+        n_filter.refilter()
+
+    def visible_cb(self, model, iter, data=None):
+        treeview = self.interface.get_object("ServerList")
+        
+        for col in range(0, treeview.get_n_columns()):
+            value = model.get_value(iter, col).lower();
+            print("data == country", data == value)
+            if data.lower() in value.lower():
+                return True
+            else:
+                return False
+
     def connect_to_selected_server_button_clicked(self, button):
         """Button/Event handler to connect to selected server
         """     
