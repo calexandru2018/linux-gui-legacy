@@ -220,6 +220,7 @@ def manage_autoconnect(mode):
 
         if not enable_autoconnect():
             print("[!]Unable to enable autoconnect")
+            return
 
         print("Autoconnect on boot enabled")
         
@@ -227,6 +228,7 @@ def manage_autoconnect(mode):
 
         if not disable_autoconnect():
             print("[!]Could not disable autoconnect")
+            return
 
         print("Autoconnect on boot disabled")
           
@@ -261,6 +263,9 @@ def disable_autoconnect():
 def find_cli():
     """Find intalled CLI and returns it's path
     """
+    cli_ng_err = ''
+    custom_cli_err = ''
+
     try:
         protonvpn_path = subprocess.Popen(['sudo', 'which', 'protonvpn'],  stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         protonvpn_path, cli_ng_err = protonvpn_path.communicate()
@@ -276,11 +281,11 @@ def find_cli():
             print("[!]custom protonvpn-cli is not found.")
 
     if not len(custom_cli_err) == 0:
-        print("[!]Could not find any CLI's to use for boot.")
+        print("In find_cli: custom_cli_err")
         return False
 
     # to remove \n
-    return protonvpn_path[:-1]
+    return protonvpn_path[:-1].decode()
         
 def generate_template(template):
     """Generates service file
@@ -295,7 +300,7 @@ def generate_template(template):
         return False
 
     if not len(err) == 0:
-        print("[!]Some error occurred during template generation.")
+        print("In generate_template: ", err)
         return False
     
     return True
@@ -310,9 +315,10 @@ def remove_template():
         print("[!]Could not remove service file.")
         return False  
 
-    if not err(err) == 0:
-        print("Something else happend.")
-        return False
+    # Gives error if file does not exist, should check first if file exists
+    # if not len(err) == 0:
+    #     print("In remove_template: ", err)
+    #     return False
 
     return True
 
@@ -326,7 +332,8 @@ def enable_daemon():
         print("[!]Could not reload daemon.")
         return False
 
-    if len(reload_err) == 0:
+    if not len(reload_err) == 0:
+        print("In enable_daemon (reload): ", reload_err)
         return False
 
     try:
@@ -336,8 +343,10 @@ def enable_daemon():
         print("[!]Could not enable daemon.")
         return False
 
-    if len(enable_err) == 0:
-        return False
+    # Gives error since this throws message that a symlink is created, needs to be handled
+    # if not len(enable_err) == 0:
+    #     print("In enable_daemon (enable): ", enable_err)
+    #     return False
 
     return True
     
@@ -351,8 +360,10 @@ def stop_and_disable_daemon():
         print("[!]Could not stop deamon. Either not running or an error occurred.")
         return False
 
-    if len(stop_err) == 0:
-        return False
+    # Gives error if the service is not running
+    # if not len(stop_err) == 0:
+    #     print("In stop_and_disable_daemon (stop): ", stop_err)
+    #     return False
 
     try:
         disable_daemon = subprocess.Popen(['sudo', 'systemctl', 'disable' ,'protonvpn-autoconnect'],  stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -361,8 +372,10 @@ def stop_and_disable_daemon():
         print("[!]Could not disable daemon. Either it was already disabled or an error occurred.")
         return False
 
-    if len(disable_err) == 0:
-        return False
+    # Gives error if service is not enabled
+    # if not len(disable_err) == 0:
+    #     print("In stop_and_disable_daemon (disable): ", disable_err)
+    #     return False
 
     return True
 
