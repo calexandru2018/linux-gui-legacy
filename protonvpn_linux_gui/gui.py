@@ -66,37 +66,23 @@ class Handler:
     def server_filter_input_key_release(self, object, event):
         user_filter_input = object.get_text()
         model = self.interface.get_object("ServerListStore")
+        tree = self.interface.get_object("ServerList")
 
         n_filter = model.filter_new()
-
         n_filter.set_visible_func(self.visible_cb, data=user_filter_input)
-
+        tree.set_model(n_filter)
         n_filter.refilter()
 
     def visible_cb(self, model, iter, data=None):
         treeview = self.interface.get_object("ServerList")
-        search_query = data
-        i = 0
-        # active_category = self.catcombo.get_active()
-        # print(data.lower() in model[iter][0].lower())
-        # for str in model[iter]:
-        #     if data.lower() in str.lower():
-        #         print(str)
-        # return data.lower() in model[iter][2].lower()
-        # for col in range(0, treeview.get_n_columns()):
-        #     value = model.get_value(iter, col).lower()
-        #     if data in value:
-        #         print(value, i)
-        #         i += 1
-        country = model.get_value(iter, 0).lower();
-        if data == country:
-            return True;
-        else:
-            return False;
-            # print(model[col][0], model[col][1], model[col][2], i)
-            # i += 1
-            # if data in data: 
-            #     print(value)
+        
+        for col in range(0, treeview.get_n_columns()):
+            value = model.get_value(iter, col).lower();
+            print("data == country", data == value)
+            if data.lower() in value.lower():
+                return True
+            else:
+                return False
 
     def connect_to_selected_server_button_clicked(self, button):
         """Button/Event handler to connect to selected server
