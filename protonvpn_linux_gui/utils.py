@@ -212,21 +212,26 @@ def populate_server_list(server_list_object):
 
             server_list_object.append([country, servername, tier, load, feature])
 
-def autoconnect_manager(mode):
+def manage_autoconnect(mode):
     """Manages autoconnect functionality
     """
     # Check if protonvpn-cli-ng is installed, and return the path to a CLI
     if mode == 'enable':
+
         if not enable_autoconnect():
-            print("[!]Unable to enable start on boot")
-            return False
+            print("[!]Unable to enable autoconnect")
+
         print("Autoconnect on boot enabled")
-        return True
+        
     elif mode == 'disable':
-        print("To-do")
+
+        if not disable_autoconnect():
+            print("[!]Could not disable autoconnect")
+
+        print("Autoconnect on boot disabled")
           
 def enable_autoconnect():
-    """Enables autoconnect, by calling on different functions
+    """Enables autoconnect
     """
     protonvpn_path = find_cli()
     command = " connect -f"
@@ -242,24 +247,35 @@ def enable_autoconnect():
 
     return enable_daemon() 
 
+def disable_autoconnect():
+    """Disables autoconnect
+    """
+
+    if not stop_and_disable_daemon():
+        return False
+    elif not remove_template():
+        return False
+    else:
+        return True
+
 def find_cli():
     """Find intalled CLI and returns it's path
     """
     try:
         protonvpn_path = subprocess.Popen(['sudo', 'which', 'protonvpn'],  stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        protonvpn_path, err = protonvpn_path.communicate()
+        protonvpn_path, cli_ng_err = protonvpn_path.communicate()
     except:
         print("[!]protonvpn-cli-ng is not installed.")
 
     # If protonvpn-cli-ng is not installed then attempt to get the path of 'modified protonvpn-cli'
-    if not len(err) == 0:
+    if not len(cli_ng_err) == 0:
         try:
             protonvpn_path = subprocess.Popen(['sudo', 'which', 'custom-pvpn-cli'],  stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            protonvpn_path, err = protonvpn_path.communicate()
+            protonvpn_path, custom_cli_err = protonvpn_path.communicate()
         except:
             print("[!]custom protonvpn-cli is not found.")
 
-    if not len(err) == 0:
+    if not len(custom_cli_err) == 0:
         print("[!]Could not find any CLI's to use for boot.")
         return False
 
@@ -272,8 +288,8 @@ def generate_template(template):
     generate_service_command = "cat > {0} <<EOF {1}\nEOF".format(PATH_AUTOCONNECT_SERVICE, template)
 
     try:
-        out = subprocess.Popen(["sudo", "bash", "-c", generate_service_command], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        output, err = out.communicate()
+        resp = subprocess.Popen(["sudo", "bash", "-c", generate_service_command], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        _, err = resp.communicate()
     except:
         print("[!]Could not find create boot file.")
         return False
@@ -282,6 +298,22 @@ def generate_template(template):
         print("[!]Some error occurred during template generation.")
         return False
     
+    return True
+
+def remove_template():
+    """Remove service file from /etc/systemd/system/
+    """
+    try:
+        resp = subprocess.Popen(["sudo", "rm", PATH_AUTOCONNECT_SERVICE], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        _, err = resp.communicate()
+    except:
+        print("[!]Could not remove service file.")
+        return False  
+
+    if not err(err) == 0:
+        print("Something else happend.")
+        return False
+
     return True
 
 def enable_daemon():
@@ -299,14 +331,40 @@ def enable_daemon():
 
     try:
         enable_daemon = subprocess.Popen(['sudo', 'systemctl', 'enable' ,'protonvpn-autoconnect'],  stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        _, daemon_err = enable_daemon.communicate()
+        _, enable_err = enable_daemon.communicate()
     except:
         print("[!]Could not enable daemon.")
         return False
 
-    if len(daemon_err) == 0:
+    if len(enable_err) == 0:
         return False
+
+    return True
     
+def stop_and_disable_daemon():
+    """Stops the autoconnect service and disables it
+    """
+    try:
+        stop_daemon = subprocess.Popen(['sudo', 'systemctl', 'stop' ,'protonvpn-autoconnect'],  stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        _, stop_err = stop_daemon.communicate()
+    except:
+        print("[!]Could not stop deamon. Either not running or an error occurred.")
+        return False
+
+    if len(stop_err) == 0:
+        return False
+
+    try:
+        disable_daemon = subprocess.Popen(['sudo', 'systemctl', 'disable' ,'protonvpn-autoconnect'],  stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        _, disable_err = disable_daemon.communicate()
+    except:
+        print("[!]Could not disable daemon. Either it was already disabled or an error occurred.")
+        return False
+
+    if len(disable_err) == 0:
+        return False
+
+    return True
 
     
 
