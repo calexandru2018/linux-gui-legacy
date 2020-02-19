@@ -20,11 +20,15 @@ setup(
     packages=[
         "protonvpn_linux_gui",
         "protonvpn_linux_gui.resources",
-        "protonvpn_cli_ng",
-        "protonvpn_cli_ng.protonvpn_cli"
+        "protonvpn_linux_gui.resources.flags",
+        "custom_pvpn_cli_ng",
+        "custom_pvpn_cli_ng.protonvpn_cli"
         ],
     entry_points={
-            "console_scripts": ["protonvpn-gui = protonvpn_linux_gui.gui:initialize_gui"]
+            "console_scripts": [
+                "protonvpn-gui = protonvpn_linux_gui.gui:initialize_gui",
+                "custom-pvpn-cli = custom_pvpn_cli_ng.protonvpn_cli.cli:main"
+            ]
         },
     include_package_data=True,
     version=VERSION,
