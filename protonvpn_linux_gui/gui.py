@@ -78,11 +78,10 @@ class Handler:
         
         for col in range(0, treeview.get_n_columns()):
             value = model.get_value(iter, col).lower();
-            print("data == country", data == value)
             if data.lower() in value.lower():
                 return True
             else:
-                return False
+                continue
 
     def connect_to_selected_server_button_clicked(self, button):
         """Button/Event handler to connect to selected server
