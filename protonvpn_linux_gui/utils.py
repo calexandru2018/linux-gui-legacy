@@ -175,7 +175,7 @@ def populate_server_list(server_list_object):
     pull_server_data(force=True)
 
     features = {0: "Normal", 1: "Secure-Core", 2: "Tor", 4: "P2P"}
-    server_tiers = {0: "F", 1: "B", 2: "P"}
+    server_tiers = {0: "Free", 1: "Basic", 2: "Plus/Visionary"}
 
     servers = get_servers()
 

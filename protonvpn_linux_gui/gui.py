@@ -78,11 +78,10 @@ class Handler:
         
         for col in range(0, treeview.get_n_columns()):
             value = model.get_value(iter, col).lower();
-            print("data == country", data == value)
             if data.lower() in value.lower():
                 return True
             else:
-                return False
+                continue
 
     def connect_to_selected_server_button_clicked(self, button):
         """Button/Event handler to connect to selected server
@@ -228,7 +227,10 @@ class Handler:
                 protonvpn_plan = int(k)
                 break
             
-        cli.set_protonvpn_tier(write=True, gui_enabled=True, tier=protonvpn_plan)        
+        cli.set_protonvpn_tier(write=True, gui_enabled=True, tier=protonvpn_plan)
+        print("[!]Refreshing server list")
+        load_on_start(self.interface)        
+        print("[!]Done")
 
     def update_def_protocol_button_clicked(self, button):
         """Button/Event handler to update OpenVP Protocol  
