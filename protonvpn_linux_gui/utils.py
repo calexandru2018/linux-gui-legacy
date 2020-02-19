@@ -1,4 +1,9 @@
 
+import re
+import shutil
+import fileinput
+import subprocess
+
 from custom_pvpn_cli_ng.protonvpn_cli.utils import (
     pull_server_data,
     get_servers,
@@ -12,6 +17,8 @@ from custom_pvpn_cli_ng.protonvpn_cli.utils import (
 )
 
 from custom_pvpn_cli_ng.protonvpn_cli.constants import SPLIT_TUNNEL_FILE
+
+from .constants import PATH_AUTOCONNECT_SERVICE, TEMPLATE
 
 def prepare_initilizer(username_field, password_field, interface):
     """Collects and prepares user input from login window.
@@ -204,3 +211,103 @@ def populate_server_list(server_list_object):
             tier = server_tiers[get_server_value(servername, "Tier", servers)]
 
             server_list_object.append([country, servername, tier, load, feature])
+
+def autoconnect_manager(mode):
+    """Manages autoconnect functionality
+    """
+    # Check if protonvpn-cli-ng is installed, and return the path to a CLI
+    if mode == 'enable':
+        if not enable_autoconnect():
+            print("[!]Unable to enable start on boot")
+            return False
+        print("Autoconnect on boot enabled")
+        return True
+    elif mode == 'disable':
+        print("To-do")
+          
+def enable_autoconnect():
+    """Enables autoconnect, by calling on different functions
+    """
+    protonvpn_path = find_cli()
+    command = " connect -f"
+    if not protonvpn_path:
+        return False
+
+    # Fill template with CLI path and username
+    with_cli_path = TEMPLATE.replace("PATH", (protonvpn_path + command))
+    template = with_cli_path.replace("SUDO_USER", get_config_value("USER", "username"))
+    
+    if not generate_template(template):
+        return False
+
+    return enable_daemon() 
+
+def find_cli():
+    """Find intalled CLI and returns it's path
+    """
+    try:
+        protonvpn_path = subprocess.Popen(['sudo', 'which', 'protonvpn'],  stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        protonvpn_path, err = protonvpn_path.communicate()
+    except:
+        print("[!]protonvpn-cli-ng is not installed.")
+
+    # If protonvpn-cli-ng is not installed then attempt to get the path of 'modified protonvpn-cli'
+    if not len(err) == 0:
+        try:
+            protonvpn_path = subprocess.Popen(['sudo', 'which', 'custom-pvpn-cli'],  stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            protonvpn_path, err = protonvpn_path.communicate()
+        except:
+            print("[!]custom protonvpn-cli is not found.")
+
+    if not len(err) == 0:
+        print("[!]Could not find any CLI's to use for boot.")
+        return False
+
+    # to remove \n
+    return protonvpn_path[:-1]
+        
+def generate_template(template):
+    """Generates service file
+    """
+    generate_service_command = "cat > {0} <<EOF {1}\nEOF".format(PATH_AUTOCONNECT_SERVICE, template)
+
+    try:
+        out = subprocess.Popen(["sudo", "bash", "-c", generate_service_command], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        output, err = out.communicate()
+    except:
+        print("[!]Could not find create boot file.")
+        return False
+
+    if not len(err) == 0:
+        print("[!]Some error occurred during template generation.")
+        return False
+    
+    return True
+
+def enable_daemon():
+    """Reloads daemon and enables the autoconnect service
+    """
+    try:
+        reload_daemon = subprocess.Popen(['sudo', 'systemctl', 'daemon-reload'],  stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        _, reload_err = reload_daemon.communicate()
+    except:
+        print("[!]Could not reload daemon.")
+        return False
+
+    if len(reload_err) == 0:
+        return False
+
+    try:
+        enable_daemon = subprocess.Popen(['sudo', 'systemctl', 'enable' ,'protonvpn-autoconnect'],  stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        _, daemon_err = enable_daemon.communicate()
+    except:
+        print("[!]Could not enable daemon.")
+        return False
+
+    if len(daemon_err) == 0:
+        return False
+    
+
+    
+
+    

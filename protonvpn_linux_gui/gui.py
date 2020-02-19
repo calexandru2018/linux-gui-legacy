@@ -22,7 +22,8 @@ from .utils import (
     populate_server_list,
     prepare_initilizer,
     load_on_start,
-    load_configurations
+    load_configurations,
+    start_on_boot
 )
 
 from .constants import VERSION
@@ -61,8 +62,9 @@ class Handler:
         user_window.show()
 
     # Dashboard BUTTON HANDLERS
-    def server_filter_input_changed(self, input):
-        print("text changed")
+    def start_on_boot_button_clicked(self, input):
+        start_on_boot(self.interface)
+
     def server_filter_input_key_release(self, object, event):
         user_filter_input = object.get_text()
         model = self.interface.get_object("ServerListStore")
@@ -140,8 +142,8 @@ class Handler:
     def configuration_menu_button_clicked(self, button):
         """Button/Event handler to open Configurations window
         """
-        load_configurations(self.interface)       
-
+        load_configurations(self.interface)
+        
     # To avoid getting the Preferences window destroyed and not being re-rendered again
     def ConfigurationsWindow_delete_event(self, object, event):
         """On Delete handler is used to hide the window so it renders next time the dialog is called
