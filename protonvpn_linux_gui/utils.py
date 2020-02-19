@@ -1,5 +1,5 @@
 
-from protonvpn_cli_ng.protonvpn_cli.utils import (
+from custom_pvpn_cli_ng.protonvpn_cli.utils import (
     pull_server_data,
     get_servers,
     get_country_name,
@@ -11,7 +11,7 @@ from protonvpn_cli_ng.protonvpn_cli.utils import (
     get_ip_info
 )
 
-from protonvpn_cli_ng.protonvpn_cli.constants import SPLIT_TUNNEL_FILE
+from custom_pvpn_cli_ng.protonvpn_cli.constants import SPLIT_TUNNEL_FILE
 
 def prepare_initilizer(username_field, password_field, interface):
     """Collects and prepares user input from login window.

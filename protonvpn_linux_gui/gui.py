@@ -5,12 +5,12 @@ import sys
 import pathlib
 
 # ProtonVPN base CLI package import
-from protonvpn_cli_ng.protonvpn_cli.constants import (USER, CONFIG_FILE, CONFIG_DIR, VERSION)
-from protonvpn_cli_ng.protonvpn_cli import cli
-from protonvpn_cli_ng.protonvpn_cli import connection
+from custom_pvpn_cli_ng.protonvpn_cli.constants import (USER, CONFIG_FILE, CONFIG_DIR, VERSION)
+from custom_pvpn_cli_ng.protonvpn_cli import cli
+from custom_pvpn_cli_ng.protonvpn_cli import connection
 
 # ProtonVPN helper funcitons
-from protonvpn_cli_ng.protonvpn_cli.utils import (
+from custom_pvpn_cli_ng.protonvpn_cli.utils import (
     get_config_value,
     set_config_value,
     check_root,
