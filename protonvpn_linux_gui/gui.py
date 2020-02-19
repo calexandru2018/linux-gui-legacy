@@ -63,7 +63,7 @@ class Handler:
 
     # Dashboard BUTTON HANDLERS
     def start_on_boot_button_clicked(self, input):
-        start_on_boot(self.interface)
+        start_on_boot()
 
     def server_filter_input_key_release(self, object, event):
         user_filter_input = object.get_text()
