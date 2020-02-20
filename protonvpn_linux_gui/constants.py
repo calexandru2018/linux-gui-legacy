@@ -1,4 +1,4 @@
-VERSION = "1.1.35"
+VERSION = "1.1.5"
 PATH_AUTOCONNECT_SERVICE = "/etc/systemd/system/protonvpn-autoconnect.service"
 TEMPLATE ="""
 [Unit]
