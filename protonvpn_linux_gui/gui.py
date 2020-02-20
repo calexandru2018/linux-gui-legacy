@@ -5,12 +5,12 @@ import sys
 import pathlib
 
 # ProtonVPN base CLI package import
-from protonvpn_cli_ng.protonvpn_cli.constants import (USER, CONFIG_FILE, CONFIG_DIR, VERSION)
-from protonvpn_cli_ng.protonvpn_cli import cli
-from protonvpn_cli_ng.protonvpn_cli import connection
+from custom_pvpn_cli_ng.protonvpn_cli.constants import (USER, CONFIG_FILE, CONFIG_DIR, VERSION)
+from custom_pvpn_cli_ng.protonvpn_cli import cli
+from custom_pvpn_cli_ng.protonvpn_cli import connection
 
 # ProtonVPN helper funcitons
-from protonvpn_cli_ng.protonvpn_cli.utils import (
+from custom_pvpn_cli_ng.protonvpn_cli.utils import (
     get_config_value,
     set_config_value,
     check_root,
@@ -22,7 +22,8 @@ from .utils import (
     populate_server_list,
     prepare_initilizer,
     load_on_start,
-    load_configurations
+    load_configurations,
+    manage_autoconnect
 )
 
 from .constants import VERSION
@@ -61,19 +62,30 @@ class Handler:
         user_window.show()
 
     # Dashboard BUTTON HANDLERS
-    def server_filter_input_changed(self, input):
-        print("text changed")
     def server_filter_input_key_release(self, object, event):
-        user_filter_input = object.get_text()
-        model = self.interface.get_object("ServerListStore")
-        tree = self.interface.get_object("ServerList")
+        """Event handler, to filter servers after each key release
+        """
+        user_filter_by = object.get_text()
+        server_list_object = self.interface.get_object("ServerListStore")
+        tree_view_object = self.interface.get_object("ServerList")
 
-        n_filter = model.filter_new()
-        n_filter.set_visible_func(self.visible_cb, data=user_filter_input)
-        tree.set_model(n_filter)
+        # Creates a new filter from a ListStore
+        n_filter = server_list_object.filter_new()
+
+        # set_visible_func:
+        # @first_param: filter function
+        # @ seconde_param: input to filter by
+        n_filter.set_visible_func(self.column_filter, data=user_filter_by)
+        
+        # Apply the filter model to a TreeView
+        tree_view_object.set_model(n_filter)
+
+        # Updates the ListStore model
         n_filter.refilter()
 
-    def visible_cb(self, model, iter, data=None):
+    def column_filter(self, model, iter, data=None):
+        """Filter by columns and returns the corresponding rows
+        """
         treeview = self.interface.get_object("ServerList")
         
         for col in range(0, treeview.get_n_columns()):
@@ -140,8 +152,8 @@ class Handler:
     def configuration_menu_button_clicked(self, button):
         """Button/Event handler to open Configurations window
         """
-        load_configurations(self.interface)       
-
+        load_configurations(self.interface)
+        
     # To avoid getting the Preferences window destroyed and not being re-rendered again
     def ConfigurationsWindow_delete_event(self, object, event):
         """On Delete handler is used to hide the window so it renders next time the dialog is called
@@ -241,7 +253,9 @@ class Handler:
 
     # Kill Switch
     def killswitch_combobox_changed(self, combobox):
-
+        """Event handler that reactes when the combobox value changes
+        - If killswitch is enabled, then it disables the split tunneling input and button
+        """
         if combobox.get_active() == 0:
             self.interface.get_object("split_tunneling_textview").set_property('sensitive', True)
             self.interface.get_object("update_split_tunneling_button").set_property('sensitive', True)
@@ -250,6 +264,8 @@ class Handler:
             self.interface.get_object("update_split_tunneling_button").set_property('sensitive', False)
 
     def update_killswtich_button_clicked(self, button):
+        """Button/Event handler to update Killswitch  
+        """
         ks_combobox = self.interface.get_object("killswitch_combobox")
 
         cli.set_killswitch(gui_enabled=True, user_choice=ks_combobox.get_active())

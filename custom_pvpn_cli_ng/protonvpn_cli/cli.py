@@ -213,7 +213,6 @@ def init_cli(gui_enabled=False, gui_user_input=False):
 
     # Check if GUI was enabled and get the data from GUI
     if gui_enabled == True:
-        print(gui_user_input)
         ovpn_username = gui_user_input['username']
         ovpn_password = gui_user_input['password']
         user_tier = gui_user_input['protonvpn_plan']

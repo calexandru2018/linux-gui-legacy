@@ -1,3 +1,4 @@
 include protonvpn_linux_gui/resources/main.glade 
 include protonvpn_linux_gui/resources/protonvpn_logo.png 
 include protonvpn_linux_gui/resources/protonvpn_logo_full.png
+include protonvpn_linux_gui/resources/flags/*.png
