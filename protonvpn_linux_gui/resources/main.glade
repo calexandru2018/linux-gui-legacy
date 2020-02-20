@@ -1375,38 +1375,6 @@ ProtonVPN Unofficial GUI: calexandru2018</property>
                 <property name="width">4</property>
               </packing>
             </child>
-            <child>
-              <object class="GtkButton" id="start_on_boot_button">
-                <property name="label" translatable="yes">Start on Boot</property>
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="receives_default">True</property>
-                <signal name="clicked" handler="start_on_boot_button_clicked" swapped="no"/>
-              </object>
-              <packing>
-                <property name="left_attach">1</property>
-                <property name="top_attach">1</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkButton" id="disable_on_boot_button">
-                <property name="label" translatable="yes">Disable start on boot</property>
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="receives_default">True</property>
-                <signal name="clicked" handler="disable_on_boot_button_clicked" swapped="no"/>
-              </object>
-              <packing>
-                <property name="left_attach">2</property>
-                <property name="top_attach">1</property>
-              </packing>
-            </child>
-            <child>
-              <placeholder/>
-            </child>
-            <child>
-              <placeholder/>
-            </child>
           </object>
           <packing>
             <property name="expand">False</property>

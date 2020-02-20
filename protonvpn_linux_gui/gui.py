@@ -62,12 +62,6 @@ class Handler:
         user_window.show()
 
     # Dashboard BUTTON HANDLERS
-    def start_on_boot_button_clicked(self, input):
-        manage_autoconnect('enable')
-
-    def disable_on_boot_button_clicked(self, input):
-        manage_autoconnect('disable')
-
     def server_filter_input_key_release(self, object, event):
         user_filter_input = object.get_text()
         model = self.interface.get_object("ServerListStore")
