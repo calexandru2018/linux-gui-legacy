@@ -1618,7 +1618,6 @@ ProtonVPN Unofficial GUI: calexandru2018</property>
                     <property name="can_focus">False</property>
                     <property name="halign">start</property>
                     <property name="hexpand">True</property>
-                    <property name="label" translatable="yes">Custom</property>
                     <property name="justify">fill</property>
                     <attributes>
                       <attribute name="weight" value="ultrabold"/>
