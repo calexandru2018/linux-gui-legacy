@@ -14,8 +14,9 @@ from custom_pvpn_cli_ng.protonvpn_cli.utils import (
     check_root,
     is_connected,
     get_ip_info,
-    status
 )
+
+from custom_pvpn_cli_ng.protonvpn_cli.connection import status
 
 from custom_pvpn_cli_ng.protonvpn_cli.constants import SPLIT_TUNNEL_FILE
 
