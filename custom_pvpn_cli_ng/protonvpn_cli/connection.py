@@ -348,7 +348,7 @@ def disconnect(passed=False):
         logger.debug("No connection found")
 
 
-def status():
+def status(gui_enabled=False):
     """
     Display the current VPN status
 

@@ -13,7 +13,8 @@ from custom_pvpn_cli_ng.protonvpn_cli.utils import (
     set_config_value,
     check_root,
     is_connected,
-    get_ip_info
+    get_ip_info,
+    status
 )
 
 from custom_pvpn_cli_ng.protonvpn_cli.constants import SPLIT_TUNNEL_FILE
@@ -73,12 +74,14 @@ def update_labels_status(interface):
     ip_label = interface.get_object("ip_label")
     country_label = interface.get_object("country_label")
 
+    # Under development
+    # vpn_status = status(gui_enabled=True)    
 
     # Check VPN status
     if is_connected() != True:
-        vpn_status_label.set_markup('<span>Not Running</span>')
+        vpn_status_label.set_markup('<span>Disconnected</span>')
     else:
-        vpn_status_label.set_markup('<span foreground="#4E9A06">Running</span>')
+        vpn_status_label.set_markup('<span foreground="#4E9A06">Connected</span>')
     
     # Check DNS status
     dns_enabled = get_config_value("USER", "dns_leak_protection")
