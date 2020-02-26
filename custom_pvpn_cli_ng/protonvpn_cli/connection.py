@@ -162,7 +162,9 @@ def fastest(protocol=None, gui_enabled=False):
             server_pool.append(server)
 
     fastest_server = get_fastest_server(server_pool)
-    openvpn_connect(fastest_server, protocol, gui_enabled)
+    if gui_enabled:
+        return openvpn_connect(fastest_server, protocol, gui_enabled)
+    openvpn_connect(fastest_server, protocol)
 
 
 def country_f(country_code, protocol=None):
@@ -348,7 +350,7 @@ def disconnect(passed=False):
         logger.debug("No connection found")
 
 
-def status():
+def status(gui_enabled=False):
     """
     Display the current VPN status
 

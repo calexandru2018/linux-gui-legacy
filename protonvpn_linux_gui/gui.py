@@ -3,6 +3,8 @@ import os
 import re
 import sys
 import pathlib
+from threading import Thread
+import time
 
 # ProtonVPN base CLI package import
 from custom_pvpn_cli_ng.protonvpn_cli.constants import (USER, CONFIG_FILE, CONFIG_DIR, VERSION)
@@ -110,6 +112,9 @@ class Handler:
         connection.openvpn_connect(selected_server, protocol)
         update_labels_status(self.interface)
         
+    # def log_result(self, res):
+    #     return res
+
     def quick_connect_button_clicked(self, button):
         """Button/Event handler to connect to the fastest server
         """
@@ -138,9 +143,11 @@ class Handler:
         
     def refresh_server_list_button_clicked(self, button):
         """Button/Event handler to refresh/repopulate server list
+        - At the moment, will also refresh the Dashboard information, this will be fixed in the future.
         """
         server_list_object = self.interface.get_object("ServerListStore")
         populate_server_list(server_list_object)
+        update_labels_status(self.interface)
 
     def about_menu_button_clicked(self, button):
         """Button /Event handlerto open About dialog
@@ -299,27 +306,20 @@ class Handler:
         cli.purge_configuration(gui_enabled=True)
 
 class initialize_gui:
-    """Initializes a GUI
-    -----
-    The GUI only makes external calls to the cli commands.
-    -----
-    Will request for the same data protonvpn init to initialize a user:
-    -Username
-    -Password
-    -Plan
-    -Protocol
-
-    There are two ways of starting this GUI, either by reversing the commented code so that it can be launched as part of the CLI: 
+    """Initializes the GUI 
     ---
-    -protonvpn gui:
-        This will start from within the main CLI menu. Gui is invoked through cli()
+    If user has not initialized a profile, the GUI will ask for the following data:
+    - Username
+    - Password
+    - Plan
+    - Protocol
 
-    Or leave it be as it is, and configuration is setup during installation with "pip3 install -e .", this way it can be launched as a separte command from the usual CLI:
-    -protonvpn-gui:
-        This will start the GUI without invoking cli()
+    sudo protonvpn-gui
+    - Will start the GUI without invoking cli()
     """
     def __init__(self):
         check_root()
+
         interface = Gtk.Builder()
 
         posixPath = pathlib.PurePath(pathlib.Path(__file__).parent.absolute().joinpath("resources/main.glade"))
@@ -338,6 +338,7 @@ class initialize_gui:
             window = interface.get_object("LoginWindow")
         else:
             window = interface.get_object("Dashboard")
+            window.connect("destroy", Gtk.main_quit)
             load_on_start(interface)
 
         window.show()
