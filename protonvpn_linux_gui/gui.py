@@ -143,9 +143,11 @@ class Handler:
         
     def refresh_server_list_button_clicked(self, button):
         """Button/Event handler to refresh/repopulate server list
+        - At the moment, will also refresh the Dashboard information, this will be fixed in the future.
         """
         server_list_object = self.interface.get_object("ServerListStore")
         populate_server_list(server_list_object)
+        update_labels_status(self.interface)
 
     def about_menu_button_clicked(self, button):
         """Button /Event handlerto open About dialog
