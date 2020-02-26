@@ -304,24 +304,16 @@ class Handler:
         cli.purge_configuration(gui_enabled=True)
 
 class initialize_gui:
-    """Initializes a GUI
-    -----
-    The GUI only makes external calls to the cli commands.
-    -----
-    Will request for the same data protonvpn init to initialize a user:
-    -Username
-    -Password
-    -Plan
-    -Protocol
-
-    There are two ways of starting this GUI, either by reversing the commented code so that it can be launched as part of the CLI: 
+    """Initializes the GUI 
     ---
-    -protonvpn gui:
-        This will start from within the main CLI menu. Gui is invoked through cli()
+    If user has not initialized a profile, the GUI will ask for the following data:
+    - Username
+    - Password
+    - Plan
+    - Protocol
 
-    Or leave it be as it is, and configuration is setup during installation with "pip3 install -e .", this way it can be launched as a separte command from the usual CLI:
-    -protonvpn-gui:
-        This will start the GUI without invoking cli()
+    sudo protonvpn-gui
+    - Will start the GUI without invoking cli()
     """
     def __init__(self):
         check_root()
