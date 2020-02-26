@@ -16,6 +16,7 @@ from custom_pvpn_cli_ng.protonvpn_cli.utils import (
     check_root,
     is_connected,
     get_ip_info,
+    get_transferred_data
 )
 
 from custom_pvpn_cli_ng.protonvpn_cli.connection import status
@@ -72,11 +73,21 @@ def load_on_start(interface):
 def update_labels_status(interface):
     """Updates labels status
     """
-    left_grid_update_labels(interface)
-    right_grid_update_labels(interface)
+    servers = get_servers()
+    protonvpn_conn_check = is_connected()
+    is_vpn_connected = True if protonvpn_conn_check else False
+    try:
+        connected_server = get_config_value("metadata", "connected_server")
+    except:
+        connected_server = False
+    left_grid_update_labels(interface, servers, is_vpn_connected, connected_server)
+    right_grid_update_labels(interface, servers, is_vpn_connected, connected_server)
     
 
-def left_grid_update_labels(interface):
+def left_grid_update_labels(interface, servers, is_connected, connected_server):
+    """
+    """
+
     # Left grid
     vpn_status_label =      interface.get_object("vpn_status_label")
     dns_status_label =      interface.get_object("dns_status_label")
@@ -86,9 +97,11 @@ def left_grid_update_labels(interface):
     server_features_label = interface.get_object("server_features_label")
 
     all_features = {0: "Normal", 1: "Secure-Core", 2: "Tor", 4: "P2P"}
+    connection_time = False
+    connected_to_protocol = False
 
     # Check and set VPN status label. Get also protocol status if vpn is connected
-    if is_connected() != True:
+    if is_connected != True:
         vpn_status_label.set_markup('<span>Disconnected</span>')
     else:
         vpn_status_label.set_markup('<span foreground="#4E9A06">Connected</span>')
@@ -97,11 +110,9 @@ def left_grid_update_labels(interface):
             connection_time = time.time() - int(connected_time)
             connection_time = str(datetime.timedelta(seconds=connection_time)).split(".")[0]
             connected_to_protocol = get_config_value("metadata", "connected_proto")
-            connected_server = get_config_value("metadata", "connected_server")
         except KeyError:
             connection_time = False
             connected_to_protocol = False
-            connected_server = False
     
     # Check and set DNS status label
     dns_enabled = get_config_value("USER", "dns_leak_protection")
@@ -123,16 +134,19 @@ def left_grid_update_labels(interface):
     connected_to_protocol = connected_to_protocol if connected_to_protocol else ""
     protocol_label.set_markup('<span>{0}</span>'.format(connected_to_protocol))
 
-    # Check and set features label
-    servers = get_servers()
+    # Check and set feature label
     try:
         feature = get_server_value(connected_server, "Features", servers)
-    except KeyError:
+    except:
         feature = False
-    feature = all_features[feature] if feature else ""
+    
+    feature = all_features[feature] if is_connected else ""
     server_features_label.set_markup('<span>{0}</span>'.format(feature))
 
-def right_grid_update_labels(interface):
+def right_grid_update_labels(interface, servers, is_connected, connected_server):
+    """
+    """
+
     # Right grid
     ip_label =              interface.get_object("ip_label")
     server_load_label =     interface.get_object("server_load_label")
@@ -142,24 +156,44 @@ def right_grid_update_labels(interface):
     data_received_label =   interface.get_object("data_received_label")
     data_sent_label =       interface.get_object("data_sent_label") 
 
-    connected_to_server = False
-    connected_to_protocol = False
+    tx_amount, rx_amount = get_transferred_data()
 
-    if is_connected():
-        try:
-            connected_to_server = get_config_value("metadata", "connected_server")
-            
-        except KeyError:
-            pass 
-
+    # Get and set IP labels. Get also country and ISP
     ip, isp, country = get_ip_info(gui_enbled=True)
-    
-    ip = "<span>" + ip + "</span>"
     country_isp = "<span>" + country + "/" + isp + "</span>"
-
     ip_label.set_markup(ip)
+
+    # Get and set server load label
+    try:
+        load = get_server_value(connected_server, "Load", servers)
+    except:
+        load = False
+    load = "{0}%".format(load) if load and is_connected else ""
+    server_load_label.set_markup('<span>{0}</span>'.format(load))
+
+    # Get and set server name
+    connected_server = connected_server if connected_server and is_connected else ""
+    server_name_label.set_markup('<span>{0}</span>'.format(connected_server))
+
+    # Get and set city label
+    try:
+        city = get_server_value(connected_server, "City", servers)
+    except:
+        city = False
+    city = city if city else ""
+    server_city_label.set_markup('<span>{0}</span>'.format(city))
+
+    # Set country label and ISP labels
+    ip = "<span>" + ip + "</span>"
     country_label.set_markup(country_isp)
-    
+
+    # Get and set recieved data
+    rx_amount = rx_amount if is_connected else ""
+    data_received_label.set_markup('<span>{0}</span>'.format(rx_amount))
+
+    # Get and set sent data
+    tx_amount = tx_amount if is_connected else ""
+    data_sent_label.set_markup('<span>{0}</span>'.format(tx_amount))
 
 def load_configurations(interface):
     """Set and populate user configurations before showing the configurations window
