@@ -85,7 +85,9 @@ def left_grid_update_labels(interface):
     protocol_label =        interface.get_object("openvpn_protocol_label")
     server_features_label = interface.get_object("server_features_label")
 
-    # Check and set VPN status. Get also protocol if connected
+    all_features = {0: "Normal", 1: "Secure-Core", 2: "Tor", 4: "P2P"}
+
+    # Check and set VPN status label. Get also protocol status if vpn is connected
     if is_connected() != True:
         vpn_status_label.set_markup('<span>Disconnected</span>')
     else:
@@ -94,21 +96,41 @@ def left_grid_update_labels(interface):
             connected_time = get_config_value("metadata", "connected_time")
             connection_time = time.time() - int(connected_time)
             connection_time = str(datetime.timedelta(seconds=connection_time)).split(".")[0]
+            connected_to_protocol = get_config_value("metadata", "connected_proto")
+            connected_server = get_config_value("metadata", "connected_server")
         except KeyError:
             connection_time = False
+            connected_to_protocol = False
+            connected_server = False
     
-    # Check and set DNS status
+    # Check and set DNS status label
     dns_enabled = get_config_value("USER", "dns_leak_protection")
     if int(dns_enabled) != 1:
         dns_status_label.set_markup('<span>Not Enabled</span>')
     else:
         dns_status_label.set_markup('<span foreground="#4E9A06">Enabled</span>')
 
-    # Set time connected
+    # Set time connected label
     connection_time = connection_time if connection_time else ""
     time_connected_label.set_markup('<span>{0}</span>'.format(connection_time))
 
+    # Check and set killswitch label
+    connected_time = get_config_value("USER", "killswitch")
+    killswitch_status = "Enabled" if connected_time == 0 else "Disabled"
+    killswitch_label.set_markup('<span>{0}</span>'.format(killswitch_status))
 
+    # Check and set protocol label
+    connected_to_protocol = connected_to_protocol if connected_to_protocol else ""
+    protocol_label.set_markup('<span>{0}</span>'.format(connected_to_protocol))
+
+    # Check and set features label
+    servers = get_servers()
+    try:
+        feature = get_server_value(connected_server, "Features", servers)
+    except KeyError:
+        feature = False
+    feature = all_features[feature] if feature else ""
+    server_features_label.set_markup('<span>{0}</span>'.format(feature))
 
 def right_grid_update_labels(interface):
     # Right grid
@@ -126,7 +148,7 @@ def right_grid_update_labels(interface):
     if is_connected():
         try:
             connected_to_server = get_config_value("metadata", "connected_server")
-            connected_to_protocol = get_config_value("metadata", "connected_proto")
+            
         except KeyError:
             pass 
 
