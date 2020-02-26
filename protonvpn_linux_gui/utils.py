@@ -70,10 +70,23 @@ def load_on_start(interface):
 def update_labels_status(interface):
     """Updates labels status
     """
-    vpn_status_label = interface.get_object("vpn_status_label")
-    dns_status_label = interface.get_object("dns_status_label")
-    ip_label = interface.get_object("ip_label")
-    country_label = interface.get_object("country_label")
+    
+    # Left grid
+    vpn_status_label =      interface.get_object("vpn_status_label")
+    dns_status_label =      interface.get_object("dns_status_label")
+    time_connected_label =  interface.get_object("time_connected_label")
+    killswitch_label =      interface.get_object("killswitch_label")
+    protocol_label =        interface.get_object("openvpn_protocol_label")
+    server_features_label = interface.get_object("server_features_label")
+
+    # Right grid
+    ip_label =              interface.get_object("ip_label")
+    server_load_label =     interface.get_object("server_load_label")
+    server_name_label =     interface.get_object("server_name_label")
+    server_city_label =     interface.get_object("server_city_label")
+    country_label =         interface.get_object("country_label")
+    data_received_label =   interface.get_object("data_received_label")
+    data_sent_label =       interface.get_object("data_sent_label")
 
     # Under development
     # vpn_status = status(gui_enabled=True)    
@@ -98,6 +111,8 @@ def update_labels_status(interface):
 
     ip_label.set_markup(ip)
     country_label.set_markup(country_isp)
+
+
 
 def load_configurations(interface):
     """Set and populate user configurations before showing the configurations window
