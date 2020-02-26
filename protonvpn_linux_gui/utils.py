@@ -3,6 +3,8 @@ import re
 import shutil
 import fileinput
 import subprocess
+import time
+import datetime
 
 from custom_pvpn_cli_ng.protonvpn_cli.utils import (
     pull_server_data,
@@ -70,7 +72,11 @@ def load_on_start(interface):
 def update_labels_status(interface):
     """Updates labels status
     """
+    left_grid_update_labels(interface)
+    right_grid_update_labels(interface)
     
+
+def left_grid_update_labels(interface):
     # Left grid
     vpn_status_label =      interface.get_object("vpn_status_label")
     dns_status_label =      interface.get_object("dns_status_label")
@@ -79,6 +85,32 @@ def update_labels_status(interface):
     protocol_label =        interface.get_object("openvpn_protocol_label")
     server_features_label = interface.get_object("server_features_label")
 
+    # Check and set VPN status. Get also protocol if connected
+    if is_connected() != True:
+        vpn_status_label.set_markup('<span>Disconnected</span>')
+    else:
+        vpn_status_label.set_markup('<span foreground="#4E9A06">Connected</span>')
+        try:
+            connected_time = get_config_value("metadata", "connected_time")
+            connection_time = time.time() - int(connected_time)
+            connection_time = str(datetime.timedelta(seconds=connection_time)).split(".")[0]
+        except KeyError:
+            connection_time = False
+    
+    # Check and set DNS status
+    dns_enabled = get_config_value("USER", "dns_leak_protection")
+    if int(dns_enabled) != 1:
+        dns_status_label.set_markup('<span>Not Enabled</span>')
+    else:
+        dns_status_label.set_markup('<span foreground="#4E9A06">Enabled</span>')
+
+    # Set time connected
+    connection_time = connection_time if connection_time else ""
+    time_connected_label.set_markup('<span>{0}</span>'.format(connection_time))
+
+
+
+def right_grid_update_labels(interface):
     # Right grid
     ip_label =              interface.get_object("ip_label")
     server_load_label =     interface.get_object("server_load_label")
@@ -86,23 +118,17 @@ def update_labels_status(interface):
     server_city_label =     interface.get_object("server_city_label")
     country_label =         interface.get_object("country_label")
     data_received_label =   interface.get_object("data_received_label")
-    data_sent_label =       interface.get_object("data_sent_label")
+    data_sent_label =       interface.get_object("data_sent_label") 
 
-    # Under development
-    # vpn_status = status(gui_enabled=True)    
+    connected_to_server = False
+    connected_to_protocol = False
 
-    # Check VPN status
-    if is_connected() != True:
-        vpn_status_label.set_markup('<span>Disconnected</span>')
-    else:
-        vpn_status_label.set_markup('<span foreground="#4E9A06">Connected</span>')
-    
-    # Check DNS status
-    dns_enabled = get_config_value("USER", "dns_leak_protection")
-    if int(dns_enabled) != 1:
-        dns_status_label.set_markup('<span>Not Enabled</span>')
-    else:
-        dns_status_label.set_markup('<span foreground="#4E9A06">Enabled</span>')
+    if is_connected():
+        try:
+            connected_to_server = get_config_value("metadata", "connected_server")
+            connected_to_protocol = get_config_value("metadata", "connected_proto")
+        except KeyError:
+            pass 
 
     ip, isp, country = get_ip_info(gui_enbled=True)
     
@@ -111,8 +137,7 @@ def update_labels_status(interface):
 
     ip_label.set_markup(ip)
     country_label.set_markup(country_isp)
-
-
+    
 
 def load_configurations(interface):
     """Set and populate user configurations before showing the configurations window
@@ -230,6 +255,12 @@ def populate_server_list(server_list_object):
             tier = server_tiers[get_server_value(servername, "Tier", servers)]
 
             server_list_object.append([country, servername, tier, load, feature])
+
+# Autoconnect 
+#
+# To- do
+#
+# Autoconnect
 
 def manage_autoconnect(mode):
     """Manages autoconnect functionality
