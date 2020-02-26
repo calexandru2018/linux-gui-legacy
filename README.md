@@ -73,7 +73,28 @@ You can either install via <b>PIP</b> or by cloning the repository.
 
  `sudo protonvpn-gui`
 
-After connecting to a server, if you want to close the GUI and the terminal, then do not <b>CTRL+C!</b> This will cause the process to be interrupted, instead just close the terminal by pressing on the <b>X</b> in the terminal and the process will continue to work in the background.
+## Create .desktop file
+
+To create at <i>desktop</i> launcher with a .desktop file, follow the instrucitons below.
+
+1. Find the path to the package with `pip3 show protonvpn-linux-gui-calexandru2018`
+
+   You should get something like `Location: /usr/local/lib/<YOUR_PYTHON_VERSION>/dist-packages` , this is where your Python packages reside.
+
+2. Based on previous information, the path to your icon should be `/usr/local/lib/<YOUR_PYTHON_VERSION>/dist-packages/protonvpn_linux_gui/resources/protonvpn_logo.png`
+
+3. Create a `protonvpn-gui.desktop` file in `.local/share/applications/`, and paste in the following code. Remember to change the **`Icon`** path to your own path.
+
+    ```
+    [Desktop Entry]
+    Name=ProtonVPN GUI
+    GenericName=Unofficial ProtonVPN GUI for Linux
+    Exec=sudo protonvpn-gui
+    Icon=<YOUR_ICON_PATH>
+    Type=Application
+    Terminal=true
+    Categories=Utility;GUI;Network;VPN>
+    ```
 
 ### Not yet implemented:
 
