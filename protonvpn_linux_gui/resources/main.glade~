@@ -1358,7 +1358,7 @@ ProtonVPN Unofficial GUI: calexandru2018</property>
             <property name="margin_left">80</property>
             <property name="margin_right">80</property>
             <property name="margin_top">15</property>
-            <property name="margin_bottom">35</property>
+            <property name="margin_bottom">15</property>
             <property name="column_homogeneous">True</property>
             <property name="baseline_row">1</property>
             <child>
@@ -1390,7 +1390,6 @@ ProtonVPN Unofficial GUI: calexandru2018</property>
             <property name="halign">center</property>
             <property name="margin_left">60</property>
             <property name="margin_right">60</property>
-            <property name="margin_bottom">20</property>
             <property name="hexpand">True</property>
             <property name="column_spacing">150</property>
             <property name="row_homogeneous">True</property>
@@ -1429,8 +1428,7 @@ ProtonVPN Unofficial GUI: calexandru2018</property>
                     <property name="hexpand">True</property>
                     <property name="justify">fill</property>
                     <attributes>
-                      <attribute name="weight" value="ultrabold"/>
-                      <attribute name="underline" value="True"/>
+                      <attribute name="weight" value="bold"/>
                       <attribute name="size" value="15000"/>
                     </attributes>
                   </object>
@@ -1468,8 +1466,7 @@ ProtonVPN Unofficial GUI: calexandru2018</property>
                     <property name="label" translatable="yes">Running</property>
                     <property name="justify">fill</property>
                     <attributes>
-                      <attribute name="weight" value="ultrabold"/>
-                      <attribute name="underline" value="True"/>
+                      <attribute name="weight" value="bold"/>
                       <attribute name="size" value="15000"/>
                     </attributes>
                   </object>
@@ -1507,8 +1504,7 @@ ProtonVPN Unofficial GUI: calexandru2018</property>
                     <property name="label" translatable="yes">Custom</property>
                     <property name="justify">fill</property>
                     <attributes>
-                      <attribute name="weight" value="ultrabold"/>
-                      <attribute name="underline" value="True"/>
+                      <attribute name="weight" value="bold"/>
                       <attribute name="size" value="15000"/>
                     </attributes>
                   </object>
@@ -1583,7 +1579,7 @@ ProtonVPN Unofficial GUI: calexandru2018</property>
                     <property name="hexpand">True</property>
                     <property name="justify">fill</property>
                     <attributes>
-                      <attribute name="weight" value="ultrabold"/>
+                      <attribute name="weight" value="bold"/>
                       <attribute name="underline" value="True"/>
                       <attribute name="size" value="15000"/>
                     </attributes>
@@ -1602,7 +1598,7 @@ ProtonVPN Unofficial GUI: calexandru2018</property>
                     <property name="hexpand">True</property>
                     <property name="justify">fill</property>
                     <attributes>
-                      <attribute name="weight" value="ultrabold"/>
+                      <attribute name="weight" value="bold"/>
                       <attribute name="underline" value="True"/>
                       <attribute name="size" value="15000"/>
                     </attributes>
@@ -1621,7 +1617,7 @@ ProtonVPN Unofficial GUI: calexandru2018</property>
                     <property name="hexpand">True</property>
                     <property name="justify">fill</property>
                     <attributes>
-                      <attribute name="weight" value="ultrabold"/>
+                      <attribute name="weight" value="bold"/>
                       <attribute name="underline" value="True"/>
                       <attribute name="size" value="15000"/>
                     </attributes>
@@ -1808,8 +1804,7 @@ ProtonVPN Unofficial GUI: calexandru2018</property>
                     <property name="hexpand">True</property>
                     <property name="justify">fill</property>
                     <attributes>
-                      <attribute name="weight" value="ultrabold"/>
-                      <attribute name="underline" value="True"/>
+                      <attribute name="weight" value="bold"/>
                       <attribute name="size" value="15000"/>
                     </attributes>
                   </object>
@@ -1827,8 +1822,7 @@ ProtonVPN Unofficial GUI: calexandru2018</property>
                     <property name="hexpand">True</property>
                     <property name="justify">fill</property>
                     <attributes>
-                      <attribute name="weight" value="ultrabold"/>
-                      <attribute name="underline" value="True"/>
+                      <attribute name="weight" value="bold"/>
                       <attribute name="size" value="15000"/>
                     </attributes>
                   </object>
@@ -1846,8 +1840,7 @@ ProtonVPN Unofficial GUI: calexandru2018</property>
                     <property name="hexpand">True</property>
                     <property name="justify">fill</property>
                     <attributes>
-                      <attribute name="weight" value="ultrabold"/>
-                      <attribute name="underline" value="True"/>
+                      <attribute name="weight" value="bold"/>
                       <attribute name="size" value="15000"/>
                     </attributes>
                   </object>
@@ -1865,8 +1858,7 @@ ProtonVPN Unofficial GUI: calexandru2018</property>
                     <property name="hexpand">True</property>
                     <property name="justify">fill</property>
                     <attributes>
-                      <attribute name="weight" value="ultrabold"/>
-                      <attribute name="underline" value="True"/>
+                      <attribute name="weight" value="bold"/>
                       <attribute name="size" value="15000"/>
                     </attributes>
                   </object>
@@ -1884,8 +1876,7 @@ ProtonVPN Unofficial GUI: calexandru2018</property>
                     <property name="hexpand">True</property>
                     <property name="justify">fill</property>
                     <attributes>
-                      <attribute name="weight" value="ultrabold"/>
-                      <attribute name="underline" value="True"/>
+                      <attribute name="weight" value="bold"/>
                       <attribute name="size" value="15000"/>
                     </attributes>
                   </object>
@@ -1911,6 +1902,8 @@ ProtonVPN Unofficial GUI: calexandru2018</property>
         </child>
         <child>
           <object class="GtkGrid">
+            <property name="width_request">-1</property>
+            <property name="height_request">4</property>
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <property name="margin_left">30</property>
