@@ -139,7 +139,7 @@ def random_c(protocol=None):
     openvpn_connect(servername, protocol)
 
 
-def fastest(protocol=None, gui_enabled=False):
+def fastest(protocol=None, gui_enabled=False, return_dict=False):
     """Connect to the fastest server available."""
 
     logger.debug("Starting fastest connect")
@@ -162,7 +162,9 @@ def fastest(protocol=None, gui_enabled=False):
             server_pool.append(server)
 
     fastest_server = get_fastest_server(server_pool)
-    openvpn_connect(fastest_server, protocol, gui_enabled)
+    if gui_enabled:
+        return openvpn_connect(fastest_server, protocol, gui_enabled, return_dict)
+    openvpn_connect(fastest_server, protocol)
 
 
 def country_f(country_code, protocol=None):
@@ -437,7 +439,7 @@ def status(gui_enabled=False):
     )
 
 
-def openvpn_connect(servername, protocol, gui_enabled=False):
+def openvpn_connect(servername, protocol, gui_enabled=False, return_dict=False ):
     """Connect to VPN Server."""
 
     logger.debug("Initiating OpenVPN connection")
@@ -465,7 +467,7 @@ def openvpn_connect(servername, protocol, gui_enabled=False):
 
     old_ip, _ = get_ip_info()
 
-    print("Connecting to {0} via {1}...".format(servername, protocol.upper()))
+    # print("Connecting to {0} via {1}...".format(servername, protocol.upper()))
 
     with open(os.path.join(CONFIG_DIR, "ovpn.log"), "w+") as f:
         subprocess.Popen(
@@ -512,6 +514,9 @@ def openvpn_connect(servername, protocol, gui_enabled=False):
                     logger.debug("Failed to connect. IP didn't change")
                     print("[!] Connection failed. Reverting all changes...")
                     disconnect(passed=True)
+                if gui_enabled == True:
+                    return_dict.put({"CONNECTION":"CONNECTED WITH PROCESS"})
+                    sys.exit(1)
                 print("Connected!")
                 logger.debug("Connection successful")
                 break
@@ -524,10 +529,15 @@ def openvpn_connect(servername, protocol, gui_enabled=False):
                 )
                 logger.debug("Authentication failure")
                 if not gui_enabled == True:
+                    return_dict.put({"CONNECTION":"Failed to authenticate"})
                     sys.exit(1)
-                break
+                return "UNABLE TO CONNECT WITH PROCESS"
+                # break
             # Stop after 45s
             elif time.time() - time_start >= 45:
+                if gui_enabled == True:
+                    return_dict.put({"CONNECTION":"TIMED OUT, PROCESS"})
+                    sys.exit(1)
                 print("Connection timed out after 45 Seconds")
                 logger.debug("Connection timed out after 45 Seconds")
                 sys.exit(1)

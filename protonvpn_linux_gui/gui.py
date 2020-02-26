@@ -3,6 +3,9 @@ import os
 import re
 import sys
 import pathlib
+from multiprocessing import Process, Queue, Manager, Pool
+from threading import Thread
+import time
 
 # ProtonVPN base CLI package import
 from custom_pvpn_cli_ng.protonvpn_cli.constants import (USER, CONFIG_FILE, CONFIG_DIR, VERSION)
@@ -110,11 +113,28 @@ class Handler:
         connection.openvpn_connect(selected_server, protocol)
         update_labels_status(self.interface)
         
+    # def log_result(self, res):
+    #     return res
+
     def quick_connect_button_clicked(self, button):
         """Button/Event handler to connect to the fastest server
         """
         protocol = get_config_value("USER", "default_protocol")
+        protocol = get_config_value("USER", "default_protocol")
         connection.fastest(protocol, gui_enabled=True)
+        # return_val = Queue()
+        # p = Process(target=connection.fastest, args=(protocol, gui_enabled, return_val))
+        # p = Thread(target=connection.fastest, args=(protocol, gui_enabled, return_val))
+        # p.start()
+        # print(return_val.get())
+        # p.join()
+        # connection.fastest(protocol, gui_enabled=True)
+        # p.join()
+        # pool = Pool()
+        # pool.apply_async(connection.fastest, args=(protocol, gui_enabled), callback = self.log_result)
+        # pool.close()
+        # pool.join()
+        # print(pool.get())
         update_labels_status(self.interface)
     
     def last_connect_button_clicked(self, button):
@@ -338,6 +358,7 @@ class initialize_gui:
             window = interface.get_object("LoginWindow")
         else:
             window = interface.get_object("Dashboard")
+            window.connect("destroy", Gtk.main_quit)
             load_on_start(interface)
 
         window.show()
