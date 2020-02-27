@@ -25,7 +25,8 @@ from .utils import (
     prepare_initilizer,
     load_on_start,
     load_configurations,
-    manage_autoconnect
+    manage_autoconnect,
+    is_connected
 )
 
 from .constants import VERSION
@@ -35,7 +36,8 @@ import gi
 
 # Gtk3 import
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk
+from gi.repository import GLib, Gtk, GObject, GLib
+import threading
 
 class Handler:
     """Handler that has all callback functions.
@@ -119,7 +121,13 @@ class Handler:
         """Button/Event handler to connect to the fastest server
         """
         protocol = get_config_value("USER", "default_protocol")
+        # is_user_connected = is_connected()
+        # thread = threading.Thread(target=connection.fastest, args=(protocol, True)).start()
         connection.fastest(protocol, gui_enabled=True)
+        # thread.daemon = True
+        # thread.start()
+        # while not is_user_connected:
+            # GLib.idle_add(update_labels_status, [self.interface])
         update_labels_status(self.interface)
     
     def last_connect_button_clicked(self, button):
@@ -138,7 +146,11 @@ class Handler:
     def disconnect_button_clicked(self, button):
         """Button/Event handler to disconnect any existing connections
         """
-        connection.disconnect()
+        # thread = threading.Thread(target=connection.disconnect).start()
+        # thread.daemon = True
+        # thread.start()
+        # GLib.idle_add(update_labels_status, [self.interface, True])
+
         update_labels_status(self.interface)
         
     def refresh_server_list_button_clicked(self, button):
@@ -340,6 +352,7 @@ class initialize_gui:
             window = interface.get_object("Dashboard")
             window.connect("destroy", Gtk.main_quit)
             load_on_start(interface)
-
+            
+        # GObject.threads_init()
         window.show()
         Gtk.main()

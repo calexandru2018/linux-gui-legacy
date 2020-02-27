@@ -5,6 +5,7 @@ import fileinput
 import subprocess
 import time
 import datetime
+import threading
 
 from custom_pvpn_cli_ng.protonvpn_cli.utils import (
     pull_server_data,
@@ -64,29 +65,40 @@ def load_on_start(interface):
     """Updates Dashboard labels and populates server list content before showing it to the user
     """
     server_list_object = interface.get_object("ServerListStore")
-
-    update_labels_status(interface)
+    servers = get_servers()
+    if not servers:
+        servers = False
+        
+    # Update labels
+    # update_labels_thread = threading.Thread(target=update_labels_status, args=[interface, False, servers]).start()
+    # update_labels_thread.daemon = True
+    # update_labels_thread.start()
+    update_labels_status(interface, servers=servers)
 
     # Populate server list
-    populate_server_list(server_list_object)
+    # populate_server_list_thread = threading.Thread(target=populate_server_list, args=[server_list_object, servers]).start()
+    # populate_server_list_thread.daemon = True
+    # populate_server_list_thread.start()
+    populate_server_list(server_list_object, servers=servers)
 
-def update_labels_status(interface):
-    """Updates labels status
-    """
-    servers = get_servers()
+def update_labels_status(interface, disconnecting=False, servers=False):
+    """Updates labels status"""
+    if not servers:
+        servers = get_servers()
+
     protonvpn_conn_check = is_connected()
     is_vpn_connected = True if protonvpn_conn_check else False
     try:
         connected_server = get_config_value("metadata", "connected_server")
     except:
         connected_server = False
-    left_grid_update_labels(interface, servers, is_vpn_connected, connected_server)
-    right_grid_update_labels(interface, servers, is_vpn_connected, connected_server)
+        
+    left_grid_update_labels(interface, servers, is_vpn_connected, connected_server, disconnecting)
+    right_grid_update_labels(interface, servers, is_vpn_connected, connected_server, disconnecting)
     
 
-def left_grid_update_labels(interface, servers, is_connected, connected_server):
-    """
-    """
+def left_grid_update_labels(interface, servers, is_connected, connected_server, disconnecting):
+    """Holds labels that are position within the left-side grid"""
 
     # Left grid
     vpn_status_label =      interface.get_object("vpn_status_label")
@@ -101,7 +113,7 @@ def left_grid_update_labels(interface, servers, is_connected, connected_server):
     connected_to_protocol = False
 
     # Check and set VPN status label. Get also protocol status if vpn is connected
-    if is_connected != True:
+    if is_connected != True or disconnecting:
         vpn_status_label.set_markup('<span>Disconnected</span>')
     else:
         vpn_status_label.set_markup('<span foreground="#4E9A06">Connected</span>')
@@ -140,12 +152,11 @@ def left_grid_update_labels(interface, servers, is_connected, connected_server):
     except:
         feature = False
     
-    feature = all_features[feature] if is_connected else ""
+    feature = all_features[feature] if disconnecting or is_connected else ""
     server_features_label.set_markup('<span>{0}</span>'.format(feature))
 
-def right_grid_update_labels(interface, servers, is_connected, connected_server):
-    """
-    """
+def right_grid_update_labels(interface, servers, is_connected, connected_server, disconnecting):
+    """Holds labels that are position within the right-side grid"""
 
     # Right grid
     ip_label =              interface.get_object("ip_label")
@@ -276,15 +287,16 @@ def load_configurations(interface):
 
     pref_dialog.show()
 
-def populate_server_list(server_list_object):
+def populate_server_list(server_list_object, servers=False):
     """Populates Dashboard with servers
     """
-    pull_server_data(force=True)
+    pull_server_data()
 
     features = {0: "Normal", 1: "Secure-Core", 2: "Tor", 4: "P2P"}
     server_tiers = {0: "Free", 1: "Basic", 2: "Plus/Visionary"}
-
-    servers = get_servers()
+    
+    if not servers:
+        servers = get_servers()
 
     # Country with respective servers, ex: PT#02
     countries = {}
