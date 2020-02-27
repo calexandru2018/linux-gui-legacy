@@ -152,7 +152,7 @@ def left_grid_update_labels(interface, servers, is_connected, connected_server, 
     except:
         feature = False
     
-    feature = all_features[feature] if disconnecting or is_connected else ""
+    feature = all_features[feature] if not disconnecting and is_connected else ""
     server_features_label.set_markup('<span>{0}</span>'.format(feature))
 
 def right_grid_update_labels(interface, servers, is_connected, connected_server, disconnecting):

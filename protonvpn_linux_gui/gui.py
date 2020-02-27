@@ -150,8 +150,8 @@ class Handler:
         # thread.daemon = True
         # thread.start()
         # GLib.idle_add(update_labels_status, [self.interface, True])
-
-        update_labels_status(self.interface)
+        connection.disconnect()
+        update_labels_status(self.interface, disconnecting=True)
         
     def refresh_server_list_button_clicked(self, button):
         """Button/Event handler to refresh/repopulate server list
