@@ -49,7 +49,8 @@ def call_api(endpoint, json_format=True, handle_errors=True):
             "[!] Please make sure your connection is working properly!"
         )
         logger.debug("Error connecting to ProtonVPN API")
-        sys.exit(1)
+        return
+        # sys.exit(1)
     try:
         response.raise_for_status()
     except requests.exceptions.HTTPError:
