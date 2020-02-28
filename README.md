@@ -79,9 +79,9 @@ To create at <i>desktop</i> launcher with a .desktop file, follow the instrucito
 
 1. Find the path to the package with `pip3 show protonvpn-linux-gui-calexandru2018`
 
-   You should get something like `Location: /usr/local/lib/<YOUR_PYTHON_VERSION>/dist-packages` , this is where your Python packages reside.
+   You should get something like `Location: /usr/local/lib/<YOUR_PYTHON_VERSION>/dist-packages` , this is where your Python packages reside. **Note:** Based on your distro, your `Location` path may not look exactly like this one, so make sure to use your own and `Location` path.
 
-2. Based on previous information, the path to your icon should be `/usr/local/lib/<YOUR_PYTHON_VERSION>/dist-packages/protonvpn_linux_gui/resources/protonvpn_logo.png`
+2. Based on previous information, the path to your icon should be `<PATH_DISPLAYED_IN_STEP_1>/protonvpn_linux_gui/resources/protonvpn_logo.png`
 
 3. Create a `protonvpn-gui.desktop` file in `.local/share/applications/`, and paste in the following code. Remember to change the **`Icon`** path to your own path.
 
@@ -95,6 +95,14 @@ To create at <i>desktop</i> launcher with a .desktop file, follow the instrucito
     Terminal=true
     Categories=Utility;GUI;Network;VPN>
     ```
+### Further enhancement
+If you would like to launch the GUI without having to type in your sudo password everytime, then you could add the bin to `visudo`. This is extremly useful when you have a .desktop file, and all you want to do is click the launcher to have the GUI pop-up without being prompted for sudo password.
+
+1. First you will need the path to the GUI. This can be found by typing `which protonvpn-gui`. You should get something like this: `/usr/bin/protonvpn-gui`. Save it since you will need it later. **Note:** As previously mentioned, the path may look different for you, based on your distro.
+2. Identify your username by typing `whoami`. Save it (or memorize it). 
+3. In another terminal, type in `sudo visudo`, and a window should pop-up, scroll to the very bottom of it.
+4. Once you are at the botton, type: `<YOUR_USERNAME_FROM_STEP2> ALL = (root) NOPASSWD: <YOUR_PATH_FROM_STEP1>`
+5. Exit and save! Have fun :)
 
 ### Not yet implemented:
 
