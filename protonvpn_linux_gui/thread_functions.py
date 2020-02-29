@@ -102,19 +102,16 @@ def quick_connect(interface):
     """Button/Event handler to connect to the fastest server
     """
     protocol = get_config_value("USER", "default_protocol")
-    # is_user_connected = is_connected()
-    # thread = threading.Thread(target=connection.fastest, args=(protocol, True)).start()
+
     connection.fastest(protocol, gui_enabled=True)
-    # thread.daemon = True
-    # thread.start()
-    # while not thread.isAlive():
-    #     GLib.idle_add(update_labels_status, [interface])
-    # test = 3
-    # while test > 0:
-    #     time.sleep(1)
-    update_labels_status(interface)
-    #     print("Updated label")
-    # print("Got out")
+
+    update_labels_dict = {
+        "interface": interface,
+        "servers": False,
+        "disconnecting": False
+    }
+    update_labels_status(update_labels_dict)
+ 
 
 def last_connect_button_clicked(interface):
     """Button/Event handler to reconnect to previously connected server
@@ -132,15 +129,18 @@ def random_connect_button_clicked(interface):
 def disconnect(interface):
     """Button/Event handler to disconnect any existing connections
     """
-    # thread = threading.Thread(target=connection.disconnect).start()
-    # thread.daemon = True
-    # thread.start()
-    # GLib.idle_add(update_labels_status, [interface, True])
     connection.disconnect()
     # test = 3
     # while test > 0:
     #     time.sleep(1)
-    update_labels_status(interface, disconnecting=True)
+
+    update_labels_dict = {
+        "interface": interface,
+        "servers": False,
+        "disconnecting": True
+    }
+
+    update_labels_status(update_labels_dict)
     
     
 def refresh_server_list_button_clicked(interface):

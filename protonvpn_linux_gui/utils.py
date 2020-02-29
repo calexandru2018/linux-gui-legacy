@@ -73,27 +73,28 @@ def load_on_start(interface):
     """Updates Dashboard labels and populates server list content before showing it to the user
     """
 
-    p = threading.Thread(target=test, args=[interface])
-    # p.daemon = True
+    p = threading.Thread(target=load_thread, args=[interface])
+    p.daemon = True
     p.start()
 
-def test(interface):
+def load_thread(interface):
     server_list_object = interface.get_object("ServerListStore")
     servers = get_servers()
     if not servers:
         servers = False
         
-    # Update labels
-
     update_labels_dict = {
-        "inter": interface,
-        "serv": servers
+        "interface": interface,
+        "servers": servers,
+        "disconnecting": False
     }
 
     populate_servers_dict = {
         "list_object": server_list_object,
         "servers": servers
     }
+
+    # Update labels
 
     # Should be done with gobject_idle_add
     gobject.idle_add(update_labels_status, update_labels_dict)
@@ -116,10 +117,10 @@ def test(interface):
 def update_labels_status(update_labels_dict):
     """Updates labels status"""
 
-    if not update_labels_dict["serv"]:
+    if not update_labels_dict["servers"]:
         servers = get_servers()
     else:
-        servers = update_labels_dict["serv"]
+        servers = update_labels_dict["servers"]
 
     protonvpn_conn_check = is_connected()
     is_vpn_connected = True if protonvpn_conn_check else False
@@ -129,8 +130,8 @@ def update_labels_status(update_labels_dict):
     except:
         connected_server = False
         
-    left_grid_update_labels(update_labels_dict["inter"], servers, is_vpn_connected, connected_server, False)
-    right_grid_update_labels(update_labels_dict["inter"], servers, is_vpn_connected, connected_server, False)
+    left_grid_update_labels(update_labels_dict["interface"], servers, is_vpn_connected, connected_server, False)
+    right_grid_update_labels(update_labels_dict["interface"], servers, is_vpn_connected, connected_server, False)
     
 def left_grid_update_labels(interface, servers, is_connected, connected_server, disconnecting):
     """Holds labels that are position within the left-side grid"""
