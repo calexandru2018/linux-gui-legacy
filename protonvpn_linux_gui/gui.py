@@ -31,7 +31,8 @@ from .utils import (
 
 # Import thread functions
 from .thread_functions import(
-    quick_connect
+    quick_connect,
+    disconnect
 )
 
 # PyGObject import
@@ -39,7 +40,7 @@ import gi
 
 # Gtk3 import
 gi.require_version('Gtk', '3.0')
-from gi.repository import GLib, Gtk, GObject, GLib
+from gi.repository import GLib, Gtk, GObject, GLib, Gdk
 import threading
 
 # class ThreadClass(threading.Thread):
@@ -152,7 +153,7 @@ class Handler:
     def disconnect_button_clicked(self, button):
         """Button/Event handler to disconnect any existing connections
         """
-        thread = threading.Thread(target=connection.disconnect)
+        thread = threading.Thread(target=disconnect, args=[self.interface])
         thread.daemon = True
         thread.start()
         # GLib.idle_add(update_labels_status, [self.interface, True])
@@ -354,10 +355,16 @@ def initialize_gui():
 
     if not os.path.isfile(CONFIG_FILE):
         window = interface.get_object("LoginWindow")
+        window.connect("destroy", Gtk.main_quit)
     else:
         window = interface.get_object("Dashboard")
         window.connect("destroy", Gtk.main_quit)
         load_on_start(interface)
-        
+    
     window.show()
+    
+    Gdk.threads_init()
+    Gdk.threads_enter()
     Gtk.main()
+    Gdk.threads_leave()
+    
