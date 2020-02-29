@@ -70,16 +70,16 @@ def load_on_start(interface):
         servers = False
         
     # Update labels
-    # update_labels_thread = threading.Thread(target=update_labels_status, args=[interface, False, servers]).start()
+    update_labels_thread = threading.Thread(target=update_labels_status, args=[interface, False, servers]).start()
     # update_labels_thread.daemon = True
     # update_labels_thread.start()
-    update_labels_status(interface, servers=servers)
+    # update_labels_status(interface, servers=servers)
 
     # Populate server list
-    # populate_server_list_thread = threading.Thread(target=populate_server_list, args=[server_list_object, servers]).start()
+    populate_server_list_thread = threading.Thread(target=populate_server_list, args=[server_list_object, servers]).start()
     # populate_server_list_thread.daemon = True
     # populate_server_list_thread.start()
-    populate_server_list(server_list_object, servers=servers)
+    # populate_server_list(server_list_object, servers=servers)
 
 def update_labels_status(interface, disconnecting=False, servers=False):
     """Updates labels status"""

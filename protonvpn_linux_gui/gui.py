@@ -29,7 +29,10 @@ from .utils import (
     is_connected
 )
 
-from .constants import VERSION
+# Import thread functions
+from .thread_functions import(
+    quick_connect
+)
 
 # PyGObject import
 import gi
@@ -38,6 +41,13 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import GLib, Gtk, GObject, GLib
 import threading
+
+# class ThreadClass(threading.Thread):
+#     def __init__(self, parent = None):
+#         super(ThreadClass, self).__init__(parent)
+
+#     def run(self):
+#         print("HELLO")
 
 class Handler:
     """Handler that has all callback functions.
@@ -113,23 +123,19 @@ class Handler:
             selected_server = model.get_value(tree_iter, 1)
         connection.openvpn_connect(selected_server, protocol)
         update_labels_status(self.interface)
-        
-    # def log_result(self, res):
-    #     return res
 
     def quick_connect_button_clicked(self, button):
         """Button/Event handler to connect to the fastest server
         """
-        protocol = get_config_value("USER", "default_protocol")
+        # protocol = get_config_value("USER", "default_protocol")
         # is_user_connected = is_connected()
-        # thread = threading.Thread(target=connection.fastest, args=(protocol, True)).start()
-        connection.fastest(protocol, gui_enabled=True)
-        # thread.daemon = True
-        # thread.start()
-        # while not is_user_connected:
-            # GLib.idle_add(update_labels_status, [self.interface])
-        update_labels_status(self.interface)
-    
+        thread = threading.Thread(target=quick_connect, args=[self.interface])
+        # connection.fastest(protocol, gui_enabled=True)
+        thread.daemon = True
+        thread.start()
+        # update_labels_status(self.interface)
+        # thread.join()
+
     def last_connect_button_clicked(self, button):
         """Button/Event handler to reconnect to previously connected server
         """        
@@ -146,12 +152,12 @@ class Handler:
     def disconnect_button_clicked(self, button):
         """Button/Event handler to disconnect any existing connections
         """
-        # thread = threading.Thread(target=connection.disconnect).start()
-        # thread.daemon = True
-        # thread.start()
+        thread = threading.Thread(target=connection.disconnect)
+        thread.daemon = True
+        thread.start()
         # GLib.idle_add(update_labels_status, [self.interface, True])
-        connection.disconnect()
-        update_labels_status(self.interface, disconnecting=True)
+        # connection.disconnect()
+        # update_labels_status(self.interface, disconnecting=True)
         
     def refresh_server_list_button_clicked(self, button):
         """Button/Event handler to refresh/repopulate server list
@@ -183,7 +189,7 @@ class Handler:
         if object.get_property("visible") == True:
             object.hide()
             return True
-    
+
     # To avoid getting the About window destroyed and not being re-rendered again
     def AboutDialog_delete_event(self, object, event):
         """On Delete handler is used to hide the dialog and that it successfully  renders next time it is called
@@ -312,12 +318,12 @@ class Handler:
 
 
     def purge_configurations_button_clicked(self, button):
-        """Button/Event handler to purge configurations
-        """
-        # To-do: Confirm prior to allowing user to do this
-        cli.purge_configuration(gui_enabled=True)
+            """Button/Event handler to purge configurations
+            """
+            # To-do: Confirm prior to allowing user to do this
+            cli.purge_configuration(gui_enabled=True)
 
-class initialize_gui:
+def initialize_gui():
     """Initializes the GUI 
     ---
     If user has not initialized a profile, the GUI will ask for the following data:
@@ -329,30 +335,29 @@ class initialize_gui:
     sudo protonvpn-gui
     - Will start the GUI without invoking cli()
     """
-    def __init__(self):
-        check_root()
+    # def __init__(self):
+    check_root()
 
-        interface = Gtk.Builder()
+    interface = Gtk.Builder()
 
-        posixPath = pathlib.PurePath(pathlib.Path(__file__).parent.absolute().joinpath("resources/main.glade"))
-        glade_path = ''
-        
-        for path in posixPath.parts:
-            if path == '/':
-                glade_path = glade_path + path
-            else:
-                glade_path = glade_path + path + "/"
-                
-        interface.add_from_file(glade_path[:-1])
-        interface.connect_signals(Handler(interface))
-
-        if not os.path.isfile(CONFIG_FILE):
-            window = interface.get_object("LoginWindow")
+    posixPath = pathlib.PurePath(pathlib.Path(__file__).parent.absolute().joinpath("resources/main.glade"))
+    glade_path = ''
+    
+    for path in posixPath.parts:
+        if path == '/':
+            glade_path = glade_path + path
         else:
-            window = interface.get_object("Dashboard")
-            window.connect("destroy", Gtk.main_quit)
-            load_on_start(interface)
+            glade_path = glade_path + path + "/"
             
-        # GObject.threads_init()
-        window.show()
-        Gtk.main()
+    interface.add_from_file(glade_path[:-1])
+    interface.connect_signals(Handler(interface))
+
+    if not os.path.isfile(CONFIG_FILE):
+        window = interface.get_object("LoginWindow")
+    else:
+        window = interface.get_object("Dashboard")
+        window.connect("destroy", Gtk.main_quit)
+        load_on_start(interface)
+        
+    window.show()
+    Gtk.main()
