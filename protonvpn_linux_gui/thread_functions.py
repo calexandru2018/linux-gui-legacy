@@ -1,12 +1,5 @@
-# PyGObject import
-import gi
 import re
 import time
-
-# Gtk3 import
-gi.require_version('Gtk', '3.0')
-from gi.repository import GLib, Gtk, GObject as gobject
-import threading
 
 from custom_pvpn_cli_ng.protonvpn_cli.utils import get_config_value
 
@@ -20,14 +13,13 @@ from .utils import (
     prepare_initilizer,
     load_on_start,
     load_configurations,
-    manage_autoconnect,
     is_connected,
     update_labels_server_list
 )
 
 from .constants import VERSION
 
-# Login BUTTON HANDLER
+# Login handler
 def on_login(interface):
     """Button/Event handler to intialize user account. Calls populate_server_list(server_list_object) to populate server list.
     """     
@@ -47,40 +39,7 @@ def on_login(interface):
     login_window.destroy()
     user_window.show()
 
-# Dashboard BUTTON HANDLERS
-def server_filter_input_key_release(object, interface):
-    """Event handler, to filter servers after each key release
-    """
-    user_filter_by = object.get_text()
-    server_list_object = interface.get_object("ServerListStore")
-    tree_view_object = interface.get_object("ServerList")
-
-    # Creates a new filter from a ListStore
-    n_filter = server_list_object.filter_new()
-
-    # set_visible_func:
-    # @first_param: filter function
-    # @ seconde_param: input to filter by
-    n_filter.set_visible_func(column_filter, data=[user_filter_by, interface])
-    
-    # Apply the filter model to a TreeView
-    tree_view_object.set_model(n_filter)
-
-    # Updates the ListStore model
-    n_filter.refilter()
-
-def column_filter(model, iter, data=None):
-    """Filter by columns and returns the corresponding rows
-    """
-    treeview = data[1].get_object("ServerList")
-    
-    for col in range(0, treeview.get_n_columns()):
-        value = model.get_value(iter, col).lower();
-        if data[0].lower() in value.lower():
-            return True
-        else:
-            continue
-
+# Dashboard hanlder
 def connect_to_selected_server(interface):
     """Button/Event handler to connect to selected server
     """     

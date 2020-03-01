@@ -1,11 +1,8 @@
 
-import re
-import shutil
-import fileinput
 import subprocess
 import time
 import datetime
-import threading
+from threading import Thread
 
 from custom_pvpn_cli_ng.protonvpn_cli.utils import (
     pull_server_data,
@@ -13,14 +10,10 @@ from custom_pvpn_cli_ng.protonvpn_cli.utils import (
     get_country_name,
     get_server_value,
     get_config_value,
-    set_config_value,
-    check_root,
     is_connected,
     get_ip_info,
     get_transferred_data
 )
-
-from custom_pvpn_cli_ng.protonvpn_cli.connection import status
 
 from custom_pvpn_cli_ng.protonvpn_cli.constants import SPLIT_TUNNEL_FILE
 
@@ -32,7 +25,6 @@ import gi
 # Gtk3 import
 gi.require_version('Gtk', '3.0')
 from gi.repository import GObject as gobject
-import threading
 
 def prepare_initilizer(username_field, password_field, interface):
     """Collects and prepares user input from login window.
@@ -73,7 +65,7 @@ def load_on_start(interface):
     """Updates Dashboard labels and populates server list content before showing it to the user
     """
 
-    p = threading.Thread(target=update_labels_server_list, args=[interface])
+    p = Thread(target=update_labels_server_list, args=[interface])
     p.daemon = True
     p.start()
 

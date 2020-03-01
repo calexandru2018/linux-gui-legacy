@@ -5,29 +5,20 @@ import sys
 import pathlib
 from threading import Thread
 import time
-from multiprocessing import Process
 
 # ProtonVPN base CLI package import
-from custom_pvpn_cli_ng.protonvpn_cli.constants import (USER, CONFIG_FILE, CONFIG_DIR, VERSION)
+from custom_pvpn_cli_ng.protonvpn_cli.constants import (USER, CONFIG_FILE, VERSION)
 from custom_pvpn_cli_ng.protonvpn_cli import cli
-from custom_pvpn_cli_ng.protonvpn_cli import connection
 
 # ProtonVPN helper funcitons
-from custom_pvpn_cli_ng.protonvpn_cli.utils import (
-    get_config_value,
-    set_config_value,
-    check_root,
-)
+from custom_pvpn_cli_ng.protonvpn_cli.utils import check_root
 
 # Custom helper functions
 from .utils import (
-    update_labels_status,
     populate_server_list,
     prepare_initilizer,
     load_on_start,
     load_configurations,
-    manage_autoconnect,
-    is_connected
 )
 
 # Import functions that are called with threads
