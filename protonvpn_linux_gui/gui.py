@@ -350,8 +350,9 @@ def initialize_gui():
     
     window.show()
     
-    Gdk.threads_init()
-    Gdk.threads_enter()
+    # Gdk.threads_init()
+    # Gdk.threads_enter()
+    GObject.threads_init()
     Gtk.main()
-    Gdk.threads_leave()
+    # Gdk.threads_leave()
     
