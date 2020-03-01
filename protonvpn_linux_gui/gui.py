@@ -30,12 +30,13 @@ from .utils import (
     is_connected
 )
 
-# Import thread functions
+# Import functions that are called with threads
 from .thread_functions import(
     quick_connect,
     disconnect,
     refresh_server_list,
-    random_connect
+    random_connect,
+    last_connect
 )
 
 # PyGObject import
@@ -130,8 +131,9 @@ class Handler:
     def last_connect_button_clicked(self, button):
         """Button/Event handler to reconnect to previously connected server
         """        
-        connection.reconnect()
-        update_labels_status(self.interface)
+        thread = Thread(target=last_connect, args=[self.interface])
+        thread.daemon = True
+        thread.start()
 
     def random_connect_button_clicked(self, button):
         """Button/Event handler to connect to a random server

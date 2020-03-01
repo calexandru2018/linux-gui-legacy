@@ -113,11 +113,17 @@ def quick_connect(interface):
     }
     update_labels_status(update_labels_dict)
 
-def last_connect_button_clicked(interface):
+def last_connect(interface):
     """Button/Event handler to reconnect to previously connected server
     """        
+    update_labels_dict = {
+        "interface": interface,
+        "servers": False,
+        "disconnecting": False
+    }
     connection.reconnect()
-    update_labels_status(interface)
+
+    update_labels_status(update_labels_dict)
 
 def random_connect(interface):
     """Button/Event handler to connect to a random server
