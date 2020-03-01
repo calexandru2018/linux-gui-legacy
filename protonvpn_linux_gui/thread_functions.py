@@ -119,12 +119,18 @@ def last_connect_button_clicked(interface):
     connection.reconnect()
     update_labels_status(interface)
 
-def random_connect_button_clicked(interface):
+def random_connect(interface):
     """Button/Event handler to connect to a random server
     """
+    update_labels_dict = {
+        "interface": interface,
+        "servers": False,
+        "disconnecting": False
+    }
     protocol = get_config_value("USER", "default_protocol")
     connection.random_c(protocol)
-    update_labels_status(interface)
+
+    update_labels_status(update_labels_dict)
 
 def disconnect(interface):
     """Button/Event handler to disconnect any existing connections

@@ -34,7 +34,8 @@ from .utils import (
 from .thread_functions import(
     quick_connect,
     disconnect,
-    refresh_server_list
+    refresh_server_list,
+    random_connect
 )
 
 # PyGObject import
@@ -126,7 +127,6 @@ class Handler:
         thread.daemon = True
         thread.start()
 
-
     def last_connect_button_clicked(self, button):
         """Button/Event handler to reconnect to previously connected server
         """        
@@ -136,9 +136,9 @@ class Handler:
     def random_connect_button_clicked(self, button):
         """Button/Event handler to connect to a random server
         """
-        protocol = get_config_value("USER", "default_protocol")
-        connection.random_c(protocol)
-        update_labels_status(self.interface)
+        thread = Thread(target=random_connect, args=[self.interface])
+        thread.daemon = True
+        thread.start()
 
     def disconnect_button_clicked(self, button):
         """Button/Event handler to disconnect any existing connections
