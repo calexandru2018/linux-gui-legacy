@@ -5,6 +5,7 @@ import sys
 import pathlib
 from threading import Thread
 import time
+from multiprocessing import Process
 
 # ProtonVPN base CLI package import
 from custom_pvpn_cli_ng.protonvpn_cli.constants import (USER, CONFIG_FILE, CONFIG_DIR, VERSION)
@@ -32,7 +33,8 @@ from .utils import (
 # Import thread functions
 from .thread_functions import(
     quick_connect,
-    disconnect
+    disconnect,
+    refresh_server_list
 )
 
 # PyGObject import
@@ -40,15 +42,7 @@ import gi
 
 # Gtk3 import
 gi.require_version('Gtk', '3.0')
-from gi.repository import GLib, Gtk, GObject, GLib, Gdk
-import threading
-
-# class ThreadClass(threading.Thread):
-#     def __init__(self, parent = None):
-#         super(ThreadClass, self).__init__(parent)
-
-#     def run(self):
-#         print("HELLO")
+from gi.repository import GLib, Gtk, GObject, Gdk
 
 class Handler:
     """Handler that has all callback functions.
@@ -128,14 +122,10 @@ class Handler:
     def quick_connect_button_clicked(self, button):
         """Button/Event handler to connect to the fastest server
         """
-        # protocol = get_config_value("USER", "default_protocol")
-        # is_user_connected = is_connected()
-        thread = threading.Thread(target=quick_connect, args=[self.interface])
-        # connection.fastest(protocol, gui_enabled=True)
+        thread = Thread(target=quick_connect, args=[self.interface])
         thread.daemon = True
         thread.start()
-        # update_labels_status(self.interface)
-        # thread.join()
+
 
     def last_connect_button_clicked(self, button):
         """Button/Event handler to reconnect to previously connected server
@@ -153,20 +143,17 @@ class Handler:
     def disconnect_button_clicked(self, button):
         """Button/Event handler to disconnect any existing connections
         """
-        thread = threading.Thread(target=disconnect, args=[self.interface])
+        thread = Thread(target=disconnect, args=[self.interface])
         thread.daemon = True
         thread.start()
-        # GLib.idle_add(update_labels_status, [self.interface, True])
-        # connection.disconnect()
-        # update_labels_status(self.interface, disconnecting=True)
         
     def refresh_server_list_button_clicked(self, button):
         """Button/Event handler to refresh/repopulate server list
         - At the moment, will also refresh the Dashboard information, this will be fixed in the future.
         """
-        server_list_object = self.interface.get_object("ServerListStore")
-        populate_server_list(server_list_object)
-        update_labels_status(self.interface)
+        thread = Thread(target=refresh_server_list, args=[self.interface])
+        thread.daemon = True
+        thread.start()
 
     def about_menu_button_clicked(self, button):
         """Button /Event handlerto open About dialog

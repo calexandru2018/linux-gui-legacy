@@ -73,12 +73,16 @@ def load_on_start(interface):
     """Updates Dashboard labels and populates server list content before showing it to the user
     """
 
-    p = threading.Thread(target=load_thread, args=[interface])
+    p = threading.Thread(target=update_labels_server_list, args=[interface])
     p.daemon = True
     p.start()
 
-def load_thread(interface):
-    server_list_object = interface.get_object("ServerListStore")
+def update_labels_server_list(interface, server_list_obj=False):
+    if not server_list_obj:
+        server_list_object = interface.get_object("ServerListStore")
+    else:
+        server_list_object = server_list_obj
+
     servers = get_servers()
     if not servers:
         servers = False
@@ -95,25 +99,13 @@ def load_thread(interface):
     }
 
     # Update labels
-
     # Should be done with gobject_idle_add
     gobject.idle_add(update_labels_status, update_labels_dict)
-    # update_labels_thread = threading.Thread(target=update_labels_status, args=[interface, False, servers]).start()
-    
-    # update_labels_thread.daemon = True
-    # update_labels_thread.start()
-    # update_labels_status(interface, servers=servers)
 
     # Populate server list
-
     # Should be done with gobject_idle_add
     gobject.idle_add(populate_server_list, populate_servers_dict)
-    #  populate_server_list_thread = threading.Thread(target=populate_server_list, args=[server_list_object, servers]).start()
-    # populate_server_list_thread.daemon = True
-    # populate_server_list_thread.start()
-    # populate_server_list(server_list_object, servers=servers)
 
-# def update_labels_status(interface, disconnecting=False, servers=False):
 def update_labels_status(update_labels_dict):
     """Updates labels status"""
 
@@ -130,8 +122,8 @@ def update_labels_status(update_labels_dict):
     except:
         connected_server = False
         
-    left_grid_update_labels(update_labels_dict["interface"], servers, is_vpn_connected, connected_server, False)
-    right_grid_update_labels(update_labels_dict["interface"], servers, is_vpn_connected, connected_server, False)
+    left_grid_update_labels(update_labels_dict["interface"], servers, is_vpn_connected, connected_server, update_labels_dict["disconnecting"])
+    right_grid_update_labels(update_labels_dict["interface"], servers, is_vpn_connected, connected_server, update_labels_dict["disconnecting"])
     
 def left_grid_update_labels(interface, servers, is_connected, connected_server, disconnecting):
     """Holds labels that are position within the left-side grid"""

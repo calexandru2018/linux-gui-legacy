@@ -5,7 +5,7 @@ import time
 
 # Gtk3 import
 gi.require_version('Gtk', '3.0')
-from gi.repository import GLib, Gtk, GObject, GLib
+from gi.repository import GLib, Gtk, GObject as gobject
 import threading
 
 from custom_pvpn_cli_ng.protonvpn_cli.utils import get_config_value
@@ -21,7 +21,8 @@ from .utils import (
     load_on_start,
     load_configurations,
     manage_autoconnect,
-    is_connected
+    is_connected,
+    update_labels_server_list
 )
 
 from .constants import VERSION
@@ -111,7 +112,6 @@ def quick_connect(interface):
         "disconnecting": False
     }
     update_labels_status(update_labels_dict)
- 
 
 def last_connect_button_clicked(interface):
     """Button/Event handler to reconnect to previously connected server
@@ -129,27 +129,26 @@ def random_connect_button_clicked(interface):
 def disconnect(interface):
     """Button/Event handler to disconnect any existing connections
     """
-    connection.disconnect()
-    # test = 3
-    # while test > 0:
-    #     time.sleep(1)
-
     update_labels_dict = {
         "interface": interface,
         "servers": False,
         "disconnecting": True
     }
 
+    connection.disconnect()
+
     update_labels_status(update_labels_dict)
     
     
-def refresh_server_list_button_clicked(interface):
+def refresh_server_list(interface):
     """Button/Event handler to refresh/repopulate server list
     - At the moment, will also refresh the Dashboard information, this will be fixed in the future.
     """
-    server_list_object = interface.get_object("ServerListStore")
-    populate_server_list(server_list_object)
-    update_labels_status(interface)
+    # Sleep is needed because it takes a second to update the information,
+    # which makes the button "lag".
+    time.sleep(1)
+    # Temporary solution
+    update_labels_server_list(interface)
 
 def about_menu_button_clicked(interface):
     """Button /Event handlerto open About dialog
