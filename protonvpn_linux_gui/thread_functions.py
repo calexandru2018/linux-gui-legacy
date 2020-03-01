@@ -81,24 +81,32 @@ def column_filter(model, iter, data=None):
         else:
             continue
 
-def connect_to_selected_server_button_clicked(interface):
+def connect_to_selected_server(interface):
     """Button/Event handler to connect to selected server
     """     
+    update_labels_dict = {
+        "interface": interface,
+        "servers": False,
+        "disconnecting": False
+    }
+
     selected_server = ''
     protocol = get_config_value("USER", "default_protocol")
 
+    # Get the server list object
     server_list = interface.get_object("ServerList").get_selection() 
+
+    # Get the clicked server
     (model, pathlist) = server_list.get_selected_rows()
     for path in pathlist :
         tree_iter = model.get_iter(path)
         # the second param of get_value() specifies the column number, starting at 0
         selected_server = model.get_value(tree_iter, 1)
-    connection.openvpn_connect(selected_server, protocol)
-    update_labels_status(interface)
-    
-# def log_result(res):
-#     return res
 
+    connection.openvpn_connect(selected_server, protocol)
+
+    update_labels_status(update_labels_dict)
+    
 def quick_connect(interface):
     """Button/Event handler to connect to the fastest server
     """

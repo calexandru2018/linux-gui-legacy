@@ -36,7 +36,8 @@ from .thread_functions import(
     disconnect,
     refresh_server_list,
     random_connect,
-    last_connect
+    last_connect,
+    connect_to_selected_server
 )
 
 # PyGObject import
@@ -109,17 +110,9 @@ class Handler:
     def connect_to_selected_server_button_clicked(self, button):
         """Button/Event handler to connect to selected server
         """     
-        selected_server = ''
-        protocol = get_config_value("USER", "default_protocol")
-
-        server_list = self.interface.get_object("ServerList").get_selection() 
-        (model, pathlist) = server_list.get_selected_rows()
-        for path in pathlist :
-            tree_iter = model.get_iter(path)
-            # the second param of get_value() specifies the column number, starting at 0
-            selected_server = model.get_value(tree_iter, 1)
-        connection.openvpn_connect(selected_server, protocol)
-        update_labels_status(self.interface)
+        thread = Thread(target=connect_to_selected_server, args=[self.interface])
+        thread.daemon = True
+        thread.start()
 
     def quick_connect_button_clicked(self, button):
         """Button/Event handler to connect to the fastest server
