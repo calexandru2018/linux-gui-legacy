@@ -1,5 +1,7 @@
 import re
 import time
+import requests
+import json
 
 from custom_pvpn_cli_ng.protonvpn_cli.utils import get_config_value
 
@@ -17,7 +19,7 @@ from .utils import (
     update_labels_server_list
 )
 
-from .constants import VERSION
+from .constants import VERSION, GITHUB_URL_RELEASE
 
 # Login handler
 def on_login(interface):
@@ -135,39 +137,23 @@ def refresh_server_list(interface):
     # Temporary solution
     update_labels_server_list(interface)
 
-def about_menu_button_clicked(interface):
-    """Button /Event handlerto open About dialog
-    """
-    about_dialog = interface.get_object("AboutDialog")
-    about_dialog.set_version(VERSION)
-    about_dialog.show()
+def check_for_updates():
 
-def configuration_menu_button_clicked(interface):
-    """Button/Event handler to open Configurations window
-    """
-    load_configurations(interface)
+    latest_release = ''
     
-# To avoid getting the Preferences window destroyed and not being re-rendered again
-def ConfigurationsWindow_delete_event(object, event):
-    """On Delete handler is used to hide the window so it renders next time the dialog is called
-    
-    -Returns:Boolean
-    - It needs to return True, otherwise the content will not re-render after closing the dialog
-    """
-    if object.get_property("visible") == True:
-        object.hide()
-        return True
+    try:
+        # time.sleep(1)
+        check_version = requests.get(GITHUB_URL_RELEASE, timeout=2)
+        latest_release =  check_version.url.split("/")[-1][1:]
+    except:
+        print()
+        print("[!] Failed to check for updates.")
+        return
 
-# To avoid getting the About window destroyed and not being re-rendered again
-def AboutDialog_delete_event(object, event):
-    """On Delete handler is used to hide the dialog and that it successfully  renders next time it is called
-    
-    -Returns:Boolean
-    - It needs to return True, otherwise the content will not re-render after closing the window
-    """
-    if object.get_property("visible") == True:
-        object.hide()
-        return True
+    if not latest_release < VERSION:
+        print("[!] There is a newer release. You should update to {0}.".format(latest_release))
+    else:
+        print("You have the latest version.") 
 
 # Preferences/Configuration menu HANDLERS
 def update_user_pass_button_clicked(interface):

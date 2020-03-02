@@ -2,6 +2,7 @@
 import subprocess
 import time
 import datetime
+import requests
 from threading import Thread
 
 from custom_pvpn_cli_ng.protonvpn_cli.utils import (
@@ -17,7 +18,7 @@ from custom_pvpn_cli_ng.protonvpn_cli.utils import (
 
 from custom_pvpn_cli_ng.protonvpn_cli.constants import SPLIT_TUNNEL_FILE
 
-from .constants import PATH_AUTOCONNECT_SERVICE, TEMPLATE
+from .constants import PATH_AUTOCONNECT_SERVICE, TEMPLATE, VERSION, GITHUB_URL_RELEASE
 
 # PyGObject import
 import gi

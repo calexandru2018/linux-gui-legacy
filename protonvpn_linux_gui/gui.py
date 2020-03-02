@@ -8,7 +8,7 @@ import time
 import concurrent.futures
 
 # ProtonVPN base CLI package import
-from custom_pvpn_cli_ng.protonvpn_cli.constants import (USER, CONFIG_FILE, VERSION)
+from custom_pvpn_cli_ng.protonvpn_cli.constants import (USER, CONFIG_FILE)
 from custom_pvpn_cli_ng.protonvpn_cli import cli
 
 # ProtonVPN helper funcitons
@@ -30,8 +30,11 @@ from .thread_functions import(
     random_connect,
     last_connect,
     connect_to_selected_server,
-    on_login
+    on_login,
+    check_for_updates
 )
+
+from .constants import VERSION
 
 # PyGObject import
 import gi
@@ -146,6 +149,15 @@ class Handler:
         about_dialog = self.interface.get_object("AboutDialog")
         about_dialog.set_version(VERSION)
         about_dialog.show()
+    
+    def check_for_updates_button_clicked(self, button):
+        thread = Thread(target=check_for_updates)
+        thread.daemon = True
+        thread.start()
+
+    def help_button_clicked(self, button):
+        # To-do
+        print("To-do show help.")
 
     def configuration_menu_button_clicked(self, button):
         """Button/Event handler to open Configurations window
@@ -320,8 +332,10 @@ def initialize_gui():
             glade_path = glade_path + path
         else:
             glade_path = glade_path + path + "/"
+
             
     interface.add_from_file(glade_path[:-1])
+
     interface.connect_signals(Handler(interface))
 
     if not os.path.isfile(CONFIG_FILE):
