@@ -7,35 +7,36 @@ from threading import Thread
 import time
 
 # ProtonVPN base CLI package import
-from custom_pvpn_cli_ng.protonvpn_cli.constants import (USER, CONFIG_FILE, CONFIG_DIR, VERSION)
+from custom_pvpn_cli_ng.protonvpn_cli.constants import (USER, CONFIG_FILE, VERSION)
 from custom_pvpn_cli_ng.protonvpn_cli import cli
-from custom_pvpn_cli_ng.protonvpn_cli import connection
 
 # ProtonVPN helper funcitons
-from custom_pvpn_cli_ng.protonvpn_cli.utils import (
-    get_config_value,
-    set_config_value,
-    check_root,
-)
+from custom_pvpn_cli_ng.protonvpn_cli.utils import check_root
 
 # Custom helper functions
 from .utils import (
-    update_labels_status,
     populate_server_list,
     prepare_initilizer,
     load_on_start,
     load_configurations,
-    manage_autoconnect
 )
 
-from .constants import VERSION
+# Import functions that are called with threads
+from .thread_functions import(
+    quick_connect,
+    disconnect,
+    refresh_server_list,
+    random_connect,
+    last_connect,
+    connect_to_selected_server
+)
 
 # PyGObject import
 import gi
 
 # Gtk3 import
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk
+from gi.repository import GLib, Gtk, GObject, Gdk
 
 class Handler:
     """Handler that has all callback functions.
@@ -100,54 +101,45 @@ class Handler:
     def connect_to_selected_server_button_clicked(self, button):
         """Button/Event handler to connect to selected server
         """     
-        selected_server = ''
-        protocol = get_config_value("USER", "default_protocol")
-
-        server_list = self.interface.get_object("ServerList").get_selection() 
-        (model, pathlist) = server_list.get_selected_rows()
-        for path in pathlist :
-            tree_iter = model.get_iter(path)
-            # the second param of get_value() specifies the column number, starting at 0
-            selected_server = model.get_value(tree_iter, 1)
-        connection.openvpn_connect(selected_server, protocol)
-        update_labels_status(self.interface)
-        
-    # def log_result(self, res):
-    #     return res
+        thread = Thread(target=connect_to_selected_server, args=[self.interface])
+        thread.daemon = True
+        thread.start()
 
     def quick_connect_button_clicked(self, button):
         """Button/Event handler to connect to the fastest server
         """
-        protocol = get_config_value("USER", "default_protocol")
-        connection.fastest(protocol, gui_enabled=True)
-        update_labels_status(self.interface)
-    
+        thread = Thread(target=quick_connect, args=[self.interface])
+        thread.daemon = True
+        thread.start()
+
     def last_connect_button_clicked(self, button):
         """Button/Event handler to reconnect to previously connected server
         """        
-        connection.reconnect()
-        update_labels_status(self.interface)
+        thread = Thread(target=last_connect, args=[self.interface])
+        thread.daemon = True
+        thread.start()
 
     def random_connect_button_clicked(self, button):
         """Button/Event handler to connect to a random server
         """
-        protocol = get_config_value("USER", "default_protocol")
-        connection.random_c(protocol)
-        update_labels_status(self.interface)
+        thread = Thread(target=random_connect, args=[self.interface])
+        thread.daemon = True
+        thread.start()
 
     def disconnect_button_clicked(self, button):
         """Button/Event handler to disconnect any existing connections
         """
-        connection.disconnect()
-        update_labels_status(self.interface)
+        thread = Thread(target=disconnect, args=[self.interface])
+        thread.daemon = True
+        thread.start()
         
     def refresh_server_list_button_clicked(self, button):
         """Button/Event handler to refresh/repopulate server list
         - At the moment, will also refresh the Dashboard information, this will be fixed in the future.
         """
-        server_list_object = self.interface.get_object("ServerListStore")
-        populate_server_list(server_list_object)
-        update_labels_status(self.interface)
+        thread = Thread(target=refresh_server_list, args=[self.interface])
+        thread.daemon = True
+        thread.start()
 
     def about_menu_button_clicked(self, button):
         """Button /Event handlerto open About dialog
@@ -171,7 +163,7 @@ class Handler:
         if object.get_property("visible") == True:
             object.hide()
             return True
-    
+
     # To avoid getting the About window destroyed and not being re-rendered again
     def AboutDialog_delete_event(self, object, event):
         """On Delete handler is used to hide the dialog and that it successfully  renders next time it is called
@@ -300,12 +292,12 @@ class Handler:
 
 
     def purge_configurations_button_clicked(self, button):
-        """Button/Event handler to purge configurations
-        """
-        # To-do: Confirm prior to allowing user to do this
-        cli.purge_configuration(gui_enabled=True)
+            """Button/Event handler to purge configurations
+            """
+            # To-do: Confirm prior to allowing user to do this
+            cli.purge_configuration(gui_enabled=True)
 
-class initialize_gui:
+def initialize_gui():
     """Initializes the GUI 
     ---
     If user has not initialized a profile, the GUI will ask for the following data:
@@ -317,29 +309,35 @@ class initialize_gui:
     sudo protonvpn-gui
     - Will start the GUI without invoking cli()
     """
-    def __init__(self):
-        check_root()
+    check_root()
 
-        interface = Gtk.Builder()
+    interface = Gtk.Builder()
 
-        posixPath = pathlib.PurePath(pathlib.Path(__file__).parent.absolute().joinpath("resources/main.glade"))
-        glade_path = ''
-        
-        for path in posixPath.parts:
-            if path == '/':
-                glade_path = glade_path + path
-            else:
-                glade_path = glade_path + path + "/"
-                
-        interface.add_from_file(glade_path[:-1])
-        interface.connect_signals(Handler(interface))
-
-        if not os.path.isfile(CONFIG_FILE):
-            window = interface.get_object("LoginWindow")
+    posixPath = pathlib.PurePath(pathlib.Path(__file__).parent.absolute().joinpath("resources/main.glade"))
+    glade_path = ''
+    
+    for path in posixPath.parts:
+        if path == '/':
+            glade_path = glade_path + path
         else:
-            window = interface.get_object("Dashboard")
-            window.connect("destroy", Gtk.main_quit)
-            load_on_start(interface)
+            glade_path = glade_path + path + "/"
+            
+    interface.add_from_file(glade_path[:-1])
+    interface.connect_signals(Handler(interface))
 
-        window.show()
-        Gtk.main()
+    if not os.path.isfile(CONFIG_FILE):
+        window = interface.get_object("LoginWindow")
+        window.connect("destroy", Gtk.main_quit)
+    else:
+        window = interface.get_object("Dashboard")
+        window.connect("destroy", Gtk.main_quit)
+        load_on_start(interface)
+    
+    window.show()
+    
+    # Gdk.threads_init()
+    # Gdk.threads_enter()
+    GObject.threads_init()
+    Gtk.main()
+    # Gdk.threads_leave()
+    
