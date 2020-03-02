@@ -23,10 +23,14 @@ from .constants import VERSION
 def on_login(interface):
     """Button/Event handler to intialize user account. Calls populate_server_list(server_list_object) to populate server list.
     """     
-    login_window = interface.get_object("LoginWindow")
-    username_field = interface.get_object('username_field').get_text()
-    password_field = interface.get_object('password_field').get_text()
+    username_field = interface.get_object('username_field').get_text().strip()
+    password_field = interface.get_object('password_field').get_text().strip()
     
+    if len(username_field) == 0 or len(password_field) == 0:
+        print()
+        print("[!] None of the fields can be left empty.")
+        return False
+
     user_data = prepare_initilizer(username_field, password_field, interface)
     server_list_object = interface.get_object("ServerListStore")
 

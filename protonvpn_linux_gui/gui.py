@@ -56,10 +56,12 @@ class Handler:
         with concurrent.futures.ThreadPoolExecutor() as executor:
             future = executor.submit(on_login, self.interface)
             return_value = future.result()
-            user_window.show()
-            login_window.destroy()
             
+            if not return_value and not return_value is None:
+                return
 
+            user_window.show()
+            login_window.destroy()    
 
     # Dashboard BUTTON HANDLERS
     def server_filter_input_key_release(self, object, event):
