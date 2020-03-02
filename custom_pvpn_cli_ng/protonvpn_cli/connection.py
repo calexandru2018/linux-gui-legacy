@@ -148,7 +148,15 @@ def fastest(protocol=None, gui_enabled=False):
         protocol = get_config_value("USER", "default_protocol")
 
     disconnect(passed=True)
+
+    tries = 2
+
+    # while tries > 0:
+    #     try:
     pull_server_data(force=True)
+        # except:
+        #     tries -= 1
+        #     time.sleep(1)
 
     servers = get_servers()
 
