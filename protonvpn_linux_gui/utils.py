@@ -1,10 +1,9 @@
 
-import re
-import shutil
-import fileinput
 import subprocess
 import time
 import datetime
+import requests
+from threading import Thread
 
 from custom_pvpn_cli_ng.protonvpn_cli.utils import (
     pull_server_data,
@@ -12,18 +11,21 @@ from custom_pvpn_cli_ng.protonvpn_cli.utils import (
     get_country_name,
     get_server_value,
     get_config_value,
-    set_config_value,
-    check_root,
     is_connected,
     get_ip_info,
     get_transferred_data
 )
 
-from custom_pvpn_cli_ng.protonvpn_cli.connection import status
-
 from custom_pvpn_cli_ng.protonvpn_cli.constants import SPLIT_TUNNEL_FILE
 
-from .constants import PATH_AUTOCONNECT_SERVICE, TEMPLATE
+from .constants import PATH_AUTOCONNECT_SERVICE, TEMPLATE, VERSION, GITHUB_URL_RELEASE
+
+# PyGObject import
+import gi
+
+# Gtk3 import
+gi.require_version('Gtk', '3.0')
+from gi.repository import GObject as gobject
 
 def prepare_initilizer(username_field, password_field, interface):
     """Collects and prepares user input from login window.
@@ -63,30 +65,61 @@ def prepare_initilizer(username_field, password_field, interface):
 def load_on_start(interface):
     """Updates Dashboard labels and populates server list content before showing it to the user
     """
-    server_list_object = interface.get_object("ServerListStore")
 
-    update_labels_status(interface)
+    p = Thread(target=update_labels_server_list, args=[interface])
+    p.daemon = True
+    p.start()
+
+def update_labels_server_list(interface, server_list_obj=False):
+    if not server_list_obj:
+        server_list_object = interface.get_object("ServerListStore")
+    else:
+        server_list_object = server_list_obj
+
+    servers = get_servers()
+    if not servers:
+        servers = False
+        
+    update_labels_dict = {
+        "interface": interface,
+        "servers": servers,
+        "disconnecting": False
+    }
+
+    populate_servers_dict = {
+        "list_object": server_list_object,
+        "servers": servers
+    }
+
+    # Update labels
+    # Should be done with gobject_idle_add
+    gobject.idle_add(update_labels_status, update_labels_dict)
 
     # Populate server list
-    populate_server_list(server_list_object)
+    # Should be done with gobject_idle_add
+    gobject.idle_add(populate_server_list, populate_servers_dict)
 
-def update_labels_status(interface):
-    """Updates labels status
-    """
-    servers = get_servers()
+def update_labels_status(update_labels_dict):
+    """Updates labels status"""
+
+    if not update_labels_dict["servers"]:
+        servers = get_servers()
+    else:
+        servers = update_labels_dict["servers"]
+
     protonvpn_conn_check = is_connected()
     is_vpn_connected = True if protonvpn_conn_check else False
+
     try:
         connected_server = get_config_value("metadata", "connected_server")
     except:
         connected_server = False
-    left_grid_update_labels(interface, servers, is_vpn_connected, connected_server)
-    right_grid_update_labels(interface, servers, is_vpn_connected, connected_server)
+        
+    left_grid_update_labels(update_labels_dict["interface"], servers, is_vpn_connected, connected_server, update_labels_dict["disconnecting"])
+    right_grid_update_labels(update_labels_dict["interface"], servers, is_vpn_connected, connected_server, update_labels_dict["disconnecting"])
     
-
-def left_grid_update_labels(interface, servers, is_connected, connected_server):
-    """
-    """
+def left_grid_update_labels(interface, servers, is_connected, connected_server, disconnecting):
+    """Holds labels that are position within the left-side grid"""
 
     # Left grid
     vpn_status_label =      interface.get_object("vpn_status_label")
@@ -101,7 +134,7 @@ def left_grid_update_labels(interface, servers, is_connected, connected_server):
     connected_to_protocol = False
 
     # Check and set VPN status label. Get also protocol status if vpn is connected
-    if is_connected != True:
+    if is_connected != True or disconnecting:
         vpn_status_label.set_markup('<span>Disconnected</span>')
     else:
         vpn_status_label.set_markup('<span foreground="#4E9A06">Connected</span>')
@@ -140,12 +173,11 @@ def left_grid_update_labels(interface, servers, is_connected, connected_server):
     except:
         feature = False
     
-    feature = all_features[feature] if is_connected else ""
+    feature = all_features[feature] if not disconnecting and is_connected else ""
     server_features_label.set_markup('<span>{0}</span>'.format(feature))
 
-def right_grid_update_labels(interface, servers, is_connected, connected_server):
-    """
-    """
+def right_grid_update_labels(interface, servers, is_connected, connected_server, disconnecting):
+    """Holds labels that are position within the right-side grid"""
 
     # Right grid
     ip_label =              interface.get_object("ip_label")
@@ -276,15 +308,18 @@ def load_configurations(interface):
 
     pref_dialog.show()
 
-def populate_server_list(server_list_object):
+def populate_server_list(populate_servers_dict):
     """Populates Dashboard with servers
     """
-    pull_server_data(force=True)
+    pull_server_data()
 
     features = {0: "Normal", 1: "Secure-Core", 2: "Tor", 4: "P2P"}
     server_tiers = {0: "Free", 1: "Basic", 2: "Plus/Visionary"}
-
-    servers = get_servers()
+    
+    if not populate_servers_dict["servers"]:
+        servers = get_servers()
+    else:
+        servers = populate_servers_dict["servers"]
 
     # Country with respective servers, ex: PT#02
     countries = {}
@@ -300,7 +335,7 @@ def populate_server_list(server_list_object):
             countries[country],
             key=lambda s: get_server_value(s, "Load", servers)
         )
-    server_list_object.clear()
+    populate_servers_dict["list_object"].clear()
     for country in country_servers:
         for servername in country_servers[country]:
             load = str(get_server_value(servername, "Load", servers)).rjust(3, " ")
@@ -310,7 +345,7 @@ def populate_server_list(server_list_object):
 
             tier = server_tiers[get_server_value(servername, "Tier", servers)]
 
-            server_list_object.append([country, servername, tier, load, feature])
+            populate_servers_dict["list_object"].append([country, servername, tier, load, feature])
 
 # Autoconnect 
 #
