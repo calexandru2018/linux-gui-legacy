@@ -1580,7 +1580,6 @@ ProtonVPN Unofficial GUI: calexandru2018</property>
                     <property name="justify">fill</property>
                     <attributes>
                       <attribute name="weight" value="bold"/>
-                      <attribute name="underline" value="True"/>
                       <attribute name="size" value="15000"/>
                     </attributes>
                   </object>
@@ -1599,7 +1598,6 @@ ProtonVPN Unofficial GUI: calexandru2018</property>
                     <property name="justify">fill</property>
                     <attributes>
                       <attribute name="weight" value="bold"/>
-                      <attribute name="underline" value="True"/>
                       <attribute name="size" value="15000"/>
                     </attributes>
                   </object>
@@ -1618,7 +1616,6 @@ ProtonVPN Unofficial GUI: calexandru2018</property>
                     <property name="justify">fill</property>
                     <attributes>
                       <attribute name="weight" value="bold"/>
-                      <attribute name="underline" value="True"/>
                       <attribute name="size" value="15000"/>
                     </attributes>
                   </object>
