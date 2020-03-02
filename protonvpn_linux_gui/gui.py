@@ -5,6 +5,7 @@ import sys
 import pathlib
 from threading import Thread
 import time
+import concurrent.futures
 
 # ProtonVPN base CLI package import
 from custom_pvpn_cli_ng.protonvpn_cli.constants import (USER, CONFIG_FILE, VERSION)
@@ -28,7 +29,8 @@ from .thread_functions import(
     refresh_server_list,
     random_connect,
     last_connect,
-    connect_to_selected_server
+    connect_to_selected_server,
+    on_login
 )
 
 # PyGObject import
@@ -49,20 +51,15 @@ class Handler:
         """Button/Event handler to intialize user account. Calls populate_server_list(server_list_object) to populate server list.
         """     
         login_window = self.interface.get_object("LoginWindow")
-        username_field = self.interface.get_object('username_field').get_text()
-        password_field = self.interface.get_object('password_field').get_text()
-        
-        user_data = prepare_initilizer(username_field, password_field, self.interface)
-
-        if not cli.init_cli(gui_enabled=True, gui_user_input=user_data):
-            return
-
         user_window = self.interface.get_object("Dashboard")
-        server_list_object = self.interface.get_object("ServerListStore")
 
-        populate_server_list(server_list_object)
-        login_window.destroy()
-        user_window.show()
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            future = executor.submit(on_login, self.interface)
+            return_value = future.result()
+            user_window.show()
+            login_window.destroy()
+            
+
 
     # Dashboard BUTTON HANDLERS
     def server_filter_input_key_release(self, object, event):
@@ -327,7 +324,8 @@ def initialize_gui():
 
     if not os.path.isfile(CONFIG_FILE):
         window = interface.get_object("LoginWindow")
-        window.connect("destroy", Gtk.main_quit)
+        dashboard = interface.get_object("Dashboard")
+        dashboard.connect("destroy", Gtk.main_quit)
     else:
         window = interface.get_object("Dashboard")
         window.connect("destroy", Gtk.main_quit)

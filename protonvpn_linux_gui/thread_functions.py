@@ -28,16 +28,18 @@ def on_login(interface):
     password_field = interface.get_object('password_field').get_text()
     
     user_data = prepare_initilizer(username_field, password_field, interface)
+    server_list_object = interface.get_object("ServerListStore")
+
+    populate_servers_dict = {
+        "list_object": server_list_object,
+        "servers": False
+    }
 
     if not cli.init_cli(gui_enabled=True, gui_user_input=user_data):
         return
 
-    user_window = interface.get_object("Dashboard")
-    server_list_object = interface.get_object("ServerListStore")
-
-    populate_server_list(server_list_object)
-    login_window.destroy()
-    user_window.show()
+    load_on_start(interface)
+    # populate_server_list(populate_servers_dict)
 
 # Dashboard hanlder
 def connect_to_selected_server(interface):
