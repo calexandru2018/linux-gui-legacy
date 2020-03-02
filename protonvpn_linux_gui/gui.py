@@ -309,7 +309,6 @@ def initialize_gui():
     sudo protonvpn-gui
     - Will start the GUI without invoking cli()
     """
-    # def __init__(self):
     check_root()
 
     interface = Gtk.Builder()
