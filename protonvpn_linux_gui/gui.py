@@ -6,6 +6,7 @@ import pathlib
 from threading import Thread
 import time
 import concurrent.futures
+import queue
 
 # ProtonVPN base CLI package import
 from custom_pvpn_cli_ng.protonvpn_cli.constants import (USER, CONFIG_FILE)
@@ -20,6 +21,8 @@ from .utils import (
     prepare_initilizer,
     load_on_start,
     load_configurations,
+    message_dialog,
+    check_for_updates
 )
 
 # Import functions that are called with threads
@@ -30,8 +33,7 @@ from .thread_functions import(
     random_connect,
     last_connect,
     connect_to_selected_server,
-    on_login,
-    check_for_updates
+    on_login
 )
 
 from .constants import VERSION
@@ -151,13 +153,22 @@ class Handler:
         about_dialog.show()
     
     def check_for_updates_button_clicked(self, button):
-        thread = Thread(target=check_for_updates)
+        messagedialog_window = self.interface.get_object("MessageDialog")
+        messagedialog_label = self.interface.get_object("message_dialog_label")
+        messagedialog_label.set_markup("Checking...")
+
+        thread = Thread(target=message_dialog, args=[self.interface, "check_for_update", messagedialog_label])
         thread.daemon = True
         thread.start()
+
+        messagedialog_window.show()
 
     def help_button_clicked(self, button):
         # To-do
         print("To-do show help.")
+
+    def close_message_dialog(self, button):
+        self.interface.get_object("MessageDialog").hide()
 
     def configuration_menu_button_clicked(self, button):
         """Button/Event handler to open Configurations window

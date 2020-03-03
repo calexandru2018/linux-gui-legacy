@@ -137,24 +137,6 @@ def refresh_server_list(interface):
     # Temporary solution
     update_labels_server_list(interface)
 
-def check_for_updates():
-
-    latest_release = ''
-    
-    try:
-        # time.sleep(1)
-        check_version = requests.get(GITHUB_URL_RELEASE, timeout=2)
-        latest_release =  check_version.url.split("/")[-1][1:]
-    except:
-        print()
-        print("[!] Failed to check for updates.")
-        return
-
-    if not latest_release < VERSION:
-        print("[!] There is a newer release. You should update to {0}.".format(latest_release))
-    else:
-        print("You have the latest version.") 
-
 # Preferences/Configuration menu HANDLERS
 def update_user_pass_button_clicked(interface):
     """Button/Event handler to update Username & Password

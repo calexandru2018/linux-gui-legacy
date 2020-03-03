@@ -4,6 +4,7 @@ import time
 import datetime
 import requests
 from threading import Thread
+import concurrent.futures
 
 from custom_pvpn_cli_ng.protonvpn_cli.utils import (
     pull_server_data,
@@ -26,6 +27,38 @@ import gi
 # Gtk3 import
 gi.require_version('Gtk', '3.0')
 from gi.repository import GObject as gobject
+
+def message_dialog(interface, action, object):
+    # time.sleep(1)
+    # messagedialog_window = interface.get_object("MessageDialog")
+    if action == "check_for_update":
+
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            future = executor.submit(check_for_updates)
+            return_value = future.result()
+
+            object.set_markup("<span>{0}</span>".format(return_value))
+            # object.set_text(return_value)
+
+def check_for_updates():
+
+    latest_release = ''
+    
+    try:
+        check_version = requests.get(GITHUB_URL_RELEASE, timeout=2)
+        latest_release =  check_version.url.split("/")[-1][1:]
+    except:
+        print()
+        return "Failed to check for updates."
+
+    if latest_release != VERSION:
+        return "You have the latest version!"
+    else:
+        return_string = "There is a newer release, you should update to <b>v{0}</b>.\n\n".format(latest_release)
+        return_string = return_string + "If installed via pip then upgrade with:\n<b>sudo pip3 install protonvpn-linux-gui-calexandru2018 --upgrade</b>\n\n"
+        return_string = return_string + "If installed via github then upgrade with:\n<b>git clone https://github.com/calexandru2018/protonvpn-linux-gui</b>"
+        return return_string
+
 
 def prepare_initilizer(username_field, password_field, interface):
     """Collects and prepares user input from login window.
