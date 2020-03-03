@@ -92,7 +92,7 @@ To create at <i>desktop</i> launcher with a .desktop file, follow the instrucito
     Exec=sudo protonvpn-gui
     Icon=<YOUR_ICON_PATH>
     Type=Application
-    Terminal=true
+    Terminal=False
     Categories=Utility;GUI;Network;VPN>
     ```
 ### Further enhancement
