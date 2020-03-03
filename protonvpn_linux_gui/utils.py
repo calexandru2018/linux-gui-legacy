@@ -51,7 +51,7 @@ def check_for_updates():
         print()
         return "Failed to check for updates."
 
-    if latest_release != VERSION:
+    if latest_release == VERSION:
         return "You have the latest version!"
     else:
         return_string = "There is a newer release, you should update to <b>v{0}</b>.\n\n".format(latest_release)
