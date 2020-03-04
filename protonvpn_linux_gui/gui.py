@@ -162,7 +162,7 @@ class Handler:
             servername = get_config_value("metadata", "connected_server")
             protocol = get_config_value("metadata", "connected_proto")     
         except:
-            messagedialog_label.set_markup("Connecting to to previously connected server...")
+            messagedialog_label.set_markup("Connecting to previously connected server...")
             messagedialog_spinner.hide()
             messagedialog_window.show()
             return
@@ -195,9 +195,18 @@ class Handler:
     def disconnect_button_clicked(self, button):
         """Button/Event handler to disconnect any existing connections
         """
-        thread = Thread(target=disconnect, args=[self.interface])
+        messagedialog_window = self.interface.get_object("MessageDialog")
+        messagedialog_label = self.interface.get_object("message_dialog_label")
+        messagedialog_spinner = self.interface.get_object("message_dialog_spinner")
+
+        messagedialog_label.set_markup("Disconnecting...")
+        messagedialog_spinner.show()
+
+        thread = Thread(target=disconnect, args=[self.interface, messagedialog_label, messagedialog_spinner])
         thread.daemon = True
         thread.start()
+
+        messagedialog_window.show()
         
     def refresh_server_list_button_clicked(self, button):
         """Button/Event handler to refresh/repopulate server list

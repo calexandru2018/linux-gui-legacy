@@ -110,13 +110,13 @@ def random_connect(interface, messagedialog_label, messagedialog_spinner):
     }
 
     result = connection.random_c(protocol, gui_enabled=True)
-
+    
     messagedialog_label.set_markup(result)
     messagedialog_spinner.hide()
 
     update_labels_status(update_labels_dict)
 
-def disconnect(interface):
+def disconnect(interface, messagedialog_label, messagedialog_spinner):
     """Button/Event handler to disconnect any existing connections
     """
     update_labels_dict = {
@@ -125,7 +125,10 @@ def disconnect(interface):
         "disconnecting": True
     }
 
-    connection.disconnect()
+    result = connection.disconnect(gui_enabled=True)
+    
+    messagedialog_label.set_markup(result)
+    messagedialog_spinner.hide()
 
     update_labels_status(update_labels_dict)
     

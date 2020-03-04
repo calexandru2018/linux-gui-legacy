@@ -318,11 +318,11 @@ def reconnect(gui_enabled=False):
     openvpn_connect(servername, protocol)
 
 
-def disconnect(passed=False):
+def disconnect(passed=False, gui_enabled=False):
     """Disconnect VPN if a connection is present."""
 
     logger.debug("Initiating disconnect")
-
+    return_message = 'Error occured with this message'
     if is_connected():
         if passed:
             print("There is already a VPN connection running.")
@@ -347,7 +347,9 @@ def disconnect(passed=False):
 
         if is_connected():
             print("[!] Could not terminate OpenVPN process.")
-            sys.exit(1)
+            if not gui_enabled:
+                sys.exit(1)
+            return_message = "Could not terminate OpenVPN process."
         else:
             manage_dns("restore")
             manage_ipv6("restore")
@@ -355,6 +357,7 @@ def disconnect(passed=False):
             logger.debug("Disconnected")
             if not passed:
                 print("Disconnected.")
+                return_message = "Disconnected from VPN server."
     else:
         if not passed:
             print("No connection found.")
@@ -362,6 +365,10 @@ def disconnect(passed=False):
         manage_ipv6("restore")
         manage_killswitch("restore")
         logger.debug("No connection found")
+        return_message = "No active connection was found."
+    
+    if gui_enabled:
+        return return_message
 
 
 def status(gui_enabled=False):
