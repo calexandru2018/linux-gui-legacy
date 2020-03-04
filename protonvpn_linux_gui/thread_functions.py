@@ -3,7 +3,7 @@ import time
 import requests
 import json
 
-from custom_pvpn_cli_ng.protonvpn_cli.utils import get_config_value
+from custom_pvpn_cli_ng.protonvpn_cli.utils import get_config_value, is_valid_ip
 
 from custom_pvpn_cli_ng.protonvpn_cli import cli
 from custom_pvpn_cli_ng.protonvpn_cli import connection
@@ -149,9 +149,12 @@ def refresh_server_list(interface, messagedialog_window, messagedialog_spinner):
 
 
 # Preferences/Configuration menu HANDLERS
-def update_user_pass(interface, username_field, password_field, messagedialog_label, messagedialog_spinner):
+def update_user_pass(interface, messagedialog_label, messagedialog_spinner):
     """Button/Event handler to update Username & Password
     """
+    username_field = interface.get_object("update_username_input")
+    password_field = interface.get_object("update_password_input")
+
     username_text = username_field.get_text().strip()
     password_text = password_field.get_text().strip()
 
@@ -166,37 +169,44 @@ def update_user_pass(interface, username_field, password_field, messagedialog_la
     password_field.set_text("")
     messagedialog_spinner.hide()
 
-def dns_preferens_combobox_changed(combobox, interface):
-    """Button/Event handler that is triggered whenever combo box value is changed.
-    """
-    # DNS ComboBox
-    # 0 - Leak Protection Enabled
-    # 1 - Custom DNS
-    # 2 - None
-
-    dns_custom_input = interface.get_object("dns_custom_input")
-
-    if combobox.get_active() == 0 or combobox.get_active() == 2:
-        dns_custom_input.set_property('sensitive', False)
-    else:
-        dns_custom_input.set_property('sensitive', True)
-
-def update_dns_button_clicked(interface):
+def update_dns(interface, messagedialog_label, messagedialog_spinner):
     """Button/Event handler to update DNS protection 
     """
     dns_combobox = interface.get_object("dns_preferens_combobox")
 
-    dns_leak_protection = 1
-    custom_dns = None
     if (not dns_combobox.get_active() == 0) and (not dns_combobox.get_active() == 2):
         dns_leak_protection = 0
+
         custom_dns = interface.get_object("dns_custom_input").get_text()
+        
+        if len(custom_dns) == 0:
+            messagedialog_spinner.hide()
+            messagedialog_label.set_markup("Custom DNS field input can not be left empty.")
+            return
+
+        custom_dns = custom_dns.split(" ")
+
+        for ip in custom_dns:
+            if not is_valid_ip(ip):
+                messagedialog_spinner.hide()
+                messagedialog_label.set_markup("<b>{0}</b> is not valid.\nNone of the DNS were added, please try again with a different DNS.".format(ip))
+                return
+
     elif dns_combobox.get_active() == 2:
         dns_leak_protection = 0
+        custom_dns = None
+        interface.get_object("dns_custom_input").set_text("")
+    else:
+        dns_leak_protection = 1
+        custom_dns = None
+        interface.get_object("dns_custom_input").set_text("")
     
-    cli.set_dns_protection(gui_enabled=True, dns_settings=(dns_leak_protection, custom_dns))
+    result = cli.set_dns_protection(gui_enabled=True, dns_settings=(dns_leak_protection, custom_dns))
 
-def update_pvpn_plan_button_clicked(interface):
+    messagedialog_label.set_markup(result)
+    messagedialog_spinner.hide()
+
+def update_pvpn_plan(interface):
     """Button/Event handler to update ProtonVPN Plan  
     """
     protonvpn_plan = 0
@@ -217,35 +227,22 @@ def update_pvpn_plan_button_clicked(interface):
     load_on_start(interface)        
     print("[!]Done")
 
-def update_def_protocol_button_clicked(interface):
+def update_def_protocol(interface):
     """Button/Event handler to update OpenVP Protocol  
     """
     openvpn_protocol = 'tcp' if interface.get_object('protocol_tcp_update_checkbox').get_active() == True else 'udp'
     
     cli.set_default_protocol(write=True, gui_enabled=True, protoc=openvpn_protocol)
 
-# Kill Switch
-def killswitch_combobox_changed(combobox, interface):
-    """Event handler that reactes when the combobox value changes
-    - If killswitch is enabled, then it disables the split tunneling input and button
-    """
-    if combobox.get_active() == 0:
-        interface.get_object("split_tunneling_textview").set_property('sensitive', True)
-        interface.get_object("update_split_tunneling_button").set_property('sensitive', True)
-    else:
-        interface.get_object("split_tunneling_textview").set_property('sensitive', False)
-        interface.get_object("update_split_tunneling_button").set_property('sensitive', False)
-
-def update_killswtich_button_clicked(interface):
+def update_killswtich(interface):
     """Button/Event handler to update Killswitch  
     """
     ks_combobox = interface.get_object("killswitch_combobox")
 
     cli.set_killswitch(gui_enabled=True, user_choice=ks_combobox.get_active())
 
-# To-do Start on boot
 
-def update_split_tunneling_button_clicked(interface):
+def update_split_tunneling(interface):
     """Button/Event handler to update Split Tunneling 
     """
     split_tunneling_buffer = interface.get_object("split_tunneling_textview").get_buffer()
@@ -265,7 +262,7 @@ def update_split_tunneling_button_clicked(interface):
     cli.set_split_tunnel(gui_enabled=True, user_data=split_tunneling_content)
 
 
-def purge_configurations_button_clicked(interface):
+def purge_configurations(interface):
         """Button/Event handler to purge configurations
         """
         # To-do: Confirm prior to allowing user to do this

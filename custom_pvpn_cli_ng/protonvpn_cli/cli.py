@@ -515,6 +515,8 @@ def set_default_protocol(write=False, gui_enabled=False, protoc=False):
 def set_dns_protection(gui_enabled=False, dns_settings=False):
     """Enable or disable DNS Leak Protection and custom DNS"""
 
+    result_message = 'Some error occured during DNS configuration.'
+
     if gui_enabled == True:
         dns_leak_protection, custom_dns = dns_settings
     else:
@@ -573,6 +575,10 @@ def set_dns_protection(gui_enabled=False, dns_settings=False):
     set_config_value("USER", "custom_dns", custom_dns)
     print("DNS Management updated.")
 
+    result_message = "DNS settings updated."
+
+    if gui_enabled:
+        return result_message
 
 def set_killswitch(gui_enabled=True, user_choice=False):
     """Enable or disable the Kill Switch."""

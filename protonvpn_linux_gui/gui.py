@@ -34,7 +34,13 @@ from .thread_functions import(
     last_connect,
     connect_to_selected_server,
     on_login,
-    update_user_pass
+    update_user_pass,
+    update_dns,
+    update_pvpn_plan,
+    update_def_protocol,
+    update_killswtich,
+    update_split_tunneling,
+    purge_configurations
 )
 
 from .constants import VERSION
@@ -289,14 +295,10 @@ class Handler:
         messagedialog_label = self.interface.get_object("message_dialog_label")
         messagedialog_spinner = self.interface.get_object("message_dialog_spinner")
 
-        username_field = self.interface.get_object("update_username_input")
-        password_field = self.interface.get_object("update_password_input")
-
         messagedialog_label.set_markup("Updating username and password...")
         messagedialog_spinner.show()
 
-
-        thread = Thread(target=update_user_pass, args=[self.interface,username_field, password_field, messagedialog_label, messagedialog_spinner])
+        thread = Thread(target=update_user_pass, args=[self.interface, messagedialog_label, messagedialog_spinner])
         thread.daemon = True
         thread.start()
 
@@ -320,17 +322,18 @@ class Handler:
     def update_dns_button_clicked(self, button):
         """Button/Event handler to update DNS protection 
         """
-        dns_combobox = self.interface.get_object("dns_preferens_combobox")
+        messagedialog_window = self.interface.get_object("MessageDialog")
+        messagedialog_label = self.interface.get_object("message_dialog_label")
+        messagedialog_spinner = self.interface.get_object("message_dialog_spinner")
 
-        dns_leak_protection = 1
-        custom_dns = None
-        if (not dns_combobox.get_active() == 0) and (not dns_combobox.get_active() == 2):
-            dns_leak_protection = 0
-            custom_dns = self.interface.get_object("dns_custom_input").get_text()
-        elif dns_combobox.get_active() == 2:
-            dns_leak_protection = 0
+        messagedialog_label.set_markup("DNS configurations...")
+        messagedialog_spinner.show()
         
-        cli.set_dns_protection(gui_enabled=True, dns_settings=(dns_leak_protection, custom_dns))
+        thread = Thread(target=update_dns, args=[self.interface, messagedialog_label, messagedialog_spinner])
+        thread.daemon = True
+        thread.start()
+
+        messagedialog_window.show()
 
     def update_pvpn_plan_button_clicked(self, button):
         """Button/Event handler to update ProtonVPN Plan  
