@@ -519,7 +519,7 @@ def set_default_protocol(write=False, gui_enabled=False, protoc=False):
 
     if gui_enabled:
         return result_message
-        
+
     return user_protocol
 
 
@@ -594,6 +594,9 @@ def set_dns_protection(gui_enabled=False, dns_settings=False):
 def set_killswitch(gui_enabled=True, user_choice=False):
     """Enable or disable the Kill Switch."""
     
+    # result_message = "Error occured during update of killswitch configurations."
+    result_message = ""
+
     if gui_enabled == True:
         killswitch = user_choice
     else:
@@ -643,11 +646,14 @@ def set_killswitch(gui_enabled=True, user_choice=False):
             "[!] Split Tunneling has been disabled."
         )
         time.sleep(1)
+        result_message = "Kill Switch can't be used with Split Tunneling.\nSplit Tunneling has been disabled."
 
     set_config_value("USER", "killswitch", killswitch)
     print()
     print("Kill Switch configuration updated.")
-
+    result_message = result_message + "Kill Switch configuration updated."
+    if gui_enabled:
+        return result_message
 
 def set_split_tunnel(gui_enabled=False, user_data=False):
     """Enable or disable split tunneling"""

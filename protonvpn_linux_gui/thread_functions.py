@@ -240,12 +240,15 @@ def update_def_protocol(interface, messagedialog_label, messagedialog_spinner):
     messagedialog_spinner.hide()
 
 
-def update_killswtich(interface):
+def update_killswitch(interface, messagedialog_label, messagedialog_spinner):
     """Button/Event handler to update Killswitch  
     """
     ks_combobox = interface.get_object("killswitch_combobox")
 
-    cli.set_killswitch(gui_enabled=True, user_choice=ks_combobox.get_active())
+    result = cli.set_killswitch(gui_enabled=True, user_choice=ks_combobox.get_active())
+
+    messagedialog_label.set_markup(result)
+    messagedialog_spinner.hide()
 
 
 def update_split_tunneling(interface):

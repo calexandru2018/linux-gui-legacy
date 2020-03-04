@@ -38,7 +38,7 @@ from .thread_functions import(
     update_dns,
     update_pvpn_plan,
     update_def_protocol,
-    update_killswtich,
+    update_killswitch,
     update_split_tunneling,
     purge_configurations
 )
@@ -380,12 +380,21 @@ class Handler:
             self.interface.get_object("split_tunneling_textview").set_property('sensitive', False)
             self.interface.get_object("update_split_tunneling_button").set_property('sensitive', False)
 
-    def update_killswtich_button_clicked(self, button):
+    def update_killswitch_button_clicked(self, button):
         """Button/Event handler to update Killswitch  
         """
-        ks_combobox = self.interface.get_object("killswitch_combobox")
+        messagedialog_window = self.interface.get_object("MessageDialog")
+        messagedialog_label = self.interface.get_object("message_dialog_label")
+        messagedialog_spinner = self.interface.get_object("message_dialog_spinner")
+        
+        messagedialog_label.set_markup("Updating killswitch configurations...")
+        messagedialog_spinner.show()
 
-        cli.set_killswitch(gui_enabled=True, user_choice=ks_combobox.get_active())
+        thread = Thread(target=update_killswitch, args=[self.interface, messagedialog_label, messagedialog_spinner])
+        thread.daemon = True
+        thread.start()
+
+        messagedialog_window.show()
 
     # To-do Start on boot
 
