@@ -62,7 +62,6 @@ def connect_to_selected_server(interface, selected_server, messagedialog_label, 
     result = connection.openvpn_connect(selected_server, protocol)
 
     messagedialog_label.set_markup(result)
-    
     messagedialog_spinner.hide()
 
     update_labels_status(update_labels_dict)
@@ -81,7 +80,6 @@ def quick_connect(interface, messagedialog_label, messagedialog_spinner):
     result = connection.fastest(protocol, gui_enabled=True)
 
     messagedialog_label.set_markup(result)
-
     messagedialog_spinner.hide()
     
     update_labels_status(update_labels_dict)
@@ -97,22 +95,24 @@ def last_connect(interface, messagedialog_label, messagedialog_spinner):
     result = connection.reconnect(gui_enabled=True)
 
     messagedialog_label.set_markup(result)
-
     messagedialog_spinner.hide()
-    
 
     update_labels_status(update_labels_dict)
 
-def random_connect(interface):
+def random_connect(interface, messagedialog_label, messagedialog_spinner):
     """Button/Event handler to connect to a random server
     """
+    protocol = get_config_value("USER", "default_protocol")
     update_labels_dict = {
         "interface": interface,
         "servers": False,
         "disconnecting": False
     }
-    protocol = get_config_value("USER", "default_protocol")
-    connection.random_c(protocol)
+
+    result = connection.random_c(protocol, gui_enabled=True)
+
+    messagedialog_label.set_markup(result)
+    messagedialog_spinner.hide()
 
     update_labels_status(update_labels_dict)
 

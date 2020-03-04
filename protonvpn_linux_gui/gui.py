@@ -179,9 +179,18 @@ class Handler:
     def random_connect_button_clicked(self, button):
         """Button/Event handler to connect to a random server
         """
-        thread = Thread(target=random_connect, args=[self.interface])
+        messagedialog_window = self.interface.get_object("MessageDialog")
+        messagedialog_label = self.interface.get_object("message_dialog_label")
+        messagedialog_spinner = self.interface.get_object("message_dialog_spinner")
+
+        messagedialog_label.set_markup("Connecting to a random server...")
+        messagedialog_spinner.show()
+
+        thread = Thread(target=random_connect, args=[self.interface, messagedialog_label, messagedialog_spinner])
         thread.daemon = True
         thread.start()
+
+        messagedialog_window.show()
 
     def disconnect_button_clicked(self, button):
         """Button/Event handler to disconnect any existing connections

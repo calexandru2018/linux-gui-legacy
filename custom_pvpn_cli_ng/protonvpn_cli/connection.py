@@ -124,7 +124,7 @@ def dialog():
     openvpn_connect(server_result, protocol_result)
 
 
-def random_c(protocol=None):
+def random_c(protocol=None, gui_enabled=False):
     """Connect to a random ProtonVPN Server."""
 
     logger.debug("Starting random connect")
@@ -136,6 +136,8 @@ def random_c(protocol=None):
 
     servername = random.choice(servers)["Name"]
 
+    if gui_enabled:
+        return openvpn_connect(servername, protocol, gui_enabled)
     openvpn_connect(servername, protocol)
 
 
