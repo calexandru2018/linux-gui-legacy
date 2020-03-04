@@ -208,9 +208,12 @@ class Handler:
     def check_for_updates_button_clicked(self, button):
         messagedialog_window = self.interface.get_object("MessageDialog")
         messagedialog_label = self.interface.get_object("message_dialog_label")
-        messagedialog_label.set_markup("Checking...")
+        messagedialog_spinner = self.interface.get_object("message_dialog_spinner")
 
-        thread = Thread(target=message_dialog, args=[self.interface, "check_for_update", messagedialog_label])
+        messagedialog_label.set_markup("Checking...")
+        messagedialog_spinner.show()
+
+        thread = Thread(target=message_dialog, args=[self.interface, "check_for_update", messagedialog_label, messagedialog_spinner])
         thread.daemon = True
         thread.start()
 

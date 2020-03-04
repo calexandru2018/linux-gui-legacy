@@ -28,7 +28,7 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import GObject as gobject
 
-def message_dialog(interface, action, object):
+def message_dialog(interface, action, label_object, spinner_object):
     # time.sleep(1)
     # messagedialog_window = interface.get_object("MessageDialog")
     if action == "check_for_update":
@@ -37,8 +37,8 @@ def message_dialog(interface, action, object):
             future = executor.submit(check_for_updates)
             return_value = future.result()
 
-            object.set_markup("<span>{0}</span>".format(return_value))
-            # object.set_text(return_value)
+            label_object.set_markup("<span>{0}</span>".format(return_value))
+            spinner_object.hide()
 
 def check_for_updates():
 
