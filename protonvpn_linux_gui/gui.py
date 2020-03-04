@@ -326,7 +326,7 @@ class Handler:
         messagedialog_label = self.interface.get_object("message_dialog_label")
         messagedialog_spinner = self.interface.get_object("message_dialog_spinner")
 
-        messagedialog_label.set_markup("DNS configurations...")
+        messagedialog_label.set_markup("Updating DNS configurations...")
         messagedialog_spinner.show()
         
         thread = Thread(target=update_dns, args=[self.interface, messagedialog_label, messagedialog_spinner])
@@ -338,23 +338,18 @@ class Handler:
     def update_pvpn_plan_button_clicked(self, button):
         """Button/Event handler to update ProtonVPN Plan  
         """
-        protonvpn_plan = 0
-        protonvpn_plans = {
-            1: self.interface.get_object("member_free_update_checkbox").get_active(),
-            2: self.interface.get_object("member_basic_update_checkbox").get_active(),
-            3: self.interface.get_object("member_plus_update_checkbox").get_active(),
-            4: self.interface.get_object("member_visionary_update_checkbox").get_active()
-        }
+        messagedialog_window = self.interface.get_object("MessageDialog")
+        messagedialog_label = self.interface.get_object("message_dialog_label")
+        messagedialog_spinner = self.interface.get_object("message_dialog_spinner")
+        
+        messagedialog_label.set_markup("Updating ProtonVPN Plan...")
+        messagedialog_spinner.show()
 
-        for k,v in protonvpn_plans.items():
-            if v == True:
-                protonvpn_plan = int(k)
-                break
-            
-        cli.set_protonvpn_tier(write=True, gui_enabled=True, tier=protonvpn_plan)
-        print("[!]Refreshing server list")
-        load_on_start(self.interface)        
-        print("[!]Done")
+        thread = Thread(target=update_pvpn_plan, args=[self.interface, messagedialog_label, messagedialog_spinner])
+        thread.daemon = True
+        thread.start()
+
+        messagedialog_window.show()
 
     def update_def_protocol_button_clicked(self, button):
         """Button/Event handler to update OpenVP Protocol  

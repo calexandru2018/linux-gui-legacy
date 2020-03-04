@@ -428,10 +428,12 @@ def set_username_password(write=False, gui_enabled=False, user_data=False):
 def set_protonvpn_tier(write=False, gui_enabled=False, tier=False):
     """Set the users ProtonVPN Plan."""
 
+    result_message = "Some error occured updating ProtonVPN plan."
+
     protonvpn_plans = {1: "Free", 2: "Basic", 3: "Plus", 4: "Visionary"}
 
     print()
-    if gui_enabled == True:
+    if gui_enabled:
         user_tier = tier
     else:
         print("Please choose your ProtonVPN Plan")
@@ -463,7 +465,10 @@ def set_protonvpn_tier(write=False, gui_enabled=False, tier=False):
         set_config_value("USER", "tier", str(user_tier))
 
         print("ProtonVPN Plan has been updated!")
+        result_message = "ProtonVPN Plan has been updated!\n\nServer list has been refreshed."
 
+    if gui_enabled:
+        return result_message
     return user_tier
 
 

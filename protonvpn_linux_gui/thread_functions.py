@@ -206,7 +206,7 @@ def update_dns(interface, messagedialog_label, messagedialog_spinner):
     messagedialog_label.set_markup(result)
     messagedialog_spinner.hide()
 
-def update_pvpn_plan(interface):
+def update_pvpn_plan(interface, messagedialog_label, messagedialog_spinner):
     """Button/Event handler to update ProtonVPN Plan  
     """
     protonvpn_plan = 0
@@ -222,10 +222,12 @@ def update_pvpn_plan(interface):
             protonvpn_plan = int(k)
             break
         
-    cli.set_protonvpn_tier(write=True, gui_enabled=True, tier=protonvpn_plan)
-    print("[!]Refreshing server list")
+    result = cli.set_protonvpn_tier(write=True, gui_enabled=True, tier=protonvpn_plan)
+
+    messagedialog_label.set_markup(result)
+    messagedialog_spinner.hide()
+
     load_on_start(interface)        
-    print("[!]Done")
 
 def update_def_protocol(interface):
     """Button/Event handler to update OpenVP Protocol  
