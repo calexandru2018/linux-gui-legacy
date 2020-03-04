@@ -1,4 +1,4 @@
-VERSION = "1.3.0"
+VERSION = "1.4.0"
 GITHUB_URL_RELEASE = "https://github.com/calexandru2018/protonvpn-linux-gui/releases/latest"
 PATH_AUTOCONNECT_SERVICE = "/etc/systemd/system/protonvpn-autoconnect.service"
 TEMPLATE ="""
