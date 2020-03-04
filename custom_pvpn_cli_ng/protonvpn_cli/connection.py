@@ -293,7 +293,7 @@ def direct(user_input, protocol=None):
     openvpn_connect(servername, protocol)
 
 
-def reconnect():
+def reconnect(gui_enabled=False):
     """Reconnect to the last VPN Server."""
 
     logger.debug("Starting reconnect")
@@ -307,8 +307,12 @@ def reconnect():
             "[!] Couldn't find a previous connection\n"
             "[!] Please connect normally first"
         )
-        sys.exit(1)
+        if not gui_enabled:
+            sys.exit(1)
+        return "Couldn't find a previous connection.\nPlease connect normally first."
 
+    if gui_enabled:
+        return openvpn_connect(servername, protocol, gui_enabled)
     openvpn_connect(servername, protocol)
 
 

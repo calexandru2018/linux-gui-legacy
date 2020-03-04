@@ -86,7 +86,7 @@ def quick_connect(interface, messagedialog_label, messagedialog_spinner):
     
     update_labels_status(update_labels_dict)
 
-def last_connect(interface):
+def last_connect(interface, messagedialog_label, messagedialog_spinner):
     """Button/Event handler to reconnect to previously connected server
     """        
     update_labels_dict = {
@@ -94,7 +94,12 @@ def last_connect(interface):
         "servers": False,
         "disconnecting": False
     }
-    connection.reconnect()
+    result = connection.reconnect(gui_enabled=True)
+
+    messagedialog_label.set_markup(result)
+
+    messagedialog_spinner.hide()
+    
 
     update_labels_status(update_labels_dict)
 

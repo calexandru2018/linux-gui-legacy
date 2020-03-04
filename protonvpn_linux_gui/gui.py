@@ -13,7 +13,7 @@ from custom_pvpn_cli_ng.protonvpn_cli.constants import (USER, CONFIG_FILE)
 from custom_pvpn_cli_ng.protonvpn_cli import cli
 
 # ProtonVPN helper funcitons
-from custom_pvpn_cli_ng.protonvpn_cli.utils import check_root
+from custom_pvpn_cli_ng.protonvpn_cli.utils import check_root, get_config_value
 
 # Custom helper functions
 from .utils import (
@@ -153,10 +153,28 @@ class Handler:
 
     def last_connect_button_clicked(self, button):
         """Button/Event handler to reconnect to previously connected server
-        """        
-        thread = Thread(target=last_connect, args=[self.interface])
+        """   
+        messagedialog_window = self.interface.get_object("MessageDialog")
+        messagedialog_label = self.interface.get_object("message_dialog_label")
+        messagedialog_spinner = self.interface.get_object("message_dialog_spinner")
+        
+        try:
+            servername = get_config_value("metadata", "connected_server")
+            protocol = get_config_value("metadata", "connected_proto")     
+        except:
+            messagedialog_label.set_markup("Connecting to to previously connected server...")
+            messagedialog_spinner.hide()
+            messagedialog_window.show()
+            return
+
+        messagedialog_label.set_markup("Connecting to to previously connected server <b>{0}</b> with <b>{1}</b>".format(servername, protocol.upper()))
+        messagedialog_spinner.show()
+
+        thread = Thread(target=last_connect, args=[self.interface, messagedialog_label, messagedialog_spinner])
         thread.daemon = True
         thread.start()
+
+        messagedialog_window.show()
 
     def random_connect_button_clicked(self, button):
         """Button/Event handler to connect to a random server
