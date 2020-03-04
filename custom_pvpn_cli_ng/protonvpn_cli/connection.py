@@ -455,6 +455,8 @@ def openvpn_connect(servername, protocol, gui_enabled=False):
         "Connecting to {0} via {1}".format(servername, protocol.upper())
     )
 
+    return_message = ''
+
     port = {"udp": 1194, "tcp": 443}
 
     shutil.copyfile(TEMPLATE_FILE, OVPN_FILE)
@@ -524,6 +526,7 @@ def openvpn_connect(servername, protocol, gui_enabled=False):
                     disconnect(passed=True)
                 print("Connected!")
                 logger.debug("Connection successful")
+                return_message = "Connected to <b>{0}</b> via <b>{1}</b>".format(servername, protocol.upper())
                 break
             # If Authentication failed
             elif "AUTH_FAILED" in content:
@@ -535,6 +538,7 @@ def openvpn_connect(servername, protocol, gui_enabled=False):
                 logger.debug("Authentication failure")
                 if not gui_enabled == True:
                     sys.exit(1)
+                return_message = "Authentication failed.\nPlease make sure that your Username and Password is correct."
                 break
             # Stop after 45s
             elif time.time() - time_start >= 45:
@@ -556,6 +560,7 @@ def openvpn_connect(servername, protocol, gui_enabled=False):
         config.write(f)
 
     check_update()
+    return return_message
 
 
 def manage_dns(mode, dns_server=False):
