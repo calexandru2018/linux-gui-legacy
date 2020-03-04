@@ -59,14 +59,60 @@ ProtonVPN Unofficial GUI: calexandru2018</property>
           <placeholder/>
         </child>
         <child>
-          <placeholder/>
-        </child>
-        <child type="center">
-          <object class="GtkButtonBox">
+          <object class="GtkGrid">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-            <property name="spacing">20</property>
-            <property name="layout_style">start</property>
+            <property name="halign">center</property>
+            <property name="row_homogeneous">True</property>
+            <property name="column_homogeneous">True</property>
+            <child>
+              <object class="GtkButtonBox">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="halign">center</property>
+                <property name="spacing">20</property>
+                <property name="layout_style">start</property>
+                <child>
+                  <placeholder/>
+                </child>
+                <child>
+                  <placeholder/>
+                </child>
+                <child>
+                  <object class="GtkButton" id="check_for_updates_button">
+                    <property name="label" translatable="yes">Update</property>
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="receives_default">True</property>
+                    <signal name="clicked" handler="check_for_updates_button_clicked" swapped="no"/>
+                  </object>
+                  <packing>
+                    <property name="expand">True</property>
+                    <property name="fill">True</property>
+                    <property name="position">3</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkButton" id="help_button">
+                    <property name="label" translatable="yes">Help</property>
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="receives_default">True</property>
+                    <signal name="clicked" handler="help_button_clicked" swapped="no"/>
+                  </object>
+                  <packing>
+                    <property name="expand">True</property>
+                    <property name="fill">True</property>
+                    <property name="position">4</property>
+                  </packing>
+                </child>
+              </object>
+              <packing>
+                <property name="left_attach">0</property>
+                <property name="top_attach">2</property>
+                <property name="width">3</property>
+              </packing>
+            </child>
             <child>
               <placeholder/>
             </child>
@@ -74,40 +120,26 @@ ProtonVPN Unofficial GUI: calexandru2018</property>
               <placeholder/>
             </child>
             <child>
-              <object class="GtkButton" id="check_for_updates_button">
-                <property name="label" translatable="yes">Update</property>
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="receives_default">True</property>
-                <signal name="clicked" handler="check_for_updates_button_clicked" swapped="no"/>
-              </object>
-              <packing>
-                <property name="expand">True</property>
-                <property name="fill">True</property>
-                <property name="position">3</property>
-              </packing>
+              <placeholder/>
             </child>
             <child>
-              <object class="GtkButton" id="help_button">
-                <property name="label" translatable="yes">Help</property>
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="receives_default">True</property>
-                <signal name="clicked" handler="help_button_clicked" swapped="no"/>
-              </object>
-              <packing>
-                <property name="expand">True</property>
-                <property name="fill">True</property>
-                <property name="position">4</property>
-              </packing>
+              <placeholder/>
+            </child>
+            <child>
+              <placeholder/>
+            </child>
+            <child>
+              <placeholder/>
             </child>
           </object>
           <packing>
-            <property name="expand">False</property>
-            <property name="fill">False</property>
-            <property name="pack_type">end</property>
-            <property name="position">4</property>
+            <property name="expand">True</property>
+            <property name="fill">True</property>
+            <property name="position">3</property>
           </packing>
+        </child>
+        <child type="center">
+          <placeholder/>
         </child>
       </object>
     </child>
@@ -1284,6 +1316,100 @@ ProtonVPN Unofficial GUI: calexandru2018</property>
           <packing>
             <property name="left_attach">0</property>
             <property name="top_attach">3</property>
+          </packing>
+        </child>
+      </object>
+    </child>
+  </object>
+  <object class="GtkDialog" id="MessageDialog">
+    <property name="width_request">400</property>
+    <property name="height_request">200</property>
+    <property name="can_focus">False</property>
+    <property name="title" translatable="yes">ProtonVPN GUI</property>
+    <property name="resizable">False</property>
+    <property name="modal">True</property>
+    <property name="destroy_with_parent">True</property>
+    <property name="icon">protonvpn_logo.png</property>
+    <property name="type_hint">dialog</property>
+    <property name="skip_pager_hint">True</property>
+    <child>
+      <placeholder/>
+    </child>
+    <child internal-child="vbox">
+      <object class="GtkBox">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="is_focus">True</property>
+        <property name="margin_left">20</property>
+        <property name="margin_right">20</property>
+        <property name="margin_top">20</property>
+        <property name="margin_bottom">20</property>
+        <property name="orientation">vertical</property>
+        <property name="spacing">2</property>
+        <child internal-child="action_area">
+          <object class="GtkButtonBox">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="layout_style">end</property>
+            <child>
+              <placeholder/>
+            </child>
+            <child>
+              <object class="GtkButton">
+                <property name="label" translatable="yes">Close</property>
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">True</property>
+                <property name="always_show_image">True</property>
+                <signal name="clicked" handler="close_message_dialog" swapped="no"/>
+              </object>
+              <packing>
+                <property name="expand">True</property>
+                <property name="fill">True</property>
+                <property name="position">1</property>
+              </packing>
+            </child>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">0</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkLabel" id="message_dialog_label">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="valign">center</property>
+            <property name="margin_top">30</property>
+            <property name="margin_bottom">30</property>
+            <property name="label" translatable="yes">label</property>
+            <property name="wrap">True</property>
+            <property name="selectable">True</property>
+            <property name="width_chars">40</property>
+            <property name="max_width_chars">70</property>
+            <attributes>
+              <attribute name="size" value="12000"/>
+            </attributes>
+          </object>
+          <packing>
+            <property name="expand">True</property>
+            <property name="fill">True</property>
+            <property name="position">1</property>
+          </packing>
+        </child>
+        <child type="center">
+          <object class="GtkSpinner" id="message_dialog_spinner">
+            <property name="width_request">50</property>
+            <property name="height_request">50</property>
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="active">True</property>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">2</property>
           </packing>
         </child>
       </object>

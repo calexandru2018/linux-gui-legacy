@@ -124,7 +124,7 @@ def dialog():
     openvpn_connect(server_result, protocol_result)
 
 
-def random_c(protocol=None):
+def random_c(protocol=None, gui_enabled=False):
     """Connect to a random ProtonVPN Server."""
 
     logger.debug("Starting random connect")
@@ -136,6 +136,8 @@ def random_c(protocol=None):
 
     servername = random.choice(servers)["Name"]
 
+    if gui_enabled:
+        return openvpn_connect(servername, protocol, gui_enabled)
     openvpn_connect(servername, protocol)
 
 
@@ -293,7 +295,7 @@ def direct(user_input, protocol=None):
     openvpn_connect(servername, protocol)
 
 
-def reconnect():
+def reconnect(gui_enabled=False):
     """Reconnect to the last VPN Server."""
 
     logger.debug("Starting reconnect")
@@ -307,16 +309,20 @@ def reconnect():
             "[!] Couldn't find a previous connection\n"
             "[!] Please connect normally first"
         )
-        sys.exit(1)
+        if not gui_enabled:
+            sys.exit(1)
+        return "Couldn't find a previous connection.\nPlease connect normally first."
 
+    if gui_enabled:
+        return openvpn_connect(servername, protocol, gui_enabled)
     openvpn_connect(servername, protocol)
 
 
-def disconnect(passed=False):
+def disconnect(passed=False, gui_enabled=False):
     """Disconnect VPN if a connection is present."""
 
     logger.debug("Initiating disconnect")
-
+    return_message = 'Error occured with this message'
     if is_connected():
         if passed:
             print("There is already a VPN connection running.")
@@ -341,7 +347,9 @@ def disconnect(passed=False):
 
         if is_connected():
             print("[!] Could not terminate OpenVPN process.")
-            sys.exit(1)
+            if not gui_enabled:
+                sys.exit(1)
+            return_message = "Could not terminate OpenVPN process."
         else:
             manage_dns("restore")
             manage_ipv6("restore")
@@ -349,6 +357,7 @@ def disconnect(passed=False):
             logger.debug("Disconnected")
             if not passed:
                 print("Disconnected.")
+                return_message = "Disconnected from VPN server."
     else:
         if not passed:
             print("No connection found.")
@@ -356,6 +365,10 @@ def disconnect(passed=False):
         manage_ipv6("restore")
         manage_killswitch("restore")
         logger.debug("No connection found")
+        return_message = "No active connection was found."
+    
+    if gui_enabled:
+        return return_message
 
 
 def status(gui_enabled=False):
@@ -455,6 +468,8 @@ def openvpn_connect(servername, protocol, gui_enabled=False):
         "Connecting to {0} via {1}".format(servername, protocol.upper())
     )
 
+    return_message = ''
+
     port = {"udp": 1194, "tcp": 443}
 
     shutil.copyfile(TEMPLATE_FILE, OVPN_FILE)
@@ -524,6 +539,7 @@ def openvpn_connect(servername, protocol, gui_enabled=False):
                     disconnect(passed=True)
                 print("Connected!")
                 logger.debug("Connection successful")
+                return_message = "Connected to <b>{0}</b> via <b>{1}</b>".format(servername, protocol.upper())
                 break
             # If Authentication failed
             elif "AUTH_FAILED" in content:
@@ -535,6 +551,7 @@ def openvpn_connect(servername, protocol, gui_enabled=False):
                 logger.debug("Authentication failure")
                 if not gui_enabled == True:
                     sys.exit(1)
+                return_message = "Authentication failed.\nPlease make sure that your Username and Password is correct."
                 break
             # Stop after 45s
             elif time.time() - time_start >= 45:
@@ -556,6 +573,7 @@ def openvpn_connect(servername, protocol, gui_enabled=False):
         config.write(f)
 
     check_update()
+    return return_message
 
 
 def manage_dns(mode, dns_server=False):

@@ -379,16 +379,19 @@ def purge_configuration(gui_enabled=False):
         time.sleep(0.5)
 
     connection.disconnect(passed=True)
+
     if os.path.isdir(CONFIG_DIR):
         shutil.rmtree(CONFIG_DIR)
-    print("Configuration purged.")
-
+        print("Configuration purged.")
+        if gui_enabled:
+            return "All your configurations were purged. Re-initilize your profile."
 
 def set_username_password(write=False, gui_enabled=False, user_data=False):
     """Set the ProtonVPN Username and Password."""
-
+    
+    return_message = 'Something went wrong.'
     print()
-    if gui_enabled == True:
+    if gui_enabled:
         ovpn_username, ovpn_password1 = user_data
     else:
         ovpn_username = input("Enter your ProtonVPN OpenVPN username: ")
@@ -417,17 +420,22 @@ def set_username_password(write=False, gui_enabled=False, user_data=False):
             os.chmod(PASSFILE, 0o600)
 
         print("Username and Password has been updated!")
+        return_message = "Username and Password has been updated!"
 
+    if gui_enabled:
+        return return_message
     return ovpn_username, ovpn_password1
 
 
 def set_protonvpn_tier(write=False, gui_enabled=False, tier=False):
     """Set the users ProtonVPN Plan."""
 
+    result_message = "Some error occured updating ProtonVPN plan."
+
     protonvpn_plans = {1: "Free", 2: "Basic", 3: "Plus", 4: "Visionary"}
 
     print()
-    if gui_enabled == True:
+    if gui_enabled:
         user_tier = tier
     else:
         print("Please choose your ProtonVPN Plan")
@@ -459,15 +467,20 @@ def set_protonvpn_tier(write=False, gui_enabled=False, tier=False):
         set_config_value("USER", "tier", str(user_tier))
 
         print("ProtonVPN Plan has been updated!")
+        result_message = "ProtonVPN Plan has been updated!\n\nServer list has been refreshed."
 
+    if gui_enabled:
+        return result_message
     return user_tier
 
 
 def set_default_protocol(write=False, gui_enabled=False, protoc=False):
     """Set the users default protocol"""
 
+    result_message = "Some error occured in updating default OpenVPN protocol..."
+
     print()
-    if gui_enabled == True:
+    if gui_enabled:
         user_protocol = protoc
     else:
         print(
@@ -504,12 +517,18 @@ def set_default_protocol(write=False, gui_enabled=False, protoc=False):
     if write:
         set_config_value("USER", "default_protocol", user_protocol)
         print("Default protocol has been updated.")
+        result_message = "Default OpenVPN protocol has been updated."
+
+    if gui_enabled:
+        return result_message
 
     return user_protocol
 
 
 def set_dns_protection(gui_enabled=False, dns_settings=False):
     """Enable or disable DNS Leak Protection and custom DNS"""
+
+    result_message = 'Some error occured during DNS configuration.'
 
     if gui_enabled == True:
         dns_leak_protection, custom_dns = dns_settings
@@ -569,10 +588,17 @@ def set_dns_protection(gui_enabled=False, dns_settings=False):
     set_config_value("USER", "custom_dns", custom_dns)
     print("DNS Management updated.")
 
+    result_message = "DNS settings updated."
+
+    if gui_enabled:
+        return result_message
 
 def set_killswitch(gui_enabled=True, user_choice=False):
     """Enable or disable the Kill Switch."""
     
+    # result_message = "Error occured during update of killswitch configurations."
+    result_message = ""
+
     if gui_enabled == True:
         killswitch = user_choice
     else:
@@ -622,14 +648,19 @@ def set_killswitch(gui_enabled=True, user_choice=False):
             "[!] Split Tunneling has been disabled."
         )
         time.sleep(1)
+        result_message = "Kill Switch can't be used with Split Tunneling.\nSplit Tunneling has been disabled."
 
     set_config_value("USER", "killswitch", killswitch)
     print()
     print("Kill Switch configuration updated.")
-
+    result_message = result_message + "Kill Switch configuration updated."
+    if gui_enabled:
+        return result_message
 
 def set_split_tunnel(gui_enabled=False, user_data=False):
     """Enable or disable split tunneling"""
+
+    result_message = ''
 
     print()
 
@@ -638,6 +669,7 @@ def set_split_tunnel(gui_enabled=False, user_data=False):
             set_config_value("USER", "split_tunnel", 0)
             if os.path.isfile(SPLIT_TUNNEL_FILE):
                 os.remove(SPLIT_TUNNEL_FILE)
+                result_message = "Split tunneling disabled.\n\n"
         else:
             if int(get_config_value("USER", "killswitch")):
                 set_config_value("USER", "killswitch", 0)
@@ -646,6 +678,7 @@ def set_split_tunnel(gui_enabled=False, user_data=False):
                     "[!] Split Tunneling can't be used with Kill Switch.\n" +
                     "[!] Kill Switch has been disabled.\n"
                 )
+                result_message = "Split Tunneling can't be used with Kill Switch.\nKill Switch has been disabled.\n\n"
                 time.sleep(1)
 
             set_config_value("USER", "split_tunnel", 1)
@@ -661,6 +694,7 @@ def set_split_tunnel(gui_enabled=False, user_data=False):
                 # split tunneling should be disabled again
                 logger.debug("No split tunneling file existing.")
                 set_config_value("USER", "split_tunnel", 0)
+                result_message = result_message + "No split tunneling file, split tunneling will be disabled.\n\n"
     else:
         user_choice = input("Enable split tunneling? [y/N]: ")
 
@@ -713,4 +747,8 @@ def set_split_tunnel(gui_enabled=False, user_data=False):
 
     print()
     print("Split tunneling configuration updated.")
+    result_message = result_message + "Split tunneling configuration updated."
     make_ovpn_template()
+
+    if gui_enabled:
+        return result_message

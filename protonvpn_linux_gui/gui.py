@@ -6,13 +6,14 @@ import pathlib
 from threading import Thread
 import time
 import concurrent.futures
+import queue
 
 # ProtonVPN base CLI package import
 from custom_pvpn_cli_ng.protonvpn_cli.constants import (USER, CONFIG_FILE)
 from custom_pvpn_cli_ng.protonvpn_cli import cli
 
 # ProtonVPN helper funcitons
-from custom_pvpn_cli_ng.protonvpn_cli.utils import check_root
+from custom_pvpn_cli_ng.protonvpn_cli.utils import check_root, get_config_value
 
 # Custom helper functions
 from .utils import (
@@ -20,6 +21,8 @@ from .utils import (
     prepare_initilizer,
     load_on_start,
     load_configurations,
+    message_dialog,
+    check_for_updates
 )
 
 # Import functions that are called with threads
@@ -31,7 +34,13 @@ from .thread_functions import(
     last_connect,
     connect_to_selected_server,
     on_login,
-    check_for_updates
+    update_user_pass,
+    update_dns,
+    update_pvpn_plan,
+    update_def_protocol,
+    update_killswitch,
+    update_split_tunneling,
+    purge_configurations
 )
 
 from .constants import VERSION
@@ -103,45 +112,125 @@ class Handler:
     def connect_to_selected_server_button_clicked(self, button):
         """Button/Event handler to connect to selected server
         """     
-        thread = Thread(target=connect_to_selected_server, args=[self.interface])
-        thread.daemon = True
-        thread.start()
+        selected_server = ''
+
+        messagedialog_window = self.interface.get_object("MessageDialog")
+        messagedialog_label = self.interface.get_object("message_dialog_label")
+        messagedialog_spinner = self.interface.get_object("message_dialog_spinner")
+        
+        # Get the server list object
+        server_list = self.interface.get_object("ServerList").get_selection() 
+
+        # Get the selected server
+        (model, pathlist) = server_list.get_selected_rows()
+        for path in pathlist :
+            tree_iter = model.get_iter(path)
+            # the second param of get_value() specifies the column number, starting at 0
+            selected_server = model.get_value(tree_iter, 1)
+
+        if selected_server == '':
+            messagedialog_spinner.hide()
+            messagedialog_label.set_markup("No server was selected!\nPlease select a server before attempting to connect.")
+        else:
+            # Set text and show spinner
+            messagedialog_label.set_markup("Connecting to <b>{0}</b>".format(selected_server))
+            messagedialog_spinner.show()
+
+            thread = Thread(target=connect_to_selected_server, args=[self.interface, selected_server, messagedialog_label, messagedialog_spinner])
+            thread.daemon = True
+            thread.start()
+            
+        messagedialog_window.show()
 
     def quick_connect_button_clicked(self, button):
         """Button/Event handler to connect to the fastest server
         """
-        thread = Thread(target=quick_connect, args=[self.interface])
+        messagedialog_window = self.interface.get_object("MessageDialog")
+        messagedialog_label = self.interface.get_object("message_dialog_label")
+        messagedialog_spinner = self.interface.get_object("message_dialog_spinner")
+
+        messagedialog_label.set_markup("Connecting to the fastest server...")
+        messagedialog_spinner.show()
+
+        thread = Thread(target=quick_connect, args=[self.interface, messagedialog_label, messagedialog_spinner])
         thread.daemon = True
         thread.start()
 
+        messagedialog_window.show()
+
     def last_connect_button_clicked(self, button):
         """Button/Event handler to reconnect to previously connected server
-        """        
-        thread = Thread(target=last_connect, args=[self.interface])
+        """   
+        messagedialog_window = self.interface.get_object("MessageDialog")
+        messagedialog_label = self.interface.get_object("message_dialog_label")
+        messagedialog_spinner = self.interface.get_object("message_dialog_spinner")
+        
+        try:
+            servername = get_config_value("metadata", "connected_server")
+            protocol = get_config_value("metadata", "connected_proto")     
+        except:
+            messagedialog_label.set_markup("Connecting to previously connected server...")
+            messagedialog_spinner.hide()
+            messagedialog_window.show()
+            return
+
+        messagedialog_label.set_markup("Connecting to to previously connected server <b>{0}</b> with <b>{1}</b>".format(servername, protocol.upper()))
+        messagedialog_spinner.show()
+
+        thread = Thread(target=last_connect, args=[self.interface, messagedialog_label, messagedialog_spinner])
         thread.daemon = True
         thread.start()
+
+        messagedialog_window.show()
 
     def random_connect_button_clicked(self, button):
         """Button/Event handler to connect to a random server
         """
-        thread = Thread(target=random_connect, args=[self.interface])
+        messagedialog_window = self.interface.get_object("MessageDialog")
+        messagedialog_label = self.interface.get_object("message_dialog_label")
+        messagedialog_spinner = self.interface.get_object("message_dialog_spinner")
+
+        messagedialog_label.set_markup("Connecting to a random server...")
+        messagedialog_spinner.show()
+
+        thread = Thread(target=random_connect, args=[self.interface, messagedialog_label, messagedialog_spinner])
         thread.daemon = True
         thread.start()
+
+        messagedialog_window.show()
 
     def disconnect_button_clicked(self, button):
         """Button/Event handler to disconnect any existing connections
         """
-        thread = Thread(target=disconnect, args=[self.interface])
+        messagedialog_window = self.interface.get_object("MessageDialog")
+        messagedialog_label = self.interface.get_object("message_dialog_label")
+        messagedialog_spinner = self.interface.get_object("message_dialog_spinner")
+
+        messagedialog_label.set_markup("Disconnecting...")
+        messagedialog_spinner.show()
+
+        thread = Thread(target=disconnect, args=[self.interface, messagedialog_label, messagedialog_spinner])
         thread.daemon = True
         thread.start()
+
+        messagedialog_window.show()
         
     def refresh_server_list_button_clicked(self, button):
         """Button/Event handler to refresh/repopulate server list
         - At the moment, will also refresh the Dashboard information, this will be fixed in the future.
         """
-        thread = Thread(target=refresh_server_list, args=[self.interface])
+        messagedialog_window = self.interface.get_object("MessageDialog")
+        messagedialog_label = self.interface.get_object("message_dialog_label")
+        messagedialog_spinner = self.interface.get_object("message_dialog_spinner")
+
+        messagedialog_label.set_markup("Refreshing server list...")
+        messagedialog_spinner.show()
+
+        thread = Thread(target=refresh_server_list, args=[self.interface, messagedialog_window, messagedialog_spinner])
         thread.daemon = True
         thread.start()
+
+        messagedialog_window.show()
 
     def about_menu_button_clicked(self, button):
         """Button /Event handlerto open About dialog
@@ -151,13 +240,25 @@ class Handler:
         about_dialog.show()
     
     def check_for_updates_button_clicked(self, button):
-        thread = Thread(target=check_for_updates)
+        messagedialog_window = self.interface.get_object("MessageDialog")
+        messagedialog_label = self.interface.get_object("message_dialog_label")
+        messagedialog_spinner = self.interface.get_object("message_dialog_spinner")
+
+        messagedialog_label.set_markup("Checking...")
+        messagedialog_spinner.show()
+
+        thread = Thread(target=message_dialog, args=[self.interface, "check_for_update", messagedialog_label, messagedialog_spinner])
         thread.daemon = True
         thread.start()
+
+        messagedialog_window.show()
 
     def help_button_clicked(self, button):
         # To-do
         print("To-do show help.")
+
+    def close_message_dialog(self, button):
+        self.interface.get_object("MessageDialog").hide()
 
     def configuration_menu_button_clicked(self, button):
         """Button/Event handler to open Configurations window
@@ -190,18 +291,18 @@ class Handler:
     def update_user_pass_button_clicked(self, button):
         """Button/Event handler to update Username & Password
         """
-        username_field = self.interface.get_object("update_username_input")
-        password_field = self.interface.get_object("update_password_input")
+        messagedialog_window = self.interface.get_object("MessageDialog")
+        messagedialog_label = self.interface.get_object("message_dialog_label")
+        messagedialog_spinner = self.interface.get_object("message_dialog_spinner")
 
-        username_text = username_field.get_text().strip()
-        password_text = password_field.get_text().strip()
+        messagedialog_label.set_markup("Updating username and password...")
+        messagedialog_spinner.show()
 
-        if len(username_text) == 0 or len(password_text) == 0:
-            print("Both field need to be filled")
-            return
+        thread = Thread(target=update_user_pass, args=[self.interface, messagedialog_label, messagedialog_spinner])
+        thread.daemon = True
+        thread.start()
 
-        cli.set_username_password(write=True, gui_enabled=True, user_data=(username_text, password_text))
-        password_field.set_text("")
+        messagedialog_window.show()
 
     def dns_preferens_combobox_changed(self, combobox):
         """Button/Event handler that is triggered whenever combo box value is changed.
@@ -221,45 +322,51 @@ class Handler:
     def update_dns_button_clicked(self, button):
         """Button/Event handler to update DNS protection 
         """
-        dns_combobox = self.interface.get_object("dns_preferens_combobox")
+        messagedialog_window = self.interface.get_object("MessageDialog")
+        messagedialog_label = self.interface.get_object("message_dialog_label")
+        messagedialog_spinner = self.interface.get_object("message_dialog_spinner")
 
-        dns_leak_protection = 1
-        custom_dns = None
-        if (not dns_combobox.get_active() == 0) and (not dns_combobox.get_active() == 2):
-            dns_leak_protection = 0
-            custom_dns = self.interface.get_object("dns_custom_input").get_text()
-        elif dns_combobox.get_active() == 2:
-            dns_leak_protection = 0
+        messagedialog_label.set_markup("Updating DNS configurations...")
+        messagedialog_spinner.show()
         
-        cli.set_dns_protection(gui_enabled=True, dns_settings=(dns_leak_protection, custom_dns))
+        thread = Thread(target=update_dns, args=[self.interface, messagedialog_label, messagedialog_spinner])
+        thread.daemon = True
+        thread.start()
+
+        messagedialog_window.show()
 
     def update_pvpn_plan_button_clicked(self, button):
         """Button/Event handler to update ProtonVPN Plan  
         """
-        protonvpn_plan = 0
-        protonvpn_plans = {
-            1: self.interface.get_object("member_free_update_checkbox").get_active(),
-            2: self.interface.get_object("member_basic_update_checkbox").get_active(),
-            3: self.interface.get_object("member_plus_update_checkbox").get_active(),
-            4: self.interface.get_object("member_visionary_update_checkbox").get_active()
-        }
+        messagedialog_window = self.interface.get_object("MessageDialog")
+        messagedialog_label = self.interface.get_object("message_dialog_label")
+        messagedialog_spinner = self.interface.get_object("message_dialog_spinner")
+        
+        messagedialog_label.set_markup("Updating ProtonVPN Plan...")
+        messagedialog_spinner.show()
 
-        for k,v in protonvpn_plans.items():
-            if v == True:
-                protonvpn_plan = int(k)
-                break
-            
-        cli.set_protonvpn_tier(write=True, gui_enabled=True, tier=protonvpn_plan)
-        print("[!]Refreshing server list")
-        load_on_start(self.interface)        
-        print("[!]Done")
+        thread = Thread(target=update_pvpn_plan, args=[self.interface, messagedialog_label, messagedialog_spinner])
+        thread.daemon = True
+        thread.start()
 
+        messagedialog_window.show()
+
+    # Update Default OpenVPN protocol
     def update_def_protocol_button_clicked(self, button):
         """Button/Event handler to update OpenVP Protocol  
         """
-        openvpn_protocol = 'tcp' if self.interface.get_object('protocol_tcp_update_checkbox').get_active() == True else 'udp'
+        messagedialog_window = self.interface.get_object("MessageDialog")
+        messagedialog_label = self.interface.get_object("message_dialog_label")
+        messagedialog_spinner = self.interface.get_object("message_dialog_spinner")
         
-        cli.set_default_protocol(write=True, gui_enabled=True, protoc=openvpn_protocol)
+        messagedialog_label.set_markup("Updating default OpenVPN Protocol...")
+        messagedialog_spinner.show()
+
+        thread = Thread(target=update_def_protocol, args=[self.interface, messagedialog_label, messagedialog_spinner])
+        thread.daemon = True
+        thread.start()
+
+        messagedialog_window.show()
 
     # Kill Switch
     def killswitch_combobox_changed(self, combobox):
@@ -273,40 +380,56 @@ class Handler:
             self.interface.get_object("split_tunneling_textview").set_property('sensitive', False)
             self.interface.get_object("update_split_tunneling_button").set_property('sensitive', False)
 
-    def update_killswtich_button_clicked(self, button):
+    def update_killswitch_button_clicked(self, button):
         """Button/Event handler to update Killswitch  
         """
-        ks_combobox = self.interface.get_object("killswitch_combobox")
+        messagedialog_window = self.interface.get_object("MessageDialog")
+        messagedialog_label = self.interface.get_object("message_dialog_label")
+        messagedialog_spinner = self.interface.get_object("message_dialog_spinner")
+        
+        messagedialog_label.set_markup("Updating killswitch configurations...")
+        messagedialog_spinner.show()
 
-        cli.set_killswitch(gui_enabled=True, user_choice=ks_combobox.get_active())
+        thread = Thread(target=update_killswitch, args=[self.interface, messagedialog_label, messagedialog_spinner])
+        thread.daemon = True
+        thread.start()
+
+        messagedialog_window.show()
 
     # To-do Start on boot
 
     def update_split_tunneling_button_clicked(self, button):
         """Button/Event handler to update Split Tunneling 
         """
-        split_tunneling_buffer = self.interface.get_object("split_tunneling_textview").get_buffer()
-
-        # Get text takes a start_iter, end_iter and the buffer itself as last param
-        split_tunneling_content = split_tunneling_buffer.get_text(split_tunneling_buffer.get_start_iter(), split_tunneling_buffer.get_end_iter(), split_tunneling_buffer)
+        messagedialog_window = self.interface.get_object("MessageDialog")
+        messagedialog_label = self.interface.get_object("message_dialog_label")
+        messagedialog_spinner = self.interface.get_object("message_dialog_spinner")
         
-        # Split IP/CIDR by either ";" and/or "\n"
-        split_tunneling_content = re.split('[;\n]', split_tunneling_content)
+        messagedialog_label.set_markup("Updating split tunneling configurations...")
+        messagedialog_spinner.show()
 
-        # Remove empty spaces
-        split_tunneling_content = [content.strip() for content in split_tunneling_content]
+        thread = Thread(target=update_split_tunneling, args=[self.interface, messagedialog_label, messagedialog_spinner])
+        thread.daemon = True
+        thread.start()
 
-        # Remove empty list elements
-        split_tunneling_content = list(filter(None, split_tunneling_content))
-
-        cli.set_split_tunnel(gui_enabled=True, user_data=split_tunneling_content)
+        messagedialog_window.show()
 
 
     def purge_configurations_button_clicked(self, button):
-            """Button/Event handler to purge configurations
-            """
-            # To-do: Confirm prior to allowing user to do this
-            cli.purge_configuration(gui_enabled=True)
+        """Button/Event handler to purge configurations
+        """
+        messagedialog_window = self.interface.get_object("MessageDialog")
+        messagedialog_label = self.interface.get_object("message_dialog_label")
+        messagedialog_spinner = self.interface.get_object("message_dialog_spinner")
+        
+        messagedialog_label.set_markup("Purging configurations configurations...")
+        messagedialog_spinner.show()
+
+        thread = Thread(target=purge_configurations, args=[self.interface, messagedialog_label, messagedialog_spinner])
+        thread.daemon = True
+        thread.start()
+
+        messagedialog_window.show()
 
 def initialize_gui():
     """Initializes the GUI 
