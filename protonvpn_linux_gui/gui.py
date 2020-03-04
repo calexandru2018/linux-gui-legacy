@@ -401,21 +401,18 @@ class Handler:
     def update_split_tunneling_button_clicked(self, button):
         """Button/Event handler to update Split Tunneling 
         """
-        split_tunneling_buffer = self.interface.get_object("split_tunneling_textview").get_buffer()
-
-        # Get text takes a start_iter, end_iter and the buffer itself as last param
-        split_tunneling_content = split_tunneling_buffer.get_text(split_tunneling_buffer.get_start_iter(), split_tunneling_buffer.get_end_iter(), split_tunneling_buffer)
+        messagedialog_window = self.interface.get_object("MessageDialog")
+        messagedialog_label = self.interface.get_object("message_dialog_label")
+        messagedialog_spinner = self.interface.get_object("message_dialog_spinner")
         
-        # Split IP/CIDR by either ";" and/or "\n"
-        split_tunneling_content = re.split('[;\n]', split_tunneling_content)
+        messagedialog_label.set_markup("Updating split tunneling configurations...")
+        messagedialog_spinner.show()
 
-        # Remove empty spaces
-        split_tunneling_content = [content.strip() for content in split_tunneling_content]
+        thread = Thread(target=update_split_tunneling, args=[self.interface, messagedialog_label, messagedialog_spinner])
+        thread.daemon = True
+        thread.start()
 
-        # Remove empty list elements
-        split_tunneling_content = list(filter(None, split_tunneling_content))
-
-        cli.set_split_tunnel(gui_enabled=True, user_data=split_tunneling_content)
+        messagedialog_window.show()
 
 
     def purge_configurations_button_clicked(self, button):

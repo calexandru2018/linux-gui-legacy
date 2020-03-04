@@ -251,7 +251,7 @@ def update_killswitch(interface, messagedialog_label, messagedialog_spinner):
     messagedialog_spinner.hide()
 
 
-def update_split_tunneling(interface):
+def update_split_tunneling(interface, messagedialog_label, messagedialog_spinner):
     """Button/Event handler to update Split Tunneling 
     """
     split_tunneling_buffer = interface.get_object("split_tunneling_textview").get_buffer()
@@ -268,8 +268,16 @@ def update_split_tunneling(interface):
     # Remove empty list elements
     split_tunneling_content = list(filter(None, split_tunneling_content))
 
-    cli.set_split_tunnel(gui_enabled=True, user_data=split_tunneling_content)
+    for ip in split_tunneling_content:
+        if not is_valid_ip(ip):
+            messagedialog_spinner.hide()
+            messagedialog_label.set_markup("<b>{0}</b> is not valid.\nNone of the IP's were added, please try again with a different IP.".format(ip))
+            return
 
+    result = cli.set_split_tunnel(gui_enabled=True, user_data=split_tunneling_content)
+
+    messagedialog_label.set_markup(result)
+    messagedialog_spinner.hide()
 
 def purge_configurations(interface):
         """Button/Event handler to purge configurations

@@ -658,6 +658,8 @@ def set_killswitch(gui_enabled=True, user_choice=False):
 def set_split_tunnel(gui_enabled=False, user_data=False):
     """Enable or disable split tunneling"""
 
+    result_message = ''
+
     print()
 
     if gui_enabled == True:
@@ -665,6 +667,7 @@ def set_split_tunnel(gui_enabled=False, user_data=False):
             set_config_value("USER", "split_tunnel", 0)
             if os.path.isfile(SPLIT_TUNNEL_FILE):
                 os.remove(SPLIT_TUNNEL_FILE)
+                result_message = "Split tunneling disabled.\n\n"
         else:
             if int(get_config_value("USER", "killswitch")):
                 set_config_value("USER", "killswitch", 0)
@@ -673,6 +676,7 @@ def set_split_tunnel(gui_enabled=False, user_data=False):
                     "[!] Split Tunneling can't be used with Kill Switch.\n" +
                     "[!] Kill Switch has been disabled.\n"
                 )
+                result_message = "Split Tunneling can't be used with Kill Switch.\nKill Switch has been disabled.\n\n"
                 time.sleep(1)
 
             set_config_value("USER", "split_tunnel", 1)
@@ -688,6 +692,7 @@ def set_split_tunnel(gui_enabled=False, user_data=False):
                 # split tunneling should be disabled again
                 logger.debug("No split tunneling file existing.")
                 set_config_value("USER", "split_tunnel", 0)
+                result_message = result_message + "No split tunneling file, split tunneling will be disabled.\n\n"
     else:
         user_choice = input("Enable split tunneling? [y/N]: ")
 
@@ -740,4 +745,8 @@ def set_split_tunnel(gui_enabled=False, user_data=False):
 
     print()
     print("Split tunneling configuration updated.")
+    result_message = result_message + "Split tunneling configuration updated."
     make_ovpn_template()
+
+    if gui_enabled:
+        return result_message
