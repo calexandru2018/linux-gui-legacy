@@ -212,9 +212,18 @@ class Handler:
         """Button/Event handler to refresh/repopulate server list
         - At the moment, will also refresh the Dashboard information, this will be fixed in the future.
         """
-        thread = Thread(target=refresh_server_list, args=[self.interface])
+        messagedialog_window = self.interface.get_object("MessageDialog")
+        messagedialog_label = self.interface.get_object("message_dialog_label")
+        messagedialog_spinner = self.interface.get_object("message_dialog_spinner")
+
+        messagedialog_label.set_markup("Refreshing server list...")
+        messagedialog_spinner.show()
+
+        thread = Thread(target=refresh_server_list, args=[self.interface, messagedialog_window, messagedialog_spinner])
         thread.daemon = True
         thread.start()
+
+        messagedialog_window.show()
 
     def about_menu_button_clicked(self, button):
         """Button /Event handlerto open About dialog

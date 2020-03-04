@@ -133,7 +133,7 @@ def disconnect(interface, messagedialog_label, messagedialog_spinner):
     update_labels_status(update_labels_dict)
     
     
-def refresh_server_list(interface):
+def refresh_server_list(interface, messagedialog_window, messagedialog_spinner):
     """Button/Event handler to refresh/repopulate server list
     - At the moment, will also refresh the Dashboard information, this will be fixed in the future.
     """
@@ -142,6 +142,11 @@ def refresh_server_list(interface):
     time.sleep(1)
     # Temporary solution
     update_labels_server_list(interface)
+
+    messagedialog_window.hide()
+    messagedialog_spinner.hide()
+
+
 
 # Preferences/Configuration menu HANDLERS
 def update_user_pass_button_clicked(interface):
