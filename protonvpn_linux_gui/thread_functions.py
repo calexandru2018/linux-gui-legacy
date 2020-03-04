@@ -229,12 +229,16 @@ def update_pvpn_plan(interface, messagedialog_label, messagedialog_spinner):
 
     load_on_start(interface)        
 
-def update_def_protocol(interface):
+def update_def_protocol(interface, messagedialog_label, messagedialog_spinner):
     """Button/Event handler to update OpenVP Protocol  
     """
     openvpn_protocol = 'tcp' if interface.get_object('protocol_tcp_update_checkbox').get_active() == True else 'udp'
     
-    cli.set_default_protocol(write=True, gui_enabled=True, protoc=openvpn_protocol)
+    result = cli.set_default_protocol(write=True, gui_enabled=True, protoc=openvpn_protocol)
+
+    messagedialog_label.set_markup(result)
+    messagedialog_spinner.hide()
+
 
 def update_killswtich(interface):
     """Button/Event handler to update Killswitch  

@@ -475,8 +475,10 @@ def set_protonvpn_tier(write=False, gui_enabled=False, tier=False):
 def set_default_protocol(write=False, gui_enabled=False, protoc=False):
     """Set the users default protocol"""
 
+    result_message = "Some error occured in updating default OpenVPN protocol..."
+
     print()
-    if gui_enabled == True:
+    if gui_enabled:
         user_protocol = protoc
     else:
         print(
@@ -513,7 +515,11 @@ def set_default_protocol(write=False, gui_enabled=False, protoc=False):
     if write:
         set_config_value("USER", "default_protocol", user_protocol)
         print("Default protocol has been updated.")
+        result_message = "Default OpenVPN protocol has been updated."
 
+    if gui_enabled:
+        return result_message
+        
     return user_protocol
 
 

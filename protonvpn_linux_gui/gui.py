@@ -351,12 +351,22 @@ class Handler:
 
         messagedialog_window.show()
 
+    # Update Default OpenVPN protocol
     def update_def_protocol_button_clicked(self, button):
         """Button/Event handler to update OpenVP Protocol  
         """
-        openvpn_protocol = 'tcp' if self.interface.get_object('protocol_tcp_update_checkbox').get_active() == True else 'udp'
+        messagedialog_window = self.interface.get_object("MessageDialog")
+        messagedialog_label = self.interface.get_object("message_dialog_label")
+        messagedialog_spinner = self.interface.get_object("message_dialog_spinner")
         
-        cli.set_default_protocol(write=True, gui_enabled=True, protoc=openvpn_protocol)
+        messagedialog_label.set_markup("Updating default OpenVPN Protocol...")
+        messagedialog_spinner.show()
+
+        thread = Thread(target=update_def_protocol, args=[self.interface, messagedialog_label, messagedialog_spinner])
+        thread.daemon = True
+        thread.start()
+
+        messagedialog_window.show()
 
     # Kill Switch
     def killswitch_combobox_changed(self, combobox):
