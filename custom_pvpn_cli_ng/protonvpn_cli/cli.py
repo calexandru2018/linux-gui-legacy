@@ -379,10 +379,12 @@ def purge_configuration(gui_enabled=False):
         time.sleep(0.5)
 
     connection.disconnect(passed=True)
+
     if os.path.isdir(CONFIG_DIR):
         shutil.rmtree(CONFIG_DIR)
-    print("Configuration purged.")
-
+        print("Configuration purged.")
+        if gui_enabled:
+            return "All your configurations were purged. Re-initilize your profile."
 
 def set_username_password(write=False, gui_enabled=False, user_data=False):
     """Set the ProtonVPN Username and Password."""

@@ -416,10 +416,20 @@ class Handler:
 
 
     def purge_configurations_button_clicked(self, button):
-            """Button/Event handler to purge configurations
-            """
-            # To-do: Confirm prior to allowing user to do this
-            cli.purge_configuration(gui_enabled=True)
+        """Button/Event handler to purge configurations
+        """
+        messagedialog_window = self.interface.get_object("MessageDialog")
+        messagedialog_label = self.interface.get_object("message_dialog_label")
+        messagedialog_spinner = self.interface.get_object("message_dialog_spinner")
+        
+        messagedialog_label.set_markup("Purging configurations configurations...")
+        messagedialog_spinner.show()
+
+        thread = Thread(target=purge_configurations, args=[self.interface, messagedialog_label, messagedialog_spinner])
+        thread.daemon = True
+        thread.start()
+
+        messagedialog_window.show()
 
 def initialize_gui():
     """Initializes the GUI 

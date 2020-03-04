@@ -336,7 +336,6 @@ def load_configurations(interface):
             split_tunneling_buffer.set_text(content)
 
     except FileNotFoundError:
-        print("No split tunnel file presente")
         split_tunneling_buffer.set_text(content)
 
     pref_dialog.show()

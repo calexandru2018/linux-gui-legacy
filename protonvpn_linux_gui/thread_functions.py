@@ -279,8 +279,11 @@ def update_split_tunneling(interface, messagedialog_label, messagedialog_spinner
     messagedialog_label.set_markup(result)
     messagedialog_spinner.hide()
 
-def purge_configurations(interface):
-        """Button/Event handler to purge configurations
-        """
-        # To-do: Confirm prior to allowing user to do this
-        cli.purge_configuration(gui_enabled=True)
+def purge_configurations(interface, messagedialog_label, messagedialog_spinner):
+    """Button/Event handler to purge configurations
+    """
+    # To-do: Confirm prior to allowing user to do this
+    result = cli.purge_configuration(gui_enabled=True)
+
+    messagedialog_label.set_markup(result)
+    messagedialog_spinner.hide()
