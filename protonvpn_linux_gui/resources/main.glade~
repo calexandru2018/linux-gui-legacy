@@ -1387,7 +1387,7 @@ ProtonVPN Unofficial GUI: calexandru2018</property>
             <property name="wrap">True</property>
             <property name="selectable">True</property>
             <property name="width_chars">40</property>
-            <property name="max_width_chars">55</property>
+            <property name="max_width_chars">70</property>
             <attributes>
               <attribute name="size" value="12000"/>
             </attributes>
@@ -1396,6 +1396,20 @@ ProtonVPN Unofficial GUI: calexandru2018</property>
             <property name="expand">True</property>
             <property name="fill">True</property>
             <property name="position">1</property>
+          </packing>
+        </child>
+        <child type="center">
+          <object class="GtkSpinner" id="message_dialog_spinner">
+            <property name="width_request">50</property>
+            <property name="height_request">50</property>
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="active">True</property>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">2</property>
           </packing>
         </child>
       </object>
