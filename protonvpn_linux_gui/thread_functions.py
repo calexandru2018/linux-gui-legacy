@@ -51,35 +51,39 @@ def on_login(interface):
 def connect_to_selected_server(interface, selected_server, messagedialog_label, messagedialog_spinner):
     """Button/Event handler to connect to selected server
     """     
+    protocol = get_config_value("USER", "default_protocol")
     update_labels_dict = {
         "interface": interface,
         "servers": False,
         "disconnecting": False
     }
 
-    protocol = get_config_value("USER", "default_protocol")
 
     result = connection.openvpn_connect(selected_server, protocol)
 
     messagedialog_label.set_markup(result)
     
-    update_labels_status(update_labels_dict)
-
     messagedialog_spinner.hide()
 
+    update_labels_status(update_labels_dict)
     
-def quick_connect(interface):
+def quick_connect(interface, messagedialog_label, messagedialog_spinner):
     """Button/Event handler to connect to the fastest server
     """
+
     protocol = get_config_value("USER", "default_protocol")
-
-    connection.fastest(protocol, gui_enabled=True)
-
     update_labels_dict = {
         "interface": interface,
         "servers": False,
         "disconnecting": False
     }
+
+    result = connection.fastest(protocol, gui_enabled=True)
+
+    messagedialog_label.set_markup(result)
+
+    messagedialog_spinner.hide()
+    
     update_labels_status(update_labels_dict)
 
 def last_connect(interface):
