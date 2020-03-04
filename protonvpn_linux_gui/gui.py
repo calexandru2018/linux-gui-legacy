@@ -33,7 +33,8 @@ from .thread_functions import(
     random_connect,
     last_connect,
     connect_to_selected_server,
-    on_login
+    on_login,
+    update_user_pass
 )
 
 from .constants import VERSION
@@ -284,18 +285,22 @@ class Handler:
     def update_user_pass_button_clicked(self, button):
         """Button/Event handler to update Username & Password
         """
+        messagedialog_window = self.interface.get_object("MessageDialog")
+        messagedialog_label = self.interface.get_object("message_dialog_label")
+        messagedialog_spinner = self.interface.get_object("message_dialog_spinner")
+
         username_field = self.interface.get_object("update_username_input")
         password_field = self.interface.get_object("update_password_input")
 
-        username_text = username_field.get_text().strip()
-        password_text = password_field.get_text().strip()
+        messagedialog_label.set_markup("Updating username and password...")
+        messagedialog_spinner.show()
 
-        if len(username_text) == 0 or len(password_text) == 0:
-            print("Both field need to be filled")
-            return
 
-        cli.set_username_password(write=True, gui_enabled=True, user_data=(username_text, password_text))
-        password_field.set_text("")
+        thread = Thread(target=update_user_pass, args=[self.interface,username_field, password_field, messagedialog_label, messagedialog_spinner])
+        thread.daemon = True
+        thread.start()
+
+        messagedialog_window.show()
 
     def dns_preferens_combobox_changed(self, combobox):
         """Button/Event handler that is triggered whenever combo box value is changed.

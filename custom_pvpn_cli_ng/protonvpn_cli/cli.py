@@ -386,9 +386,10 @@ def purge_configuration(gui_enabled=False):
 
 def set_username_password(write=False, gui_enabled=False, user_data=False):
     """Set the ProtonVPN Username and Password."""
-
+    
+    return_message = 'Something went wrong.'
     print()
-    if gui_enabled == True:
+    if gui_enabled:
         ovpn_username, ovpn_password1 = user_data
     else:
         ovpn_username = input("Enter your ProtonVPN OpenVPN username: ")
@@ -417,7 +418,10 @@ def set_username_password(write=False, gui_enabled=False, user_data=False):
             os.chmod(PASSFILE, 0o600)
 
         print("Username and Password has been updated!")
+        return_message = "Username and Password has been updated!"
 
+    if gui_enabled:
+        return return_message
     return ovpn_username, ovpn_password1
 
 

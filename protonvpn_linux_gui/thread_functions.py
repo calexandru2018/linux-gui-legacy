@@ -149,21 +149,22 @@ def refresh_server_list(interface, messagedialog_window, messagedialog_spinner):
 
 
 # Preferences/Configuration menu HANDLERS
-def update_user_pass_button_clicked(interface):
+def update_user_pass(interface, username_field, password_field, messagedialog_label, messagedialog_spinner):
     """Button/Event handler to update Username & Password
     """
-    username_field = interface.get_object("update_username_input")
-    password_field = interface.get_object("update_password_input")
-
     username_text = username_field.get_text().strip()
     password_text = password_field.get_text().strip()
 
     if len(username_text) == 0 or len(password_text) == 0:
-        print("Both field need to be filled")
+        messagedialog_label.set_markup("Both fields need to be filled.")
+        messagedialog_spinner.hide()
         return
 
-    cli.set_username_password(write=True, gui_enabled=True, user_data=(username_text, password_text))
+    result = cli.set_username_password(write=True, gui_enabled=True, user_data=(username_text, password_text))
+    
+    messagedialog_label.set_markup(result)
     password_field.set_text("")
+    messagedialog_spinner.hide()
 
 def dns_preferens_combobox_changed(combobox, interface):
     """Button/Event handler that is triggered whenever combo box value is changed.
