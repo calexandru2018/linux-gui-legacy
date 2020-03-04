@@ -48,7 +48,7 @@ def on_login(interface):
     # populate_server_list(populate_servers_dict)
 
 # Dashboard hanlder
-def connect_to_selected_server(interface):
+def connect_to_selected_server(interface, selected_server, messagedialog_label, messagedialog_spinner):
     """Button/Event handler to connect to selected server
     """     
     update_labels_dict = {
@@ -57,22 +57,16 @@ def connect_to_selected_server(interface):
         "disconnecting": False
     }
 
-    selected_server = ''
     protocol = get_config_value("USER", "default_protocol")
 
-    # Get the server list object
-    server_list = interface.get_object("ServerList").get_selection() 
+    result = connection.openvpn_connect(selected_server, protocol)
 
-    # Get the clicked server
-    (model, pathlist) = server_list.get_selected_rows()
-    for path in pathlist :
-        tree_iter = model.get_iter(path)
-        # the second param of get_value() specifies the column number, starting at 0
-        selected_server = model.get_value(tree_iter, 1)
-
-    connection.openvpn_connect(selected_server, protocol)
-
+    messagedialog_label.set_markup(result)
+    
     update_labels_status(update_labels_dict)
+
+    messagedialog_spinner.hide()
+
     
 def quick_connect(interface):
     """Button/Event handler to connect to the fastest server

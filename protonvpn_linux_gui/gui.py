@@ -105,9 +105,31 @@ class Handler:
     def connect_to_selected_server_button_clicked(self, button):
         """Button/Event handler to connect to selected server
         """     
-        thread = Thread(target=connect_to_selected_server, args=[self.interface])
+        selected_server = ''
+
+        messagedialog_window = self.interface.get_object("MessageDialog")
+        messagedialog_label = self.interface.get_object("message_dialog_label")
+        messagedialog_spinner = self.interface.get_object("message_dialog_spinner")
+        
+        # Get the server list object
+        server_list = self.interface.get_object("ServerList").get_selection() 
+
+        # Get the selected server
+        (model, pathlist) = server_list.get_selected_rows()
+        for path in pathlist :
+            tree_iter = model.get_iter(path)
+            # the second param of get_value() specifies the column number, starting at 0
+            selected_server = model.get_value(tree_iter, 1)
+
+        # Set text and show spinner
+        messagedialog_label.set_markup("Connecting to <b>{0}</b>".format(selected_server))
+        messagedialog_spinner.show()
+
+        thread = Thread(target=connect_to_selected_server, args=[self.interface, selected_server, messagedialog_label, messagedialog_spinner])
         thread.daemon = True
         thread.start()
+        
+        messagedialog_window.show()
 
     def quick_connect_button_clicked(self, button):
         """Button/Event handler to connect to the fastest server
