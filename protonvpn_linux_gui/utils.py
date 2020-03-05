@@ -552,6 +552,8 @@ def stop_and_disable_daemon():
 
     return True
 
-    
+def get_gui_processes():
+        processes = subprocess.run(["pgrep", "protonvpn-gui"],stdout=subprocess.PIPE)
 
+        return list(filter(None, processes.stdout.decode().split("\n"))) 
     

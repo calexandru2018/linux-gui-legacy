@@ -22,7 +22,8 @@ from .utils import (
     load_on_start,
     load_configurations,
     message_dialog,
-    check_for_updates
+    check_for_updates,
+    get_gui_processes
 )
 
 # Import functions that are called with threads
@@ -40,7 +41,8 @@ from .thread_functions import(
     update_def_protocol,
     update_killswitch,
     update_split_tunneling,
-    purge_configurations
+    purge_configurations,
+    kill_duplicate_gui_process
 )
 
 from .constants import VERSION
@@ -460,6 +462,31 @@ def initialize_gui():
     interface.add_from_file(glade_path[:-1])
 
     interface.connect_signals(Handler(interface))
+
+    if len(get_gui_processes()) > 1:
+        messagedialog_window = interface.get_object("MessageDialog")
+        messagedialog_label = interface.get_object("message_dialog_label")
+        messagedialog_spinner = interface.get_object("message_dialog_spinner")
+
+        messagedialog_label.set_markup("Another GUI process was found, attempting to end it...")
+        messagedialog_spinner.show()
+        messagedialog_window.show()
+
+        time.sleep(1)
+        # thread = Thread(target=kill_duplicate_gui_process, args=[interface, messagedialog_label, messagedialog_spinner])
+        # thread.daemon = True
+        # thread.start()
+
+        response = kill_duplicate_gui_process()
+
+        if not response['success']:
+            messagedialog_label.set_markup(response['message'])
+            messagedialog_spinner.hide()
+            time.sleep(3)
+            sys.exit(1)
+
+        messagedialog_label.set_markup(response['message'])
+        messagedialog_spinner.hide()
 
     if not os.path.isfile(CONFIG_FILE):
         window = interface.get_object("LoginWindow")
