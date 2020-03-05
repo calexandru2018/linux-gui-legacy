@@ -117,14 +117,14 @@ If you would like to launch the GUI without having to type in your sudo password
 </p>
 
 <p align="center">
-  <img src="https://i.imgur.com/ToooLUV.png" alt="Logo"></img>
+  <img src="https://i.imgur.com/QlgrT66.png" alt="Logo"></img>
+</p>
+
+<p align="center">
+  <img src="https://i.imgur.com/mqf64v7.png" alt="Logo"></img>
 </p>
 
 <p align="center">
   <img src="https://i.imgur.com/nVU65pO.png" alt="Logo"></img>
 </p> 
-
-<p align="center">
-  <img src="https://i.imgur.com/UdKoMGC.png" alt="Logo"></img>
-</p>
  
