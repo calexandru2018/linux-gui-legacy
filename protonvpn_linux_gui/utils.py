@@ -41,6 +41,13 @@ def message_dialog(interface, action, label_object, spinner_object, sub_label_ob
             spinner_object.hide()
     elif action == "diagnose":
         reccomendation = '' 
+
+        end_openvpn_process_guide = """\n
+        sudo pkill openvpn\n
+        or\n
+        sudo pkill -9 openvpn
+        """
+
         restore_ip_tables_guide ="""\n
         sudo iptables -F
         sudo iptables -P INPUT ACCEPT
@@ -94,7 +101,6 @@ def message_dialog(interface, action, label_object, spinner_object, sub_label_ob
                         is_custom_resolv_conf["logical"] = True
                         is_custom_resolv_conf["display"] = "Custom"
         try:
-            print("Trying split tunnel")
             is_splitunn_enabled = True if get_config_value("USER", "split_tunnel") == "1" else False
         except KeyError:
             is_splitunn_enabled = False
@@ -105,20 +111,18 @@ def message_dialog(interface, action, label_object, spinner_object, sub_label_ob
         # Reccomendations based on known issues
         if not has_internet:
             if is_ovpnprocess_running:
-                reccomendation = reccomendation + "\nYou have no internet conneciton though a OpenVPN process is running, try to kill the process first."
+                reccomendation = reccomendation + "\nYou have no internet conneciton and a VPN process is running, try to kill the process first:" + end_openvpn_process_guide
             elif not is_ovpnprocess_running:
                 if is_killswitch_enabled:
                     reccomendation = reccomendation + "\nYou Have killswitch enabled, which might be blocking your connection.\nTry to flush and then reconfigure your IP tables:" + restore_ip_tables_guide
                 elif is_custom_resolv_conf["logical"] == True:
-                    reccomendation = reccomendation + "\nCustom DNS is still present in resolv.conf.\nTry to restart your network manager to restore to default configurations:" + restart_netwman_guide
+                    reccomendation = reccomendation + "\nCustom DNS is still present in resolv.conf even though you are not connected to a server.\nTry to restart your network manager to restore default configurations:" + restart_netwman_guide
                 elif is_custom_resolv_conf["logical"] == None:
-                    reccomendation = reccomendation + "\nNo DNS settings is present in resolv.conf.\nTry to restart your network manager to restore to default configurations:" + restart_netwman_guide
+                    reccomendation = reccomendation + "\nNo running VPN process was found, though DNS configurations are lacking in resolv.conf. This might be due to some error or corruption during restoration.\nTry to restart your network manager to restore default configurations:" + restart_netwman_guide
                 else:
                     reccomendation = "\nYou have no internet connection.\nTry to connect to a different nework to resolve the issue."
             else:
                 reccomendation = "<b>Unkown problem!</b>"
-        elif not has_internet and is_custom_resolv_conf["logical"] == True:
-            reccomendation = "\nCustom DNS is still present in resolv.conf.\nTry to restart your network manager to restore to default configurations.\nsudo systemctl restart NetworkManager:" + restart_netwman_guide 
         else:
             reccomendation = "\nYour system seems to be ok. There are no reccomendations at the moment."
 
