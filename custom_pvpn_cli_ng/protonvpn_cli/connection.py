@@ -572,8 +572,9 @@ def openvpn_connect(servername, protocol, gui_enabled=False):
     with open(CONFIG_FILE, "w+") as f:
         config.write(f)
 
-    check_update()
-    return return_message
+    # check_update()
+    if gui_enabled:
+        return return_message
 
 
 def manage_dns(mode, dns_server=False):
