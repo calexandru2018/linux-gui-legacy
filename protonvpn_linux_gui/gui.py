@@ -65,7 +65,7 @@ class Handler:
         """Button/Event handler to intialize user account. Calls populate_server_list(server_list_object) to populate server list.
         """     
         login_window = self.interface.get_object("LoginWindow")
-        user_window = self.interface.get_object("Dashboard")
+        user_window = self.interface.get_object("DashboardWindow")
 
         with concurrent.futures.ThreadPoolExecutor() as executor:
             future = executor.submit(on_login, self.interface)
@@ -490,10 +490,10 @@ def initialize_gui():
 
     if not os.path.isfile(CONFIG_FILE):
         window = interface.get_object("LoginWindow")
-        dashboard = interface.get_object("Dashboard")
+        dashboard = interface.get_object("DashboardWindow")
         dashboard.connect("destroy", Gtk.main_quit)
     else:
-        window = interface.get_object("Dashboard")
+        window = interface.get_object("DashboardWindow")
         window.connect("destroy", Gtk.main_quit)
         load_on_start(interface)
     
