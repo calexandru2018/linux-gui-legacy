@@ -1201,8 +1201,8 @@
         <property name="visible">True</property>
         <property name="can_focus">False</property>
         <property name="is_focus">True</property>
-        <property name="margin_left">20</property>
-        <property name="margin_right">20</property>
+        <property name="margin_left">25</property>
+        <property name="margin_right">25</property>
         <property name="margin_top">20</property>
         <property name="margin_bottom">20</property>
         <property name="orientation">vertical</property>
@@ -1244,7 +1244,6 @@
             <property name="valign">center</property>
             <property name="margin_top">30</property>
             <property name="margin_bottom">30</property>
-            <property name="label" translatable="yes">label</property>
             <property name="wrap">True</property>
             <property name="selectable">True</property>
             <property name="width_chars">40</property>
@@ -1256,15 +1255,34 @@
           <packing>
             <property name="expand">True</property>
             <property name="fill">True</property>
+            <property name="position">0</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkLabel" id="message_dialog_sub_label">
+            <property name="can_focus">False</property>
+            <property name="valign">center</property>
+            <property name="margin_top">15</property>
+            <property name="margin_bottom">30</property>
+            <property name="wrap">True</property>
+            <property name="selectable">True</property>
+            <property name="width_chars">40</property>
+            <property name="max_width_chars">70</property>
+          </object>
+          <packing>
+            <property name="expand">True</property>
+            <property name="fill">True</property>
             <property name="position">1</property>
           </packing>
         </child>
-        <child type="center">
+        <child>
           <object class="GtkSpinner" id="message_dialog_spinner">
             <property name="width_request">50</property>
             <property name="height_request">50</property>
             <property name="visible">True</property>
             <property name="can_focus">False</property>
+            <property name="valign">center</property>
+            <property name="margin_bottom">50</property>
             <property name="active">True</property>
           </object>
           <packing>
@@ -1457,6 +1475,7 @@
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="margin_left">30</property>
+                <property name="margin_right">100</property>
                 <property name="column_spacing">20</property>
                 <property name="row_homogeneous">True</property>
                 <child>
@@ -1522,7 +1541,6 @@
                     <property name="can_focus">False</property>
                     <property name="halign">start</property>
                     <property name="hexpand">True</property>
-                    <property name="label" translatable="yes">Running</property>
                     <property name="justify">fill</property>
                     <attributes>
                       <attribute name="weight" value="bold"/>
@@ -1560,7 +1578,6 @@
                     <property name="can_focus">False</property>
                     <property name="halign">start</property>
                     <property name="hexpand">True</property>
-                    <property name="label" translatable="yes">Custom</property>
                     <property name="justify">fill</property>
                     <attributes>
                       <attribute name="weight" value="bold"/>
@@ -1695,7 +1712,7 @@
               <object class="GtkGrid" id="right_dashboard_grid">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="margin_left">100</property>
+                <property name="margin_right">20</property>
                 <property name="column_spacing">20</property>
                 <property name="row_homogeneous">True</property>
                 <child>
