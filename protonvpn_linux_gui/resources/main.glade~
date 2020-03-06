@@ -1290,6 +1290,17 @@
       <column type="gchararray"/>
     </columns>
   </object>
+  <object class="GtkImage" id="gtk-execute">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="stock">gtk-execute</property>
+    <property name="use_fallback">True</property>
+  </object>
+  <object class="GtkImage" id="gtk-preferences">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="stock">gtk-preferences</property>
+  </object>
   <object class="GtkApplicationWindow" id="DashboardWindow">
     <property name="can_focus">True</property>
     <property name="has_focus">True</property>
@@ -1326,11 +1337,11 @@
                     <property name="can_focus">False</property>
                     <child>
                       <object class="GtkImageMenuItem" id="configurations_menu_button">
-                        <property name="label">gtk-preferences</property>
+                        <property name="label">Configurations</property>
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="use_underline">True</property>
-                        <property name="use_stock">True</property>
+                        <property name="image">gtk-preferences</property>
+                        <property name="use_stock">False</property>
                         <property name="always_show_image">True</property>
                         <signal name="activate" handler="configuration_menu_button_clicked" swapped="no"/>
                       </object>
@@ -1374,6 +1385,16 @@
                         <property name="use_stock">True</property>
                         <property name="always_show_image">True</property>
                         <signal name="activate" handler="about_menu_button_clicked" swapped="no"/>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkImageMenuItem" id="diagnose_menu_button">
+                        <property name="label">Diagnose</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="image">gtk-execute</property>
+                        <property name="use_stock">False</property>
+                        <property name="always_show_image">True</property>
                       </object>
                     </child>
                   </object>
@@ -2196,14 +2217,14 @@
     <property name="title" translatable="yes">ProtonVPN GUI - About</property>
     <property name="resizable">False</property>
     <property name="modal">True</property>
-    <property name="gravity">center</property>
-    <property name="window_position">center</property>
+    <property name="window_position">center-always</property>
     <property name="destroy_with_parent">True</property>
     <property name="icon">protonvpn_logo.png</property>
     <property name="type_hint">dialog</property>
     <property name="urgency_hint">True</property>
     <property name="accept_focus">False</property>
     <property name="focus_on_map">False</property>
+    <property name="gravity">center</property>
     <property name="attached_to">DashboardWindow</property>
     <property name="program_name">Unofficial ProntVPN GUI for Linux</property>
     <property name="comments" translatable="yes">Based on protonvpn-cli-ng</property>
