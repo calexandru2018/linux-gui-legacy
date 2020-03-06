@@ -29,14 +29,14 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import GObject as gobject
 
-def message_dialog(interface, action, label_object, spinner_object):
+def message_dialog(interface, action, label_object, spinner_object, sub_label_object=False):
     # time.sleep(1)
     # messagedialog_window = interface.get_object("MessageDialog")
     if action == "check_for_update":
         with concurrent.futures.ThreadPoolExecutor() as executor:
             future = executor.submit(check_for_updates)
             return_value = future.result()
-
+            
             label_object.set_markup("<span>{0}</span>".format(return_value))
             spinner_object.hide()
     elif action == "diagnose":
@@ -93,6 +93,11 @@ def message_dialog(interface, action, label_object, spinner_object):
                     if "protonvpn" in item.lower():
                         is_custom_resolv_conf["logical"] = True
                         is_custom_resolv_conf["display"] = "Custom"
+        try:
+            print("Trying split tunnel")
+            is_splitunn_enabled = True if get_config_value("USER", "split_tunnel") == "1" else False
+        except KeyError:
+            is_splitunn_enabled = False
 
         # Check if servers are cached
             # Maybe to-do
@@ -104,33 +109,37 @@ def message_dialog(interface, action, label_object, spinner_object):
             elif not is_ovpnprocess_running:
                 if is_killswitch_enabled:
                     reccomendation = reccomendation + "\nYou Have killswitch enabled, which might be blocking your connection.\nTry to flush and then reconfigure your IP tables:" + restore_ip_tables_guide
-                if is_custom_resolv_conf["logical"] == True:
-                    reccomendation = reccomendation + "\nCustom DNS is still present in resolv.config.\nTry to restart your network manager to restore to default configurations:" + restart_netwman_guide
+                elif is_custom_resolv_conf["logical"] == True:
+                    reccomendation = reccomendation + "\nCustom DNS is still present in resolv.conf.\nTry to restart your network manager to restore to default configurations:" + restart_netwman_guide
                 elif is_custom_resolv_conf["logical"] == None:
-                    reccomendation = reccomendation + "\nNo DNS settings is present in resolv.config.\nTry to restart your network manager to restore to default configurations:" + restart_netwman_guide
+                    reccomendation = reccomendation + "\nNo DNS settings is present in resolv.conf.\nTry to restart your network manager to restore to default configurations:" + restart_netwman_guide
+                else:
+                    reccomendation = "\nYou have no internet connection.\nTry to connect to a different nework to resolve the issue."
             else:
                 reccomendation = "<b>Unkown problem!</b>"
-        elif has_internet and is_custom_resolv_conf["logical"] == True:
-            reccomendation = "\nCustom DNS is still present in resolv.config.\nTry to restart your network manager to restore to default configurations.\nsudo systemctl restart NetworkManager:" + restart_netwman_guide 
+        elif not has_internet and is_custom_resolv_conf["logical"] == True:
+            reccomendation = "\nCustom DNS is still present in resolv.conf.\nTry to restart your network manager to restore to default configurations.\nsudo systemctl restart NetworkManager:" + restart_netwman_guide 
         else:
             reccomendation = "\nYour system seems to be ok. There are no reccomendations at the moment."
 
         result = """
-        Has internet: <b>{conn}</b>
-        VPN Process Running: <b>{is_conn}</b>
-        DNS Protection Enabled: <b>{dns_protec}</b>
-        resolv.conf: <b>{resolv_conf}</b>
-        Killswitch enabled: <b>{ks}</b>
-
-        <b><u>Reccomendation:</u></b>\n<span>{recc}</span>""".format(
-            is_conn= "Yes" if is_ovpnprocess_running else "No", 
-            ks= "Yes" if is_killswitch_enabled else "No",
-            conn= "Yes" if has_internet else "No",
-            dns_protec= "Yes" if is_dns_protection_enabled else "No",
-            resolv_conf=is_custom_resolv_conf["display"],
-            recc=reccomendation)
+        Has internet:\t\t\t\t<b>{has_internet}</b>
+        resolv.conf status:\t\t\t<b>{resolv_conf_status}</b>
+        Killswitch enabled:\t\t\t<b>{is_ks_enabled}</b>
+        VPN Process Running:\t\t<b>{is_vpnprocess_running}</b>
+        DNS Protection Enabled:\t\t<b>{is_dns_enabled}</b>
+        Split Tunneling Enabled:\t\t<b>{is_sp_enabled}</b>
+        """.format(
+            has_internet= "Yes" if has_internet else "No",
+            resolv_conf_status=is_custom_resolv_conf["display"],
+            is_ks_enabled= "Yes" if is_killswitch_enabled else "No",
+            is_vpnprocess_running= "Yes" if is_ovpnprocess_running else "No", 
+            is_dns_enabled= "Yes" if is_dns_protection_enabled else "No",
+            is_sp_enabled= "Yes" if is_splitunn_enabled else "No")
 
         label_object.set_markup(result)
+        sub_label_object.set_markup("<b><u>Reccomendation:</u></b>\n<span>{recc}</span>".format(recc=reccomendation))
+        sub_label_object.show()
         spinner_object.hide()
 
 def check_internet_conn(fast_boot=False):
