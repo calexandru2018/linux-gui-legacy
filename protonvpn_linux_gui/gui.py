@@ -118,6 +118,7 @@ class Handler:
 
         messagedialog_window = self.interface.get_object("MessageDialog")
         messagedialog_label = self.interface.get_object("message_dialog_label")
+        messagedialog_sub_label = self.interface.get_object("message_dialog_sub_label").hide()
         messagedialog_spinner = self.interface.get_object("message_dialog_spinner")
         
         # Get the server list object
@@ -149,6 +150,7 @@ class Handler:
         """
         messagedialog_window = self.interface.get_object("MessageDialog")
         messagedialog_label = self.interface.get_object("message_dialog_label")
+        messagedialog_sub_label = self.interface.get_object("message_dialog_sub_label").hide()
         messagedialog_spinner = self.interface.get_object("message_dialog_spinner")
 
         messagedialog_label.set_markup("Connecting to the fastest server...")
@@ -165,6 +167,7 @@ class Handler:
         """   
         messagedialog_window = self.interface.get_object("MessageDialog")
         messagedialog_label = self.interface.get_object("message_dialog_label")
+        messagedialog_sub_label = self.interface.get_object("message_dialog_sub_label").hide()
         messagedialog_spinner = self.interface.get_object("message_dialog_spinner")
         
         try:
@@ -190,6 +193,7 @@ class Handler:
         """
         messagedialog_window = self.interface.get_object("MessageDialog")
         messagedialog_label = self.interface.get_object("message_dialog_label")
+        messagedialog_sub_label = self.interface.get_object("message_dialog_sub_label").hide()
         messagedialog_spinner = self.interface.get_object("message_dialog_spinner")
 
         messagedialog_label.set_markup("Connecting to a random server...")
@@ -206,6 +210,7 @@ class Handler:
         """
         messagedialog_window = self.interface.get_object("MessageDialog")
         messagedialog_label = self.interface.get_object("message_dialog_label")
+        messagedialog_sub_label = self.interface.get_object("message_dialog_sub_label").hide()
         messagedialog_spinner = self.interface.get_object("message_dialog_spinner")
 
         messagedialog_label.set_markup("Disconnecting...")
@@ -223,6 +228,7 @@ class Handler:
         """
         messagedialog_window = self.interface.get_object("MessageDialog")
         messagedialog_label = self.interface.get_object("message_dialog_label")
+        messagedialog_sub_label = self.interface.get_object("message_dialog_sub_label").hide()
         messagedialog_spinner = self.interface.get_object("message_dialog_spinner")
 
         messagedialog_label.set_markup("Refreshing server list...")
@@ -244,12 +250,13 @@ class Handler:
     def diagnose_menu_button_clicked(self, button):
         messagedialog_window = self.interface.get_object("MessageDialog")
         messagedialog_label = self.interface.get_object("message_dialog_label")
+        messagedialog_sub_label = self.interface.get_object("message_dialog_sub_label")
         messagedialog_spinner = self.interface.get_object("message_dialog_spinner")
 
         messagedialog_label.set_markup("Diagnosing...")
         messagedialog_spinner.show()
 
-        thread = Thread(target=message_dialog, args=[self.interface, "diagnose", messagedialog_label, messagedialog_spinner])
+        thread = Thread(target=message_dialog, args=[self.interface, "diagnose", messagedialog_label, messagedialog_spinner, messagedialog_sub_label])
         thread.daemon = True
         thread.start()
         
@@ -258,6 +265,7 @@ class Handler:
     def check_for_updates_button_clicked(self, button):
         messagedialog_window = self.interface.get_object("MessageDialog")
         messagedialog_label = self.interface.get_object("message_dialog_label")
+        messagedialog_sub_label = self.interface.get_object("message_dialog_sub_label").hide()
         messagedialog_spinner = self.interface.get_object("message_dialog_spinner")
 
         messagedialog_label.set_markup("Checking...")
@@ -309,6 +317,7 @@ class Handler:
         """
         messagedialog_window = self.interface.get_object("MessageDialog")
         messagedialog_label = self.interface.get_object("message_dialog_label")
+        messagedialog_sub_label = self.interface.get_object("message_dialog_sub_label").hide()
         messagedialog_spinner = self.interface.get_object("message_dialog_spinner")
 
         messagedialog_label.set_markup("Updating username and password...")
@@ -340,6 +349,7 @@ class Handler:
         """
         messagedialog_window = self.interface.get_object("MessageDialog")
         messagedialog_label = self.interface.get_object("message_dialog_label")
+        messagedialog_sub_label = self.interface.get_object("message_dialog_sub_label").hide()
         messagedialog_spinner = self.interface.get_object("message_dialog_spinner")
 
         messagedialog_label.set_markup("Updating DNS configurations...")
@@ -356,6 +366,7 @@ class Handler:
         """
         messagedialog_window = self.interface.get_object("MessageDialog")
         messagedialog_label = self.interface.get_object("message_dialog_label")
+        messagedialog_sub_label = self.interface.get_object("message_dialog_sub_label").hide()
         messagedialog_spinner = self.interface.get_object("message_dialog_spinner")
         
         messagedialog_label.set_markup("Updating ProtonVPN Plan...")
@@ -373,6 +384,7 @@ class Handler:
         """
         messagedialog_window = self.interface.get_object("MessageDialog")
         messagedialog_label = self.interface.get_object("message_dialog_label")
+        messagedialog_sub_label = self.interface.get_object("message_dialog_sub_label").hide()
         messagedialog_spinner = self.interface.get_object("message_dialog_spinner")
         
         messagedialog_label.set_markup("Updating default OpenVPN Protocol...")
@@ -401,6 +413,7 @@ class Handler:
         """
         messagedialog_window = self.interface.get_object("MessageDialog")
         messagedialog_label = self.interface.get_object("message_dialog_label")
+        messagedialog_sub_label = self.interface.get_object("message_dialog_sub_label").hide()
         messagedialog_spinner = self.interface.get_object("message_dialog_spinner")
         
         messagedialog_label.set_markup("Updating killswitch configurations...")
@@ -419,6 +432,7 @@ class Handler:
         """
         messagedialog_window = self.interface.get_object("MessageDialog")
         messagedialog_label = self.interface.get_object("message_dialog_label")
+        messagedialog_sub_label = self.interface.get_object("message_dialog_sub_label").hide()
         messagedialog_spinner = self.interface.get_object("message_dialog_spinner")
         
         messagedialog_label.set_markup("Updating split tunneling configurations...")
@@ -436,6 +450,7 @@ class Handler:
         """
         messagedialog_window = self.interface.get_object("MessageDialog")
         messagedialog_label = self.interface.get_object("message_dialog_label")
+        messagedialog_sub_label = self.interface.get_object("message_dialog_sub_label").hide()
         messagedialog_spinner = self.interface.get_object("message_dialog_spinner")
         
         messagedialog_label.set_markup("Purging configurations configurations...")
