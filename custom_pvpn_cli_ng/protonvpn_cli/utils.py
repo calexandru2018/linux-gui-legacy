@@ -98,10 +98,21 @@ def pull_server_data(force=False):
 def get_servers():
     """Return a list of all servers for the users Tier."""
 
-    with open(SERVER_INFO_FILE, "r") as f:
-        logger.debug("Reading servers from file")
-        server_data = json.load(f)
+    server_data = {}
 
+    while True:
+        with open(SERVER_INFO_FILE, "r") as f:
+            logger.debug("Reading servers from file")
+            try:
+                data = json.load(f)
+                if not data == None and not len(data) == 0:
+                    server_data = data
+                    break
+            except:
+                pull_server_data(force=True)
+                time.sleep(2)
+                pass
+    
     servers = server_data["LogicalServers"]
 
     user_tier = int(get_config_value("USER", "tier"))
