@@ -42,20 +42,60 @@ def message_dialog(interface, action, label_object, spinner_object):
         result = '' 
         # Check if there is internet connection
             # Depending on next questions, some actions might be suggested.
-
+        has_internet = check_internet_conn()
+        
         # Check if killswitch is enabled
             # Advice to restore IP tables manually and restart netowrk manager.
+        is_killswitch_enabled = True if get_config_value("USER", "killswitch") == 1 else False
 
         # Check if VPN is running
             # If there is a OpenVPN process running in the background, kill it.
+        is_vpnconnected = is_connected()
 
-        # Check if custom DNS is current
+        # Check if custom DNS is enabled
             # If there is no VPN connection and also no internet, then it is a DNS issue.
+        
+        is_dns_protection_enabled = False if get_config_value("USER", "dns_leak_protection") == "0" or (not get_config_value("USER", "custom_dns") == None and get_config_value("USER", "dns_leak_protection") == "0") else True
+
+        # Check if custom DNS is in use. 
+            # It might that the user has disabled the custom DNS settings but the file still resides there
+        # read os.path.realpath("/etc/resolv.conf") and check if it has any signs of midification
 
         # Check if servers are cached
             # Maybe to-do
-        label_object.set_markup("To-do")
+
+        result = result + """
+        Connected to VPN: <b>{is_conn}</b>
+        Killswitch enabled: <b>{ks}</b>
+        Has internet: <b>{conn}</b>
+        DNS Protection Enabled: <b>{dns_protec}</b>
+        """.format(
+            is_conn=is_vpnconnected, 
+            ks=is_killswitch_enabled,
+            conn=has_internet,
+            dns_protec=is_dns_protection_enabled)
+        label_object.set_markup(result)
         spinner_object.hide()
+
+def check_internet_conn():
+    timer_start = time.time()
+    result = ''
+    while True:
+        if time.time() - timer_start > 5:
+            break
+            result = False
+
+        try:
+            if get_ip_info(gui_enabled=True):
+                result = True
+            else:
+                result = False
+        except:
+            pass
+
+        time.sleep(0.2)
+
+    return result
 
 def check_for_updates():
 
@@ -115,10 +155,10 @@ def prepare_initilizer(username_field, password_field, interface):
 def load_on_start(interface):
     """Updates Dashboard labels and populates server list content before showing it to the user
     """
-
-    p = Thread(target=update_labels_server_list, args=[interface])
-    p.daemon = True
-    p.start()
+    if check_internet_conn():
+        p = Thread(target=update_labels_server_list, args=[interface])
+        p.daemon = True
+        p.start()
 
 def update_labels_server_list(interface, server_list_obj=False):
     if not server_list_obj:
@@ -241,7 +281,7 @@ def right_grid_update_labels(interface, servers, is_connected, connected_server,
     tx_amount, rx_amount = get_transferred_data()
 
     # Get and set IP labels. Get also country and ISP
-    ip, isp, country = get_ip_info(gui_enbled=True)
+    ip, isp, country = get_ip_info(gui_enabled=True)
     country_isp = "<span>" + country + "/" + isp + "</span>"
     ip_label.set_markup(ip)
 
@@ -372,29 +412,31 @@ def populate_server_list(populate_servers_dict):
 
     # Country with respective servers, ex: PT#02
     countries = {}
-    for server in servers:
-        country = get_country_name(server["ExitCountry"])
-        if country not in countries.keys():
-            countries[country] = []
-        countries[country].append(server["Name"])
+    print("VALUE: ", servers, type(servers))
+    if servers:
+        for server in servers:
+            country = get_country_name(server["ExitCountry"])
+            if country not in countries.keys():
+                countries[country] = []
+            countries[country].append(server["Name"])
 
-    country_servers = {}            
-    for country in countries:
-        country_servers[country] = sorted(
-            countries[country],
-            key=lambda s: get_server_value(s, "Load", servers)
-        )
-    populate_servers_dict["list_object"].clear()
-    for country in country_servers:
-        for servername in country_servers[country]:
-            load = str(get_server_value(servername, "Load", servers)).rjust(3, " ")
-            load = load + "%"
+        country_servers = {}            
+        for country in countries:
+            country_servers[country] = sorted(
+                countries[country],
+                key=lambda s: get_server_value(s, "Load", servers)
+            )
+        populate_servers_dict["list_object"].clear()
+        for country in country_servers:
+            for servername in country_servers[country]:
+                load = str(get_server_value(servername, "Load", servers)).rjust(3, " ")
+                load = load + "%"
 
-            feature = features[get_server_value(servername, 'Features', servers)]
+                feature = features[get_server_value(servername, 'Features', servers)]
 
-            tier = server_tiers[get_server_value(servername, "Tier", servers)]
+                tier = server_tiers[get_server_value(servername, "Tier", servers)]
 
-            populate_servers_dict["list_object"].append([country, servername, tier, load, feature])
+                populate_servers_dict["list_object"].append([country, servername, tier, load, feature])
 
 # Autoconnect 
 #
