@@ -242,8 +242,19 @@ class Handler:
         about_dialog.show()
 
     def diagnose_menu_button_clicked(self, button):
-        print("To-do")
-    
+        messagedialog_window = self.interface.get_object("MessageDialog")
+        messagedialog_label = self.interface.get_object("message_dialog_label")
+        messagedialog_spinner = self.interface.get_object("message_dialog_spinner")
+
+        messagedialog_label.set_markup("Diagnosing...")
+        messagedialog_spinner.show()
+
+        thread = Thread(target=message_dialog, args=[self.interface, "diagnose", messagedialog_label, messagedialog_spinner])
+        thread.daemon = True
+        thread.start()
+        
+        messagedialog_window.show()
+        
     def check_for_updates_button_clicked(self, button):
         messagedialog_window = self.interface.get_object("MessageDialog")
         messagedialog_label = self.interface.get_object("message_dialog_label")

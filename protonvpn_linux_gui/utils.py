@@ -39,7 +39,23 @@ def message_dialog(interface, action, label_object, spinner_object):
             label_object.set_markup("<span>{0}</span>".format(return_value))
             spinner_object.hide()
     elif action == "diagnose":
-        print("Diagnose")
+        result = '' 
+        # Check if there is internet connection
+            # Depending on next questions, some actions might be suggested.
+
+        # Check if killswitch is enabled
+            # Advice to restore IP tables manually and restart netowrk manager.
+
+        # Check if VPN is running
+            # If there is a OpenVPN process running in the background, kill it.
+
+        # Check if custom DNS is current
+            # If there is no VPN connection and also no internet, then it is a DNS issue.
+
+        # Check if servers are cached
+            # Maybe to-do
+        label_object.set_markup("To-do")
+        spinner_object.hide()
 
 def check_for_updates():
 
