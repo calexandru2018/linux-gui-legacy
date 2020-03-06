@@ -240,6 +240,9 @@ class Handler:
         about_dialog = self.interface.get_object("AboutDialog")
         about_dialog.set_version(VERSION)
         about_dialog.show()
+
+    def diagnose_menu_button_clicked(self, button):
+        print("To-do")
     
     def check_for_updates_button_clicked(self, button):
         messagedialog_window = self.interface.get_object("MessageDialog")

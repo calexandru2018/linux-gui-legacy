@@ -32,13 +32,14 @@ def message_dialog(interface, action, label_object, spinner_object):
     # time.sleep(1)
     # messagedialog_window = interface.get_object("MessageDialog")
     if action == "check_for_update":
-
         with concurrent.futures.ThreadPoolExecutor() as executor:
             future = executor.submit(check_for_updates)
             return_value = future.result()
 
             label_object.set_markup("<span>{0}</span>".format(return_value))
             spinner_object.hide()
+    elif action == "diagnose":
+        print("Diagnose")
 
 def check_for_updates():
 
