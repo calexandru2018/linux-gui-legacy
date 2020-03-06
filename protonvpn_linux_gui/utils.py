@@ -1,6 +1,7 @@
 
 import subprocess
 import time
+import re
 import datetime
 import requests
 from threading import Thread
@@ -39,7 +40,17 @@ def message_dialog(interface, action, label_object, spinner_object):
             label_object.set_markup("<span>{0}</span>".format(return_value))
             spinner_object.hide()
     elif action == "diagnose":
-        advice = '' 
+        reccomendation = '' 
+        restore_ip_tables_guide ="""\n
+        sudo iptables -F
+        sudo iptables -P INPUT ACCEPT
+        sudo iptables -P OUTPUT ACCEPT
+        sudo iptables -P FORWARD ACCEPT
+        """
+
+        restart_netwman_guide = """\n
+        sudo systemctl restart NetworkManager
+        """
         # Check if there is internet connection
             # Depending on next questions, some actions might be suggested.
         has_internet = check_internet_conn()
@@ -59,37 +70,65 @@ def message_dialog(interface, action, label_object, spinner_object):
 
         # Check if custom DNS is in use. 
             # It might that the user has disabled the custom DNS settings but the file still resides there
+        is_custom_resolv_conf = {
+            "logical": False,
+            "display": "Original"
+        }
         with open("/etc/resolv.conf") as f:
-            l = f.readlines()
+            lines = f.readlines()
+
+            # remove \n from all elements
+            lines = map(lambda l: l.strip(), lines)
+            # remove empty elements
+            lines = list(filter(None, lines))
+            
+            # False
+            # print("None==False ", None==False)
+
+            if len(lines) < 2:
+                is_custom_resolv_conf["logical"] = None
+                is_custom_resolv_conf["display"] = "Missing"
+            else:
+                for item in lines:
+                    if "protonvpn" in item.lower():
+                        is_custom_resolv_conf["logical"] = True
+                        is_custom_resolv_conf["display"] = "Custom"
 
         # Check if servers are cached
             # Maybe to-do
-
+        
+        # Reccomendations based on known issues
         if not has_internet:
             if is_ovpnprocess_running:
-                print("CHECK resolv.conf")
-                advice = advice + "\nYou have no internet conneciton though VPN process is running, try to kill the VPN process first."
+                reccomendation = reccomendation + "\nYou have no internet conneciton though a OpenVPN process is running, try to kill the process first."
             elif not is_ovpnprocess_running:
-                print("CHECK DNS and Killswitch")
+                if is_killswitch_enabled:
+                    reccomendation = reccomendation + "\nYou Have killswitch enabled, which might be blocking your connection.\nTry to flush and then reconfigure your IP tables:" + restore_ip_tables_guide
+                if is_custom_resolv_conf["logical"] == True:
+                    reccomendation = reccomendation + "\nCustom DNS is still present in resolv.config.\nTry to restart your network manager to restore to default configurations:" + restart_netwman_guide
+                elif is_custom_resolv_conf["logical"] == None:
+                    reccomendation = reccomendation + "\nNo DNS settings is present in resolv.config.\nTry to restart your network manager to restore to default configurations:" + restart_netwman_guide
+            else:
+                reccomendation = "<b>Unkown problem!</b>"
+        elif has_internet and is_custom_resolv_conf["logical"] == True:
+            reccomendation = "\nCustom DNS is still present in resolv.config.\nTry to restart your network manager to restore to default configurations.\nsudo systemctl restart NetworkManager:" + restart_netwman_guide 
         else:
-            print("VPN not running.")
-        result = """
-        VPN Process Running: <b>{is_conn}</b>
-        Killswitch enabled: <b>{ks}</b>
-        Has internet: <b>{conn}</b>
-        DNS Protection Enabled: <b>{dns_protec}</b>
-        Custom resolv.conf: <b>{dns_conf}</b>
-        lines: <b>{lines}</b>
+            reccomendation = "\nYour system seems to be ok. There are no reccomendations at the moment."
 
-        {advice}
-        """.format(
-            is_conn=is_ovpnprocess_running, 
-            ks=is_killswitch_enabled,
-            conn=has_internet,
-            dns_protec=is_dns_protection_enabled,
-            dns_conf=l,
-            lines=len(l),
-            advice=advice)
+        result = """
+        Has internet: <b>{conn}</b>
+        VPN Process Running: <b>{is_conn}</b>
+        DNS Protection Enabled: <b>{dns_protec}</b>
+        resolv.conf: <b>{resolv_conf}</b>
+        Killswitch enabled: <b>{ks}</b>
+
+        <b><u>Reccomendation:</u></b>\n<span>{recc}</span>""".format(
+            is_conn= "Yes" if is_ovpnprocess_running else "No", 
+            ks= "Yes" if is_killswitch_enabled else "No",
+            conn= "Yes" if has_internet else "No",
+            dns_protec= "Yes" if is_dns_protection_enabled else "No",
+            resolv_conf=is_custom_resolv_conf["display"],
+            recc=reccomendation)
 
         label_object.set_markup(result)
         spinner_object.hide()
@@ -108,7 +147,7 @@ def check_internet_conn(fast_boot=False):
         elif time.time() - timer_start > 5:
             break
             result = False
-    
+
         try:
             if get_ip_info(gui_enabled=True):
                 result = True
