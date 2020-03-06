@@ -1,6 +1,7 @@
 
 import subprocess
 import time
+import re
 import datetime
 import requests
 from threading import Thread
@@ -28,17 +29,151 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import GObject as gobject
 
-def message_dialog(interface, action, label_object, spinner_object):
+def message_dialog(interface, action, label_object, spinner_object, sub_label_object=False):
     # time.sleep(1)
     # messagedialog_window = interface.get_object("MessageDialog")
     if action == "check_for_update":
-
         with concurrent.futures.ThreadPoolExecutor() as executor:
             future = executor.submit(check_for_updates)
             return_value = future.result()
-
+            
             label_object.set_markup("<span>{0}</span>".format(return_value))
             spinner_object.hide()
+    elif action == "diagnose":
+        reccomendation = '' 
+
+        end_openvpn_process_guide = """\n
+        sudo pkill openvpn\n
+        or\n
+        sudo pkill -9 openvpn
+        """
+
+        restore_ip_tables_guide ="""\n
+        sudo iptables -F
+        sudo iptables -P INPUT ACCEPT
+        sudo iptables -P OUTPUT ACCEPT
+        sudo iptables -P FORWARD ACCEPT
+        """
+
+        restart_netwman_guide = """\n
+        sudo systemctl restart NetworkManager
+        """
+        # Check if there is internet connection
+            # Depending on next questions, some actions might be suggested.
+        has_internet = check_internet_conn()
+        
+        # Check if killswitch is enabled
+            # Advice to restore IP tables manually and restart netowrk manager.
+        is_killswitch_enabled = True if get_config_value("USER", "killswitch") == 1 else False
+
+        # Check if VPN is running
+            # If there is a OpenVPN process running in the background, kill it.
+        is_ovpnprocess_running = is_connected()
+
+        # Check if custom DNS is enabled
+            # If there is no VPN connection and also no internet, then it is a DNS issue.
+        
+        is_dns_protection_enabled = False if get_config_value("USER", "dns_leak_protection") == "0" or (not get_config_value("USER", "custom_dns") == None and get_config_value("USER", "dns_leak_protection") == "0") else True
+
+        # Check if custom DNS is in use. 
+            # It might that the user has disabled the custom DNS settings but the file still resides there
+        is_custom_resolv_conf = {
+            "logical": False,
+            "display": "Original"
+        }
+        with open("/etc/resolv.conf") as f:
+            lines = f.readlines()
+
+            # remove \n from all elements
+            lines = map(lambda l: l.strip(), lines)
+            # remove empty elements
+            lines = list(filter(None, lines))
+            
+            # False
+            # print("None==False ", None==False)
+
+            if len(lines) < 2:
+                is_custom_resolv_conf["logical"] = None
+                is_custom_resolv_conf["display"] = "Missing"
+            else:
+                for item in lines:
+                    if "protonvpn" in item.lower():
+                        is_custom_resolv_conf["logical"] = True
+                        is_custom_resolv_conf["display"] = "Custom"
+        try:
+            is_splitunn_enabled = True if get_config_value("USER", "split_tunnel") == "1" else False
+        except KeyError:
+            is_splitunn_enabled = False
+
+        # Check if servers are cached
+            # Maybe to-do
+        
+        # Reccomendations based on known issues
+        if not has_internet:
+            if is_ovpnprocess_running:
+                reccomendation = reccomendation + "\nYou have no internet conneciton and a VPN process is running, try to kill the process first:" + end_openvpn_process_guide
+            elif not is_ovpnprocess_running:
+                if is_killswitch_enabled:
+                    reccomendation = reccomendation + "\nYou Have killswitch enabled, which might be blocking your connection.\nTry to flush and then reconfigure your IP tables:" + restore_ip_tables_guide
+                elif is_custom_resolv_conf["logical"] == True:
+                    reccomendation = reccomendation + "\nCustom DNS is still present in resolv.conf even though you are not connected to a server.\nTry to restart your network manager to restore default configurations:" + restart_netwman_guide
+                elif is_custom_resolv_conf["logical"] == None:
+                    reccomendation = reccomendation + "\nNo running VPN process was found, though DNS configurations are lacking in resolv.conf. This might be due to some error or corruption during restoration.\nTry to restart your network manager to restore default configurations:" + restart_netwman_guide
+                else:
+                    reccomendation = "\nYou have no internet connection.\nTry to connect to a different nework to resolve the issue."
+            else:
+                reccomendation = "<b>Unkown problem!</b>"
+        else:
+            reccomendation = "\nYour system seems to be ok. There are no reccomendations at the moment."
+
+        result = """
+        Has internet:\t\t\t\t<b>{has_internet}</b>
+        resolv.conf status:\t\t\t<b>{resolv_conf_status}</b>
+        Killswitch enabled:\t\t\t<b>{is_ks_enabled}</b>
+        VPN Process Running:\t\t<b>{is_vpnprocess_running}</b>
+        DNS Protection Enabled:\t\t<b>{is_dns_enabled}</b>
+        Split Tunneling Enabled:\t\t<b>{is_sp_enabled}</b>
+        """.format(
+            has_internet= "Yes" if has_internet else "No",
+            resolv_conf_status=is_custom_resolv_conf["display"],
+            is_ks_enabled= "Yes" if is_killswitch_enabled else "No",
+            is_vpnprocess_running= "Yes" if is_ovpnprocess_running else "No", 
+            is_dns_enabled= "Yes" if is_dns_protection_enabled else "No",
+            is_sp_enabled= "Yes" if is_splitunn_enabled else "No")
+
+        label_object.set_markup(result)
+        sub_label_object.set_markup("<b><u>Reccomendation:</u></b>\n<span>{recc}</span>".format(recc=reccomendation))
+        sub_label_object.show()
+        spinner_object.hide()
+
+def check_internet_conn(fast_boot=False):
+    timer_start = time.time()
+    result = ''
+    attempts = 2
+
+    while True:
+        # To speed up GUI start
+        if fast_boot and attempts == 0:
+            result = False
+            break
+        # Useful when using diagnostics tool
+        elif time.time() - timer_start > 5:
+            break
+            result = False
+
+        try:
+            if get_ip_info(gui_enabled=True):
+                result = True
+                break
+            else:
+                result = False
+        except:
+            pass
+
+        attempts -= 1
+        time.sleep(0.2)
+
+    return result
 
 def check_for_updates():
 
@@ -95,13 +230,13 @@ def prepare_initilizer(username_field, password_field, interface):
 
     return user_data
 
-def load_on_start(interface):
+def load_on_start(interface, fast_boot=False):
     """Updates Dashboard labels and populates server list content before showing it to the user
     """
-
-    p = Thread(target=update_labels_server_list, args=[interface])
-    p.daemon = True
-    p.start()
+    if check_internet_conn(fast_boot=fast_boot):
+        p = Thread(target=update_labels_server_list, args=[interface])
+        p.daemon = True
+        p.start()
 
 def update_labels_server_list(interface, server_list_obj=False):
     if not server_list_obj:
@@ -224,7 +359,7 @@ def right_grid_update_labels(interface, servers, is_connected, connected_server,
     tx_amount, rx_amount = get_transferred_data()
 
     # Get and set IP labels. Get also country and ISP
-    ip, isp, country = get_ip_info(gui_enbled=True)
+    ip, isp, country = get_ip_info(gui_enabled=True)
     country_isp = "<span>" + country + "/" + isp + "</span>"
     ip_label.set_markup(ip)
 
@@ -355,29 +490,31 @@ def populate_server_list(populate_servers_dict):
 
     # Country with respective servers, ex: PT#02
     countries = {}
-    for server in servers:
-        country = get_country_name(server["ExitCountry"])
-        if country not in countries.keys():
-            countries[country] = []
-        countries[country].append(server["Name"])
+    
+    if servers:
+        for server in servers:
+            country = get_country_name(server["ExitCountry"])
+            if country not in countries.keys():
+                countries[country] = []
+            countries[country].append(server["Name"])
 
-    country_servers = {}            
-    for country in countries:
-        country_servers[country] = sorted(
-            countries[country],
-            key=lambda s: get_server_value(s, "Load", servers)
-        )
-    populate_servers_dict["list_object"].clear()
-    for country in country_servers:
-        for servername in country_servers[country]:
-            load = str(get_server_value(servername, "Load", servers)).rjust(3, " ")
-            load = load + "%"
+        country_servers = {}            
+        for country in countries:
+            country_servers[country] = sorted(
+                countries[country],
+                key=lambda s: get_server_value(s, "Load", servers)
+            )
+        populate_servers_dict["list_object"].clear()
+        for country in country_servers:
+            for servername in country_servers[country]:
+                load = str(get_server_value(servername, "Load", servers)).rjust(3, " ")
+                load = load + "%"
 
-            feature = features[get_server_value(servername, 'Features', servers)]
+                feature = features[get_server_value(servername, 'Features', servers)]
 
-            tier = server_tiers[get_server_value(servername, "Tier", servers)]
+                tier = server_tiers[get_server_value(servername, "Tier", servers)]
 
-            populate_servers_dict["list_object"].append([country, servername, tier, load, feature])
+                populate_servers_dict["list_object"].append([country, servername, tier, load, feature])
 
 # Autoconnect 
 #
@@ -552,6 +689,8 @@ def stop_and_disable_daemon():
 
     return True
 
-    
+def get_gui_processes():
+        processes = subprocess.run(["pgrep", "protonvpn-gui"],stdout=subprocess.PIPE)
 
+        return list(filter(None, processes.stdout.decode().split("\n"))) 
     

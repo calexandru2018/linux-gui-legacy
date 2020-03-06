@@ -22,7 +22,8 @@ from .utils import (
     load_on_start,
     load_configurations,
     message_dialog,
-    check_for_updates
+    check_for_updates,
+    get_gui_processes
 )
 
 # Import functions that are called with threads
@@ -40,7 +41,8 @@ from .thread_functions import(
     update_def_protocol,
     update_killswitch,
     update_split_tunneling,
-    purge_configurations
+    purge_configurations,
+    kill_duplicate_gui_process
 )
 
 from .constants import VERSION
@@ -63,7 +65,7 @@ class Handler:
         """Button/Event handler to intialize user account. Calls populate_server_list(server_list_object) to populate server list.
         """     
         login_window = self.interface.get_object("LoginWindow")
-        user_window = self.interface.get_object("Dashboard")
+        user_window = self.interface.get_object("DashboardWindow")
 
         with concurrent.futures.ThreadPoolExecutor() as executor:
             future = executor.submit(on_login, self.interface)
@@ -116,6 +118,7 @@ class Handler:
 
         messagedialog_window = self.interface.get_object("MessageDialog")
         messagedialog_label = self.interface.get_object("message_dialog_label")
+        messagedialog_sub_label = self.interface.get_object("message_dialog_sub_label").hide()
         messagedialog_spinner = self.interface.get_object("message_dialog_spinner")
         
         # Get the server list object
@@ -147,6 +150,7 @@ class Handler:
         """
         messagedialog_window = self.interface.get_object("MessageDialog")
         messagedialog_label = self.interface.get_object("message_dialog_label")
+        messagedialog_sub_label = self.interface.get_object("message_dialog_sub_label").hide()
         messagedialog_spinner = self.interface.get_object("message_dialog_spinner")
 
         messagedialog_label.set_markup("Connecting to the fastest server...")
@@ -163,6 +167,7 @@ class Handler:
         """   
         messagedialog_window = self.interface.get_object("MessageDialog")
         messagedialog_label = self.interface.get_object("message_dialog_label")
+        messagedialog_sub_label = self.interface.get_object("message_dialog_sub_label").hide()
         messagedialog_spinner = self.interface.get_object("message_dialog_spinner")
         
         try:
@@ -188,6 +193,7 @@ class Handler:
         """
         messagedialog_window = self.interface.get_object("MessageDialog")
         messagedialog_label = self.interface.get_object("message_dialog_label")
+        messagedialog_sub_label = self.interface.get_object("message_dialog_sub_label").hide()
         messagedialog_spinner = self.interface.get_object("message_dialog_spinner")
 
         messagedialog_label.set_markup("Connecting to a random server...")
@@ -204,6 +210,7 @@ class Handler:
         """
         messagedialog_window = self.interface.get_object("MessageDialog")
         messagedialog_label = self.interface.get_object("message_dialog_label")
+        messagedialog_sub_label = self.interface.get_object("message_dialog_sub_label").hide()
         messagedialog_spinner = self.interface.get_object("message_dialog_spinner")
 
         messagedialog_label.set_markup("Disconnecting...")
@@ -221,6 +228,7 @@ class Handler:
         """
         messagedialog_window = self.interface.get_object("MessageDialog")
         messagedialog_label = self.interface.get_object("message_dialog_label")
+        messagedialog_sub_label = self.interface.get_object("message_dialog_sub_label").hide()
         messagedialog_spinner = self.interface.get_object("message_dialog_spinner")
 
         messagedialog_label.set_markup("Refreshing server list...")
@@ -238,10 +246,26 @@ class Handler:
         about_dialog = self.interface.get_object("AboutDialog")
         about_dialog.set_version(VERSION)
         about_dialog.show()
-    
+
+    def diagnose_menu_button_clicked(self, button):
+        messagedialog_window = self.interface.get_object("MessageDialog")
+        messagedialog_label = self.interface.get_object("message_dialog_label")
+        messagedialog_sub_label = self.interface.get_object("message_dialog_sub_label")
+        messagedialog_spinner = self.interface.get_object("message_dialog_spinner")
+
+        messagedialog_label.set_markup("Diagnosing...")
+        messagedialog_spinner.show()
+
+        thread = Thread(target=message_dialog, args=[self.interface, "diagnose", messagedialog_label, messagedialog_spinner, messagedialog_sub_label])
+        thread.daemon = True
+        thread.start()
+        
+        messagedialog_window.show()
+        
     def check_for_updates_button_clicked(self, button):
         messagedialog_window = self.interface.get_object("MessageDialog")
         messagedialog_label = self.interface.get_object("message_dialog_label")
+        messagedialog_sub_label = self.interface.get_object("message_dialog_sub_label").hide()
         messagedialog_spinner = self.interface.get_object("message_dialog_spinner")
 
         messagedialog_label.set_markup("Checking...")
@@ -293,6 +317,7 @@ class Handler:
         """
         messagedialog_window = self.interface.get_object("MessageDialog")
         messagedialog_label = self.interface.get_object("message_dialog_label")
+        messagedialog_sub_label = self.interface.get_object("message_dialog_sub_label").hide()
         messagedialog_spinner = self.interface.get_object("message_dialog_spinner")
 
         messagedialog_label.set_markup("Updating username and password...")
@@ -324,6 +349,7 @@ class Handler:
         """
         messagedialog_window = self.interface.get_object("MessageDialog")
         messagedialog_label = self.interface.get_object("message_dialog_label")
+        messagedialog_sub_label = self.interface.get_object("message_dialog_sub_label").hide()
         messagedialog_spinner = self.interface.get_object("message_dialog_spinner")
 
         messagedialog_label.set_markup("Updating DNS configurations...")
@@ -340,6 +366,7 @@ class Handler:
         """
         messagedialog_window = self.interface.get_object("MessageDialog")
         messagedialog_label = self.interface.get_object("message_dialog_label")
+        messagedialog_sub_label = self.interface.get_object("message_dialog_sub_label").hide()
         messagedialog_spinner = self.interface.get_object("message_dialog_spinner")
         
         messagedialog_label.set_markup("Updating ProtonVPN Plan...")
@@ -357,6 +384,7 @@ class Handler:
         """
         messagedialog_window = self.interface.get_object("MessageDialog")
         messagedialog_label = self.interface.get_object("message_dialog_label")
+        messagedialog_sub_label = self.interface.get_object("message_dialog_sub_label").hide()
         messagedialog_spinner = self.interface.get_object("message_dialog_spinner")
         
         messagedialog_label.set_markup("Updating default OpenVPN Protocol...")
@@ -385,6 +413,7 @@ class Handler:
         """
         messagedialog_window = self.interface.get_object("MessageDialog")
         messagedialog_label = self.interface.get_object("message_dialog_label")
+        messagedialog_sub_label = self.interface.get_object("message_dialog_sub_label").hide()
         messagedialog_spinner = self.interface.get_object("message_dialog_spinner")
         
         messagedialog_label.set_markup("Updating killswitch configurations...")
@@ -403,6 +432,7 @@ class Handler:
         """
         messagedialog_window = self.interface.get_object("MessageDialog")
         messagedialog_label = self.interface.get_object("message_dialog_label")
+        messagedialog_sub_label = self.interface.get_object("message_dialog_sub_label").hide()
         messagedialog_spinner = self.interface.get_object("message_dialog_spinner")
         
         messagedialog_label.set_markup("Updating split tunneling configurations...")
@@ -420,6 +450,7 @@ class Handler:
         """
         messagedialog_window = self.interface.get_object("MessageDialog")
         messagedialog_label = self.interface.get_object("message_dialog_label")
+        messagedialog_sub_label = self.interface.get_object("message_dialog_sub_label").hide()
         messagedialog_spinner = self.interface.get_object("message_dialog_spinner")
         
         messagedialog_label.set_markup("Purging configurations configurations...")
@@ -461,14 +492,39 @@ def initialize_gui():
 
     interface.connect_signals(Handler(interface))
 
+    if len(get_gui_processes()) > 1:
+        messagedialog_window = interface.get_object("MessageDialog")
+        messagedialog_label = interface.get_object("message_dialog_label")
+        messagedialog_spinner = interface.get_object("message_dialog_spinner")
+
+        messagedialog_label.set_markup("Another GUI process was found, attempting to end it...")
+        messagedialog_spinner.show()
+        messagedialog_window.show()
+
+        time.sleep(1)
+        # thread = Thread(target=kill_duplicate_gui_process, args=[interface, messagedialog_label, messagedialog_spinner])
+        # thread.daemon = True
+        # thread.start()
+
+        response = kill_duplicate_gui_process()
+
+        if not response['success']:
+            messagedialog_label.set_markup(response['message'])
+            messagedialog_spinner.hide()
+            time.sleep(3)
+            sys.exit(1)
+
+        messagedialog_label.set_markup(response['message'])
+        messagedialog_spinner.hide()
+
     if not os.path.isfile(CONFIG_FILE):
         window = interface.get_object("LoginWindow")
-        dashboard = interface.get_object("Dashboard")
+        dashboard = interface.get_object("DashboardWindow")
         dashboard.connect("destroy", Gtk.main_quit)
     else:
-        window = interface.get_object("Dashboard")
+        window = interface.get_object("DashboardWindow")
         window.connect("destroy", Gtk.main_quit)
-        load_on_start(interface)
+        load_on_start(interface, fast_boot=True)
     
     window.show()
     

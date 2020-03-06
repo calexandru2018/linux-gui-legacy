@@ -21,7 +21,7 @@ from .constants import (
 )
 
 
-def call_api(endpoint, json_format=True, handle_errors=True):
+def call_api(endpoint, json_format=True, handle_errors=True, gui_enabled=False):
     """Call to the ProtonVPN API."""
 
     api_domain = "https://api.protonvpn.ch"
@@ -44,10 +44,11 @@ def call_api(endpoint, json_format=True, handle_errors=True):
         response = requests.get(url, headers=headers)
     except (requests.exceptions.ConnectionError,
             requests.exceptions.ConnectTimeout):
-        print(
-            "[!] There was an error connecting to the ProtonVPN API.\n"
-            "[!] Please make sure your connection is working properly!"
-        )
+        if not gui_enabled:
+            print(
+                "[!] There was an error connecting to the ProtonVPN API.\n"
+                "[!] Please make sure your connection is working properly!"
+            )
         logger.debug("Error connecting to ProtonVPN API")
         return
         # sys.exit(1)
@@ -98,9 +99,29 @@ def pull_server_data(force=False):
 def get_servers():
     """Return a list of all servers for the users Tier."""
 
-    with open(SERVER_INFO_FILE, "r") as f:
-        logger.debug("Reading servers from file")
-        server_data = json.load(f)
+    server_data = {}
+    timer_start = time.time()
+
+    while True:
+        if time.time() - timer_start > 5:
+            break
+
+        with open(SERVER_INFO_FILE, "r") as f:
+            logger.debug("Reading servers from file")
+            try:
+                data = json.load(f)
+                if not data == None and not len(data) == 0:
+                    server_data = data
+                    break
+            except:
+                pull_server_data(force=True)
+                time.sleep(2)
+                pass
+
+        # time.sleep(2)
+
+    if len(server_data) == 0:
+        return False
 
     servers = server_data["LogicalServers"]
 
@@ -139,15 +160,18 @@ def set_config_value(group, key, value):
         config.write(f)
 
 
-def get_ip_info(gui_enbled=False):
+def get_ip_info(gui_enabled=False):
     """Return the current public IP Address"""
     logger.debug("Getting IP Information")
-    ip_info = call_api("/vpn/location")
+    ip_info = call_api("/vpn/location", gui_enabled=gui_enabled)
+
+    if ip_info == None:
+        return False
 
     ip = ip_info["IP"]
     isp = ip_info["ISP"]
 
-    if gui_enbled == True:
+    if gui_enabled == True:
         return ip, isp, ip_info["Country"]
     return ip, isp
 

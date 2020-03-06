@@ -2,6 +2,7 @@ import re
 import time
 import requests
 import json
+import subprocess
 
 from custom_pvpn_cli_ng.protonvpn_cli.utils import get_config_value, is_valid_ip
 
@@ -16,7 +17,8 @@ from .utils import (
     load_on_start,
     load_configurations,
     is_connected,
-    update_labels_server_list
+    update_labels_server_list,
+    get_gui_processes
 )
 
 from .constants import VERSION, GITHUB_URL_RELEASE
@@ -287,3 +289,43 @@ def purge_configurations(interface, messagedialog_label, messagedialog_spinner):
 
     messagedialog_label.set_markup(result)
     messagedialog_spinner.hide()
+
+# def kill_duplicate_gui_process(interface, messagedialog_label, messagedialog_spinner):
+def kill_duplicate_gui_process():
+
+    return_message = {
+        "message": "Unable to automatically end service. Please do it manually.",
+        "success": False
+    }
+    
+    process = get_gui_processes()
+    
+    if len(process) > 1:
+        print("[!] Two processes found, attempting to end previous.")
+
+        # select first(longest living) process from list
+        process_to_kill = process[0]
+
+        timer_start = time.time()
+
+        while len(get_gui_processes()) > 1:
+            if time.time() - timer_start <= 10:
+                subprocess.run(["kill", process_to_kill])
+                time.sleep(0.2)
+                print("Tried pkill")
+            else:
+                subprocess.run(["kill", "-9", process_to_kill])
+                print("Sendig SIGKILL")
+                break
+
+        if len(get_gui_processes()) == 1:
+            return_message['message'] = "Previous process ended, resuming actual session."        
+            return_message['success'] = True
+
+    elif len(process) == 1:
+        return_message['message'] = "Only one process, normal startup."        
+        return_message['success'] = True
+
+    # messagedialog_label.set_markup(return_message['message'])
+    # messagedialog_spinner.hide()
+    return return_message
