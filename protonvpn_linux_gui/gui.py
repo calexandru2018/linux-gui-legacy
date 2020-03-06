@@ -509,7 +509,7 @@ def initialize_gui():
     else:
         window = interface.get_object("DashboardWindow")
         window.connect("destroy", Gtk.main_quit)
-        load_on_start(interface)
+        load_on_start(interface, fast_boot=True)
     
     window.show()
     

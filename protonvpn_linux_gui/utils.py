@@ -39,7 +39,7 @@ def message_dialog(interface, action, label_object, spinner_object):
             label_object.set_markup("<span>{0}</span>".format(return_value))
             spinner_object.hide()
     elif action == "diagnose":
-        result = '' 
+        advice = '' 
         # Check if there is internet connection
             # Depending on next questions, some actions might be suggested.
         has_internet = check_internet_conn()
@@ -50,7 +50,7 @@ def message_dialog(interface, action, label_object, spinner_object):
 
         # Check if VPN is running
             # If there is a OpenVPN process running in the background, kill it.
-        is_vpnconnected = is_connected()
+        is_ovpnprocess_running = is_connected()
 
         # Check if custom DNS is enabled
             # If there is no VPN connection and also no internet, then it is a DNS issue.
@@ -59,40 +59,66 @@ def message_dialog(interface, action, label_object, spinner_object):
 
         # Check if custom DNS is in use. 
             # It might that the user has disabled the custom DNS settings but the file still resides there
-        # read os.path.realpath("/etc/resolv.conf") and check if it has any signs of midification
+        with open("/etc/resolv.conf") as f:
+            l = f.readlines()
 
         # Check if servers are cached
             # Maybe to-do
 
-        result = result + """
-        Connected to VPN: <b>{is_conn}</b>
+        if not has_internet:
+            if is_ovpnprocess_running:
+                print("CHECK resolv.conf")
+                advice = advice + "\nYou have no internet conneciton though VPN process is running, try to kill the VPN process first."
+            elif not is_ovpnprocess_running:
+                print("CHECK DNS and Killswitch")
+        else:
+            print("VPN not running.")
+        result = """
+        VPN Process Running: <b>{is_conn}</b>
         Killswitch enabled: <b>{ks}</b>
         Has internet: <b>{conn}</b>
         DNS Protection Enabled: <b>{dns_protec}</b>
+        Custom resolv.conf: <b>{dns_conf}</b>
+        lines: <b>{lines}</b>
+
+        {advice}
         """.format(
-            is_conn=is_vpnconnected, 
+            is_conn=is_ovpnprocess_running, 
             ks=is_killswitch_enabled,
             conn=has_internet,
-            dns_protec=is_dns_protection_enabled)
+            dns_protec=is_dns_protection_enabled,
+            dns_conf=l,
+            lines=len(l),
+            advice=advice)
+
         label_object.set_markup(result)
         spinner_object.hide()
 
-def check_internet_conn():
+def check_internet_conn(fast_boot=False):
     timer_start = time.time()
     result = ''
+    attempts = 2
+
     while True:
-        if time.time() - timer_start > 5:
+        # To speed up GUI start
+        if fast_boot and attempts == 0:
+            result = False
+            break
+        # Useful when using diagnostics tool
+        elif time.time() - timer_start > 5:
             break
             result = False
-
+    
         try:
             if get_ip_info(gui_enabled=True):
                 result = True
+                break
             else:
                 result = False
         except:
             pass
 
+        attempts -= 1
         time.sleep(0.2)
 
     return result
@@ -152,10 +178,10 @@ def prepare_initilizer(username_field, password_field, interface):
 
     return user_data
 
-def load_on_start(interface):
+def load_on_start(interface, fast_boot=False):
     """Updates Dashboard labels and populates server list content before showing it to the user
     """
-    if check_internet_conn():
+    if check_internet_conn(fast_boot=fast_boot):
         p = Thread(target=update_labels_server_list, args=[interface])
         p.daemon = True
         p.start()
@@ -412,7 +438,7 @@ def populate_server_list(populate_servers_dict):
 
     # Country with respective servers, ex: PT#02
     countries = {}
-    print("VALUE: ", servers, type(servers))
+    
     if servers:
         for server in servers:
             country = get_country_name(server["ExitCountry"])
