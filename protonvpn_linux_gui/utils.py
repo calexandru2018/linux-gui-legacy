@@ -188,12 +188,11 @@ def check_for_updates():
 
     if latest_release == VERSION:
         return "You have the latest version!"
-    else:
+    elif VERSION < latest_release:
         return_string = "There is a newer release, you should update to <b>v{0}</b>.\n\n".format(latest_release)
         return_string = return_string + "If installed via pip then upgrade with:\n<b>sudo pip3 install protonvpn-linux-gui-calexandru2018 --upgrade</b>\n\n"
         return_string = return_string + "If installed via github then upgrade with:\n<b>git clone https://github.com/calexandru2018/protonvpn-linux-gui</b>"
         return return_string
-
 
 def prepare_initilizer(username_field, password_field, interface):
     """Collects and prepares user input from login window.
