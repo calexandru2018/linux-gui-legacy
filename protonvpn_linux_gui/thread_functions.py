@@ -61,7 +61,8 @@ def connect_to_selected_server(interface, selected_server, messagedialog_label, 
     }
 
 
-    result = connection.openvpn_connect(selected_server, protocol)
+    result = connection.openvpn_connect(selected_server, protocol, gui_enabled=True)
+    # result = connection.openvpn_connect(selected_server, protocol)
 
     messagedialog_label.set_markup(result)
     messagedialog_spinner.hide()
