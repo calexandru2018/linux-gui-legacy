@@ -113,18 +113,22 @@ If you would like to launch the GUI without having to type in your sudo password
 
 ## GUI Layout
 <p align="center">
-  <img src="https://i.imgur.com/Dxe9vRH.png" alt="Logo"></img>
+  <img src="https://i.imgur.com/VnOMaeg.png" alt="Logo"></img>
 </p>
 
 <p align="center">
-  <img src="https://i.imgur.com/QlgrT66.png" alt="Logo"></img>
+  <img src="https://i.imgur.com/BbwBiu6.png" alt="Logo"></img>
 </p>
 
 <p align="center">
-  <img src="https://i.imgur.com/mqf64v7.png" alt="Logo"></img>
+  <img src="https://i.imgur.com/103IBOc.png" alt="Logo"></img>
 </p>
 
 <p align="center">
-  <img src="https://i.imgur.com/nVU65pO.png" alt="Logo"></img>
+  <img src="https://i.imgur.com/zq93OdU.png" alt="Logo"></img>
+</p> 
+
+ <p align="center">
+  <img src="https://i.imgur.com/bhK8qqB.png" alt="Logo"></img>
 </p> 
  

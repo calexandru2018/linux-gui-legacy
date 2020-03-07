@@ -193,6 +193,8 @@ def check_for_updates():
         return_string = return_string + "If installed via pip then upgrade with:\n<b>sudo pip3 install protonvpn-linux-gui-calexandru2018 --upgrade</b>\n\n"
         return_string = return_string + "If installed via github then upgrade with:\n<b>git clone https://github.com/calexandru2018/protonvpn-linux-gui</b>"
         return return_string
+    else:
+        return "Developer Mode."
 
 def prepare_initilizer(username_field, password_field, interface):
     """Collects and prepares user input from login window.
