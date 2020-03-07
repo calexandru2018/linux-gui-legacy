@@ -557,7 +557,11 @@ def openvpn_connect(servername, protocol, gui_enabled=False):
             elif time.time() - time_start >= 45:
                 print("Connection timed out after 45 Seconds")
                 logger.debug("Connection timed out after 45 Seconds")
-                sys.exit(1)
+                return_message = "Connection timed out after 45 Seconds"
+
+                if not gui_enabled == True:
+                    sys.exit(1)
+
             time.sleep(0.1)
 
     # Write connection info into configuration file
