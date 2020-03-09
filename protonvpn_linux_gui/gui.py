@@ -269,6 +269,8 @@ class Handler:
         messagedialog_window = self.interface.get_object("MessageDialog")
         messagedialog_label = self.interface.get_object("message_dialog_label")
         messagedialog_sub_label = self.interface.get_object("message_dialog_sub_label")
+        messagedialog_sub_label.set_text("")
+        messagedialog_sub_label.hide()
         messagedialog_spinner = self.interface.get_object("message_dialog_spinner")
 
         messagedialog_label.set_markup("Diagnosing...")
