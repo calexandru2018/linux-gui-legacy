@@ -311,7 +311,7 @@ class Handler:
         gui_logger.debug(">>> Starting \"load_configurations\".")
         load_configurations(self.interface)
         
-    # To avoid getting the Preferences window destroyed and not being re-rendered again
+    # To avoid getting the ConfigurationsWindow destroyed and not being re-rendered again
     def ConfigurationsWindow_delete_event(self, object, event):
         """On Delete handler is used to hide the window so it renders next time the dialog is called
         
@@ -322,9 +322,20 @@ class Handler:
             object.hide()
             return True
 
-    # To avoid getting the About window destroyed and not being re-rendered again
+    # To avoid getting the AboutDialog destroyed and not being re-rendered again
     def AboutDialog_delete_event(self, object, event):
-        """On Delete handler is used to hide the dialog and that it successfully  renders next time it is called
+        """On Delete handler is used to hide the dialog and so that it successfully renders next time it is called
+        
+        -Returns:Boolean
+        - It needs to return True, otherwise the content will not re-render after closing the window
+        """
+        if object.get_property("visible") == True:
+            object.hide()
+            return True    
+
+    # To avoid getting the MessageDialog destroyed and not being re-rendered again
+    def MessageDialog_delete_event(self, object, event):
+        """On Delete handler is used to hide the dialog and so that it successfully renders next time it is called
         
         -Returns:Boolean
         - It needs to return True, otherwise the content will not re-render after closing the window
