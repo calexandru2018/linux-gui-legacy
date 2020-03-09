@@ -4,8 +4,8 @@ import requests
 import json
 import subprocess
 
+# Import ProtonVPN methods and utils
 from custom_pvpn_cli_ng.protonvpn_cli.utils import get_config_value, is_valid_ip
-
 from custom_pvpn_cli_ng.protonvpn_cli import cli
 from custom_pvpn_cli_ng.protonvpn_cli import connection
 
@@ -21,6 +21,10 @@ from .utils import (
     get_gui_processes
 )
 
+# Import GUI logger
+from .gui_logger import gui_logger
+
+# Import constants
 from .constants import VERSION, GITHUB_URL_RELEASE
 
 # Login handler
@@ -31,8 +35,7 @@ def on_login(interface):
     password_field = interface.get_object('password_field').get_text().strip()
     
     if len(username_field) == 0 or len(password_field) == 0:
-        print()
-        print("[!] None of the fields can be left empty.")
+        gui_logger.debug("[!] One of the fields were left empty upon profile initialization.")
         return False
 
     user_data = prepare_initilizer(username_field, password_field, interface)
@@ -60,6 +63,7 @@ def connect_to_selected_server(interface, selected_server, messagedialog_label, 
         "disconnecting": False
     }
 
+    gui_logger.debug(">>> Running \"openvpn_connect\".")
 
     result = connection.openvpn_connect(selected_server, protocol, gui_enabled=True)
     # result = connection.openvpn_connect(selected_server, protocol)
@@ -67,7 +71,11 @@ def connect_to_selected_server(interface, selected_server, messagedialog_label, 
     messagedialog_label.set_markup(result)
     messagedialog_spinner.hide()
 
+    gui_logger.debug(">>> Result: \"{0}\"".format(result))
+
     update_labels_status(update_labels_dict)
+
+    gui_logger.debug(">>> Ended tasks in \"openvpn_connect\" thread.")
     
 def quick_connect(interface, messagedialog_label, messagedialog_spinner):
     """Button/Event handler to connect to the fastest server
@@ -80,12 +88,18 @@ def quick_connect(interface, messagedialog_label, messagedialog_spinner):
         "disconnecting": False
     }
 
+    gui_logger.debug(">>> Running \"fastest\".")
+
     result = connection.fastest(protocol, gui_enabled=True)
 
     messagedialog_label.set_markup(result)
     messagedialog_spinner.hide()
+
+    gui_logger.debug(">>> Result: \"{0}\"".format(result))
     
     update_labels_status(update_labels_dict)
+
+    gui_logger.debug(">>> Ended tasks in \"fastest\" thread.")
 
 def last_connect(interface, messagedialog_label, messagedialog_spinner):
     """Button/Event handler to reconnect to previously connected server
@@ -95,12 +109,19 @@ def last_connect(interface, messagedialog_label, messagedialog_spinner):
         "servers": False,
         "disconnecting": False
     }
+
+    gui_logger.debug(">>> Running \"reconnect\".")
+
     result = connection.reconnect(gui_enabled=True)
 
     messagedialog_label.set_markup(result)
     messagedialog_spinner.hide()
 
+    gui_logger.debug(">>> Result: \"{0}\"".format(result))
+
     update_labels_status(update_labels_dict)
+
+    gui_logger.debug(">>> Ended tasks in \"reconnect\" thread.")
 
 def random_connect(interface, messagedialog_label, messagedialog_spinner):
     """Button/Event handler to connect to a random server
@@ -112,12 +133,18 @@ def random_connect(interface, messagedialog_label, messagedialog_spinner):
         "disconnecting": False
     }
 
+    gui_logger.debug(">>> Running \"reconnect\"")
+
     result = connection.random_c(protocol, gui_enabled=True)
     
     messagedialog_label.set_markup(result)
     messagedialog_spinner.hide()
 
+    gui_logger.debug(">>> Result: \"{0}\"".format(result))
+
     update_labels_status(update_labels_dict)
+
+    gui_logger.debug(">>> Ended tasks in \"random_c\" thread.")
 
 def disconnect(interface, messagedialog_label, messagedialog_spinner):
     """Button/Event handler to disconnect any existing connections
@@ -128,13 +155,18 @@ def disconnect(interface, messagedialog_label, messagedialog_spinner):
         "disconnecting": True
     }
 
+    gui_logger.debug(">>> Running \"disconnect\".")
+
     result = connection.disconnect(gui_enabled=True)
     
     messagedialog_label.set_markup(result)
     messagedialog_spinner.hide()
 
+    gui_logger.debug(">>> Result: \"{0}\"".format(result))
+
     update_labels_status(update_labels_dict)
-    
+
+    gui_logger.debug(">>> Ended tasks in \"disconnect\" thread.")
     
 def refresh_server_list(interface, messagedialog_window, messagedialog_spinner):
     """Button/Event handler to refresh/repopulate server list
@@ -144,12 +176,15 @@ def refresh_server_list(interface, messagedialog_window, messagedialog_spinner):
     # which makes the button "lag".
     time.sleep(1)
     # Temporary solution
+
+    gui_logger.debug(">>> Running \"update_labels_server_list\"")
+
     update_labels_server_list(interface)
 
     messagedialog_window.hide()
     messagedialog_spinner.hide()
 
-
+    gui_logger.debug(">>> Ended tasks in \"update_labels_server_list\" thread.")
 
 # Preferences/Configuration menu HANDLERS
 def update_user_pass(interface, messagedialog_label, messagedialog_spinner):
@@ -295,14 +330,13 @@ def purge_configurations(interface, messagedialog_label, messagedialog_spinner):
 def kill_duplicate_gui_process():
 
     return_message = {
-        "message": "Unable to automatically end service. Please do it manually.",
+        "message": "Unable to automatically end service. Please manually end the process.",
         "success": False
     }
     
     process = get_gui_processes()
-    
     if len(process) > 1:
-        print("[!] Two processes found, attempting to end previous.")
+        gui_logger.debug("[!] Found following processes: {0}. Will attempt to end \"{1}\"".format(process, process[0]))
 
         # select first(longest living) process from list
         process_to_kill = process[0]
@@ -313,19 +347,20 @@ def kill_duplicate_gui_process():
             if time.time() - timer_start <= 10:
                 subprocess.run(["kill", process_to_kill])
                 time.sleep(0.2)
-                print("Tried pkill")
             else:
                 subprocess.run(["kill", "-9", process_to_kill])
-                print("Sendig SIGKILL")
+                gui_logger.debug("[!] Unable to pkill process \"{0}\". Will attempt a SIGKILL.".format(process[0]))
                 break
 
         if len(get_gui_processes()) == 1:
             return_message['message'] = "Previous process ended, resuming actual session."        
             return_message['success'] = True
+            gui_logger.debug("[!] Process \"{0}\" was ended.".format(process[0]))
 
     elif len(process) == 1:
         return_message['message'] = "Only one process, normal startup."        
         return_message['success'] = True
+        gui_logger.debug(">>> Only one process was found, continuing with normal startup.")
 
     # messagedialog_label.set_markup(return_message['message'])
     # messagedialog_spinner.hide()

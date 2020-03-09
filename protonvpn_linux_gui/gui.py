@@ -9,11 +9,14 @@ import concurrent.futures
 import queue
 
 # ProtonVPN base CLI package import
-from custom_pvpn_cli_ng.protonvpn_cli.constants import (USER, CONFIG_FILE)
+from custom_pvpn_cli_ng.protonvpn_cli.constants import (USER, CONFIG_FILE, CONFIG_DIR)
 from custom_pvpn_cli_ng.protonvpn_cli import cli
 
 # ProtonVPN helper funcitons
-from custom_pvpn_cli_ng.protonvpn_cli.utils import check_root, get_config_value
+from custom_pvpn_cli_ng.protonvpn_cli.utils import check_root, get_config_value, change_file_owner
+
+# Import GUI logger
+from .gui_logger import gui_logger
 
 # Custom helper functions
 from .utils import (
@@ -45,6 +48,7 @@ from .thread_functions import(
     kill_duplicate_gui_process
 )
 
+# Import version
 from .constants import VERSION
 
 # PyGObject import
@@ -57,7 +61,7 @@ from gi.repository import GLib, Gtk, GObject, Gdk
 class Handler:
     """Handler that has all callback functions.
     """
-    def __init__(self, interface):
+    def __init__(self, interface): 
         self.interface = interface
 
     # Login BUTTON HANDLER
@@ -134,10 +138,13 @@ class Handler:
         if selected_server == '':
             messagedialog_spinner.hide()
             messagedialog_label.set_markup("No server was selected!\nPlease select a server before attempting to connect.")
+            gui_logger.debug("[!] No server was selected to be connected to.")
         else:
             # Set text and show spinner
             messagedialog_label.set_markup("Connecting to <b>{0}</b>".format(selected_server))
             messagedialog_spinner.show()
+
+            gui_logger.debug(">>> Starting \"connect_to_selected_server\" thread.")
 
             thread = Thread(target=connect_to_selected_server, args=[self.interface, selected_server, messagedialog_label, messagedialog_spinner])
             thread.daemon = True
@@ -155,6 +162,8 @@ class Handler:
 
         messagedialog_label.set_markup("Connecting to the fastest server...")
         messagedialog_spinner.show()
+
+        gui_logger.debug(">>> Starting \"quick_connect\" thread.")
 
         thread = Thread(target=quick_connect, args=[self.interface, messagedialog_label, messagedialog_spinner])
         thread.daemon = True
@@ -174,13 +183,16 @@ class Handler:
             servername = get_config_value("metadata", "connected_server")
             protocol = get_config_value("metadata", "connected_proto")     
         except:
-            messagedialog_label.set_markup("Connecting to previously connected server...")
+            messagedialog_label.set_markup("You have not previously connected to any server, please do that connect to a server first before attempting to reconnect.")
             messagedialog_spinner.hide()
             messagedialog_window.show()
+            gui_logger.debug("[!] Attempted to connect to previously connected server without having made any previous connections.")
             return
 
         messagedialog_label.set_markup("Connecting to to previously connected server <b>{0}</b> with <b>{1}</b>".format(servername, protocol.upper()))
         messagedialog_spinner.show()
+
+        gui_logger.debug(">>> Starting \"last_connect\" thread.")
 
         thread = Thread(target=last_connect, args=[self.interface, messagedialog_label, messagedialog_spinner])
         thread.daemon = True
@@ -199,6 +211,8 @@ class Handler:
         messagedialog_label.set_markup("Connecting to a random server...")
         messagedialog_spinner.show()
 
+        gui_logger.debug(">>> Starting \"random_connect\" thread.")
+
         thread = Thread(target=random_connect, args=[self.interface, messagedialog_label, messagedialog_spinner])
         thread.daemon = True
         thread.start()
@@ -215,6 +229,8 @@ class Handler:
 
         messagedialog_label.set_markup("Disconnecting...")
         messagedialog_spinner.show()
+
+        gui_logger.debug(">>> Starting \"disconnect\" thread.")
 
         thread = Thread(target=disconnect, args=[self.interface, messagedialog_label, messagedialog_spinner])
         thread.daemon = True
@@ -233,6 +249,8 @@ class Handler:
 
         messagedialog_label.set_markup("Refreshing server list...")
         messagedialog_spinner.show()
+
+        gui_logger.debug(">>> Starting \"refresh_server_list\" thread.")
 
         thread = Thread(target=refresh_server_list, args=[self.interface, messagedialog_window, messagedialog_spinner])
         thread.daemon = True
@@ -475,6 +493,8 @@ def initialize_gui():
     - Will start the GUI without invoking cli()
     """
     check_root()
+    change_file_owner(os.path.join(CONFIG_DIR, "protonvpn-gui.log"))
+    gui_logger.debug("\n______________________________________\n\n\tINITIALIZING NEW GUI WINDOW\n______________________________________\n")
 
     interface = Gtk.Builder()
 
@@ -493,6 +513,7 @@ def initialize_gui():
     interface.connect_signals(Handler(interface))
 
     if len(get_gui_processes()) > 1:
+        gui_logger.debug("[!] Two processes were found. Displaying MessageDialog to inform user.")
         messagedialog_window = interface.get_object("MessageDialog")
         messagedialog_label = interface.get_object("message_dialog_label")
         messagedialog_spinner = interface.get_object("message_dialog_spinner")
@@ -518,11 +539,13 @@ def initialize_gui():
         messagedialog_spinner.hide()
 
     if not os.path.isfile(CONFIG_FILE):
+        gui_logger.debug(">>> Loading LoginWindow")
         window = interface.get_object("LoginWindow")
         dashboard = interface.get_object("DashboardWindow")
         dashboard.connect("destroy", Gtk.main_quit)
     else:
         window = interface.get_object("DashboardWindow")
+        gui_logger.debug(">>> Loading DashboardWindow")
         window.connect("destroy", Gtk.main_quit)
         load_on_start(interface, fast_boot=True)
     
