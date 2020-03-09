@@ -274,6 +274,7 @@ class Handler:
         messagedialog_label.set_markup("Diagnosing...")
         messagedialog_spinner.show()
 
+        gui_logger.debug(">>> Starting \"message_dialog\" thread. [DIAGNOSE]")
         thread = Thread(target=message_dialog, args=[self.interface, "diagnose", messagedialog_label, messagedialog_spinner, messagedialog_sub_label])
         thread.daemon = True
         thread.start()
@@ -288,6 +289,8 @@ class Handler:
 
         messagedialog_label.set_markup("Checking...")
         messagedialog_spinner.show()
+
+        gui_logger.debug(">>> Starting \"message_dialog\" thread. [CHECK_FOR_UPDATES]")
 
         thread = Thread(target=message_dialog, args=[self.interface, "check_for_update", messagedialog_label, messagedialog_spinner])
         thread.daemon = True
@@ -305,6 +308,7 @@ class Handler:
     def configuration_menu_button_clicked(self, button):
         """Button/Event handler to open Configurations window
         """
+        gui_logger.debug(">>> Starting \"load_configurations\".")
         load_configurations(self.interface)
         
     # To avoid getting the Preferences window destroyed and not being re-rendered again
@@ -341,6 +345,8 @@ class Handler:
         messagedialog_label.set_markup("Updating username and password...")
         messagedialog_spinner.show()
 
+        gui_logger.debug(">>> Starting \"update_user_pass\" thread.")
+
         thread = Thread(target=update_user_pass, args=[self.interface, messagedialog_label, messagedialog_spinner])
         thread.daemon = True
         thread.start()
@@ -373,6 +379,8 @@ class Handler:
         messagedialog_label.set_markup("Updating DNS configurations...")
         messagedialog_spinner.show()
         
+        gui_logger.debug(">>> Starting \"update_dns\" thread.")
+
         thread = Thread(target=update_dns, args=[self.interface, messagedialog_label, messagedialog_spinner])
         thread.daemon = True
         thread.start()
@@ -389,6 +397,8 @@ class Handler:
         
         messagedialog_label.set_markup("Updating ProtonVPN Plan...")
         messagedialog_spinner.show()
+
+        gui_logger.debug(">>> Starting \"update_pvpn_plan\" thread.")
 
         thread = Thread(target=update_pvpn_plan, args=[self.interface, messagedialog_label, messagedialog_spinner])
         thread.daemon = True
@@ -407,6 +417,8 @@ class Handler:
         
         messagedialog_label.set_markup("Updating default OpenVPN Protocol...")
         messagedialog_spinner.show()
+
+        gui_logger.debug(">>> Starting \"update_def_protocol\" thread.")
 
         thread = Thread(target=update_def_protocol, args=[self.interface, messagedialog_label, messagedialog_spinner])
         thread.daemon = True
@@ -437,6 +449,8 @@ class Handler:
         messagedialog_label.set_markup("Updating killswitch configurations...")
         messagedialog_spinner.show()
 
+        gui_logger.debug(">>> Starting \"update_killswitch\" thread.")
+
         thread = Thread(target=update_killswitch, args=[self.interface, messagedialog_label, messagedialog_spinner])
         thread.daemon = True
         thread.start()
@@ -456,6 +470,8 @@ class Handler:
         messagedialog_label.set_markup("Updating split tunneling configurations...")
         messagedialog_spinner.show()
 
+        gui_logger.debug(">>> Starting \"update_split_tunneling\" thread.")
+
         thread = Thread(target=update_split_tunneling, args=[self.interface, messagedialog_label, messagedialog_spinner])
         thread.daemon = True
         thread.start()
@@ -473,6 +489,8 @@ class Handler:
         
         messagedialog_label.set_markup("Purging configurations configurations...")
         messagedialog_spinner.show()
+
+        gui_logger.debug(">>> Starting \"purge_configurations\" thread.")
 
         thread = Thread(target=purge_configurations, args=[self.interface, messagedialog_label, messagedialog_spinner])
         thread.daemon = True
