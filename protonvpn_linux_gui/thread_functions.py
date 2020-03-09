@@ -177,7 +177,7 @@ def refresh_server_list(interface, messagedialog_window, messagedialog_spinner):
     time.sleep(1)
     # Temporary solution
 
-    gui_logger.debug(">>> Running \"update_labels_server_list\"")
+    gui_logger.debug(">>> Running \"update_labels_server_list\".")
 
     update_labels_server_list(interface)
 
@@ -201,11 +201,18 @@ def update_user_pass(interface, messagedialog_label, messagedialog_spinner):
         messagedialog_spinner.hide()
         return
 
+    gui_logger.debug(">>> Running \"set_username_password\".")
+
     result = cli.set_username_password(write=True, gui_enabled=True, user_data=(username_text, password_text))
     
     messagedialog_label.set_markup(result)
     password_field.set_text("")
     messagedialog_spinner.hide()
+
+    gui_logger.debug(">>> Result: \"{0}\"".format(result))
+
+    gui_logger.debug(">>> Ended tasks in \"set_username_password\" thread.")
+
 
 def update_dns(interface, messagedialog_label, messagedialog_spinner):
     """Button/Event handler to update DNS protection 
@@ -220,6 +227,7 @@ def update_dns(interface, messagedialog_label, messagedialog_spinner):
         if len(custom_dns) == 0:
             messagedialog_spinner.hide()
             messagedialog_label.set_markup("Custom DNS field input can not be left empty.")
+            gui_logger.debug("[!] Custom DNS field left emtpy.")
             return
 
         custom_dns = custom_dns.split(" ")
@@ -228,6 +236,7 @@ def update_dns(interface, messagedialog_label, messagedialog_spinner):
             if not is_valid_ip(ip):
                 messagedialog_spinner.hide()
                 messagedialog_label.set_markup("<b>{0}</b> is not valid.\nNone of the DNS were added, please try again with a different DNS.".format(ip))
+                gui_logger.debug("[!] Invalid IP \"{0}\".".format(ip))
                 return
 
     elif dns_combobox.get_active() == 2:
@@ -239,10 +248,16 @@ def update_dns(interface, messagedialog_label, messagedialog_spinner):
         custom_dns = None
         interface.get_object("dns_custom_input").set_text("")
     
+    gui_logger.debug(">>> Running \"set_dns_protection\".")
+
     result = cli.set_dns_protection(gui_enabled=True, dns_settings=(dns_leak_protection, custom_dns))
 
     messagedialog_label.set_markup(result)
     messagedialog_spinner.hide()
+
+    gui_logger.debug(">>> Result: \"{0}\"".format(result))
+
+    gui_logger.debug(">>> Ended tasks in \"set_dns_protection\" thread.")
 
 def update_pvpn_plan(interface, messagedialog_label, messagedialog_spinner):
     """Button/Event handler to update ProtonVPN Plan  
@@ -260,34 +275,50 @@ def update_pvpn_plan(interface, messagedialog_label, messagedialog_spinner):
             protonvpn_plan = int(k)
             break
         
+    gui_logger.debug(">>> Running \"set_protonvpn_tier\".")
+
     result = cli.set_protonvpn_tier(write=True, gui_enabled=True, tier=protonvpn_plan)
 
     messagedialog_label.set_markup(result)
     messagedialog_spinner.hide()
 
-    load_on_start(interface)        
+    gui_logger.debug(">>> Result: \"{0}\"".format(result))
+
+    load_on_start(interface)     
+
+    gui_logger.debug(">>> Ended tasks in \"set_protonvpn_tier\" thread.")   
 
 def update_def_protocol(interface, messagedialog_label, messagedialog_spinner):
     """Button/Event handler to update OpenVP Protocol  
     """
     openvpn_protocol = 'tcp' if interface.get_object('protocol_tcp_update_checkbox').get_active() == True else 'udp'
     
+    gui_logger.debug(">>> Running \"set_default_protocol\".")
+
     result = cli.set_default_protocol(write=True, gui_enabled=True, protoc=openvpn_protocol)
 
     messagedialog_label.set_markup(result)
     messagedialog_spinner.hide()
 
+    gui_logger.debug(">>> Result: \"{0}\"".format(result))
+
+    gui_logger.debug(">>> Ended tasks in \"set_default_protocol\" thread.")   
 
 def update_killswitch(interface, messagedialog_label, messagedialog_spinner):
     """Button/Event handler to update Killswitch  
     """
     ks_combobox = interface.get_object("killswitch_combobox")
 
+    gui_logger.debug(">>> Running \"set_killswitch\".")
+
     result = cli.set_killswitch(gui_enabled=True, user_choice=ks_combobox.get_active())
 
     messagedialog_label.set_markup(result)
     messagedialog_spinner.hide()
 
+    gui_logger.debug(">>> Result: \"{0}\"".format(result))
+
+    gui_logger.debug(">>> Ended tasks in \"set_killswitch\" thread.")   
 
 def update_split_tunneling(interface, messagedialog_label, messagedialog_spinner):
     """Button/Event handler to update Split Tunneling 
@@ -310,21 +341,35 @@ def update_split_tunneling(interface, messagedialog_label, messagedialog_spinner
         if not is_valid_ip(ip):
             messagedialog_spinner.hide()
             messagedialog_label.set_markup("<b>{0}</b> is not valid.\nNone of the IP's were added, please try again with a different IP.".format(ip))
+            gui_logger.debug("[!] Invalid IP \"{0}\".".format(ip))
             return
+
+    gui_logger.debug(">>> Running \"set_split_tunnel\".")
 
     result = cli.set_split_tunnel(gui_enabled=True, user_data=split_tunneling_content)
 
     messagedialog_label.set_markup(result)
     messagedialog_spinner.hide()
 
+    gui_logger.debug(">>> Result: \"{0}\"".format(result))
+
+    gui_logger.debug(">>> Ended tasks in \"set_split_tunnel\" thread.")   
+
 def purge_configurations(interface, messagedialog_label, messagedialog_spinner):
     """Button/Event handler to purge configurations
     """
     # To-do: Confirm prior to allowing user to do this
+
+    gui_logger.debug(">>> Running \"set_split_tunnel\".")
+
     result = cli.purge_configuration(gui_enabled=True)
 
     messagedialog_label.set_markup(result)
     messagedialog_spinner.hide()
+
+    gui_logger.debug(">>> Result: \"{0}\"".format(result))
+
+    gui_logger.debug(">>> Ended tasks in \"set_split_tunnel\" thread.")   
 
 # def kill_duplicate_gui_process(interface, messagedialog_label, messagedialog_spinner):
 def kill_duplicate_gui_process():
