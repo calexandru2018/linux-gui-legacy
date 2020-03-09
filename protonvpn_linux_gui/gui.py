@@ -9,11 +9,14 @@ import concurrent.futures
 import queue
 
 # ProtonVPN base CLI package import
-from custom_pvpn_cli_ng.protonvpn_cli.constants import (USER, CONFIG_FILE)
+from custom_pvpn_cli_ng.protonvpn_cli.constants import (USER, CONFIG_FILE, CONFIG_DIR)
 from custom_pvpn_cli_ng.protonvpn_cli import cli
 
 # ProtonVPN helper funcitons
-from custom_pvpn_cli_ng.protonvpn_cli.utils import check_root, get_config_value
+from custom_pvpn_cli_ng.protonvpn_cli.utils import check_root, get_config_value, change_file_owner
+
+# Import GUI logger
+from .gui_logger import gui_logger
 
 # Custom helper functions
 from .utils import (
@@ -45,6 +48,7 @@ from .thread_functions import(
     kill_duplicate_gui_process
 )
 
+# Import version
 from .constants import VERSION
 
 # PyGObject import
@@ -57,7 +61,7 @@ from gi.repository import GLib, Gtk, GObject, Gdk
 class Handler:
     """Handler that has all callback functions.
     """
-    def __init__(self, interface):
+    def __init__(self, interface): 
         self.interface = interface
 
     # Login BUTTON HANDLER
@@ -134,10 +138,13 @@ class Handler:
         if selected_server == '':
             messagedialog_spinner.hide()
             messagedialog_label.set_markup("No server was selected!\nPlease select a server before attempting to connect.")
+            gui_logger.debug("[!] No server was selected to be connected to.")
         else:
             # Set text and show spinner
             messagedialog_label.set_markup("Connecting to <b>{0}</b>".format(selected_server))
             messagedialog_spinner.show()
+
+            gui_logger.debug(">>> Starting \"connect_to_selected_server\" thread.")
 
             thread = Thread(target=connect_to_selected_server, args=[self.interface, selected_server, messagedialog_label, messagedialog_spinner])
             thread.daemon = True
@@ -155,6 +162,8 @@ class Handler:
 
         messagedialog_label.set_markup("Connecting to the fastest server...")
         messagedialog_spinner.show()
+
+        gui_logger.debug(">>> Starting \"quick_connect\" thread.")
 
         thread = Thread(target=quick_connect, args=[self.interface, messagedialog_label, messagedialog_spinner])
         thread.daemon = True
@@ -174,13 +183,16 @@ class Handler:
             servername = get_config_value("metadata", "connected_server")
             protocol = get_config_value("metadata", "connected_proto")     
         except:
-            messagedialog_label.set_markup("Connecting to previously connected server...")
+            messagedialog_label.set_markup("You have not previously connected to any server, please do that connect to a server first before attempting to reconnect.")
             messagedialog_spinner.hide()
             messagedialog_window.show()
+            gui_logger.debug("[!] Attempted to connect to previously connected server without having made any previous connections.")
             return
 
         messagedialog_label.set_markup("Connecting to to previously connected server <b>{0}</b> with <b>{1}</b>".format(servername, protocol.upper()))
         messagedialog_spinner.show()
+
+        gui_logger.debug(">>> Starting \"last_connect\" thread.")
 
         thread = Thread(target=last_connect, args=[self.interface, messagedialog_label, messagedialog_spinner])
         thread.daemon = True
@@ -199,6 +211,8 @@ class Handler:
         messagedialog_label.set_markup("Connecting to a random server...")
         messagedialog_spinner.show()
 
+        gui_logger.debug(">>> Starting \"random_connect\" thread.")
+
         thread = Thread(target=random_connect, args=[self.interface, messagedialog_label, messagedialog_spinner])
         thread.daemon = True
         thread.start()
@@ -215,6 +229,8 @@ class Handler:
 
         messagedialog_label.set_markup("Disconnecting...")
         messagedialog_spinner.show()
+
+        gui_logger.debug(">>> Starting \"disconnect\" thread.")
 
         thread = Thread(target=disconnect, args=[self.interface, messagedialog_label, messagedialog_spinner])
         thread.daemon = True
@@ -234,6 +250,8 @@ class Handler:
         messagedialog_label.set_markup("Refreshing server list...")
         messagedialog_spinner.show()
 
+        gui_logger.debug(">>> Starting \"refresh_server_list\" thread.")
+
         thread = Thread(target=refresh_server_list, args=[self.interface, messagedialog_window, messagedialog_spinner])
         thread.daemon = True
         thread.start()
@@ -251,11 +269,14 @@ class Handler:
         messagedialog_window = self.interface.get_object("MessageDialog")
         messagedialog_label = self.interface.get_object("message_dialog_label")
         messagedialog_sub_label = self.interface.get_object("message_dialog_sub_label")
+        messagedialog_sub_label.set_text("")
+        messagedialog_sub_label.hide()
         messagedialog_spinner = self.interface.get_object("message_dialog_spinner")
 
         messagedialog_label.set_markup("Diagnosing...")
         messagedialog_spinner.show()
 
+        gui_logger.debug(">>> Starting \"message_dialog\" thread. [DIAGNOSE]")
         thread = Thread(target=message_dialog, args=[self.interface, "diagnose", messagedialog_label, messagedialog_spinner, messagedialog_sub_label])
         thread.daemon = True
         thread.start()
@@ -270,6 +291,8 @@ class Handler:
 
         messagedialog_label.set_markup("Checking...")
         messagedialog_spinner.show()
+
+        gui_logger.debug(">>> Starting \"message_dialog\" thread. [CHECK_FOR_UPDATES]")
 
         thread = Thread(target=message_dialog, args=[self.interface, "check_for_update", messagedialog_label, messagedialog_spinner])
         thread.daemon = True
@@ -287,9 +310,10 @@ class Handler:
     def configuration_menu_button_clicked(self, button):
         """Button/Event handler to open Configurations window
         """
+        gui_logger.debug(">>> Starting \"load_configurations\".")
         load_configurations(self.interface)
         
-    # To avoid getting the Preferences window destroyed and not being re-rendered again
+    # To avoid getting the ConfigurationsWindow destroyed and not being re-rendered again
     def ConfigurationsWindow_delete_event(self, object, event):
         """On Delete handler is used to hide the window so it renders next time the dialog is called
         
@@ -300,9 +324,20 @@ class Handler:
             object.hide()
             return True
 
-    # To avoid getting the About window destroyed and not being re-rendered again
+    # To avoid getting the AboutDialog destroyed and not being re-rendered again
     def AboutDialog_delete_event(self, object, event):
-        """On Delete handler is used to hide the dialog and that it successfully  renders next time it is called
+        """On Delete handler is used to hide the dialog and so that it successfully renders next time it is called
+        
+        -Returns:Boolean
+        - It needs to return True, otherwise the content will not re-render after closing the window
+        """
+        if object.get_property("visible") == True:
+            object.hide()
+            return True    
+
+    # To avoid getting the MessageDialog destroyed and not being re-rendered again
+    def MessageDialog_delete_event(self, object, event):
+        """On Delete handler is used to hide the dialog and so that it successfully renders next time it is called
         
         -Returns:Boolean
         - It needs to return True, otherwise the content will not re-render after closing the window
@@ -322,6 +357,8 @@ class Handler:
 
         messagedialog_label.set_markup("Updating username and password...")
         messagedialog_spinner.show()
+
+        gui_logger.debug(">>> Starting \"update_user_pass\" thread.")
 
         thread = Thread(target=update_user_pass, args=[self.interface, messagedialog_label, messagedialog_spinner])
         thread.daemon = True
@@ -355,6 +392,8 @@ class Handler:
         messagedialog_label.set_markup("Updating DNS configurations...")
         messagedialog_spinner.show()
         
+        gui_logger.debug(">>> Starting \"update_dns\" thread.")
+
         thread = Thread(target=update_dns, args=[self.interface, messagedialog_label, messagedialog_spinner])
         thread.daemon = True
         thread.start()
@@ -371,6 +410,8 @@ class Handler:
         
         messagedialog_label.set_markup("Updating ProtonVPN Plan...")
         messagedialog_spinner.show()
+
+        gui_logger.debug(">>> Starting \"update_pvpn_plan\" thread.")
 
         thread = Thread(target=update_pvpn_plan, args=[self.interface, messagedialog_label, messagedialog_spinner])
         thread.daemon = True
@@ -389,6 +430,8 @@ class Handler:
         
         messagedialog_label.set_markup("Updating default OpenVPN Protocol...")
         messagedialog_spinner.show()
+
+        gui_logger.debug(">>> Starting \"update_def_protocol\" thread.")
 
         thread = Thread(target=update_def_protocol, args=[self.interface, messagedialog_label, messagedialog_spinner])
         thread.daemon = True
@@ -419,6 +462,8 @@ class Handler:
         messagedialog_label.set_markup("Updating killswitch configurations...")
         messagedialog_spinner.show()
 
+        gui_logger.debug(">>> Starting \"update_killswitch\" thread.")
+
         thread = Thread(target=update_killswitch, args=[self.interface, messagedialog_label, messagedialog_spinner])
         thread.daemon = True
         thread.start()
@@ -438,6 +483,8 @@ class Handler:
         messagedialog_label.set_markup("Updating split tunneling configurations...")
         messagedialog_spinner.show()
 
+        gui_logger.debug(">>> Starting \"update_split_tunneling\" thread.")
+
         thread = Thread(target=update_split_tunneling, args=[self.interface, messagedialog_label, messagedialog_spinner])
         thread.daemon = True
         thread.start()
@@ -455,6 +502,8 @@ class Handler:
         
         messagedialog_label.set_markup("Purging configurations configurations...")
         messagedialog_spinner.show()
+
+        gui_logger.debug(">>> Starting \"purge_configurations\" thread.")
 
         thread = Thread(target=purge_configurations, args=[self.interface, messagedialog_label, messagedialog_spinner])
         thread.daemon = True
@@ -475,6 +524,8 @@ def initialize_gui():
     - Will start the GUI without invoking cli()
     """
     check_root()
+    change_file_owner(os.path.join(CONFIG_DIR, "protonvpn-gui.log"))
+    gui_logger.debug("\n______________________________________\n\n\tINITIALIZING NEW GUI WINDOW\n______________________________________\n")
 
     interface = Gtk.Builder()
 
@@ -493,6 +544,7 @@ def initialize_gui():
     interface.connect_signals(Handler(interface))
 
     if len(get_gui_processes()) > 1:
+        gui_logger.debug("[!] Two processes were found. Displaying MessageDialog to inform user.")
         messagedialog_window = interface.get_object("MessageDialog")
         messagedialog_label = interface.get_object("message_dialog_label")
         messagedialog_spinner = interface.get_object("message_dialog_spinner")
@@ -518,11 +570,13 @@ def initialize_gui():
         messagedialog_spinner.hide()
 
     if not os.path.isfile(CONFIG_FILE):
+        gui_logger.debug(">>> Loading LoginWindow")
         window = interface.get_object("LoginWindow")
         dashboard = interface.get_object("DashboardWindow")
         dashboard.connect("destroy", Gtk.main_quit)
     else:
         window = interface.get_object("DashboardWindow")
+        gui_logger.debug(">>> Loading DashboardWindow")
         window.connect("destroy", Gtk.main_quit)
         load_on_start(interface, fast_boot=True)
     

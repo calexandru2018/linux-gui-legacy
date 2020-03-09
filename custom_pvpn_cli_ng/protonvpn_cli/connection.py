@@ -539,7 +539,7 @@ def openvpn_connect(servername, protocol, gui_enabled=False):
                     disconnect(passed=True)
                 print("Connected!")
                 logger.debug("Connection successful")
-                return_message = "Connected to <b>{0}</b> via <b>{1}</b>".format(servername, protocol.upper())
+                return_message = "Connected to <b>{0}</b> via <b>{1}</b>.".format(servername, protocol.upper())
                 break
             # If Authentication failed
             elif "AUTH_FAILED" in content:

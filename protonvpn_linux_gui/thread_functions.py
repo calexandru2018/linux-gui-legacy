@@ -4,8 +4,8 @@ import requests
 import json
 import subprocess
 
+# Import ProtonVPN methods and utils
 from custom_pvpn_cli_ng.protonvpn_cli.utils import get_config_value, is_valid_ip
-
 from custom_pvpn_cli_ng.protonvpn_cli import cli
 from custom_pvpn_cli_ng.protonvpn_cli import connection
 
@@ -21,6 +21,10 @@ from .utils import (
     get_gui_processes
 )
 
+# Import GUI logger
+from .gui_logger import gui_logger
+
+# Import constants
 from .constants import VERSION, GITHUB_URL_RELEASE
 
 # Login handler
@@ -31,8 +35,7 @@ def on_login(interface):
     password_field = interface.get_object('password_field').get_text().strip()
     
     if len(username_field) == 0 or len(password_field) == 0:
-        print()
-        print("[!] None of the fields can be left empty.")
+        gui_logger.debug("[!] One of the fields were left empty upon profile initialization.")
         return False
 
     user_data = prepare_initilizer(username_field, password_field, interface)
@@ -60,6 +63,7 @@ def connect_to_selected_server(interface, selected_server, messagedialog_label, 
         "disconnecting": False
     }
 
+    gui_logger.debug(">>> Running \"openvpn_connect\".")
 
     result = connection.openvpn_connect(selected_server, protocol, gui_enabled=True)
     # result = connection.openvpn_connect(selected_server, protocol)
@@ -67,7 +71,11 @@ def connect_to_selected_server(interface, selected_server, messagedialog_label, 
     messagedialog_label.set_markup(result)
     messagedialog_spinner.hide()
 
+    gui_logger.debug(">>> Result: \"{0}\"".format(result))
+
     update_labels_status(update_labels_dict)
+
+    gui_logger.debug(">>> Ended tasks in \"openvpn_connect\" thread.")
     
 def quick_connect(interface, messagedialog_label, messagedialog_spinner):
     """Button/Event handler to connect to the fastest server
@@ -80,12 +88,18 @@ def quick_connect(interface, messagedialog_label, messagedialog_spinner):
         "disconnecting": False
     }
 
+    gui_logger.debug(">>> Running \"fastest\".")
+
     result = connection.fastest(protocol, gui_enabled=True)
 
     messagedialog_label.set_markup(result)
     messagedialog_spinner.hide()
+
+    gui_logger.debug(">>> Result: \"{0}\"".format(result))
     
     update_labels_status(update_labels_dict)
+
+    gui_logger.debug(">>> Ended tasks in \"fastest\" thread.")
 
 def last_connect(interface, messagedialog_label, messagedialog_spinner):
     """Button/Event handler to reconnect to previously connected server
@@ -95,12 +109,19 @@ def last_connect(interface, messagedialog_label, messagedialog_spinner):
         "servers": False,
         "disconnecting": False
     }
+
+    gui_logger.debug(">>> Running \"reconnect\".")
+
     result = connection.reconnect(gui_enabled=True)
 
     messagedialog_label.set_markup(result)
     messagedialog_spinner.hide()
 
+    gui_logger.debug(">>> Result: \"{0}\"".format(result))
+
     update_labels_status(update_labels_dict)
+
+    gui_logger.debug(">>> Ended tasks in \"reconnect\" thread.")
 
 def random_connect(interface, messagedialog_label, messagedialog_spinner):
     """Button/Event handler to connect to a random server
@@ -112,12 +133,18 @@ def random_connect(interface, messagedialog_label, messagedialog_spinner):
         "disconnecting": False
     }
 
+    gui_logger.debug(">>> Running \"reconnect\"")
+
     result = connection.random_c(protocol, gui_enabled=True)
     
     messagedialog_label.set_markup(result)
     messagedialog_spinner.hide()
 
+    gui_logger.debug(">>> Result: \"{0}\"".format(result))
+
     update_labels_status(update_labels_dict)
+
+    gui_logger.debug(">>> Ended tasks in \"random_c\" thread.")
 
 def disconnect(interface, messagedialog_label, messagedialog_spinner):
     """Button/Event handler to disconnect any existing connections
@@ -128,13 +155,18 @@ def disconnect(interface, messagedialog_label, messagedialog_spinner):
         "disconnecting": True
     }
 
+    gui_logger.debug(">>> Running \"disconnect\".")
+
     result = connection.disconnect(gui_enabled=True)
     
     messagedialog_label.set_markup(result)
     messagedialog_spinner.hide()
 
+    gui_logger.debug(">>> Result: \"{0}\"".format(result))
+
     update_labels_status(update_labels_dict)
-    
+
+    gui_logger.debug(">>> Ended tasks in \"disconnect\" thread.")
     
 def refresh_server_list(interface, messagedialog_window, messagedialog_spinner):
     """Button/Event handler to refresh/repopulate server list
@@ -144,12 +176,15 @@ def refresh_server_list(interface, messagedialog_window, messagedialog_spinner):
     # which makes the button "lag".
     time.sleep(1)
     # Temporary solution
+
+    gui_logger.debug(">>> Running \"update_labels_server_list\".")
+
     update_labels_server_list(interface)
 
     messagedialog_window.hide()
     messagedialog_spinner.hide()
 
-
+    gui_logger.debug(">>> Ended tasks in \"update_labels_server_list\" thread.")
 
 # Preferences/Configuration menu HANDLERS
 def update_user_pass(interface, messagedialog_label, messagedialog_spinner):
@@ -166,11 +201,18 @@ def update_user_pass(interface, messagedialog_label, messagedialog_spinner):
         messagedialog_spinner.hide()
         return
 
+    gui_logger.debug(">>> Running \"set_username_password\".")
+
     result = cli.set_username_password(write=True, gui_enabled=True, user_data=(username_text, password_text))
     
     messagedialog_label.set_markup(result)
     password_field.set_text("")
     messagedialog_spinner.hide()
+
+    gui_logger.debug(">>> Result: \"{0}\"".format(result))
+
+    gui_logger.debug(">>> Ended tasks in \"set_username_password\" thread.")
+
 
 def update_dns(interface, messagedialog_label, messagedialog_spinner):
     """Button/Event handler to update DNS protection 
@@ -185,6 +227,7 @@ def update_dns(interface, messagedialog_label, messagedialog_spinner):
         if len(custom_dns) == 0:
             messagedialog_spinner.hide()
             messagedialog_label.set_markup("Custom DNS field input can not be left empty.")
+            gui_logger.debug("[!] Custom DNS field left emtpy.")
             return
 
         custom_dns = custom_dns.split(" ")
@@ -193,6 +236,7 @@ def update_dns(interface, messagedialog_label, messagedialog_spinner):
             if not is_valid_ip(ip):
                 messagedialog_spinner.hide()
                 messagedialog_label.set_markup("<b>{0}</b> is not valid.\nNone of the DNS were added, please try again with a different DNS.".format(ip))
+                gui_logger.debug("[!] Invalid IP \"{0}\".".format(ip))
                 return
 
     elif dns_combobox.get_active() == 2:
@@ -204,10 +248,16 @@ def update_dns(interface, messagedialog_label, messagedialog_spinner):
         custom_dns = None
         interface.get_object("dns_custom_input").set_text("")
     
+    gui_logger.debug(">>> Running \"set_dns_protection\".")
+
     result = cli.set_dns_protection(gui_enabled=True, dns_settings=(dns_leak_protection, custom_dns))
 
     messagedialog_label.set_markup(result)
     messagedialog_spinner.hide()
+
+    gui_logger.debug(">>> Result: \"{0}\"".format(result))
+
+    gui_logger.debug(">>> Ended tasks in \"set_dns_protection\" thread.")
 
 def update_pvpn_plan(interface, messagedialog_label, messagedialog_spinner):
     """Button/Event handler to update ProtonVPN Plan  
@@ -225,34 +275,50 @@ def update_pvpn_plan(interface, messagedialog_label, messagedialog_spinner):
             protonvpn_plan = int(k)
             break
         
+    gui_logger.debug(">>> Running \"set_protonvpn_tier\".")
+
     result = cli.set_protonvpn_tier(write=True, gui_enabled=True, tier=protonvpn_plan)
 
     messagedialog_label.set_markup(result)
     messagedialog_spinner.hide()
 
-    load_on_start(interface)        
+    gui_logger.debug(">>> Result: \"{0}\"".format(result))
+
+    load_on_start(interface)     
+
+    gui_logger.debug(">>> Ended tasks in \"set_protonvpn_tier\" thread.")   
 
 def update_def_protocol(interface, messagedialog_label, messagedialog_spinner):
     """Button/Event handler to update OpenVP Protocol  
     """
     openvpn_protocol = 'tcp' if interface.get_object('protocol_tcp_update_checkbox').get_active() == True else 'udp'
     
+    gui_logger.debug(">>> Running \"set_default_protocol\".")
+
     result = cli.set_default_protocol(write=True, gui_enabled=True, protoc=openvpn_protocol)
 
     messagedialog_label.set_markup(result)
     messagedialog_spinner.hide()
 
+    gui_logger.debug(">>> Result: \"{0}\"".format(result))
+
+    gui_logger.debug(">>> Ended tasks in \"set_default_protocol\" thread.")   
 
 def update_killswitch(interface, messagedialog_label, messagedialog_spinner):
     """Button/Event handler to update Killswitch  
     """
     ks_combobox = interface.get_object("killswitch_combobox")
 
+    gui_logger.debug(">>> Running \"set_killswitch\".")
+
     result = cli.set_killswitch(gui_enabled=True, user_choice=ks_combobox.get_active())
 
     messagedialog_label.set_markup(result)
     messagedialog_spinner.hide()
 
+    gui_logger.debug(">>> Result: \"{0}\"".format(result))
+
+    gui_logger.debug(">>> Ended tasks in \"set_killswitch\" thread.")   
 
 def update_split_tunneling(interface, messagedialog_label, messagedialog_spinner):
     """Button/Event handler to update Split Tunneling 
@@ -275,34 +341,47 @@ def update_split_tunneling(interface, messagedialog_label, messagedialog_spinner
         if not is_valid_ip(ip):
             messagedialog_spinner.hide()
             messagedialog_label.set_markup("<b>{0}</b> is not valid.\nNone of the IP's were added, please try again with a different IP.".format(ip))
+            gui_logger.debug("[!] Invalid IP \"{0}\".".format(ip))
             return
+
+    gui_logger.debug(">>> Running \"set_split_tunnel\".")
 
     result = cli.set_split_tunnel(gui_enabled=True, user_data=split_tunneling_content)
 
     messagedialog_label.set_markup(result)
     messagedialog_spinner.hide()
 
+    gui_logger.debug(">>> Result: \"{0}\"".format(result))
+
+    gui_logger.debug(">>> Ended tasks in \"set_split_tunnel\" thread.")   
+
 def purge_configurations(interface, messagedialog_label, messagedialog_spinner):
     """Button/Event handler to purge configurations
     """
     # To-do: Confirm prior to allowing user to do this
+
+    gui_logger.debug(">>> Running \"set_split_tunnel\".")
+
     result = cli.purge_configuration(gui_enabled=True)
 
     messagedialog_label.set_markup(result)
     messagedialog_spinner.hide()
 
+    gui_logger.debug(">>> Result: \"{0}\"".format(result))
+
+    gui_logger.debug(">>> Ended tasks in \"set_split_tunnel\" thread.")   
+
 # def kill_duplicate_gui_process(interface, messagedialog_label, messagedialog_spinner):
 def kill_duplicate_gui_process():
 
     return_message = {
-        "message": "Unable to automatically end service. Please do it manually.",
+        "message": "Unable to automatically end service. Please manually end the process.",
         "success": False
     }
     
     process = get_gui_processes()
-    
     if len(process) > 1:
-        print("[!] Two processes found, attempting to end previous.")
+        gui_logger.debug("[!] Found following processes: {0}. Will attempt to end \"{1}\"".format(process, process[0]))
 
         # select first(longest living) process from list
         process_to_kill = process[0]
@@ -313,19 +392,20 @@ def kill_duplicate_gui_process():
             if time.time() - timer_start <= 10:
                 subprocess.run(["kill", process_to_kill])
                 time.sleep(0.2)
-                print("Tried pkill")
             else:
                 subprocess.run(["kill", "-9", process_to_kill])
-                print("Sendig SIGKILL")
+                gui_logger.debug("[!] Unable to pkill process \"{0}\". Will attempt a SIGKILL.".format(process[0]))
                 break
 
         if len(get_gui_processes()) == 1:
             return_message['message'] = "Previous process ended, resuming actual session."        
             return_message['success'] = True
+            gui_logger.debug("[!] Process \"{0}\" was ended.".format(process[0]))
 
     elif len(process) == 1:
         return_message['message'] = "Only one process, normal startup."        
         return_message['success'] = True
+        gui_logger.debug(">>> Only one process was found, continuing with normal startup.")
 
     # messagedialog_label.set_markup(return_message['message'])
     # messagedialog_spinner.hide()

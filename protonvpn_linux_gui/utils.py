@@ -111,14 +111,20 @@ def message_dialog(interface, action, label_object, spinner_object, sub_label_ob
         # Reccomendations based on known issues
         if not has_internet:
             if is_ovpnprocess_running:
-                reccomendation = reccomendation + "\nYou have no internet conneciton and a VPN process is running, try to kill the process first:" + end_openvpn_process_guide
+                reccomendation = reccomendation + "\nYou have no internet connection and a VPN process is running.\n"
+                reccomendation = reccomendation + "This might be due to a DNS misconfiguration or lack of internet connection. You can try to disconnecto from the VPN by clicking on \"Disconnect\" or following the instructions below.\n"
+                reccomendation = reccomendation + "<b>Warning:</b> By doing this you are ending your VPN process, which might end exposing your traffic upon reconnecting, do at your own risk." + end_openvpn_process_guide
             elif not is_ovpnprocess_running:
                 if is_killswitch_enabled:
-                    reccomendation = reccomendation + "\nYou Have killswitch enabled, which might be blocking your connection.\nTry to flush and then reconfigure your IP tables:" + restore_ip_tables_guide
+                    reccomendation = reccomendation + "\nYou Have killswitch enabled, which might be blocking your connection.\nTry to flush and then reconfigure your IP tables."
+                    reccomendation = reccomendation + "<b>Warning:</b> By doing this you are clearing all of your killswitch configurations. Do at your own risk." + restore_ip_tables_guide
                 elif is_custom_resolv_conf["logical"] == True:
-                    reccomendation = reccomendation + "\nCustom DNS is still present in resolv.conf even though you are not connected to a server.\nTry to restart your network manager to restore default configurations:" + restart_netwman_guide
+                    reccomendation = reccomendation + "\nCustom DNS is still present in resolv.conf even though you are not connected to a server. This might be blocking your from establishing a non-encrypted connection.\n"
+                    reccomendation = reccomendation + "Try to restart your network manager to restore default configurations:" + restart_netwman_guide
                 elif is_custom_resolv_conf["logical"] == None:
-                    reccomendation = reccomendation + "\nNo running VPN process was found, though DNS configurations are lacking in resolv.conf. This might be due to some error or corruption during restoration.\nTry to restart your network manager to restore default configurations:" + restart_netwman_guide
+                    reccomendation = reccomendation + "\nNo running VPN process was found, though DNS configurations are lacking in resolv.conf.\n"
+                    reccomendation = reccomendation + "This might be due to some error or corruption during DNS restoration or lack of internet connection.\n"
+                    reccomendation = reccomendation + "Try to restart your network manager to restore default configurations, if it still does not work, then you probably experiencing some internet connection issues." + restart_netwman_guide
                 else:
                     reccomendation = "\nYou have no internet connection.\nTry to connect to a different nework to resolve the issue."
             else:

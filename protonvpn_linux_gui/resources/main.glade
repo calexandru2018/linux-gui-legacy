@@ -1193,6 +1193,7 @@
     <property name="skip_taskbar_hint">True</property>
     <property name="skip_pager_hint">True</property>
     <property name="gravity">center</property>
+    <signal name="delete-event" handler="MessageDialog_delete_event" swapped="no"/>
     <child type="titlebar">
       <placeholder/>
     </child>
