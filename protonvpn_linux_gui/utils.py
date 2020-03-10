@@ -153,31 +153,37 @@ def message_dialog(interface, action, label_object, spinner_object, sub_label_ob
         spinner_object.hide()
 
 def check_internet_conn(fast_boot=False):
-    timer_start = time.time()
     result = ''
     attempts = 2
+    timer_start = time.time()
 
-    while True:
-        # To speed up GUI start
-        if fast_boot and attempts == 0:
-            result = False
-            break
-        # Useful when using diagnostics tool
-        elif time.time() - timer_start > 5:
-            break
-            result = False
-
+    if fast_boot:
         try:
-            if get_ip_info(gui_enabled=True):
-                result = True
-                break
-            else:
-                result = False
+            result = True if get_ip_info(gui_enabled=True) else False
         except:
-            pass
+            result = False
+    else:
+        while True:
+            # To speed up GUI start
+            if attempts == 0:
+                result = False
+                break
+            # Useful when using diagnostics tool
+            elif time.time() - timer_start > 5:
+                break
+                result = False
 
-        attempts -= 1
-        time.sleep(0.2)
+            try:
+                if get_ip_info(gui_enabled=True):
+                    result = True
+                    break
+                else:
+                    result = False
+            except:
+                pass
+
+            attempts -= 1
+            time.sleep(0.2)
 
     return result
 
