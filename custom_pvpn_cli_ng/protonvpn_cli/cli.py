@@ -57,7 +57,7 @@ from docopt import docopt
 
 # protonvpn-cli Functions
 from . import connection
-from .logger import logger
+from protonvpn_linux_gui.gui_logger import gui_logger
 from .utils import (
     check_root, change_file_owner, pull_server_data, make_ovpn_template,
     check_init, set_config_value, get_config_value, is_valid_ip,
@@ -82,15 +82,15 @@ def cli():
 
     # Initial log values
     change_file_owner(os.path.join(CONFIG_DIR, "pvpn-cli.log"))
-    logger.debug("###########################")
-    logger.debug("### NEW PROCESS STARTED ###")
-    logger.debug("###########################")
-    logger.debug(sys.argv)
-    logger.debug("USER: {0}".format(USER))
-    logger.debug("CONFIG_DIR: {0}".format(CONFIG_DIR))
+    gui_logger.debug("###########################")
+    gui_logger.debug("### NEW PROCESS STARTED ###")
+    gui_logger.debug("###########################")
+    gui_logger.debug(sys.argv)
+    gui_logger.debug("USER: {0}".format(USER))
+    gui_logger.debug("CONFIG_DIR: {0}".format(CONFIG_DIR))
 
     args = docopt(__doc__, version="ProtonVPN-CLI v{0}".format(VERSION))
-    logger.debug("Arguments\n{0}".format(str(args).replace("\n", "")))
+    gui_logger.debug("Arguments\n{0}".format(str(args).replace("\n", "")))
 
     # Parse arguments
     if args.get("init"):
@@ -171,13 +171,13 @@ def init_cli(gui_enabled=False, gui_user_input=False):
         with open(CONFIG_FILE, "w") as f:
             config.write(f)
         change_file_owner(CONFIG_FILE)
-        logger.debug("pvpn-cli.cfg initialized")
+        gui_logger.debug("pvpn-cli.cfg initialized")
 
     check_root()
 
     if not os.path.isdir(CONFIG_DIR):
         os.mkdir(CONFIG_DIR)
-        logger.debug("Config Directory created")
+        gui_logger.debug("Config Directory created")
     change_file_owner(CONFIG_DIR)
 
     # Warn user about reinitialization
@@ -263,14 +263,14 @@ def init_cli(gui_enabled=False, gui_user_input=False):
 
         with open(PASSFILE, "w") as f:
             f.write("{0}\n{1}".format(ovpn_username, ovpn_password))
-            logger.debug("Passfile created")
+            gui_logger.debug("Passfile created")
             os.chmod(PASSFILE, 0o600)
 
         set_config_value("USER", "initialized", 1)
 
         print()
         print("Done! Your account has been successfully initialized.")
-        logger.debug("Initialization completed.")
+        gui_logger.debug("Initialization completed.")
         if gui_enabled:
             return True
     else:
@@ -416,7 +416,7 @@ def set_username_password(write=False, gui_enabled=False, user_data=False):
 
         with open(PASSFILE, "w") as f:
             f.write("{0}\n{1}".format(ovpn_username, ovpn_password1))
-            logger.debug("Passfile updated")
+            gui_logger.debug("Passfile updated")
             os.chmod(PASSFILE, 0o600)
 
         print("Username and Password has been updated!")
@@ -692,7 +692,7 @@ def set_split_tunnel(gui_enabled=False, user_data=False):
             else:
                 # If no no config file exists,
                 # split tunneling should be disabled again
-                logger.debug("No split tunneling file existing.")
+                gui_logger.debug("No split tunneling file existing.")
                 set_config_value("USER", "split_tunnel", 0)
                 result_message = result_message + "No split tunneling file, split tunneling will be disabled.\n\n"
     else:
@@ -733,7 +733,7 @@ def set_split_tunnel(gui_enabled=False, user_data=False):
             else:
                 # If no no config file exists,
                 # split tunneling should be disabled again
-                logger.debug("No split tunneling file existing.")
+                gui_logger.debug("No split tunneling file existing.")
                 set_config_value("USER", "split_tunnel", 0)
 
         else:
