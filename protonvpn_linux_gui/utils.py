@@ -153,32 +153,29 @@ def message_dialog(interface, action, label_object, spinner_object, sub_label_ob
         spinner_object.hide()
 
 def check_internet_conn(fast_boot=False):
-    result = ''
+    result = False
     attempts = 2
     timer_start = time.time()
 
+    # To speed up GUI start
     if fast_boot:
         try:
-            result = True if get_ip_info(gui_enabled=True) else False
+            result = True if get_ip_info() else False
         except:
             result = False
     else:
         while True:
-            # To speed up GUI start
+            
             if attempts == 0:
-                result = False
                 break
             # Useful when using diagnostics tool
             elif time.time() - timer_start > 5:
                 break
-                result = False
 
             try:
-                if get_ip_info(gui_enabled=True):
+                if not get_ip_info() == None:
                     result = True
                     break
-                else:
-                    result = False
             except:
                 pass
 
@@ -246,7 +243,8 @@ def prepare_initilizer(username_field, password_field, interface):
 def load_on_start(interface, fast_boot=False):
     """Updates Dashboard labels and populates server list content before showing it to the user
     """
-    if check_internet_conn(fast_boot=fast_boot):
+    conn = check_internet_conn(fast_boot=fast_boot)
+    if conn:
         p = Thread(target=update_labels_server_list, args=[interface])
         p.daemon = True
         p.start()
