@@ -50,8 +50,9 @@ def call_api(endpoint, json_format=True, handle_errors=True, gui_enabled=False):
                 "[!] Please make sure your connection is working properly!"
             )
         gui_logger.debug("Error connecting to ProtonVPN API")
-        return
-        # sys.exit(1)
+        if not gui_enabled:
+            sys.exit(1)
+        return False
     try:
         response.raise_for_status()
     except requests.exceptions.HTTPError:
@@ -61,7 +62,9 @@ def call_api(endpoint, json_format=True, handle_errors=True, gui_enabled=False):
             "[!] HTTP Error Code: {0}".format(response.status_code)
         )
         gui_logger.debug("Bad Return Code: {0}".format(response.status_code))
-        sys.exit(1)
+        if not gui_enabled:
+            sys.exit(1)
+        return False
 
     if json_format:
         gui_logger.debug("Successful json response")
