@@ -33,7 +33,7 @@ def call_api(endpoint, json_format=True, handle_errors=True, gui_enabled=False):
         "Accept": "application/vnd.protonmail.v1+json"
     }
 
-    logger.debug("Initiating API Call: {0}".format(url))
+    gui_logger.debug("Initiating API Call: {0}".format(url))
 
     # For manual error handling, such as in wait_for_network()
     if not handle_errors:
