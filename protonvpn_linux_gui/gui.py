@@ -578,7 +578,9 @@ def initialize_gui():
         window = interface.get_object("DashboardWindow")
         gui_logger.debug(">>> Loading DashboardWindow")
         window.connect("destroy", Gtk.main_quit)
-        load_on_start(interface, fast_boot=True)
+        thread = Thread(target=load_on_start, args=[interface, True])
+        thread.start()
+        # load_on_start(interface, fast_boot=True)
     
     window.show()
     
