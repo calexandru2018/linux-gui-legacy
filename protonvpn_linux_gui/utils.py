@@ -149,6 +149,8 @@ def message_dialog(interface, action, label_object, spinner_object, sub_label_ob
             is_dns_enabled= "Yes" if is_dns_protection_enabled else "No",
             is_sp_enabled= "Yes" if is_splitunn_enabled else "No")
 
+        gui_logger.debug(result)
+
         label_object.set_markup(result)
         label_object.show()
         sub_label_object.set_markup("<b><u>Reccomendation:</u></b>\n<span>{recc}</span>".format(recc=reccomendation))
