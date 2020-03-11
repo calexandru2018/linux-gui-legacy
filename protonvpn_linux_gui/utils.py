@@ -191,8 +191,6 @@ def check_for_updates():
         print()
         return "Failed to check for updates."
 
-    latest_release = "2.0.0.0"
-
     if latest_release == VERSION:
         return "You have the latest version!"
     elif VERSION < latest_release:
