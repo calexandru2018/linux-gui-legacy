@@ -22,6 +22,8 @@ from custom_pvpn_cli_ng.protonvpn_cli.constants import SPLIT_TUNNEL_FILE
 
 from .constants import PATH_AUTOCONNECT_SERVICE, TEMPLATE, VERSION, GITHUB_URL_RELEASE
 
+from .gui_logger import gui_logger
+
 # PyGObject import
 import gi
 
@@ -148,15 +150,16 @@ def message_dialog(interface, action, label_object, spinner_object, sub_label_ob
             is_sp_enabled= "Yes" if is_splitunn_enabled else "No")
 
         label_object.set_markup(result)
+        label_object.show()
         sub_label_object.set_markup("<b><u>Reccomendation:</u></b>\n<span>{recc}</span>".format(recc=reccomendation))
         sub_label_object.show()
         spinner_object.hide()
 
-def check_internet_conn():
-    result = False
+def check_internet_conn(gui_enabled=False):
+    gui_logger.debug(">>> Running \"check_internet_conn\".")
 
     try:
-        return True if get_ip_info() else False
+        return get_ip_info(gui_enabled=gui_enabled)
     except:
         return False
 
@@ -216,23 +219,28 @@ def prepare_initilizer(username_field, password_field, interface):
 
     return user_data
 
-def load_on_start(interface):
+def load_on_start(params_dict):
     """Updates Dashboard labels and populates server list content before showing it to the user
     """
-    conn = check_internet_conn()
-    if conn:
-        update_labels_server_list(interface)
-    else:
-        return False
+
+    gui_logger.debug(">>> Running \"load_on_start\". Params: {0}.".format(params_dict))
+
+    conn = check_internet_conn(gui_enabled=params_dict["gui_enabled"])
+    if not conn == False and not conn == None:
+        update_labels_server_list(params_dict["interface"], conn_info=conn)
         # p = Thread(target=update_labels_server_list, args=[interface])
         # p.daemon = True
         # p.start()
+    else:
+        return False
 
-def update_labels_server_list(interface, server_list_obj=False):
+def update_labels_server_list(interface, server_list_obj=False, conn_info=False):
     if not server_list_obj:
         server_list_object = interface.get_object("ServerListStore")
     else:
         server_list_object = server_list_obj
+
+    gui_logger.debug(">>> Running \"update_labels_server_list\" getting servers.")
 
     servers = get_servers()
     if not servers:
@@ -241,7 +249,8 @@ def update_labels_server_list(interface, server_list_obj=False):
     update_labels_dict = {
         "interface": interface,
         "servers": servers,
-        "disconnecting": False
+        "disconnecting": False,
+        "conn_info": conn_info if conn_info else False
     }
 
     populate_servers_dict = {
@@ -260,6 +269,8 @@ def update_labels_server_list(interface, server_list_obj=False):
 def update_labels_status(update_labels_dict):
     """Updates labels status"""
 
+    gui_logger.debug(">>> Running \"update_labels_status\" getting servers, is_connected and connected_server.")
+
     if not update_labels_dict["servers"]:
         servers = get_servers()
     else:
@@ -274,10 +285,12 @@ def update_labels_status(update_labels_dict):
         connected_server = False
         
     left_grid_update_labels(update_labels_dict["interface"], servers, is_vpn_connected, connected_server, update_labels_dict["disconnecting"])
-    right_grid_update_labels(update_labels_dict["interface"], servers, is_vpn_connected, connected_server, update_labels_dict["disconnecting"])
+    right_grid_update_labels(update_labels_dict["interface"], servers, is_vpn_connected, connected_server, update_labels_dict["disconnecting"], conn_info=update_labels_dict["conn_info"])
     
 def left_grid_update_labels(interface, servers, is_connected, connected_server, disconnecting):
     """Holds labels that are position within the left-side grid"""
+
+    gui_logger.debug(">>> Running \"left_grid_update_labels\".")
 
     # Left grid
     vpn_status_label =      interface.get_object("vpn_status_label")
@@ -334,8 +347,10 @@ def left_grid_update_labels(interface, servers, is_connected, connected_server, 
     feature = all_features[feature] if not disconnecting and is_connected else ""
     server_features_label.set_markup('<span>{0}</span>'.format(feature))
 
-def right_grid_update_labels(interface, servers, is_connected, connected_server, disconnecting):
+def right_grid_update_labels(interface, servers, is_connected, connected_server, disconnecting, conn_info=False):
     """Holds labels that are position within the right-side grid"""
+
+    gui_logger.debug(">>> Running \"right_grid_update_labels\".")
 
     # Right grid
     ip_label =              interface.get_object("ip_label")
@@ -349,7 +364,11 @@ def right_grid_update_labels(interface, servers, is_connected, connected_server,
     tx_amount, rx_amount = get_transferred_data()
 
     # Get and set IP labels. Get also country and ISP
-    ip, isp, country = get_ip_info(gui_enabled=True)
+    if not conn_info:
+        ip, isp, country = get_ip_info(gui_enabled=True)
+    else:
+        ip, isp, country = conn_info
+
     country_isp = "<span>" + country + "/" + isp + "</span>"
     ip_label.set_markup(ip)
 
@@ -680,7 +699,14 @@ def stop_and_disable_daemon():
     return True
 
 def get_gui_processes():
-        processes = subprocess.run(["pgrep", "protonvpn-gui"],stdout=subprocess.PIPE)
 
-        return list(filter(None, processes.stdout.decode().split("\n"))) 
+    gui_logger.debug(">>> Running \"get_gui_processes\".")
+
+    processes = subprocess.run(["pgrep", "protonvpn-gui"],stdout=subprocess.PIPE)
+    
+    processes = list(filter(None, processes.stdout.decode().split("\n"))) 
+
+    gui_logger.debug(">>> Existing process running: {0}".format(processes))
+
+    return processes
     
