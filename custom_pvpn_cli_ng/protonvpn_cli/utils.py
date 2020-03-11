@@ -13,7 +13,7 @@ import math
 # External Libraries
 import requests
 # ProtonVPN-CLI functions
-from .logger import logger
+from protonvpn_linux_gui.gui_logger import gui_logger
 # Constants
 from .constants import (
     USER, CONFIG_FILE, SERVER_INFO_FILE, TEMPLATE_FILE, SPLIT_TUNNEL_FILE,
@@ -33,7 +33,7 @@ def call_api(endpoint, json_format=True, handle_errors=True, gui_enabled=False):
         "Accept": "application/vnd.protonmail.v1+json"
     }
 
-    logger.debug("Initiating API Call: {0}".format(url))
+    gui_logger.debug("Initiating API Call: {0}".format(url))
 
     # For manual error handling, such as in wait_for_network()
     if not handle_errors:
@@ -41,17 +41,20 @@ def call_api(endpoint, json_format=True, handle_errors=True, gui_enabled=False):
         return response
 
     try:
+        # response = requests.get(url, headers=headers, timeout=8)
         response = requests.get(url, headers=headers)
     except (requests.exceptions.ConnectionError,
             requests.exceptions.ConnectTimeout):
+            # requests.exceptions.ReadTimeout):
         if not gui_enabled:
             print(
                 "[!] There was an error connecting to the ProtonVPN API.\n"
                 "[!] Please make sure your connection is working properly!"
             )
-        logger.debug("Error connecting to ProtonVPN API")
-        return
-        # sys.exit(1)
+        gui_logger.debug("Error connecting to ProtonVPN API")
+        if not gui_enabled:
+            sys.exit(1)
+        return False
     try:
         response.raise_for_status()
     except requests.exceptions.HTTPError:
@@ -60,14 +63,16 @@ def call_api(endpoint, json_format=True, handle_errors=True, gui_enabled=False):
             "[!] Please make sure your connection is working properly!\n"
             "[!] HTTP Error Code: {0}".format(response.status_code)
         )
-        logger.debug("Bad Return Code: {0}".format(response.status_code))
-        sys.exit(1)
+        gui_logger.debug("Bad Return Code: {0}".format(response.status_code))
+        if not gui_enabled:
+            sys.exit(1)
+        return False
 
     if json_format:
-        logger.debug("Successful json response")
+        gui_logger.debug("Successful json response")
         return response.json()
     else:
-        logger.debug("Successful non-json response")
+        gui_logger.debug("Successful non-json response")
         return response
 
 
@@ -79,21 +84,21 @@ def pull_server_data(force=False):
     if not force:
         # Check if last server pull happened within the last 15 min (900 sec)
         if int(time.time()) - int(config["metadata"]["last_api_pull"]) <= 900:
-            logger.debug("Last server pull within 15mins")
+            gui_logger.debug("Last server pull within 15mins")
             return
 
     data = call_api("/vpn/logicals")
 
     with open(SERVER_INFO_FILE, "w") as f:
         json.dump(data, f)
-        logger.debug("SERVER_INFO_FILE written")
+        gui_logger.debug("SERVER_INFO_FILE written")
 
     change_file_owner(SERVER_INFO_FILE)
     config["metadata"]["last_api_pull"] = str(int(time.time()))
 
     with open(CONFIG_FILE, "w+") as f:
         config.write(f)
-        logger.debug("last_api_call updated")
+        gui_logger.debug("last_api_call updated")
 
 
 def get_servers():
@@ -107,7 +112,7 @@ def get_servers():
             break
 
         with open(SERVER_INFO_FILE, "r") as f:
-            logger.debug("Reading servers from file")
+            gui_logger.debug("Reading servers from file")
             try:
                 data = json.load(f)
                 if not data == None and not len(data) == 0:
@@ -152,7 +157,7 @@ def set_config_value(group, key, value):
     config.read(CONFIG_FILE)
     config[group][key] = str(value)
 
-    logger.debug(
+    gui_logger.debug(
         "Writing {0} to [{1}] in config file".format(key, group)
     )
 
@@ -162,10 +167,10 @@ def set_config_value(group, key, value):
 
 def get_ip_info(gui_enabled=False):
     """Return the current public IP Address"""
-    logger.debug("Getting IP Information")
+    gui_logger.debug("Getting IP Information")
     ip_info = call_api("/vpn/location", gui_enabled=gui_enabled)
 
-    if ip_info == None:
+    if ip_info == None or ip_info == False:
         return False
 
     ip = ip_info["IP"]
@@ -194,7 +199,7 @@ def get_fastest_server(server_pool):
         pool_size = 4
     else:
         pool_size = 1
-    logger.debug(
+    gui_logger.debug(
         "Returning fastest server with pool size {0}".format(pool_size)
     )
     fastest_server = random.choice(fastest_pool[:pool_size])["Name"]
@@ -219,7 +224,7 @@ def is_connected():
                                     stdout=subprocess.PIPE)
     ovpn_processes = ovpn_processes.stdout.decode("utf-8").split()
 
-    logger.debug(
+    gui_logger.debug(
         "Checking connection Status. OpenVPN processes: {0}"
         .format(len(ovpn_processes))
         )
@@ -234,15 +239,15 @@ def wait_for_network(wait_time):
 
     while True:
         if time.time() - start > wait_time:
-            logger.debug("Max waiting time reached.")
+            gui_logger.debug("Max waiting time reached.")
             print("Max waiting time reached.")
             sys.exit(1)
-        logger.debug("Waiting for {0}s for connection...".format(wait_time))
+        gui_logger.debug("Waiting for {0}s for connection...".format(wait_time))
         try:
             call_api("/test/ping", handle_errors=False)
             time.sleep(2)
             print("Connection working!")
-            logger.debug("Connection working!")
+            gui_logger.debug("Connection working!")
             break
         except (requests.exceptions.ConnectionError,
                 requests.exceptions.ConnectTimeout):
@@ -272,7 +277,7 @@ def make_ovpn_template():
     with open(TEMPLATE_FILE, "wb") as f:
         for chunk in config_file_response.iter_content(100000):
             f.write(chunk)
-            logger.debug("OpenVPN config file downloaded")
+            gui_logger.debug("OpenVPN config file downloaded")
 
     # Write split tunneling config to OpenVPN Template
     try:
@@ -283,7 +288,7 @@ def make_ovpn_template():
     except KeyError:
         split = False
     if split:
-        logger.debug("Writing Split Tunnel config")
+        gui_logger.debug("Writing Split Tunnel config")
         with open(SPLIT_TUNNEL_FILE, "r") as f:
             content = f.readlines()
 
@@ -293,7 +298,7 @@ def make_ovpn_template():
                 netmask = None
 
                 if not is_valid_ip(line):
-                    logger.debug(
+                    gui_logger.debug(
                         "[!] '{0}' is invalid. Skipped.".format(line)
                     )
                     continue
@@ -313,11 +318,11 @@ def make_ovpn_template():
                     )
 
                 else:
-                    logger.debug(
+                    gui_logger.debug(
                         "[!] '{0}' is invalid. Skipped.".format(line)
                     )
 
-        logger.debug("Split Tunneling Written")
+        gui_logger.debug("Split Tunneling Written")
 
     # Remove all remote, proto, up, down and script-security lines
     # from template file
@@ -327,7 +332,7 @@ def make_ovpn_template():
         if not remove_regex.search(line):
             print(line, end="")
 
-    logger.debug("remote and proto lines removed")
+    gui_logger.debug("remote and proto lines removed")
 
     change_file_owner(TEMPLATE_FILE)
 
@@ -346,7 +351,7 @@ def change_file_owner(path):
     # Only change file owner if it wasn't owned by current running user.
     if current_owner != USER:
         os.chown(path, uid, gid)
-        logger.debug("Changed owner of {0} to {1}".format(path, USER))
+        gui_logger.debug("Changed owner of {0} to {1}".format(path, USER))
 
 
 def check_root():
@@ -356,7 +361,7 @@ def check_root():
             "[!] The program was not executed as root.\n"
             "[!] Please run as root."
         )
-        logger.debug("Program wasn't executed as root")
+        gui_logger.debug("Program wasn't executed as root")
         sys.exit(1)
     else:
         # Check for dependencies
@@ -366,7 +371,7 @@ def check_root():
                                    stdout=subprocess.PIPE,
                                    stderr=subprocess.PIPE)
             if not check.returncode == 0:
-                logger.debug("{0} not found".format(program))
+                gui_logger.debug("{0} not found".format(program))
                 print("'{0}' not found. \n".format(program) +
                       "Please install {0}.".format(program))
                 sys.exit(1)
@@ -377,17 +382,17 @@ def check_update():
 
     def get_latest_version():
         """Return the latest version from pypi"""
-        logger.debug("Calling pypi API")
+        gui_logger.debug("Calling pypi API")
         try:
             r = requests.get("https://pypi.org/pypi/protonvpn-cli/json")
         except (requests.exceptions.ConnectionError,
                 requests.exceptions.ConnectTimeout):
-            logger.debug("Couldn't connect to pypi API")
+            gui_logger.debug("Couldn't connect to pypi API")
             return False
         try:
             r.raise_for_status()
         except requests.exceptions.HTTPError:
-            logger.debug(
+            gui_logger.debug(
                 "HTTP Error with pypi API: {0}".format(r.status_code)
             )
             return False
@@ -405,10 +410,10 @@ def check_update():
         # Don't check for update
         return
 
-    logger.debug("Checking for new update")
+    gui_logger.debug("Checking for new update")
     current_version = list(VERSION.split("."))
     current_version = [int(i) for i in current_version]
-    logger.debug("Current: {0}".format(current_version))
+    gui_logger.debug("Current: {0}".format(current_version))
 
     latest_version = get_latest_version()
     if not latest_version:
@@ -416,19 +421,19 @@ def check_update():
         return
     latest_version = latest_version.split(".")
     latest_version = [int(i) for i in latest_version]
-    logger.debug("Latest: {0}".format(latest_version))
+    gui_logger.debug("Latest: {0}".format(latest_version))
 
     for idx, i in enumerate(latest_version):
         if i > current_version[idx]:
-            logger.debug("Update found")
+            gui_logger.debug("Update found")
             update_available = True
             break
         elif i < current_version[idx]:
-            logger.debug("No update")
+            gui_logger.debug("No update")
             update_available = False
             break
     else:
-        logger.debug("No update")
+        gui_logger.debug("No update")
         update_available = False
 
     set_config_value("metadata", "last_update_check", int(time.time()))
@@ -457,7 +462,7 @@ def check_init():
                 "[!] There has been no profile initialized yet. "
                 "Please run 'protonvpn init'."
             )
-            logger.debug("Initialized Profile not found")
+            gui_logger.debug("Initialized Profile not found")
             sys.exit(1)
         else:
             # Check if required configuration values are set
@@ -481,7 +486,7 @@ def check_init():
                     try:
                         get_config_value(section, config_key)
                     except KeyError:
-                        logger.debug("Config {0}/{1} not found, default set"
+                        gui_logger.debug("Config {0}/{1} not found, default set"
                                      .format(section, config_key))
                         set_config_value(section, config_key,
                                          default_conf[section][config_key])
@@ -491,7 +496,7 @@ def check_init():
             "[!] There has been no profile initialized yet. "
             "Please run 'protonvpn init'."
         )
-        logger.debug("Initialized Profile not found")
+        gui_logger.debug("Initialized Profile not found")
         sys.exit(1)
 
 
@@ -533,7 +538,7 @@ def get_transferred_data():
     elif os.path.isfile(base_path.format('tun0', 'rx_bytes')):
         adapter_name = 'tun0'
     else:
-        logger.debug("No usage stats for VPN interface available")
+        gui_logger.debug("No usage stats for VPN interface available")
         return '-', '-'
 
     # Get transmitted and received bytes from /sys/ directory

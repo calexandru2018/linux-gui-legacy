@@ -53,10 +53,10 @@
         },
         "pygobject": {
             "hashes": [
-                "sha256:2acb0daf2b3a23a90f52066cc23d1053339fee2f5f7f4275f8baa3704ae0c543"
+                "sha256:b97f570e55017fcd3732164811f24ecf63983a4834f61b55b0aaf64ecefac856"
             ],
             "index": "pypi",
-            "version": "==3.34.0"
+            "version": "==3.36.0"
         },
         "pythondialog": {
             "hashes": [

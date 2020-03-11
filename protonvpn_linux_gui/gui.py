@@ -22,7 +22,6 @@ from .gui_logger import gui_logger
 from .utils import (
     populate_server_list,
     prepare_initilizer,
-    load_on_start,
     load_configurations,
     message_dialog,
     check_for_updates,
@@ -45,7 +44,8 @@ from .thread_functions import(
     update_killswitch,
     update_split_tunneling,
     purge_configurations,
-    kill_duplicate_gui_process
+    kill_duplicate_gui_process,
+    load_content_on_start
 )
 
 # Import version
@@ -574,11 +574,31 @@ def initialize_gui():
         window = interface.get_object("LoginWindow")
         dashboard = interface.get_object("DashboardWindow")
         dashboard.connect("destroy", Gtk.main_quit)
+        window.show()
     else:
         window = interface.get_object("DashboardWindow")
         gui_logger.debug(">>> Loading DashboardWindow")
         window.connect("destroy", Gtk.main_quit)
-        load_on_start(interface, fast_boot=True)
+        
+        messagedialog_window = interface.get_object("MessageDialog")
+        messagedialog_label = interface.get_object("message_dialog_label")
+        interface.get_object("message_dialog_sub_label").hide()
+        messagedialog_spinner = interface.get_object("message_dialog_spinner")
+
+        messagedialog_label.set_markup("Loading...")
+        messagedialog_spinner.show()
+        messagedialog_window.show()
+
+        objects = {
+            "interface": interface,
+            "messagedialog_window": messagedialog_window,
+            "messagedialog_label": messagedialog_label,
+            "messagedialog_spinner": messagedialog_spinner,
+        }
+
+        thread = Thread(target=load_content_on_start, args=[objects])
+        thread.daemon = True
+        thread.start()
     
     window.show()
     

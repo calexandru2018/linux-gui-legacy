@@ -13,7 +13,7 @@ import zlib
 # External Libraries
 from dialog import Dialog
 # protonvpn-cli Functions
-from .logger import logger
+from protonvpn_linux_gui.gui_logger import gui_logger
 from .utils import (
     check_init, pull_server_data, is_connected,
     get_servers, get_server_value, get_config_value,
@@ -33,7 +33,7 @@ def dialog():
         """Show the dialog and process response."""
         d = Dialog(dialog="dialog")
 
-        logger.debug("Showing Dialog: {0}".format(headline))
+        gui_logger.debug("Showing Dialog: {0}".format(headline))
 
         code, tag = d.menu(headline, title="ProtonVPN-CLI", choices=choices)
         if code == "ok":
@@ -43,7 +43,7 @@ def dialog():
             print("Canceled.")
             sys.exit(1)
 
-    logger.debug("Starting dialog connect")
+    gui_logger.debug("Starting dialog connect")
 
     # Check if dialog is installed
     dialog_check = subprocess.run(['which', 'dialog'],
@@ -52,7 +52,7 @@ def dialog():
     if not dialog_check.returncode == 0:
         print("'dialog' not found. "
               "Please install dialog via your package manager.")
-        logger.debug("dialog not found")
+        gui_logger.debug("dialog not found")
         sys.exit(1)
 
     pull_server_data()
@@ -81,7 +81,7 @@ def dialog():
         choices.append((country, " | ".join(sorted(country_features))))
 
     country = show_dialog("Choose a country:", choices)
-    logger.debug("Country Choice: {0}".format(country))
+    gui_logger.debug("Country Choice: {0}".format(country))
 
     # Second dialog
     # lambda sorts servers by Load instead of name
@@ -110,7 +110,7 @@ def dialog():
 
     server_result = show_dialog("Choose the server to connect:", choices)
 
-    logger.debug("Server Choice: {0}".format(server_result))
+    gui_logger.debug("Server Choice: {0}".format(server_result))
 
     protocol_result = show_dialog(
         "Choose a protocol:", [
@@ -118,7 +118,7 @@ def dialog():
         ]
     )
 
-    logger.debug("Protocol Choice: {0}".format(protocol_result))
+    gui_logger.debug("Protocol Choice: {0}".format(protocol_result))
 
     os.system("clear")
     openvpn_connect(server_result, protocol_result)
@@ -127,7 +127,7 @@ def dialog():
 def random_c(protocol=None, gui_enabled=False):
     """Connect to a random ProtonVPN Server."""
 
-    logger.debug("Starting random connect")
+    gui_logger.debug("Starting random connect")
 
     if not protocol:
         protocol = get_config_value("USER", "default_protocol")
@@ -137,14 +137,14 @@ def random_c(protocol=None, gui_enabled=False):
     servername = random.choice(servers)["Name"]
 
     if gui_enabled:
-        return openvpn_connect(servername, protocol, gui_enabled)
+        return openvpn_connect(servername, protocol, gui_enabled, has_disconnected=False, servers=servers)
     openvpn_connect(servername, protocol)
 
 
 def fastest(protocol=None, gui_enabled=False):
     """Connect to the fastest server available."""
 
-    logger.debug("Starting fastest connect")
+    gui_logger.debug("Starting fastest connect")
 
     if not protocol:
         protocol = get_config_value("USER", "default_protocol")
@@ -173,13 +173,13 @@ def fastest(protocol=None, gui_enabled=False):
 
     fastest_server = get_fastest_server(server_pool)
     if gui_enabled:
-        return openvpn_connect(fastest_server, protocol, gui_enabled)
-    openvpn_connect(fastest_server, protocol)
+        return openvpn_connect(fastest_server, protocol, gui_enabled, has_disconnected=True, servers=servers)
+    openvpn_connect(fastest_server, protocol, has_disconnected=True, servers=servers)
 
 
 def country_f(country_code, protocol=None):
     """Connect to the fastest server in a specific country."""
-    logger.debug("Starting fastest country connect")
+    gui_logger.debug("Starting fastest country connect")
 
     if not protocol:
         protocol = get_config_value("USER", "default_protocol")
@@ -206,7 +206,7 @@ def country_f(country_code, protocol=None):
             "[!] No Server in country {0} found\n".format(country_code) +
             "[!] Please choose a valid country"
         )
-        logger.debug("No server in country {0}".format(country_code))
+        gui_logger.debug("No server in country {0}".format(country_code))
         sys.exit(1)
 
     fastest_server = get_fastest_server(server_pool)
@@ -215,7 +215,7 @@ def country_f(country_code, protocol=None):
 
 def feature_f(feature, protocol=None):
     """Connect to the fastest server in a specific country."""
-    logger.debug(
+    gui_logger.debug(
         "Starting fastest feature connect with feature {0}".format(feature)
     )
 
@@ -230,7 +230,7 @@ def feature_f(feature, protocol=None):
     server_pool = [s for s in servers if s["Features"] == feature]
 
     if len(server_pool) == 0:
-        logger.debug("No servers found with users selection. Exiting.")
+        gui_logger.debug("No servers found with users selection. Exiting.")
         print("[!] No servers found with your selection.")
         sys.exit(1)
 
@@ -241,7 +241,7 @@ def feature_f(feature, protocol=None):
 def direct(user_input, protocol=None):
     """Connect to a single given server directly"""
 
-    logger.debug("Starting direct connect with {0}".format(user_input))
+    gui_logger.debug("Starting direct connect with {0}".format(user_input))
     pull_server_data()
 
     if not protocol:
@@ -278,7 +278,7 @@ def direct(user_input, protocol=None):
             "[!] '{0}' is not a valid servername\n".format(user_input) +
             "[!] Please enter a valid servername"
         )
-        logger.debug("'{0}' is not a valid servername'".format(user_input))
+        gui_logger.debug("'{0}' is not a valid servername'".format(user_input))
         sys.exit(1)
 
     servers = get_servers()
@@ -289,7 +289,7 @@ def direct(user_input, protocol=None):
             "is under maintenance, or inaccessible with your plan.\n"
             "[!] Please enter a different, valid servername."
         )
-        logger.debug("{0} doesn't exist".format(servername))
+        gui_logger.debug("{0} doesn't exist".format(servername))
         sys.exit(1)
 
     openvpn_connect(servername, protocol)
@@ -298,13 +298,13 @@ def direct(user_input, protocol=None):
 def reconnect(gui_enabled=False):
     """Reconnect to the last VPN Server."""
 
-    logger.debug("Starting reconnect")
+    gui_logger.debug("Starting reconnect")
 
     try:
         servername = get_config_value("metadata", "connected_server")
         protocol = get_config_value("metadata", "connected_proto")
     except KeyError:
-        logger.debug("No previous connection found")
+        gui_logger.debug("No previous connection found")
         print(
             "[!] Couldn't find a previous connection\n"
             "[!] Please connect normally first"
@@ -321,7 +321,7 @@ def reconnect(gui_enabled=False):
 def disconnect(passed=False, gui_enabled=False):
     """Disconnect VPN if a connection is present."""
 
-    logger.debug("Initiating disconnect")
+    gui_logger.debug("Initiating disconnect")
     return_message = 'Error occured with this message'
     if is_connected():
         if passed:
@@ -340,7 +340,7 @@ def disconnect(passed=False, gui_enabled=False):
                 else:
                     subprocess.run(
                         ["pkill", "-9", "openvpn"])
-                    logger.debug("SIGKILL sent")
+                    gui_logger.debug("SIGKILL sent")
                     break
             else:
                 break
@@ -354,7 +354,7 @@ def disconnect(passed=False, gui_enabled=False):
             manage_dns("restore")
             manage_ipv6("restore")
             manage_killswitch("restore")
-            logger.debug("Disconnected")
+            gui_logger.debug("Disconnected")
             if not passed:
                 print("Disconnected.")
                 return_message = "Disconnected from VPN server."
@@ -364,7 +364,7 @@ def disconnect(passed=False, gui_enabled=False):
         manage_dns("restore")
         manage_ipv6("restore")
         manage_killswitch("restore")
-        logger.debug("No connection found")
+        gui_logger.debug("No connection found")
         return_message = "No active connection was found."
     
     if gui_enabled:
@@ -379,15 +379,15 @@ def status(gui_enabled=False):
     current IP, server name, country, server load
     """
     check_init()
-    logger.debug("Getting VPN Status")
+    gui_logger.debug("Getting VPN Status")
 
     # Quit if not connected
     if not is_connected():
-        logger.debug("Disconnected")
+        gui_logger.debug("Disconnected")
         print("Status:     Disconnected")
         if os.path.isfile(os.path.join(CONFIG_DIR, "iptables.backup")):
             print("[!] Kill Switch is currently active.")
-            logger.debug("Kill Switch active while VPN disconnected")
+            gui_logger.debug("Kill Switch active while VPN disconnected")
         else:
             ip, isp = get_ip_info()
             print("IP:         {0}".format(ip))
@@ -410,7 +410,7 @@ def status(gui_enabled=False):
                           stdout=subprocess.PIPE,
                           stderr=subprocess.PIPE)
     if ping.returncode != 0:
-        logger.debug("Could not reach VPN server")
+        gui_logger.debug("Could not reach VPN server")
         print("[!] Could not reach the VPN Server")
         print("[!] You may want to reconnect with 'protonvpn reconnect'")
         return
@@ -422,7 +422,7 @@ def status(gui_enabled=False):
     # Collect Information
     all_features = {0: "Normal", 1: "Secure-Core", 2: "Tor", 4: "P2P"}
 
-    logger.debug("Collecting status information")
+    gui_logger.debug("Collecting status information")
     country_code = get_server_value(connected_server, "ExitCountry", servers)
     country = get_country_name(country_code)
     city = get_server_value(connected_server, "City", servers)
@@ -443,7 +443,7 @@ def status(gui_enabled=False):
     tx_amount, rx_amount = get_transferred_data()
 
     # Print Status Output
-    logger.debug("Printing status")
+    gui_logger.debug("Printing status")
     print(
         "Status:       Connected\n" +
         "Time:         {0}\n".format(connection_time) +
@@ -460,11 +460,11 @@ def status(gui_enabled=False):
     )
 
 
-def openvpn_connect(servername, protocol, gui_enabled=False):
+def openvpn_connect(servername, protocol, gui_enabled=False, has_disconnected=False, servers=False):
     """Connect to VPN Server."""
 
-    logger.debug("Initiating OpenVPN connection")
-    logger.debug(
+    gui_logger.debug("Initiating OpenVPN connection")
+    gui_logger.debug(
         "Connecting to {0} via {1}".format(servername, protocol.upper())
     )
 
@@ -474,7 +474,9 @@ def openvpn_connect(servername, protocol, gui_enabled=False):
 
     shutil.copyfile(TEMPLATE_FILE, OVPN_FILE)
 
-    servers = get_servers()
+    if not servers:
+        servers = get_servers()
+
     subservers = get_server_value(servername, "Servers", servers)
     ip_list = [subserver["EntryIP"] for subserver in subservers]
 
@@ -483,10 +485,11 @@ def openvpn_connect(servername, protocol, gui_enabled=False):
         f.write("proto {0}\n".format(protocol.lower()))
         for ip in ip_list:
             f.write("remote {0} {1}\n".format(ip, port[protocol.lower()]))
-        logger.debug("IPs: {0}".format(ip_list))
-        logger.debug("connect.ovpn written")
+        gui_logger.debug("IPs: {0}".format(ip_list))
+        gui_logger.debug("connect.ovpn written")
 
-    disconnect(passed=True)
+    if not has_disconnected:
+        disconnect(passed=True)
 
     old_ip, _ = get_ip_info()
 
@@ -504,7 +507,7 @@ def openvpn_connect(servername, protocol, gui_enabled=False):
             stdout=f, stderr=f
         )
 
-    logger.debug("OpenVPN process started")
+    gui_logger.debug("OpenVPN process started")
     time_start = time.time()
 
     with open(os.path.join(CONFIG_DIR, "ovpn.log"), "r") as f:
@@ -534,12 +537,12 @@ def openvpn_connect(servername, protocol, gui_enabled=False):
                                     port=port[protocol.lower()])
                 new_ip, _ = get_ip_info()
                 if old_ip == new_ip:
-                    logger.debug("Failed to connect. IP didn't change")
+                    gui_logger.debug("Failed to connect. IP didn't change")
                     print("[!] Connection failed. Reverting all changes...")
                     disconnect(passed=True)
                 print("Connected!")
-                logger.debug("Connection successful")
-                return_message = "Connected to <b>{0}</b> via <b>{1}</b>.".format(servername, protocol.upper())
+                gui_logger.debug("Connection successful")
+                return_message = ("Connected to <b>{0}</b> via <b>{1}</b>.".format(servername, protocol.upper()), servers)
                 break
             # If Authentication failed
             elif "AUTH_FAILED" in content:
@@ -548,16 +551,16 @@ def openvpn_connect(servername, protocol, gui_enabled=False):
                     "[!] Please make sure that your "
                     "Username and Password is correct."
                 )
-                logger.debug("Authentication failure")
+                gui_logger.debug("Authentication failure")
                 if not gui_enabled == True:
                     sys.exit(1)
-                return_message = "Authentication failed.\nPlease make sure that your Username and Password is correct."
+                return_message = ("Authentication failed.\nPlease make sure that your Username and Password is correct.", servers)
                 break
             # Stop after 45s
             elif time.time() - time_start >= 45:
                 print("Connection timed out after 45 Seconds")
-                logger.debug("Connection timed out after 45 Seconds")
-                return_message = "Connection timed out after 45 Seconds"
+                gui_logger.debug("Connection timed out after 45 Seconds")
+                return_message = ("Connection timed out after 45 Seconds", servers)
 
                 if not gui_enabled == True:
                     sys.exit(1)
@@ -565,7 +568,7 @@ def openvpn_connect(servername, protocol, gui_enabled=False):
             time.sleep(0.1)
 
     # Write connection info into configuration file
-    logger.debug("Writing connection info to file")
+    gui_logger.debug("Writing connection info to file")
     config = configparser.ConfigParser()
     config.read(CONFIG_FILE)
 
@@ -594,27 +597,27 @@ def manage_dns(mode, dns_server=False):
     resolvconf_path = os.path.realpath("/etc/resolv.conf")
 
     if mode == "leak_protection":
-        logger.debug("Leak Protection initiated")
+        gui_logger.debug("Leak Protection initiated")
         # Restore original resolv.conf if it exists
         if os.path.isfile(backupfile):
-            logger.debug("resolv.conf.backup exists")
+            gui_logger.debug("resolv.conf.backup exists")
             manage_dns("restore")
         # Check for custom DNS Server
         if not int(get_config_value("USER", "dns_leak_protection")):
             if get_config_value("USER", "custom_dns") == "None":
-                logger.debug("DNS Leak Protection is disabled")
+                gui_logger.debug("DNS Leak Protection is disabled")
                 return
             else:
                 dns_server = get_config_value("USER", "custom_dns")
-                logger.debug("Using custom DNS")
+                gui_logger.debug("Using custom DNS")
         else:
-            logger.debug("DNS Leak Protection is enabled")
+            gui_logger.debug("DNS Leak Protection is enabled")
         # Make sure DNS Server has been provided
         if not dns_server:
             raise Exception("No DNS Server has been provided.")
 
         shutil.copy2(resolvconf_path, backupfile)
-        logger.debug("{0} (resolv.conf) backed up".format(resolvconf_path))
+        gui_logger.debug("{0} (resolv.conf) backed up".format(resolvconf_path))
 
         # Remove previous nameservers
         dns_regex = re.compile(r"^nameserver .*$")
@@ -622,7 +625,7 @@ def manage_dns(mode, dns_server=False):
         for line in fileinput.input(resolvconf_path, inplace=True):
             if not dns_regex.search(line) and not dns_regex.search(line):
                 print(line, end="")
-        logger.debug("Removed existing DNS Servers")
+        gui_logger.debug("Removed existing DNS Servers")
 
         # Add ProtonVPN managed DNS Server to resolv.conf
         dns_server = dns_server.split()
@@ -630,7 +633,7 @@ def manage_dns(mode, dns_server=False):
             f.write("# ProtonVPN DNS Servers. Managed by ProtonVPN-CLI.\n")
             for dns in dns_server[:3]:
                 f.write("nameserver {0}\n".format(dns))
-            logger.debug("Added ProtonVPN or custom DNS")
+            gui_logger.debug("Added ProtonVPN or custom DNS")
 
         # Write the hash of the edited file in the configuration
         #
@@ -643,7 +646,7 @@ def manage_dns(mode, dns_server=False):
         set_config_value("metadata", "resolvconf_hash", filehash)
 
     elif mode == "restore":
-        logger.debug("Restoring DNS")
+        gui_logger.debug("Restoring DNS")
         if os.path.isfile(backupfile):
 
             # Check if the file changed since connection
@@ -653,14 +656,14 @@ def manage_dns(mode, dns_server=False):
 
             if filehash == int(oldhash):
                 shutil.copy2(backupfile, resolvconf_path)
-                logger.debug("resolv.conf restored from backup")
+                gui_logger.debug("resolv.conf restored from backup")
             else:
-                logger.debug("resolv.conf changed. Not restoring.")
+                gui_logger.debug("resolv.conf changed. Not restoring.")
 
             os.remove(backupfile)
-            logger.debug("resolv.conf.backup removed")
+            gui_logger.debug("resolv.conf.backup removed")
         else:
-            logger.debug("No Backupfile found")
+            gui_logger.debug("No Backupfile found")
     else:
         raise Exception("Invalid argument provided. "
                         "Mode must be 'restore' or 'leak_protection'")
@@ -680,18 +683,18 @@ def manage_ipv6(mode):
 
     if mode == "disable":
 
-        logger.debug("Disabling IPv6")
+        gui_logger.debug("Disabling IPv6")
         # Needs to be removed eventually. I'll leave it in for now
         # so it still properly restores the IPv6 address the old way
         if os.path.isfile(ipv6_backupfile):
             manage_ipv6("legacy_restore")
 
         if os.path.isfile(ip6tables_backupfile):
-            logger.debug("IPv6 backup exists")
+            gui_logger.debug("IPv6 backup exists")
             manage_ipv6("restore")
 
         # Backing up ip6ables rules
-        logger.debug("Backing up ip6tables rules")
+        gui_logger.debug("Backing up ip6tables rules")
         ip6tables_rules = subprocess.run(["ip6tables-save"],
                                          stdout=subprocess.PIPE)
 
@@ -716,13 +719,13 @@ def manage_ipv6(mode):
         for command in ip6tables_commands:
             command = command.split()
             subprocess.run(command)
-        logger.debug("IPv6 disabled successfully")
+        gui_logger.debug("IPv6 disabled successfully")
 
     elif mode == "restore":
-        logger.debug("Restoring ip6tables")
+        gui_logger.debug("Restoring ip6tables")
         # Same as above, remove eventually
         if os.path.isfile(ipv6_backupfile):
-            logger.debug("legacy ipv6 backup found")
+            gui_logger.debug("legacy ipv6 backup found")
             manage_ipv6("legacy_restore")
         if os.path.isfile(ip6tables_backupfile):
             subprocess.run(
@@ -730,17 +733,17 @@ def manage_ipv6(mode):
                                           ip6tables_backupfile
                 ), shell=True, stdout=subprocess.PIPE
             )
-            logger.debug("ip6tables restored")
+            gui_logger.debug("ip6tables restored")
             os.remove(ip6tables_backupfile)
-            logger.debug("ip6tables.backup removed")
+            gui_logger.debug("ip6tables.backup removed")
         else:
-            logger.debug("No Backupfile found")
+            gui_logger.debug("No Backupfile found")
         return
 
     elif mode == "legacy_restore":
-        logger.debug("Restoring IPv6")
+        gui_logger.debug("Restoring IPv6")
         if not os.path.isfile(ipv6_backupfile):
-            logger.debug("No Backupfile found")
+            gui_logger.debug("No Backupfile found")
             return
 
         with open(ipv6_backupfile, "r") as f:
@@ -756,7 +759,7 @@ def manage_ipv6(mode):
         has_ipv6 = True if ipv6_info.returncode == 0 else False
 
         if has_ipv6:
-            logger.debug("IPv6 address present")
+            gui_logger.debug("IPv6 address present")
             os.remove(ipv6_backupfile)
             return
 
@@ -769,9 +772,9 @@ def manage_ipv6(mode):
             print(
                 "[!] There was an error with restoring the IPv6 configuration"
             )
-            logger.debug("IPv6 restoration error: sysctl")
-            logger.debug("stdout: {0}".format(ipv6_enable.stdout))
-            logger.debug("stderr: {0}".format(ipv6_enable.stderr))
+            gui_logger.debug("IPv6 restoration error: sysctl")
+            gui_logger.debug("stdout: {0}".format(ipv6_enable.stdout))
+            gui_logger.debug("stderr: {0}".format(ipv6_enable.stderr))
             return
 
         ipv6_restore_address = subprocess.run(
@@ -783,14 +786,14 @@ def manage_ipv6(mode):
             print(
                 "[!] There was an error with restoring the IPv6 configuration"
             )
-            logger.debug("IPv6 restoration error: ip")
-            logger.debug("stdout: {0}".format(ipv6_restore_address.stdout))
-            logger.debug("stderr: {0}".format(ipv6_restore_address.stderr))
+            gui_logger.debug("IPv6 restoration error: ip")
+            gui_logger.debug("stdout: {0}".format(ipv6_restore_address.stdout))
+            gui_logger.debug("stderr: {0}".format(ipv6_restore_address.stderr))
             return
 
-        logger.debug("Removing IPv6 backup file")
+        gui_logger.debug("Removing IPv6 backup file")
         os.remove(ipv6_backupfile)
-        logger.debug("IPv6 restored")
+        gui_logger.debug("IPv6 restored")
 
     else:
         raise Exception("Invalid argument provided. "
@@ -809,16 +812,16 @@ def manage_killswitch(mode, proto=None, port=None):
     backupfile = os.path.join(CONFIG_DIR, "iptables.backup")
 
     if mode == "restore":
-        logger.debug("Restoring iptables")
+        gui_logger.debug("Restoring iptables")
         if os.path.isfile(backupfile):
-            logger.debug("Restoring IPTables rules")
+            gui_logger.debug("Restoring IPTables rules")
             subprocess.run("iptables-restore < {0}".format(backupfile),
                            shell=True, stdout=subprocess.PIPE)
-            logger.debug("iptables restored")
+            gui_logger.debug("iptables restored")
             os.remove(backupfile)
-            logger.debug("iptables.backup removed")
+            gui_logger.debug("iptables.backup removed")
         else:
-            logger.debug("No Backupfile found")
+            gui_logger.debug("No Backupfile found")
         return
 
     # Stop if Kill Switch is disabled
@@ -827,7 +830,7 @@ def manage_killswitch(mode, proto=None, port=None):
 
     if mode == "enable":
         if os.path.isfile(backupfile):
-            logger.debug("Kill Switch backup exists")
+            gui_logger.debug("Kill Switch backup exists")
             manage_killswitch("restore")
 
         with open(os.path.join(CONFIG_DIR, "ovpn.log"), "r") as f:
@@ -836,13 +839,13 @@ def manage_killswitch(mode, proto=None, port=None):
             if not device:
                 print("[!] Kill Switch activation failed."
                       "Device couldn't be determined.")
-                logger.debug(
+                gui_logger.debug(
                     "Kill Switch activation failed. No device in logfile"
                 )
             device = device.group(2)
 
         # Backing up IPTables rules
-        logger.debug("Backing up iptables rules")
+        gui_logger.debug("Backing up iptables rules")
         iptables_rules = subprocess.run(["iptables-save"],
                                         stdout=subprocess.PIPE)
 
@@ -893,4 +896,4 @@ def manage_killswitch(mode, proto=None, port=None):
         for command in iptables_commands:
             command = command.split()
             subprocess.run(command)
-        logger.debug("Kill Switch enabled")
+        gui_logger.debug("Kill Switch enabled")

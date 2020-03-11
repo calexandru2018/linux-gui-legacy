@@ -22,6 +22,8 @@ from custom_pvpn_cli_ng.protonvpn_cli.constants import SPLIT_TUNNEL_FILE
 
 from .constants import PATH_AUTOCONNECT_SERVICE, TEMPLATE, VERSION, GITHUB_URL_RELEASE
 
+from .gui_logger import gui_logger
+
 # PyGObject import
 import gi
 
@@ -147,44 +149,41 @@ def message_dialog(interface, action, label_object, spinner_object, sub_label_ob
             is_dns_enabled= "Yes" if is_dns_protection_enabled else "No",
             is_sp_enabled= "Yes" if is_splitunn_enabled else "No")
 
+        gui_logger.debug(result)
+
         label_object.set_markup(result)
+        label_object.show()
         sub_label_object.set_markup("<b><u>Reccomendation:</u></b>\n<span>{recc}</span>".format(recc=reccomendation))
         sub_label_object.show()
         spinner_object.hide()
 
-def check_internet_conn(fast_boot=False):
-    timer_start = time.time()
-    result = ''
-    attempts = 2
+def check_internet_conn(gui_enabled=False):
+    gui_logger.debug(">>> Running \"check_internet_conn\".")
 
-    while True:
-        # To speed up GUI start
-        if fast_boot and attempts == 0:
-            result = False
-            break
-        # Useful when using diagnostics tool
-        elif time.time() - timer_start > 5:
-            break
-            result = False
-
-        try:
-            if get_ip_info(gui_enabled=True):
-                result = True
-                break
-            else:
-                result = False
-        except:
-            pass
-
-        attempts -= 1
-        time.sleep(0.2)
-
-    return result
+    try:
+        return get_ip_info(gui_enabled=gui_enabled)
+    except:
+        return False
 
 def check_for_updates():
 
     latest_release = ''
-    
+    pip3_installed = False
+
+    try:
+        is_pip3_installed = subprocess.run(["pip3", "show", "protonvpn-linux-gui-calexandru2018"],stdout=subprocess.PIPE)
+        if is_pip3_installed.returncode == 0:
+            is_pip3_installed = is_pip3_installed.stdout.decode().split("\n")
+            for el in is_pip3_installed:
+                if "Location:" in el:
+                    el = el.split(" ")[1].split("/")
+                    if not ".egg" in el[-1]:
+                        pip3_installed = True
+                        # print(".egg" in el[-1])
+                        break           
+    except:
+        pip3_installed = False
+
     try:
         check_version = requests.get(GITHUB_URL_RELEASE, timeout=2)
         latest_release =  check_version.url.split("/")[-1][1:]
@@ -195,9 +194,11 @@ def check_for_updates():
     if latest_release == VERSION:
         return "You have the latest version!"
     elif VERSION < latest_release:
-        return_string = "There is a newer release, you should update to <b>v{0}</b>.\n\n".format(latest_release)
-        return_string = return_string + "If installed via pip then upgrade with:\n<b>sudo pip3 install protonvpn-linux-gui-calexandru2018 --upgrade</b>\n\n"
-        return_string = return_string + "If installed via github then upgrade with:\n<b>git clone https://github.com/calexandru2018/protonvpn-linux-gui</b>"
+        return_string = "There is a newer release, you should upgrade to <b>v{0}</b>.\n\n".format(latest_release)
+        if pip3_installed:
+            return_string = return_string + "You can upgrade with the following command:\n\n<b>sudo pip3 install protonvpn-linux-gui-calexandru2018 --upgrade</b>\n\n"
+        else:
+            return_string = return_string + "You can upgrade by <b>first removing this version</b>, and then cloning the new one with the following commands:\n\n<b>git clone https://github.com/calexandru2018/protonvpn-linux-gui</b>\n\n<b>cd protonvpn-linux-gui</b>\n\n<b>sudo python3 setup.py install</b>"
         return return_string
     else:
         return "Developer Mode."
@@ -237,19 +238,28 @@ def prepare_initilizer(username_field, password_field, interface):
 
     return user_data
 
-def load_on_start(interface, fast_boot=False):
+def load_on_start(params_dict):
     """Updates Dashboard labels and populates server list content before showing it to the user
     """
-    if check_internet_conn(fast_boot=fast_boot):
-        p = Thread(target=update_labels_server_list, args=[interface])
-        p.daemon = True
-        p.start()
 
-def update_labels_server_list(interface, server_list_obj=False):
+    gui_logger.debug(">>> Running \"load_on_start\". Params: {0}.".format(params_dict))
+
+    conn = check_internet_conn(gui_enabled=params_dict["gui_enabled"])
+    if not conn == False and not conn == None:
+        update_labels_server_list(params_dict["interface"], conn_info=conn)
+        # p = Thread(target=update_labels_server_list, args=[interface])
+        # p.daemon = True
+        # p.start()
+    else:
+        return False
+
+def update_labels_server_list(interface, server_list_obj=False, conn_info=False):
     if not server_list_obj:
         server_list_object = interface.get_object("ServerListStore")
     else:
         server_list_object = server_list_obj
+
+    gui_logger.debug(">>> Running \"update_labels_server_list\" getting servers.")
 
     servers = get_servers()
     if not servers:
@@ -258,7 +268,8 @@ def update_labels_server_list(interface, server_list_obj=False):
     update_labels_dict = {
         "interface": interface,
         "servers": servers,
-        "disconnecting": False
+        "disconnecting": False,
+        "conn_info": conn_info if conn_info else False
     }
 
     populate_servers_dict = {
@@ -277,6 +288,8 @@ def update_labels_server_list(interface, server_list_obj=False):
 def update_labels_status(update_labels_dict):
     """Updates labels status"""
 
+    gui_logger.debug(">>> Running \"update_labels_status\" getting servers, is_connected and connected_server.")
+
     if not update_labels_dict["servers"]:
         servers = get_servers()
     else:
@@ -291,10 +304,12 @@ def update_labels_status(update_labels_dict):
         connected_server = False
         
     left_grid_update_labels(update_labels_dict["interface"], servers, is_vpn_connected, connected_server, update_labels_dict["disconnecting"])
-    right_grid_update_labels(update_labels_dict["interface"], servers, is_vpn_connected, connected_server, update_labels_dict["disconnecting"])
+    right_grid_update_labels(update_labels_dict["interface"], servers, is_vpn_connected, connected_server, update_labels_dict["disconnecting"], conn_info=update_labels_dict["conn_info"])
     
 def left_grid_update_labels(interface, servers, is_connected, connected_server, disconnecting):
     """Holds labels that are position within the left-side grid"""
+
+    gui_logger.debug(">>> Running \"left_grid_update_labels\".")
 
     # Left grid
     vpn_status_label =      interface.get_object("vpn_status_label")
@@ -351,8 +366,10 @@ def left_grid_update_labels(interface, servers, is_connected, connected_server, 
     feature = all_features[feature] if not disconnecting and is_connected else ""
     server_features_label.set_markup('<span>{0}</span>'.format(feature))
 
-def right_grid_update_labels(interface, servers, is_connected, connected_server, disconnecting):
+def right_grid_update_labels(interface, servers, is_connected, connected_server, disconnecting, conn_info=False):
     """Holds labels that are position within the right-side grid"""
+
+    gui_logger.debug(">>> Running \"right_grid_update_labels\".")
 
     # Right grid
     ip_label =              interface.get_object("ip_label")
@@ -366,7 +383,11 @@ def right_grid_update_labels(interface, servers, is_connected, connected_server,
     tx_amount, rx_amount = get_transferred_data()
 
     # Get and set IP labels. Get also country and ISP
-    ip, isp, country = get_ip_info(gui_enabled=True)
+    if not conn_info:
+        ip, isp, country = get_ip_info(gui_enabled=True)
+    else:
+        ip, isp, country = conn_info
+
     country_isp = "<span>" + country + "/" + isp + "</span>"
     ip_label.set_markup(ip)
 
@@ -697,7 +718,14 @@ def stop_and_disable_daemon():
     return True
 
 def get_gui_processes():
-        processes = subprocess.run(["pgrep", "protonvpn-gui"],stdout=subprocess.PIPE)
 
-        return list(filter(None, processes.stdout.decode().split("\n"))) 
+    gui_logger.debug(">>> Running \"get_gui_processes\".")
+
+    processes = subprocess.run(["pgrep", "protonvpn-gui"],stdout=subprocess.PIPE)
+    
+    processes = list(filter(None, processes.stdout.decode().split("\n"))) 
+
+    gui_logger.debug(">>> Existing process running: {0}".format(processes))
+
+    return processes
     
