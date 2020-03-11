@@ -41,9 +41,11 @@ def call_api(endpoint, json_format=True, handle_errors=True, gui_enabled=False):
         return response
 
     try:
+        # response = requests.get(url, headers=headers, timeout=8)
         response = requests.get(url, headers=headers)
     except (requests.exceptions.ConnectionError,
             requests.exceptions.ConnectTimeout):
+            # requests.exceptions.ReadTimeout):
         if not gui_enabled:
             print(
                 "[!] There was an error connecting to the ProtonVPN API.\n"
@@ -168,7 +170,7 @@ def get_ip_info(gui_enabled=False):
     gui_logger.debug("Getting IP Information")
     ip_info = call_api("/vpn/location", gui_enabled=gui_enabled)
 
-    if ip_info == None:
+    if ip_info == None or ip_info == False:
         return False
 
     ip = ip_info["IP"]
