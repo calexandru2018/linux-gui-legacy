@@ -3,6 +3,7 @@ import time
 import requests
 import json
 import subprocess
+import concurrent.futures
 
 # Import ProtonVPN methods and utils
 from custom_pvpn_cli_ng.protonvpn_cli.utils import get_config_value, is_valid_ip
@@ -27,6 +28,48 @@ from .gui_logger import gui_logger
 # Import constants
 from .constants import VERSION, GITHUB_URL_RELEASE
 
+# Load on start
+def load_content_on_start(objects):
+
+    gui_logger.debug(">>> Running \"load_on_start\".")
+
+    time.sleep(2)
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        
+        params_dict = {
+            "interface": objects["interface"],
+            "gui_enabled": True
+        }
+
+        objects["messagedialog_label"].set_markup("Populating dashboard...")
+        objects["messagedialog_spinner"].hide()
+
+        future = executor.submit(load_on_start, params_dict)
+        return_value = future.result()
+        
+        if return_value == None and not return_value == False:
+            objects["messagedialog_window"].hide()
+        else:
+            objects["messagedialog_label"].set_markup("Could not load necessary resources, there might be connectivity issues.")
+
+    gui_logger.debug(">>> Ended tasks in \"load_on_start\" thread.")    
+
+    # result = load_on_start(objects["interface"])
+
+    # # objects["messagedialog_label"].set_markup("Populating dashboard...")
+    # objects["messagedialog_spinner"].hide()
+    
+    # msg = ""
+    # print(result)
+    # if result == None and result == False:
+    #     objects["messagedialog_window"].hide()
+    
+    # msg = "Could not load necessary resources, there might be connectivity issues."
+
+    # objects["messagedialog_label"].set_markup(msg)
+
+    # gui_logger.debug(">>> Ended tasks in \"load_on_start\" thread.")
+
 # Login handler
 def on_login(interface):
     """Button/Event handler to intialize user account. Calls populate_server_list(server_list_object) to populate server list.
@@ -49,7 +92,7 @@ def on_login(interface):
     if not cli.init_cli(gui_enabled=True, gui_user_input=user_data):
         return
 
-    load_on_start(interface)
+    load_on_start({"interface":interface, "gui_enabled": True})
     # populate_server_list(populate_servers_dict)
 
 # Dashboard hanlder
@@ -57,16 +100,18 @@ def connect_to_selected_server(interface, selected_server, messagedialog_label, 
     """Button/Event handler to connect to selected server
     """     
     protocol = get_config_value("USER", "default_protocol")
-    update_labels_dict = {
-        "interface": interface,
-        "servers": False,
-        "disconnecting": False
-    }
 
     gui_logger.debug(">>> Running \"openvpn_connect\".")
 
-    result = connection.openvpn_connect(selected_server, protocol, gui_enabled=True)
-    # result = connection.openvpn_connect(selected_server, protocol)
+    # openvpn needs to be changed
+    result, servers = connection.openvpn_connect(selected_server, protocol, gui_enabled=True)
+    
+    update_labels_dict = {
+        "interface": interface,
+        "servers": servers if servers else False,
+        "disconnecting": False,
+        "conn_info": False
+    }
 
     messagedialog_label.set_markup(result)
     messagedialog_spinner.hide()
@@ -82,16 +127,18 @@ def quick_connect(interface, messagedialog_label, messagedialog_spinner):
     """
 
     protocol = get_config_value("USER", "default_protocol")
-    update_labels_dict = {
-        "interface": interface,
-        "servers": False,
-        "disconnecting": False
-    }
 
     gui_logger.debug(">>> Running \"fastest\".")
 
-    result = connection.fastest(protocol, gui_enabled=True)
+    result, servers = connection.fastest(protocol, gui_enabled=True)
 
+    update_labels_dict = {
+        "interface": interface,
+        "servers": servers if servers else False,
+        "disconnecting": False,
+        "conn_info": False
+    }
+    
     messagedialog_label.set_markup(result)
     messagedialog_spinner.hide()
 
@@ -104,15 +151,18 @@ def quick_connect(interface, messagedialog_label, messagedialog_spinner):
 def last_connect(interface, messagedialog_label, messagedialog_spinner):
     """Button/Event handler to reconnect to previously connected server
     """        
-    update_labels_dict = {
-        "interface": interface,
-        "servers": False,
-        "disconnecting": False
-    }
 
     gui_logger.debug(">>> Running \"reconnect\".")
 
-    result = connection.reconnect(gui_enabled=True)
+    # openvpn needs to be changed
+    result, servers = connection.reconnect(gui_enabled=True)
+
+    update_labels_dict = {
+        "interface": interface,
+        "servers": servers if servers else False,
+        "disconnecting": False,
+        "conn_info": False
+    }
 
     messagedialog_label.set_markup(result)
     messagedialog_spinner.hide()
@@ -127,16 +177,18 @@ def random_connect(interface, messagedialog_label, messagedialog_spinner):
     """Button/Event handler to connect to a random server
     """
     protocol = get_config_value("USER", "default_protocol")
-    update_labels_dict = {
-        "interface": interface,
-        "servers": False,
-        "disconnecting": False
-    }
 
     gui_logger.debug(">>> Running \"reconnect\"")
 
-    result = connection.random_c(protocol, gui_enabled=True)
+    result, servers = connection.random_c(protocol, gui_enabled=True)
     
+    update_labels_dict = {
+        "interface": interface,
+        "servers": servers if servers else False,
+        "disconnecting": False,
+        "conn_info": False
+    }
+
     messagedialog_label.set_markup(result)
     messagedialog_spinner.hide()
 
@@ -152,7 +204,8 @@ def disconnect(interface, messagedialog_label, messagedialog_spinner):
     update_labels_dict = {
         "interface": interface,
         "servers": False,
-        "disconnecting": True
+        "disconnecting": True,
+        "conn_info": False
     }
 
     gui_logger.debug(">>> Running \"disconnect\".")
@@ -284,7 +337,7 @@ def update_pvpn_plan(interface, messagedialog_label, messagedialog_spinner):
 
     gui_logger.debug(">>> Result: \"{0}\"".format(result))
 
-    load_on_start(interface)     
+    load_on_start({"interface":interface, "gui_enabled": True})     
 
     gui_logger.debug(">>> Ended tasks in \"set_protonvpn_tier\" thread.")   
 
