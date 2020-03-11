@@ -137,7 +137,7 @@ def random_c(protocol=None, gui_enabled=False):
     servername = random.choice(servers)["Name"]
 
     if gui_enabled:
-        return openvpn_connect(servername, protocol, gui_enabled)
+        return openvpn_connect(servername, protocol, gui_enabled, has_disconnected=False, servers=servers)
     openvpn_connect(servername, protocol)
 
 
@@ -173,8 +173,8 @@ def fastest(protocol=None, gui_enabled=False):
 
     fastest_server = get_fastest_server(server_pool)
     if gui_enabled:
-        return openvpn_connect(fastest_server, protocol, gui_enabled)
-    openvpn_connect(fastest_server, protocol)
+        return openvpn_connect(fastest_server, protocol, gui_enabled, has_disconnected=True, servers=servers)
+    openvpn_connect(fastest_server, protocol, has_disconnected=True, servers=servers)
 
 
 def country_f(country_code, protocol=None):
@@ -460,7 +460,7 @@ def status(gui_enabled=False):
     )
 
 
-def openvpn_connect(servername, protocol, gui_enabled=False):
+def openvpn_connect(servername, protocol, gui_enabled=False, has_disconnected=False, servers=False):
     """Connect to VPN Server."""
 
     gui_logger.debug("Initiating OpenVPN connection")
@@ -474,7 +474,9 @@ def openvpn_connect(servername, protocol, gui_enabled=False):
 
     shutil.copyfile(TEMPLATE_FILE, OVPN_FILE)
 
-    servers = get_servers()
+    if not servers:
+        servers = get_servers()
+
     subservers = get_server_value(servername, "Servers", servers)
     ip_list = [subserver["EntryIP"] for subserver in subservers]
 
@@ -486,7 +488,8 @@ def openvpn_connect(servername, protocol, gui_enabled=False):
         gui_logger.debug("IPs: {0}".format(ip_list))
         gui_logger.debug("connect.ovpn written")
 
-    disconnect(passed=True)
+    if not has_disconnected:
+        disconnect(passed=True)
 
     old_ip, _ = get_ip_info()
 
@@ -539,7 +542,7 @@ def openvpn_connect(servername, protocol, gui_enabled=False):
                     disconnect(passed=True)
                 print("Connected!")
                 gui_logger.debug("Connection successful")
-                return_message = "Connected to <b>{0}</b> via <b>{1}</b>.".format(servername, protocol.upper())
+                return_message = ("Connected to <b>{0}</b> via <b>{1}</b>.".format(servername, protocol.upper()), servers)
                 break
             # If Authentication failed
             elif "AUTH_FAILED" in content:
@@ -551,13 +554,13 @@ def openvpn_connect(servername, protocol, gui_enabled=False):
                 gui_logger.debug("Authentication failure")
                 if not gui_enabled == True:
                     sys.exit(1)
-                return_message = "Authentication failed.\nPlease make sure that your Username and Password is correct."
+                return_message = ("Authentication failed.\nPlease make sure that your Username and Password is correct.", servers)
                 break
             # Stop after 45s
             elif time.time() - time_start >= 45:
                 print("Connection timed out after 45 Seconds")
                 gui_logger.debug("Connection timed out after 45 Seconds")
-                return_message = "Connection timed out after 45 Seconds"
+                return_message = ("Connection timed out after 45 Seconds", servers)
 
                 if not gui_enabled == True:
                     sys.exit(1)
