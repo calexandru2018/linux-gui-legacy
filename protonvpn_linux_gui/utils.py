@@ -168,7 +168,41 @@ def check_internet_conn(gui_enabled=False):
 def check_for_updates():
 
     latest_release = ''
-    
+    python2 = ''
+    python3 = ''
+
+    # try:
+    #     python2 = subprocess.run(["python", "--version"],stdout=subprocess.PIPE).stdout.decode().split(" ")[1][0]
+    # except:
+    #     python2 = False
+
+    try:
+        python3 = subprocess.run(["python3", "--version"],stdout=subprocess.PIPE).stdout.decode().split(" ")[1][0]
+    except:
+        python3 = False
+
+    # check if user has installed via pip or git
+    # check for python --version
+    # check for python3 --version
+    # if both point to 3.x< then pip can be used with either pip or pip3
+    # else use pip3
+
+    # if python2 or python3:
+    if python3:
+        # try:
+        #     is_pip_installed = subprocess.run(["pip", "show", "protonvpn-linux-gui-calexandru2018"],stdout=subprocess.PIPE)
+        #     if is_pip_installed.returncode == 0:
+        #         is_pip_installed = True
+        # except:
+        #     is_pip_installed = False
+
+        try:
+            is_pip3_installed = subprocess.run(["pip3", "show", "protonvpn-linux-gui-calexandru2018"],stdout=subprocess.PIPE)
+            if is_pip3_installed.returncode == 0:
+                is_pip3_installed = True
+        except:
+            is_pip3_installed = False
+
     try:
         check_version = requests.get(GITHUB_URL_RELEASE, timeout=2)
         latest_release =  check_version.url.split("/")[-1][1:]
@@ -176,12 +210,16 @@ def check_for_updates():
         print()
         return "Failed to check for updates."
 
+    latest_release = "2.0.0.0"
+
     if latest_release == VERSION:
         return "You have the latest version!"
     elif VERSION < latest_release:
-        return_string = "There is a newer release, you should update to <b>v{0}</b>.\n\n".format(latest_release)
-        return_string = return_string + "If installed via pip then upgrade with:\n<b>sudo pip3 install protonvpn-linux-gui-calexandru2018 --upgrade</b>\n\n"
-        return_string = return_string + "If installed via github then upgrade with:\n<b>git clone https://github.com/calexandru2018/protonvpn-linux-gui</b>"
+        return_string = "There is a newer release, you should upgrade to <b>v{0}</b>.\n\n".format(latest_release)
+        if is_pip3_installed:
+            return_string = return_string + "You can upgrade with the following command:\n\n<b>sudo pip3 install protonvpn-linux-gui-calexandru2018 --upgrade</b>\n\n"
+        else:
+            return_string = return_string + "You can upgrade by <b>first removing this version</b>, and then cloning the new one with the following commands:\n\n<b>git clone https://github.com/calexandru2018/protonvpn-linux-gui</b>\n\n<b>cd protonvpn-linux-gui</b>\n\n<b>sudo python3 setup.py install</b>"
         return return_string
     else:
         return "Developer Mode."
