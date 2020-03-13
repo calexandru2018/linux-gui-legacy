@@ -4,8 +4,26 @@
 </p>
 
 <p align="center">
-    <a href="https://pepy.tech/project/protonvpn-linux-gui-calexandru2018"><img alt="Downloads" src="https://pepy.tech/badge/protonvpn-linux-gui-calexandru2018"></a>   
-    <a href="https://pepy.tech/project/protonvpn-linux-gui-calexandru2018/week"><img alt="Downloads per Week" src="https://pepy.tech/badge/protonvpn-linux-gui-calexandru2018/week"></a>
+  <a href="https://github.com/calexandru2018/protonvpn-linux-gui/releases/latest">
+      <img alt="Build Status" src="https://img.shields.io/github/release/calexandru2018/protonvpn-linux-gui.svg?style=flat" />
+  </a>
+  <a href="https://pepy.tech/project/protonvpn-linux-gui-calexandru2018">
+    <img alt="Downloads" src="https://pepy.tech/badge/protonvpn-linux-gui-calexandru2018">
+  </a>   
+    <a href="https://pepy.tech/project/protonvpn-linux-gui-calexandru2018/week">
+      <img alt="Downloads per Week" src="https://pepy.tech/badge/protonvpn-linux-gui-calexandru2018/week">
+    </a>
+</p>
+<p align="center">
+    <a href="https://actions-badge.atrox.dev/calexandru2018/protonvpn-linux-gui/goto?ref=master">
+        <img alt="Master Branch Build Status" src="https://img.shields.io/endpoint.svg?url=https%3A%2F%2Factions-badge.atrox.dev%2Fcalexandru2018%2Fprotonvpn-linux-gui%2Fbadge%3Fref%3Dmaster&style=flat" />
+    </a>
+    <a href="https://github.com/calexandru2018/protonvpn-linux-gui/blob/master/LICENSE">
+        <img src="https://img.shields.io/github/license/calexandru2018/protonvpn-linux-gui">
+    </a>
+    <a href="https://actions-badge.atrox.dev/calexandru2018/protonvpn-linux-gui/goto?ref=testing">
+        <img alt="Testing Branch Build Status" src="https://img.shields.io/endpoint.svg?url=https%3A%2F%2Factions-badge.atrox.dev%2Fcalexandru2018%2Fprotonvpn-linux-gui%2Fbadge%3Fref%3Dtesting&style=flat" />
+    </a> 
 </p>
 
 <h3 align="center">An <b>unofficial</b> Linux GUI for ProtonVPN, written in Python. Layout designed in Glade.</h3>
