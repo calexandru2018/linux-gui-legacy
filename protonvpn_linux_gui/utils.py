@@ -157,7 +157,7 @@ def message_dialog(interface, action, label_object, spinner_object, sub_label_ob
         sub_label_object.show()
         spinner_object.hide()
 
-def check_internet_conn(gui_enabled=False):
+def check_internet_conn(gui_enabled=True):
     gui_logger.debug(">>> Running \"check_internet_conn\".")
 
     try:
@@ -244,7 +244,7 @@ def load_on_start(params_dict):
 
     gui_logger.debug(">>> Running \"load_on_start\". Params: {0}.".format(params_dict))
 
-    conn = check_internet_conn(gui_enabled=params_dict["gui_enabled"])
+    conn = check_internet_conn()
     if not conn == False and not conn == None:
         update_labels_server_list(params_dict["interface"], conn_info=conn)
         # p = Thread(target=update_labels_server_list, args=[interface])
@@ -384,7 +384,13 @@ def right_grid_update_labels(interface, servers, is_connected, connected_server,
 
     # Get and set IP labels. Get also country and ISP
     if not conn_info:
-        ip, isp, country = get_ip_info(gui_enabled=True)
+        result = get_ip_info(gui_enabled=True)
+        if result:
+            ip, isp, country = result
+        else:
+            ip = "None"
+            isp = "None" 
+            country = "None"
     else:
         ip, isp, country = conn_info
 
