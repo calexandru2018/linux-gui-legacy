@@ -23,7 +23,7 @@ from .constants import (
 
 def call_api(endpoint, json_format=True, handle_errors=True, gui_enabled=False):
     """Call to the ProtonVPN API."""
-
+    
     api_domain = "https://api.protonvpn.ch"
     url = api_domain + endpoint
 
@@ -41,11 +41,10 @@ def call_api(endpoint, json_format=True, handle_errors=True, gui_enabled=False):
         return response
 
     try:
-        # response = requests.get(url, headers=headers, timeout=8)
-        response = requests.get(url, headers=headers)
+        response = requests.get(url, headers=headers, timeout=6)
+        # response = requests.get(url, headers=headers)
     except (requests.exceptions.ConnectionError,
             requests.exceptions.ConnectTimeout):
-            # requests.exceptions.ReadTimeout):
         if not gui_enabled:
             print(
                 "[!] There was an error connecting to the ProtonVPN API.\n"
@@ -58,11 +57,12 @@ def call_api(endpoint, json_format=True, handle_errors=True, gui_enabled=False):
     try:
         response.raise_for_status()
     except requests.exceptions.HTTPError:
-        print(
-            "[!] There was an error with accessing the ProtonVPN API.\n"
-            "[!] Please make sure your connection is working properly!\n"
-            "[!] HTTP Error Code: {0}".format(response.status_code)
-        )
+        if not gui_enabled:
+            print(
+                "[!] There was an error with accessing the ProtonVPN API.\n"
+                "[!] Please make sure your connection is working properly!\n"
+                "[!] HTTP Error Code: {0}".format(response.status_code)
+            )
         gui_logger.debug("Bad Return Code: {0}".format(response.status_code))
         if not gui_enabled:
             sys.exit(1)
@@ -75,6 +75,8 @@ def call_api(endpoint, json_format=True, handle_errors=True, gui_enabled=False):
         gui_logger.debug("Successful non-json response")
         return response
 
+    if gui_enabled:
+        return True
 
 def pull_server_data(force=False):
     """Pull current server data from the ProtonVPN API."""
