@@ -177,17 +177,16 @@ def fastest(protocol=None, gui_enabled=False):
     openvpn_connect(fastest_server, protocol, has_disconnected=True, servers=servers)
 
 
-def country_f(country_code, protocol=None):
+def country_f(country_code, protocol=None, gui_enabled=False):
     """Connect to the fastest server in a specific country."""
     gui_logger.debug("Starting fastest country connect")
+    if not gui_enabled:
+        if not protocol:
+            protocol = get_config_value("USER", "default_protocol")
 
-    if not protocol:
-        protocol = get_config_value("USER", "default_protocol")
-
-    country_code = country_code.strip().upper()
-
-    disconnect(passed=True)
-    pull_server_data(force=True)
+        country_code = country_code.strip().upper()
+        # disconnect(passed=True)
+        pull_server_data(force=True)
 
     servers = get_servers()
 
@@ -210,6 +209,8 @@ def country_f(country_code, protocol=None):
         sys.exit(1)
 
     fastest_server = get_fastest_server(server_pool)
+    if gui_enabled:
+        return openvpn_connect(fastest_server, protocol, gui_enabled=True, servers=servers)
     openvpn_connect(fastest_server, protocol)
 
 

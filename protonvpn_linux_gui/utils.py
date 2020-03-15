@@ -29,7 +29,7 @@ import gi
 
 # Gtk3 import
 gi.require_version('Gtk', '3.0')
-from gi.repository import GObject as gobject
+from gi.repository import GObject as gobject, Gtk
 
 def message_dialog(interface, action, label_object, spinner_object, sub_label_object=False):
     # time.sleep(1)
@@ -246,18 +246,20 @@ def load_on_start(params_dict):
 
     conn = check_internet_conn()
     if not conn == False and not conn == None:
+        params_dict["messagedialog_label"].set_markup("Populating dashboard...")
         update_labels_server_list(params_dict["interface"], conn_info=conn)
+        return True
         # p = Thread(target=update_labels_server_list, args=[interface])
         # p.daemon = True
         # p.start()
     else:
         return False
 
-def update_labels_server_list(interface, server_list_obj=False, conn_info=False):
-    if not server_list_obj:
-        server_list_object = interface.get_object("ServerListStore")
+def update_labels_server_list(interface, server_tree_list_object=False, conn_info=False):
+    if not server_tree_list_object:
+        server_tree_list_obj = interface.get_object("ServerTreeStore")
     else:
-        server_list_object = server_list_obj
+        server_tree_list_obj = server_tree_list_object
 
     gui_logger.debug(">>> Running \"update_labels_server_list\" getting servers.")
 
@@ -273,7 +275,7 @@ def update_labels_server_list(interface, server_list_obj=False, conn_info=False)
     }
 
     populate_servers_dict = {
-        "list_object": server_list_object,
+        "tree_object": server_tree_list_obj,
         "servers": servers
     }
 
@@ -512,7 +514,7 @@ def load_configurations(interface):
 def populate_server_list(populate_servers_dict):
     """Populates Dashboard with servers
     """
-    pull_server_data()
+    pull_server_data(force=True)
 
     features = {0: "Normal", 1: "Secure-Core", 2: "Tor", 4: "P2P"}
     server_tiers = {0: "Free", 1: "Basic", 2: "Plus/Visionary"}
@@ -538,8 +540,14 @@ def populate_server_list(populate_servers_dict):
                 countries[country],
                 key=lambda s: get_server_value(s, "Load", servers)
             )
-        populate_servers_dict["list_object"].clear()
+        populate_servers_dict["tree_object"].clear()
+        
         for country in country_servers:
+
+            avrg_load, country_features = get_country_avrg_features(country, country_servers, servers, features)
+
+            country_row = populate_servers_dict["tree_object"].append(None, [country, "", "", avrg_load, country_features])
+
             for servername in country_servers[country]:
                 load = str(get_server_value(servername, "Load", servers)).rjust(3, " ")
                 load = load + "%"
@@ -548,7 +556,34 @@ def populate_server_list(populate_servers_dict):
 
                 tier = server_tiers[get_server_value(servername, "Tier", servers)]
 
-                populate_servers_dict["list_object"].append([country, servername, tier, load, feature])
+                populate_servers_dict["tree_object"].append(country_row, [country, servername, tier, load, feature])
+
+def get_country_avrg_features(country, country_servers, servers, features):
+    """Returns average load and features of a specific country."""
+    # Variables for aberage per country
+    count = 0
+    load_sum = 0
+
+    # Variables for feature per country
+    features_per_country = set()
+
+    for servername in country_servers[country]:
+
+        # Get average per country
+        load_sum = load_sum + int(str(get_server_value(servername, "Load", servers)).rjust(3, " "))
+        count += 1
+
+        # Get features per country
+        feature = features[get_server_value(servername, 'Features', servers)]
+        features_per_country.add(feature)
+    
+    # Convert set to list
+    country_feature_list = list(features_per_country)
+
+    return  (
+            str(int(round(load_sum/count)))+"%", 
+            ' / '.join(str(feature) for feature in country_feature_list) if len(country_feature_list) > 1 else country_feature_list[0]
+            )    
 
 # Autoconnect 
 #

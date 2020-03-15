@@ -81,7 +81,7 @@ def cli():
     """Run user's input command."""
 
     # Initial log values
-    change_file_owner(os.path.join(CONFIG_DIR, "pvpn-cli.log"))
+    change_file_owner(os.path.join(CONFIG_DIR, "protonvpn-gui.log"))
     gui_logger.debug("###########################")
     gui_logger.debug("### NEW PROCESS STARTED ###")
     gui_logger.debug("###########################")

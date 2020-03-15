@@ -9,6 +9,7 @@ import concurrent.futures
 from custom_pvpn_cli_ng.protonvpn_cli.utils import get_config_value, is_valid_ip
 from custom_pvpn_cli_ng.protonvpn_cli import cli
 from custom_pvpn_cli_ng.protonvpn_cli import connection
+from custom_pvpn_cli_ng.protonvpn_cli.country_codes import country_codes
 
 # Custom helper functions
 from .utils import (
@@ -38,36 +39,21 @@ def load_content_on_start(objects):
         
         params_dict = {
             "interface": objects["interface"],
+            "messagedialog_label": objects["messagedialog_label"]
         }
 
-        objects["messagedialog_label"].set_markup("Populating dashboard...")
+        # objects["messagedialog_label"].set_markup("Populating dashboard...")
         objects["messagedialog_spinner"].hide()
 
         future = executor.submit(load_on_start, params_dict)
         return_value = future.result()
         
-        if return_value == None and not return_value == False:
+        if return_value:
             objects["messagedialog_window"].hide()
         else:
             objects["messagedialog_label"].set_markup("Could not load necessary resources, there might be connectivity issues.")
 
     gui_logger.debug(">>> Ended tasks in \"load_on_start\" thread.")    
-
-    # result = load_on_start(objects["interface"])
-
-    # # objects["messagedialog_label"].set_markup("Populating dashboard...")
-    # objects["messagedialog_spinner"].hide()
-    
-    # msg = ""
-    # print(result)
-    # if result == None and result == False:
-    #     objects["messagedialog_window"].hide()
-    
-    # msg = "Could not load necessary resources, there might be connectivity issues."
-
-    # objects["messagedialog_label"].set_markup(msg)
-
-    # gui_logger.debug(">>> Ended tasks in \"load_on_start\" thread.")
 
 # Login handler
 def on_login(interface):
@@ -102,9 +88,16 @@ def connect_to_selected_server(interface, selected_server, messagedialog_label, 
 
     gui_logger.debug(">>> Running \"openvpn_connect\".")
 
-    # openvpn needs to be changed
-    result, servers = connection.openvpn_connect(selected_server, protocol, gui_enabled=True)
-    
+    #check if should connect to country or server
+    if not selected_server["selected_country"]:
+        result, servers = connection.openvpn_connect(selected_server["selected_server"], protocol, gui_enabled=True)
+    else:
+        for k, v in country_codes.items():
+            if v == selected_server["selected_country"]:
+                selected_country = k
+                break
+        result, servers = connection.country_f(selected_country, protocol, gui_enabled=True)
+
     update_labels_dict = {
         "interface": interface,
         "servers": servers if servers else False,
