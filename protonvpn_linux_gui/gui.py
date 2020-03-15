@@ -86,7 +86,8 @@ class Handler:
         """Event handler, to filter servers after each key release
         """
         user_filter_by = object.get_text()
-        server_list_object = self.interface.get_object("ServerListStore")
+        # server_list_object = self.interface.get_object("ServerListStore")
+        server_list_object = self.interface.get_object("ServerTreeStore")
         tree_view_object = self.interface.get_object("ServerList")
 
         # Creates a new filter from a ListStore
