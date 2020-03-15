@@ -38,7 +38,6 @@ def load_content_on_start(objects):
         
         params_dict = {
             "interface": objects["interface"],
-            "gui_enabled": True
         }
 
         objects["messagedialog_label"].set_markup("Populating dashboard...")
