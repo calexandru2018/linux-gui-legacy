@@ -9,6 +9,7 @@ import concurrent.futures
 from custom_pvpn_cli_ng.protonvpn_cli.utils import get_config_value, is_valid_ip
 from custom_pvpn_cli_ng.protonvpn_cli import cli
 from custom_pvpn_cli_ng.protonvpn_cli import connection
+from custom_pvpn_cli_ng.protonvpn_cli.country_codes import country_codes
 
 # Custom helper functions
 from .utils import (
@@ -86,9 +87,16 @@ def connect_to_selected_server(interface, selected_server, messagedialog_label, 
 
     gui_logger.debug(">>> Running \"openvpn_connect\".")
 
-    # openvpn needs to be changed
-    result, servers = connection.openvpn_connect(selected_server, protocol, gui_enabled=True)
-    
+    #check if should connect to country or server
+    if not selected_server["selected_country"]:
+        result, servers = connection.openvpn_connect(selected_server["selected_server"], protocol, gui_enabled=True)
+    else:
+        for k, v in country_codes.items():
+            if v == selected_server["selected_country"]:
+                selected_country = k
+                break
+        result, servers = connection.country_f(selected_country, protocol, gui_enabled=True)
+
     update_labels_dict = {
         "interface": interface,
         "servers": servers if servers else False,
