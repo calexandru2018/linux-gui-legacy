@@ -39,15 +39,16 @@ def load_content_on_start(objects):
         
         params_dict = {
             "interface": objects["interface"],
+            "messagedialog_label": objects["messagedialog_label"]
         }
 
-        objects["messagedialog_label"].set_markup("Populating dashboard...")
+        # objects["messagedialog_label"].set_markup("Populating dashboard...")
         objects["messagedialog_spinner"].hide()
 
         future = executor.submit(load_on_start, params_dict)
         return_value = future.result()
         
-        if return_value == None and not return_value == False:
+        if return_value:
             objects["messagedialog_window"].hide()
         else:
             objects["messagedialog_label"].set_markup("Could not load necessary resources, there might be connectivity issues.")
