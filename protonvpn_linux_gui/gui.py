@@ -529,7 +529,7 @@ def initialize_gui():
 
     interface = Gtk.Builder()
 
-    posixPath = pathlib.PurePath(pathlib.Path(__file__).parent.absolute().joinpath("resources/main.glade"))
+    posixPath = pathlib.PurePath(pathlib.Path(__file__).parent.absolute().joinpath("resources/new_list.glade"))
     glade_path = ''
     
     for path in posixPath.parts:
