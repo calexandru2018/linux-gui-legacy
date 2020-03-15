@@ -53,22 +53,6 @@ def load_content_on_start(objects):
 
     gui_logger.debug(">>> Ended tasks in \"load_on_start\" thread.")    
 
-    # result = load_on_start(objects["interface"])
-
-    # # objects["messagedialog_label"].set_markup("Populating dashboard...")
-    # objects["messagedialog_spinner"].hide()
-    
-    # msg = ""
-    # print(result)
-    # if result == None and result == False:
-    #     objects["messagedialog_window"].hide()
-    
-    # msg = "Could not load necessary resources, there might be connectivity issues."
-
-    # objects["messagedialog_label"].set_markup(msg)
-
-    # gui_logger.debug(">>> Ended tasks in \"load_on_start\" thread.")
-
 # Login handler
 def on_login(interface):
     """Button/Event handler to intialize user account. Calls populate_server_list(server_list_object) to populate server list.
