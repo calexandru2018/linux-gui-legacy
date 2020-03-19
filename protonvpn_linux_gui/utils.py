@@ -15,8 +15,10 @@ from custom_pvpn_cli_ng.protonvpn_cli.utils import (
     get_config_value,
     is_connected,
     get_ip_info,
-    get_transferred_data
+    get_transferred_data,
 )
+
+from custom_pvpn_cli_ng.protonvpn_cli.country_codes import country_codes
 
 from custom_pvpn_cli_ng.protonvpn_cli.constants import SPLIT_TUNNEL_FILE
 
@@ -482,6 +484,14 @@ def load_configurations(interface):
     # Set OpenVPN Protocol        
     interface.get_object("protocol_tcp_update_checkbox").set_active(True) if default_protocol == "tcp" else interface.get_object("protocol_udp_update_checkbox").set_active(True)
 
+    # Set Autoconnect on boot combobox 
+    populate_autoconnect_list(interface)
+    autoconnect_combobox = interface.get_object("autoconnect_combobox")
+
+    autoconnect_setting = get_config_value("USER", "autoconnect")
+
+    autoconnect_combobox.set_active(int(autoconnect_setting))
+
     # Set Kill Switch combobox
     killswitch_combobox = interface.get_object("killswitch_combobox")
 
@@ -584,6 +594,45 @@ def get_country_avrg_features(country, country_servers, servers, features):
             str(int(round(load_sum/count)))+"%", 
             ' / '.join(str(feature) for feature in country_feature_list) if len(country_feature_list) > 1 else country_feature_list[0]
             )    
+
+def populate_autoconnect_list(interface, return_list=False):
+    autoconnect_liststore = interface.get_object("AutoconnectListStore")
+    countries = {}
+    servers = get_servers()
+    other_choice_dict = {
+        "dis": "Disabled",
+        "fast": "Fastest",
+        "rand": "Random", 
+        "p2p": "Peer2Peer", 
+        "sc": "Secure Core"
+    }
+    autoconnect_alternatives = ["dis", "fast", "rand", "p2p", "sc"]
+    return_values = []
+    for server in servers:
+        country = get_country_name(server["ExitCountry"])
+        if country not in countries.keys():
+            countries[country] = []
+        countries[country].append(server["Name"])
+    
+    for country in sorted(countries):
+        autoconnect_alternatives.append(country)
+
+    for alt in autoconnect_alternatives:
+        if alt in other_choice_dict:
+            if return_list:
+                return_values.append(other_choice_dict[alt])
+            else:
+                autoconnect_liststore.append([alt, other_choice_dict[alt]])
+        else:
+            for k,v in country_codes.items():
+                if alt.lower() == v.lower():
+                    if return_list:
+                        return_values.append(v)
+                    else:
+                        autoconnect_liststore.append([k, v])
+    
+    if return_list:
+        return return_values
 
 # Autoconnect 
 #
