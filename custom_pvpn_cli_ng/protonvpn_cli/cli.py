@@ -162,6 +162,7 @@ def init_cli(gui_enabled=False, gui_user_input=False):
             "dns_leak_protection": "1",
             "custom_dns": "None",
             "check_update_interval": "3",
+            "autoconnect": "0"
         }
         config["metadata"] = {
             "last_api_pull": "0",
@@ -260,6 +261,7 @@ def init_cli(gui_enabled=False, gui_user_input=False):
         set_config_value("USER", "dns_leak_protection", 1)
         set_config_value("USER", "custom_dns", None)
         set_config_value("USER", "killswitch", 0)
+        set_config_value("USER", "autoconnect", "0")
 
         with open(PASSFILE, "w") as f:
             f.write("{0}\n{1}".format(ovpn_username, ovpn_password))

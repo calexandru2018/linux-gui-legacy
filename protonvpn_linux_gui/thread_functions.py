@@ -6,7 +6,7 @@ import subprocess
 import concurrent.futures
 
 # Import ProtonVPN methods and utils
-from custom_pvpn_cli_ng.protonvpn_cli.utils import get_config_value, is_valid_ip
+from custom_pvpn_cli_ng.protonvpn_cli.utils import get_config_value, is_valid_ip, set_config_value
 from custom_pvpn_cli_ng.protonvpn_cli import cli
 from custom_pvpn_cli_ng.protonvpn_cli import connection
 from custom_pvpn_cli_ng.protonvpn_cli.country_codes import country_codes
@@ -348,6 +348,21 @@ def update_def_protocol(interface, messagedialog_label, messagedialog_spinner):
     gui_logger.debug(">>> Result: \"{0}\"".format(result))
 
     gui_logger.debug(">>> Ended tasks in \"set_default_protocol\" thread.")   
+
+def update_autoconnect(interface, messagedialog_label, messagedialog_spinner):
+    """Button/Event handler to update Autoconnect  
+    """
+    autoconnect_combobox = interface.get_object("autoconnect_combobox")
+    active_choice = autoconnect_combobox.get_active()
+
+    gui_logger.debug(">>> Running \"update_autoconnect\".")
+
+    set_config_value("USER", "autoconnect", active_choice)
+
+    messagedialog_label.set_markup("Autoconnect setting updated!")
+    messagedialog_spinner.hide()
+
+    gui_logger.debug(">>> Ended tasks in \"set_default_protocol\" thread.") 
 
 def update_killswitch(interface, messagedialog_label, messagedialog_spinner):
     """Button/Event handler to update Killswitch  

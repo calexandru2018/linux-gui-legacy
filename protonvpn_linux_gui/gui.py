@@ -45,7 +45,8 @@ from .thread_functions import(
     update_split_tunneling,
     purge_configurations,
     kill_duplicate_gui_process,
-    load_content_on_start
+    load_content_on_start,
+    update_autoconnect
 )
 
 # Import version
@@ -453,6 +454,24 @@ class Handler:
         gui_logger.debug(">>> Starting \"update_def_protocol\" thread.")
 
         thread = Thread(target=update_def_protocol, args=[self.interface, messagedialog_label, messagedialog_spinner])
+        thread.daemon = True
+        thread.start()
+
+        messagedialog_window.show()
+    
+    # Autoconnect on boot
+    def autoconnect_button_clicked(self, button):
+        messagedialog_window = self.interface.get_object("MessageDialog")
+        messagedialog_label = self.interface.get_object("message_dialog_label")
+        messagedialog_sub_label = self.interface.get_object("message_dialog_sub_label").hide()
+        messagedialog_spinner = self.interface.get_object("message_dialog_spinner")
+        
+        messagedialog_label.set_markup("Updating autoconnect settings...")
+        messagedialog_spinner.show()
+
+        gui_logger.debug(">>> Starting \"update_def_protocol\" thread.")
+
+        thread = Thread(target=update_autoconnect, args=[self.interface, messagedialog_label, messagedialog_spinner])
         thread.daemon = True
         thread.start()
 
