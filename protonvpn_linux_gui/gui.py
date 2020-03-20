@@ -469,7 +469,7 @@ class Handler:
         messagedialog_label.set_markup("Updating autoconnect settings...")
         messagedialog_spinner.show()
 
-        gui_logger.debug(">>> Starting \"update_def_protocol\" thread.")
+        gui_logger.debug(">>> Starting \"autoconnect_button_clicked\" thread.")
 
         thread = Thread(target=update_autoconnect, args=[self.interface, messagedialog_label, messagedialog_spinner])
         thread.daemon = True
