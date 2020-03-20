@@ -50,7 +50,7 @@ from .thread_functions import(
 )
 
 # Import version
-from .constants import VERSION
+from .constants import VERSION, HELP_TEXT
 
 # PyGObject import
 import gi
@@ -282,7 +282,7 @@ class Handler:
         """Button /Event handlerto open About dialog
         """
         about_dialog = self.interface.get_object("AboutDialog")
-        about_dialog.set_version(VERSION)
+        about_dialog.set_version("v."+VERSION)
         about_dialog.show()
 
     def diagnose_menu_button_clicked(self, button):
@@ -321,8 +321,15 @@ class Handler:
         messagedialog_window.show()
 
     def help_button_clicked(self, button):
-        # To-do
-        print("To-do show help.")
+        messagedialog_window = self.interface.get_object("MessageDialog")
+        messagedialog_label = self.interface.get_object("message_dialog_label")
+        messagedialog_sub_label = self.interface.get_object("message_dialog_sub_label").hide()
+        messagedialog_spinner = self.interface.get_object("message_dialog_spinner").hide()
+
+        messagedialog_label.set_markup(HELP_TEXT)
+
+        messagedialog_window.show()
+
 
     def close_message_dialog(self, button):
         self.interface.get_object("MessageDialog").hide()
