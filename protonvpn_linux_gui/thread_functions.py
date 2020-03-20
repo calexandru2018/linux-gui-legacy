@@ -6,7 +6,7 @@ import subprocess
 import concurrent.futures
 
 # Import ProtonVPN methods and utils
-from custom_pvpn_cli_ng.protonvpn_cli.utils import get_config_value, is_valid_ip
+from custom_pvpn_cli_ng.protonvpn_cli.utils import get_config_value, is_valid_ip, set_config_value
 from custom_pvpn_cli_ng.protonvpn_cli import cli
 from custom_pvpn_cli_ng.protonvpn_cli import connection
 from custom_pvpn_cli_ng.protonvpn_cli.country_codes import country_codes
@@ -20,7 +20,9 @@ from .utils import (
     load_configurations,
     is_connected,
     update_labels_server_list,
-    get_gui_processes
+    get_gui_processes,
+    manage_autoconnect,
+    populate_autoconnect_list
 )
 
 # Import GUI logger
@@ -348,6 +350,48 @@ def update_def_protocol(interface, messagedialog_label, messagedialog_spinner):
     gui_logger.debug(">>> Result: \"{0}\"".format(result))
 
     gui_logger.debug(">>> Ended tasks in \"set_default_protocol\" thread.")   
+
+def update_autoconnect(interface, messagedialog_label, messagedialog_spinner):
+    """Button/Event handler to update Autoconnect  
+    """
+    autoconnect_combobox = interface.get_object("autoconnect_combobox")
+    active_choice = autoconnect_combobox.get_active()
+    selected_country = False 
+
+    gui_logger.debug(">>> Running \"update_autoconnect\".")
+
+    set_config_value("USER", "autoconnect", active_choice)
+
+    # autoconnect_alternatives = ["dis", "fast", "rand", "p2p", "sc", "tor"]
+    manage_autoconnect(mode="disable")
+
+    if active_choice == 1:
+        manage_autoconnect(mode="enable", command="connect -f")
+    elif active_choice == 2:
+        manage_autoconnect(mode="enable", command="connect -r")
+    elif active_choice == 3:
+        manage_autoconnect(mode="enable", command="connect --p2p")
+    elif active_choice == 4:
+        manage_autoconnect(mode="enable", command="connect --sc")
+    elif active_choice == 5:
+        manage_autoconnect(mode="enable", command="connect --tor")
+    elif active_choice > 5:
+        # Connect to a specific country
+        country_list = populate_autoconnect_list(interface, return_list=True)
+        selected_country = country_list[active_choice]
+        for k, v in country_codes.items():
+            if v == selected_country:
+                selected_country = k
+                break
+        if not selected_country:
+            print("[!] Unable to find country code")
+            return False
+        manage_autoconnect(mode="enable", command="connect --cc " + selected_country.upper())
+
+    messagedialog_label.set_markup("Autoconnect setting updated!")
+    messagedialog_spinner.hide()
+
+    gui_logger.debug(">>> Ended tasks in \"update_autoconnect\" thread.") 
 
 def update_killswitch(interface, messagedialog_label, messagedialog_spinner):
     """Button/Event handler to update Killswitch  
