@@ -127,7 +127,7 @@ If you would like to launch the GUI without having to type in your sudo password
 - ~~Split Tunneling~~
 - ~~Kill Switch~~
 - ~~Filtering servers~~
-- Start on Boot (only for systemd OS's)
+- ~~Start on Boot~~ (only for systemd/systemctl based OS's)
 
 ## GUI Layout
 <p align="center">
