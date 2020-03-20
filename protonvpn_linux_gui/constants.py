@@ -10,6 +10,7 @@ Wants=network-online.target
 [Service]
 Type=forking
 ExecStart=PATH
+ExecStop=STOP
 Environment=PVPN_WAIT=300
 Environment=PVPN_DEBUG=1
 Environment=SUDO_USER=user
