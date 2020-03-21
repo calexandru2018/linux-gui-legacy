@@ -20,7 +20,8 @@ from custom_pvpn_cli_ng.protonvpn_cli.utils import (
 
 from custom_pvpn_cli_ng.protonvpn_cli.country_codes import country_codes
 
-from custom_pvpn_cli_ng.protonvpn_cli.constants import SPLIT_TUNNEL_FILE, USER
+from custom_pvpn_cli_ng.protonvpn_cli.constants import SPLIT_TUNNEL_FILE, USER, CONFIG_FILE, PASSFILE
+from custom_pvpn_cli_ng.protonvpn_cli.utils import change_file_owner, make_ovpn_template, set_config_value
 
 from .constants import PATH_AUTOCONNECT_SERVICE, TEMPLATE, VERSION, GITHUB_URL_RELEASE, SERVICE_NAME
 
@@ -215,9 +216,6 @@ def prepare_initilizer(username_field, password_field, interface):
     protonvpn_plan = ''
     openvpn_protocol = 'tcp' if interface.get_object('protocol_tcp_checkbox').get_active() == True else 'udp'
     
-    if len(username_field) == 0 or len(password_field) == 0:
-        return
-
     protonvpn_plans = {
         '1': interface.get_object('member_free').get_active(),
         '2': interface.get_object('member_basic').get_active(),
