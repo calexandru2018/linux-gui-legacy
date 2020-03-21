@@ -9,11 +9,10 @@ import concurrent.futures
 import queue
 
 # ProtonVPN base CLI package import
-from custom_pvpn_cli_ng.protonvpn_cli.constants import (USER, CONFIG_FILE, CONFIG_DIR)
-from custom_pvpn_cli_ng.protonvpn_cli import cli
+from protonvpn_cli.constants import (CONFIG_FILE, CONFIG_DIR) #noqa
 
 # ProtonVPN helper funcitons
-from custom_pvpn_cli_ng.protonvpn_cli.utils import check_root, get_config_value, change_file_owner
+from protonvpn_cli.utils import check_root, get_config_value, change_file_owner #noqa
 
 # Import GUI logger
 from .gui_logger import gui_logger
@@ -69,18 +68,35 @@ class Handler:
     def on_login_button_clicked(self, button):
         """Button/Event handler to intialize user account. Calls populate_server_list(server_list_object) to populate server list.
         """     
+        messagedialog_window = self.interface.get_object("MessageDialog")
+        messagedialog_label = self.interface.get_object("message_dialog_label")
+        messagedialog_sub_label = self.interface.get_object("message_dialog_sub_label").hide()
+        messagedialog_spinner = self.interface.get_object("message_dialog_spinner")
+        
         login_window = self.interface.get_object("LoginWindow")
         user_window = self.interface.get_object("DashboardWindow")
+        
+        messagedialog_label.set_markup("Initializing profile...")
+        messagedialog_spinner.show()
 
-        with concurrent.futures.ThreadPoolExecutor() as executor:
-            future = executor.submit(on_login, self.interface)
-            return_value = future.result()
+        thread = Thread(target=on_login, args=[self.interface, messagedialog_label, user_window, login_window, messagedialog_window]).start()
+        # thread.daemon = True
+        # thread.start()
+
+        messagedialog_window.show()
+        # with concurrent.futures.ThreadPoolExecutor() as executor:
+        #     future = executor.submit(on_login, self.interface, messagedialog_label)
+        #     return_value = future.result()
             
-            if not return_value and not return_value is None:
-                return
+        #     if not return_value and not return_value is None:
+        #         messagedialog_spinner.hide()
+        #         messagedialog_label.set_markup("Unable to initialize profile, make sure that both field are filled and all selections were made.")
+        #         return
 
-            user_window.show()
-            login_window.destroy()    
+        #     user_window.show()
+        #     messagedialog_window.hide()
+        #     messagedialog_spinner.hide()
+        #     login_window.destroy()    
 
     # Dashboard BUTTON HANDLERS
     def server_filter_input_key_release(self, object, event):
