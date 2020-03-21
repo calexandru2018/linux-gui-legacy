@@ -1,15 +1,17 @@
+import os
 import re
 import time
 import requests
 import json
 import subprocess
 import concurrent.futures
+import configparser
 
-# Import ProtonVPN methods and utils
-from custom_pvpn_cli_ng.protonvpn_cli.utils import get_config_value, is_valid_ip, set_config_value
-from custom_pvpn_cli_ng.protonvpn_cli import cli
-from custom_pvpn_cli_ng.protonvpn_cli import connection
-from custom_pvpn_cli_ng.protonvpn_cli.country_codes import country_codes
+# Import ProtonVPN methods, utils and constants
+from protonvpn_cli.constants import USER, CONFIG_FILE, CONFIG_DIR, PASSFILE #noqa
+from protonvpn_cli.utils import get_config_value, is_valid_ip, set_config_value, change_file_owner, pull_server_data, make_ovpn_template #noqa
+from protonvpn_cli import cli, connection #noqa
+from protonvpn_cli.country_codes import country_codes #noqa
 
 # Custom helper functions
 from .utils import (
@@ -58,29 +60,79 @@ def load_content_on_start(objects):
     gui_logger.debug(">>> Ended tasks in \"load_on_start\" thread.")    
 
 # Login handler
-def on_login(interface):
+def on_login(interface, messagedialog_label, user_window, login_window, messagedialog_window):
     """Button/Event handler to intialize user account. Calls populate_server_list(server_list_object) to populate server list.
     """     
     username_field = interface.get_object('username_field').get_text().strip()
     password_field = interface.get_object('password_field').get_text().strip()
     
-    if len(username_field) == 0 or len(password_field) == 0:
-        gui_logger.debug("[!] One of the fields were left empty upon profile initialization.")
-        return False
-
-    user_data = prepare_initilizer(username_field, password_field, interface)
     server_list_object = interface.get_object("ServerListStore")
-
+    
     populate_servers_dict = {
         "list_object": server_list_object,
         "servers": False
     }
 
-    if not cli.init_cli(gui_enabled=True, gui_user_input=user_data):
-        return
+    if len(username_field) == 0 or len(password_field) == 0:
+        gui_logger.debug("[!] One of the fields were left empty upon profile initialization.")
+        return False
 
-    load_on_start({"interface":interface, "gui_enabled": True})
-    # populate_server_list(populate_servers_dict)
+    user_data = prepare_initilizer(username_field, password_field, interface)
+    
+    config = configparser.ConfigParser()
+    config["USER"] = {
+        "username": "None",
+        "tier": "None",
+        "default_protocol": "None",
+        "initialized": "0",
+        "dns_leak_protection": "1",
+        "custom_dns": "None",
+        "check_update_interval": "3",
+        "autoconnect": "0"
+    }
+    config["metadata"] = {
+        "last_api_pull": "0",
+        "last_update_check": str(int(time.time())),
+    }
+    with open(CONFIG_FILE, "w") as f:
+        config.write(f)
+    change_file_owner(CONFIG_FILE)
+    gui_logger.debug("pvpn-cli.cfg initialized")
+
+    change_file_owner(CONFIG_DIR)
+
+    ovpn_username = user_data['username']
+    ovpn_password = user_data['password']
+    user_tier = user_data['protonvpn_plan']
+    user_protocol = user_data['openvpn_protocol']
+
+    pull_server_data(force=True)
+    make_ovpn_template()
+
+    if user_tier == 4:
+        user_tier = 3
+    user_tier -= 1
+
+    set_config_value("USER", "username", ovpn_username)
+    set_config_value("USER", "tier", user_tier)
+    set_config_value("USER", "default_protocol", user_protocol)
+    set_config_value("USER", "dns_leak_protection", 1)
+    set_config_value("USER", "custom_dns", None)
+    set_config_value("USER", "killswitch", 0)
+    set_config_value("USER", "autoconnect", "0")
+
+    with open(PASSFILE, "w") as f:
+        f.write("{0}\n{1}".format(ovpn_username, ovpn_password))
+        gui_logger.debug("Passfile created")
+        os.chmod(PASSFILE, 0o600)
+
+    set_config_value("USER", "initialized", 1)
+    user_window.show()
+    messagedialog_window.hide()
+    # messagedialog_spinner.hide()
+    login_window.destroy()   
+    # return load_on_start({"interface":interface, "gui_enabled": True, "messagedialog_label": messagedialog_label})
+    load_on_start({"interface":interface, "gui_enabled": True, "messagedialog_label": messagedialog_label})
 
 # Dashboard hanlder
 def connect_to_selected_server(interface, selected_server, messagedialog_label, messagedialog_spinner):
