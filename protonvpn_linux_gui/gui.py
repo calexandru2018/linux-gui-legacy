@@ -12,7 +12,7 @@ try:
 
     # ProtonVPN helper funcitons
     from protonvpn_cli.utils import check_root, get_config_value, change_file_owner #noqa
-except ModuleNotFoundError:
+except:
     pass
 
 # Import GUI logger

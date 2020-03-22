@@ -4,7 +4,7 @@ import os
 from logging.handlers import RotatingFileHandler
 try:
     from protonvpn_cli.constants import CONFIG_DIR
-except ModuleNotFoundError:
+except:
     pass
 
 def get_logger():

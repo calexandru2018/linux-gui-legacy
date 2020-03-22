@@ -23,7 +23,7 @@ try:
 
     from protonvpn_cli.constants import SPLIT_TUNNEL_FILE, USER, CONFIG_FILE, PASSFILE
     from protonvpn_cli.utils import change_file_owner, make_ovpn_template, set_config_value
-except ModuleNotFoundError:
+except:
     pass
 
 from .constants import PATH_AUTOCONNECT_SERVICE, TEMPLATE, VERSION, GITHUB_URL_RELEASE, SERVICE_NAME
