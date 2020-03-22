@@ -2,7 +2,7 @@ import logging
 import os
 
 from logging.handlers import RotatingFileHandler
-from custom_pvpn_cli_ng.protonvpn_cli.constants import CONFIG_DIR
+from protonvpn_cli.constants import CONFIG_DIR
 
 def get_logger():
     """Create the logger.

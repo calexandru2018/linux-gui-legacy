@@ -1,13 +1,10 @@
 # Default package import
 import os
-import re
 import sys
 import pathlib
 from threading import Thread
 from queue import Queue
 import time
-import concurrent.futures
-import queue
 
 # ProtonVPN base CLI package import
 from protonvpn_cli.constants import (CONFIG_FILE, CONFIG_DIR) #noqa
