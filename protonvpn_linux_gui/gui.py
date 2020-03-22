@@ -4,6 +4,7 @@ import re
 import sys
 import pathlib
 from threading import Thread
+from queue import Queue
 import time
 import concurrent.futures
 import queue
@@ -63,6 +64,7 @@ class Handler:
     """
     def __init__(self, interface): 
         self.interface = interface
+        self.queue = Queue()
 
     # Login BUTTON HANDLER
     def on_login_button_clicked(self, button):
@@ -76,27 +78,22 @@ class Handler:
         login_window = self.interface.get_object("LoginWindow")
         user_window = self.interface.get_object("DashboardWindow")
         
-        messagedialog_label.set_markup("Initializing profile...")
-        messagedialog_spinner.show()
+        username_field = self.interface.get_object('username_field').get_text().strip()
+        password_field = self.interface.get_object('password_field').get_text().strip()
 
-        thread = Thread(target=on_login, args=[self.interface, messagedialog_label, user_window, login_window, messagedialog_window]).start()
-        # thread.daemon = True
-        # thread.start()
+        if len(username_field) == 0 or len(password_field) == 0:
+            gui_logger.debug("[!] One of the fields were left empty upon profile initialization.")
+            messagedialog_spinner.hide()
+            messagedialog_label.set_markup("Username and password need to be provided.")
+            messagedialog_window.show()
+            return
 
-        messagedialog_window.show()
-        # with concurrent.futures.ThreadPoolExecutor() as executor:
-        #     future = executor.submit(on_login, self.interface, messagedialog_label)
-        #     return_value = future.result()
-            
-        #     if not return_value and not return_value is None:
-        #         messagedialog_spinner.hide()
-        #         messagedialog_label.set_markup("Unable to initialize profile, make sure that both field are filled and all selections were made.")
-        #         return
+        thread = Thread(target=on_login, args=[self.interface, username_field, password_field, messagedialog_label, user_window, login_window, messagedialog_window])
+        thread.daemon = True
+        thread.start()
 
-        #     user_window.show()
-        #     messagedialog_window.hide()
-        #     messagedialog_spinner.hide()
-        #     login_window.destroy()    
+        user_window.show()
+        login_window.destroy()    
 
     # Dashboard BUTTON HANDLERS
     def server_filter_input_key_release(self, object, event):

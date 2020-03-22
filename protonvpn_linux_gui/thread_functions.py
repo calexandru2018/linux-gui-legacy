@@ -60,22 +60,15 @@ def load_content_on_start(objects):
     gui_logger.debug(">>> Ended tasks in \"load_on_start\" thread.")    
 
 # Login handler
-def on_login(interface, messagedialog_label, user_window, login_window, messagedialog_window):
+def on_login(interface, username_field, password_field, messagedialog_label, user_window, login_window, messagedialog_window):
     """Button/Event handler to intialize user account. Calls populate_server_list(server_list_object) to populate server list.
     """     
-    username_field = interface.get_object('username_field').get_text().strip()
-    password_field = interface.get_object('password_field').get_text().strip()
-    
     server_list_object = interface.get_object("ServerListStore")
     
     populate_servers_dict = {
         "list_object": server_list_object,
         "servers": False
     }
-
-    if len(username_field) == 0 or len(password_field) == 0:
-        gui_logger.debug("[!] One of the fields were left empty upon profile initialization.")
-        return False
 
     user_data = prepare_initilizer(username_field, password_field, interface)
     
@@ -127,11 +120,7 @@ def on_login(interface, messagedialog_label, user_window, login_window, messaged
         os.chmod(PASSFILE, 0o600)
 
     set_config_value("USER", "initialized", 1)
-    user_window.show()
-    messagedialog_window.hide()
-    # messagedialog_spinner.hide()
-    login_window.destroy()   
-    # return load_on_start({"interface":interface, "gui_enabled": True, "messagedialog_label": messagedialog_label})
+
     load_on_start({"interface":interface, "gui_enabled": True, "messagedialog_label": messagedialog_label})
 
 # Dashboard hanlder
