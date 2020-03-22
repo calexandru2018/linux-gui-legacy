@@ -864,6 +864,9 @@ def custom_get_ip_info():
     gui_logger.debug("Getting IP Information")
     ip_info = custom_call_api(endpoint="/vpn/location")
 
+    if not ip_info:
+        return False
+        
     ip = ip_info["IP"]
     isp = ip_info["ISP"]
     country = ip_info["Country"]
