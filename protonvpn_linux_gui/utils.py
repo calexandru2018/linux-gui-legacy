@@ -246,7 +246,10 @@ def load_on_start(params_dict):
 
     conn = check_internet_conn()
     if not conn == False and not conn == None:
-        params_dict["messagedialog_label"].set_markup("Populating dashboard...")
+        try:
+            params_dict["messagedialog_label"].set_markup("Populating dashboard...")
+        except:
+            pass
         update_labels_server_list(params_dict["interface"], conn_info=conn)
         return True
         # p = Thread(target=update_labels_server_list, args=[interface])

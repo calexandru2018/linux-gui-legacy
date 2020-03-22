@@ -6,7 +6,7 @@ import concurrent.futures
 import configparser
 
 # Import ProtonVPN methods, utils and constants
-from protonvpn_cli.constants import USER, CONFIG_FILE, CONFIG_DIR, PASSFILE #noqa
+from protonvpn_cli.constants import USER, CONFIG_FILE, CONFIG_DIR, PASSFILE, SPLIT_TUNNEL_FILE #noqa
 from protonvpn_cli.utils import get_config_value, is_valid_ip, set_config_value, change_file_owner, pull_server_data, make_ovpn_template #noqa
 from protonvpn_cli import cli, connection #noqa
 from protonvpn_cli.country_codes import country_codes #noqa
@@ -311,10 +311,10 @@ def update_user_pass(interface, messagedialog_label, messagedialog_spinner):
         gui_logger.debug("Passfile updated")
         os.chmod(PASSFILE, 0o600)
 
-        messagedialog_label.set_markup("Username and password updated!")
+        messagedialog_label.set_markup("Username and password updated.")
         password_field.set_text("")
         messagedialog_spinner.hide()
-
+        messagedialog_label.set_markup("Username and password updated.")
 
     gui_logger.debug(">>> Ended tasks in \"set_username_password\" thread.")
 
@@ -323,7 +323,8 @@ def update_dns(interface, messagedialog_label, messagedialog_spinner):
     """Button/Event handler to update DNS protection 
     """
     dns_combobox = interface.get_object("dns_preferens_combobox")
-
+    text_message = ""
+    custom_dns_ip = "The following IPs were added:\n"
     if (not dns_combobox.get_active() == 0) and (not dns_combobox.get_active() == 2):
         dns_leak_protection = 0
 
@@ -343,24 +344,32 @@ def update_dns(interface, messagedialog_label, messagedialog_spinner):
                 messagedialog_label.set_markup("<b>{0}</b> is not valid.\nNone of the DNS were added, please try again with a different DNS.".format(ip))
                 gui_logger.debug("[!] Invalid IP \"{0}\".".format(ip))
                 return
+            custom_dns_ip = custom_dns_ip + " " + ip + "\n"
+        
+        text_message = "custom setting"
 
     elif dns_combobox.get_active() == 2:
         dns_leak_protection = 0
         custom_dns = None
         interface.get_object("dns_custom_input").set_text("")
+        text_message = "disabled"
     else:
         dns_leak_protection = 1
         custom_dns = None
         interface.get_object("dns_custom_input").set_text("")
+        text_message = "enabled"
     
     gui_logger.debug(">>> Running \"set_dns_protection\".")
 
-    result = cli.set_dns_protection(gui_enabled=True, dns_settings=(dns_leak_protection, custom_dns))
+    # result = cli.set_dns_protection(gui_enabled=True, dns_settings=(dns_leak_protection, custom_dns))
 
-    messagedialog_label.set_markup(result)
+    set_config_value("USER", "dns_leak_protection", dns_leak_protection)
+    set_config_value("USER", "custom_dns", custom_dns)
+
+    messagedialog_label.set_markup("DNS Management updated to <b>{0}</b>.\n{1}".format(text_message, "" if not custom_dns else custom_dns_ip))
     messagedialog_spinner.hide()
 
-    gui_logger.debug(">>> Result: \"{0}\"".format(result))
+    gui_logger.debug(">>> Result: \"{0}\"".format("DNS Management updated."))
 
     gui_logger.debug(">>> Ended tasks in \"set_dns_protection\" thread.")
 
@@ -368,27 +377,36 @@ def update_pvpn_plan(interface, messagedialog_label, messagedialog_spinner):
     """Button/Event handler to update ProtonVPN Plan  
     """
     protonvpn_plan = 0
-    protonvpn_plans = {
+    protonvpn_plans = {1: "Free", 2: "Basic", 3: "Plus", 4: "Visionary"}
+    protonvpn_radios = {
         1: interface.get_object("member_free_update_checkbox").get_active(),
         2: interface.get_object("member_basic_update_checkbox").get_active(),
         3: interface.get_object("member_plus_update_checkbox").get_active(),
         4: interface.get_object("member_visionary_update_checkbox").get_active()
     }
 
-    for k,v in protonvpn_plans.items():
+    gui_logger.debug(">>> Running \"set_protonvpn_tier\".")
+
+    for k,v in protonvpn_radios.items():
         if v == True:
             protonvpn_plan = int(k)
             break
-        
-    gui_logger.debug(">>> Running \"set_protonvpn_tier\".")
+    
+    if protonvpn_plan == 4:
+        protonvpn_plan = 3
 
-    result = cli.set_protonvpn_tier(write=True, gui_enabled=True, tier=protonvpn_plan)
+    # Lower tier by one to match API allocation
+    protonvpn_plan -= 1    
 
-    messagedialog_label.set_markup(result)
+    set_config_value("USER", "tier", str(protonvpn_plan))
+    # result = cli.set_protonvpn_tier(write=True, gui_enabled=True, tier=protonvpn_plan)
+
+    messagedialog_label.set_markup("ProtonVPN Plan has been updated to <b>{}</b>!\nServers list will be refreshed.".format(protonvpn_plans[int(protonvpn_plan+1)]))
     messagedialog_spinner.hide()
 
-    gui_logger.debug(">>> Result: \"{0}\"".format(result))
+    gui_logger.debug(">>> Result: \"{0}\"".format("ProtonVPN Plan has been updated!"))
 
+    # gobject.idle_add(load_on_start, {"interface":interface, "gui_enabled": True})
     load_on_start({"interface":interface, "gui_enabled": True})     
 
     gui_logger.debug(">>> Ended tasks in \"set_protonvpn_tier\" thread.")   
@@ -404,7 +422,7 @@ def update_def_protocol(interface, messagedialog_label, messagedialog_spinner):
 
     set_config_value("USER", "default_protocol", openvpn_protocol)
 
-    messagedialog_label.set_markup("Protocol updated to {}".format(openvpn_protocol))
+    messagedialog_label.set_markup("Protocol updated to <b>{}</b>.".format(openvpn_protocol.upper()))
     messagedialog_spinner.hide()
 
     # gui_logger.debug(">>> Result: \"{0}\"".format(result))
@@ -417,6 +435,7 @@ def update_autoconnect(interface, messagedialog_label, messagedialog_spinner):
     autoconnect_combobox = interface.get_object("autoconnect_combobox")
     active_choice = autoconnect_combobox.get_active()
     selected_country = False 
+    display_text = "disabled"
 
     gui_logger.debug(">>> Running \"update_autoconnect\".")
 
@@ -427,14 +446,19 @@ def update_autoconnect(interface, messagedialog_label, messagedialog_spinner):
 
     if active_choice == 1:
         manage_autoconnect(mode="enable", command="connect -f")
+        display_text = "fastest"
     elif active_choice == 2:
         manage_autoconnect(mode="enable", command="connect -r")
+        display_text = "random"
     elif active_choice == 3:
         manage_autoconnect(mode="enable", command="connect --p2p")
+        display_text = "peer2peer"
     elif active_choice == 4:
         manage_autoconnect(mode="enable", command="connect --sc")
+        display_text = "secure-core"
     elif active_choice == 5:
         manage_autoconnect(mode="enable", command="connect --tor")
+        display_text = "tor"
     elif active_choice > 5:
         # Connect to a specific country
         country_list = populate_autoconnect_list(interface, return_list=True)
@@ -442,13 +466,14 @@ def update_autoconnect(interface, messagedialog_label, messagedialog_spinner):
         for k, v in country_codes.items():
             if v == selected_country:
                 selected_country = k
+                display_text = v
                 break
         if not selected_country:
             print("[!] Unable to find country code")
             return False
         manage_autoconnect(mode="enable", command="connect --cc " + selected_country.upper())
 
-    messagedialog_label.set_markup("Autoconnect setting updated!")
+    messagedialog_label.set_markup("Autoconnect setting updated to connect to <b>{}</b>!".format(display_text))
     messagedialog_spinner.hide()
 
     gui_logger.debug(">>> Ended tasks in \"update_autoconnect\" thread.") 
@@ -457,10 +482,26 @@ def update_killswitch(interface, messagedialog_label, messagedialog_spinner):
     """Button/Event handler to update Killswitch  
     """
     ks_combobox = interface.get_object("killswitch_combobox")
+    killswitch = ks_combobox.get_active()
+    split_tunnel_message = ""
+
+    if int(killswitch) == 0:
+        split_tunnel_extra_message = "<b>disabled</b>"
+    elif int(killswitch) == 1:
+        split_tunnel_extra_message = "<b>enabled</b> but <b>blocks</b> access to/from LAN"
+    elif int(killswitch) == 2:
+        split_tunnel_extra_message = "<b>enabled</b> and <b>allows</b> access to/from LAN"
 
     gui_logger.debug(">>> Running \"set_killswitch\".")
 
-    result = cli.set_killswitch(gui_enabled=True, user_choice=ks_combobox.get_active())
+    # result = cli.set_killswitch(gui_enabled=True, user_choice=ks_combobox.get_active())
+
+    if killswitch and int(get_config_value("USER", "split_tunnel")):
+        set_config_value("USER", "split_tunnel", 0)
+        split_tunnel_message = "Kill Switch <b>can't</b> be used with Split Tunneling.\nSplit Tunneling has been <b>disabled</b>.\n"
+
+    set_config_value("USER", "killswitch", killswitch)
+    result = split_tunnel_message + "Kill Switch configuration updated to {}!".format(split_tunnel_extra_message)
 
     messagedialog_label.set_markup(result)
     messagedialog_spinner.hide()
@@ -472,6 +513,7 @@ def update_killswitch(interface, messagedialog_label, messagedialog_spinner):
 def update_split_tunneling(interface, messagedialog_label, messagedialog_spinner):
     """Button/Event handler to update Split Tunneling 
     """
+    result = "Split tunneling configurations updated!\n"
     split_tunneling_buffer = interface.get_object("split_tunneling_textview").get_buffer()
 
     # Get text takes a start_iter, end_iter and the buffer itself as last param
@@ -495,7 +537,37 @@ def update_split_tunneling(interface, messagedialog_label, messagedialog_spinner
 
     gui_logger.debug(">>> Running \"set_split_tunnel\".")
 
-    result = cli.set_split_tunnel(gui_enabled=True, user_data=split_tunneling_content)
+    # result = cli.set_split_tunnel(gui_enabled=True, user_data=split_tunneling_content)
+
+    if len(split_tunneling_content) == 0:
+        set_config_value("USER", "split_tunnel", 0)
+        if os.path.isfile(SPLIT_TUNNEL_FILE):
+            os.remove(SPLIT_TUNNEL_FILE)
+            result = "Split tunneling <b>disabled</b>.\n\n"
+
+    if int(get_config_value("USER", "killswitch")):
+        set_config_value("USER", "killswitch", 0)
+
+        result = result + "Split Tunneling <b>can't</b> be used with Kill Switch.\nKill Switch has been <b>disabled</b>.\n\n"
+        time.sleep(1)
+
+    set_config_value("USER", "split_tunnel", 1)
+
+    with open(SPLIT_TUNNEL_FILE, "w") as f:
+        for ip in split_tunneling_content:
+            f.write("\n{0}".format(ip))
+
+    if os.path.isfile(SPLIT_TUNNEL_FILE):
+        change_file_owner(SPLIT_TUNNEL_FILE)
+
+        if len(split_tunneling_content) > 0:
+            result = result + "The following servers were added:\n\n{}".format([ip for ip in split_tunneling_content])
+    else:
+        # If no no config file exists,
+        # split tunneling should be disabled again
+        gui_logger.debug("No split tunneling file existing.")
+        set_config_value("USER", "split_tunnel", 0)
+        result = "No split tunneling file was found, split tunneling will be <b>disabled</b>.\n\n"
 
     messagedialog_label.set_markup(result)
     messagedialog_spinner.hide()
@@ -511,12 +583,16 @@ def purge_configurations(interface, messagedialog_label, messagedialog_spinner):
 
     gui_logger.debug(">>> Running \"set_split_tunnel\".")
 
-    result = cli.purge_configuration(gui_enabled=True)
+    # result = cli.purge_configuration(gui_enabled=True)
 
-    messagedialog_label.set_markup(result)
+    connection.disconnect(passed=True)
+    if os.path.isdir(CONFIG_DIR):
+        shutil.rmtree(CONFIG_DIR)
+        gui_logger.debug(">>> Result: \"{0}\"".format("Configurations purged."))
+
+    messagedialog_label.set_markup("Configurations purged.")
     messagedialog_spinner.hide()
 
-    gui_logger.debug(">>> Result: \"{0}\"".format(result))
 
     gui_logger.debug(">>> Ended tasks in \"set_split_tunnel\" thread.")   
 
