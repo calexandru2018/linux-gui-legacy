@@ -21,13 +21,10 @@ setup(
         "protonvpn_linux_gui",
         "protonvpn_linux_gui.resources",
         "protonvpn_linux_gui.resources.flags",
-        "custom_pvpn_cli_ng",
-        "custom_pvpn_cli_ng.protonvpn_cli"
         ],
     entry_points={
             "console_scripts": [
-                "protonvpn-gui = protonvpn_linux_gui.gui:initialize_gui",
-                "custom-pvpn-cli = custom_pvpn_cli_ng.protonvpn_cli.cli:main"
+                "protonvpn-gui = protonvpn_linux_gui.gui:initialize_gui"
             ]
         },
     include_package_data=True,
@@ -37,11 +34,7 @@ setup(
     author="calexandru2018",
     license="GPLv3",
     url="https://github.com/calexandru2018/protonvpn-linux-gui",
-    install_requires=[
-        "requests",
-        "docopt",
-        "pythondialog",
-    ],
+    install_requires=[],
     python_requires=">=3.5",
     classifiers=[
         "Development Status :: 4 - Beta",
