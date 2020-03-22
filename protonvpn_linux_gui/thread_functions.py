@@ -302,13 +302,19 @@ def update_user_pass(interface, messagedialog_label, messagedialog_spinner):
 
     gui_logger.debug(">>> Running \"set_username_password\".")
 
-    result = cli.set_username_password(write=True, gui_enabled=True, user_data=(username_text, password_text))
+    # result = cli.set_username_password(write=True, gui_enabled=True, user_data=(username_text, password_text))
     
-    messagedialog_label.set_markup(result)
-    password_field.set_text("")
-    messagedialog_spinner.hide()
+    set_config_value("USER", "username", username_text)
 
-    gui_logger.debug(">>> Result: \"{0}\"".format(result))
+    with open(PASSFILE, "w") as f:
+        f.write("{0}\n{1}".format(username_text, password_text))
+        gui_logger.debug("Passfile updated")
+        os.chmod(PASSFILE, 0o600)
+
+        messagedialog_label.set_markup("Username and password updated!")
+        password_field.set_text("")
+        messagedialog_spinner.hide()
+
 
     gui_logger.debug(">>> Ended tasks in \"set_username_password\" thread.")
 
