@@ -211,7 +211,7 @@ def custom_call_api(endpoint=False, request_bool=False):
         return True
 
     return response.json()
-
+    
 def check_for_updates():
 
     latest_release = ''
@@ -751,14 +751,6 @@ def find_cli():
     except:
         gui_logger.debug("[!] Unable to run \"find protonvpn-cli-ng\" subprocess.")
         protonvpn_path = False
-
-    # If protonvpn-cli-ng is not installed then attempt to get the path of 'modified protonvpn-cli'
-    if not protonvpn_path == False and protonvpn_path.returncode == 1:
-        try:
-            protonvpn_path = subprocess.run(['sudo', 'which', 'custom-pvpn-cli'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        except:
-            gui_logger.debug("[!] Unable to run \"find custom protonvpn-cli\" subprocess.")
-            protonvpn_path = False
 
     return protonvpn_path.stdout.decode()[:-1] if (not protonvpn_path == False and protonvpn_path.returncode == 0) else False
         
