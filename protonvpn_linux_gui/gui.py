@@ -222,7 +222,7 @@ class Handler:
             gui_logger.debug("[!] Attempted to connect to previously connected server without having made any previous connections.")
             return
 
-        messagedialog_label.set_markup("Connecting to to previously connected server <b>{0}</b> with <b>{1}</b>".format(servername, protocol.upper()))
+        messagedialog_label.set_markup("Connecting to previously connected server <b>{0}</b> with <b>{1}</b>".format(servername, protocol.upper()))
         messagedialog_spinner.show()
 
         gui_logger.debug(">>> Starting \"last_connect\" thread.")
