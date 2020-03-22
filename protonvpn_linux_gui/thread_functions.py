@@ -135,7 +135,7 @@ def connect_to_selected_server(interface, selected_server, messagedialog_label, 
     #check if should connect to country or server
     if not selected_server["selected_country"]:
         # run subprocess
-        res = subprocess.run(["protonvpn", "connect", selected_server["selected_server"]], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        res = subprocess.run(["protonvpn", "connect", selected_server["selected_server"], "-p", protocol], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         messagedialog_spinner.hide()
         messagedialog_label.set_markup(res.stdout.decode())
         gui_logger.debug(">>> Log during connection to specific server: {}".format(res))
@@ -146,7 +146,7 @@ def connect_to_selected_server(interface, selected_server, messagedialog_label, 
                 selected_country = k
                 break
         # run subprocess
-        res = subprocess.run(["protonvpn", "connect", "--cc", selected_country], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        res = subprocess.run(["protonvpn", "connect", "--cc", selected_country, "-p", protocol], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         messagedialog_spinner.hide()
         messagedialog_label.set_markup(res.stdout.decode())
         gui_logger.debug(">>> Log during connection to country: {}".format(res))
@@ -158,7 +158,7 @@ def connect_to_selected_server(interface, selected_server, messagedialog_label, 
         "disconnecting": False,
         "conn_info": False
     }
-    
+
     update_labels_status(update_labels_dict)
 
     gui_logger.debug(">>> Ended tasks in \"openvpn_connect\" thread.")
@@ -171,19 +171,20 @@ def quick_connect(interface, messagedialog_label, messagedialog_spinner):
 
     gui_logger.debug(">>> Running \"fastest\".")
 
-    result, servers = connection.fastest(protocol, gui_enabled=True)
+    res = subprocess.run(["protonvpn", "connect", "--fastest", "-p", protocol], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    # result, servers = connection.fastest(protocol, gui_enabled=True)
 
     update_labels_dict = {
         "interface": interface,
-        "servers": servers if servers else False,
+        "servers": False,
         "disconnecting": False,
         "conn_info": False
     }
     
-    messagedialog_label.set_markup(result)
+    messagedialog_label.set_markup(res.stdout.decode())
     messagedialog_spinner.hide()
 
-    gui_logger.debug(">>> Result: \"{0}\"".format(result))
+    gui_logger.debug(">>> Result: \"{0}\"".format(res))
     
     update_labels_status(update_labels_dict)
 
@@ -389,12 +390,14 @@ def update_def_protocol(interface, messagedialog_label, messagedialog_spinner):
     
     gui_logger.debug(">>> Running \"set_default_protocol\".")
 
-    result = cli.set_default_protocol(write=True, gui_enabled=True, protoc=openvpn_protocol)
+    # result = cli.set_default_protocol(write=True, gui_enabled=True, protoc=openvpn_protocol)
 
-    messagedialog_label.set_markup(result)
+    set_config_value("USER", "default_protocol", openvpn_protocol)
+
+    messagedialog_label.set_markup("Protocol updated to {}".format(openvpn_protocol))
     messagedialog_spinner.hide()
 
-    gui_logger.debug(">>> Result: \"{0}\"".format(result))
+    # gui_logger.debug(">>> Result: \"{0}\"".format(result))
 
     gui_logger.debug(">>> Ended tasks in \"set_default_protocol\" thread.")   
 
