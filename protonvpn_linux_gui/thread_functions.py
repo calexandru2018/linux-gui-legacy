@@ -135,10 +135,10 @@ def connect_to_selected_server(interface, selected_server, messagedialog_label, 
     #check if should connect to country or server
     if not selected_server["selected_country"]:
         # run subprocess
-        res = subprocess.run(["protonvpn", "connect", selected_server["selected_server"], "-p", protocol], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        result = subprocess.run(["protonvpn", "connect", selected_server["selected_server"], "-p", protocol], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         messagedialog_spinner.hide()
-        messagedialog_label.set_markup(res.stdout.decode())
-        gui_logger.debug(">>> Log during connection to specific server: {}".format(res))
+        messagedialog_label.set_markup(result.stdout.decode())
+        gui_logger.debug(">>> Log during connection to specific server: {}".format(result))
         # result, servers = connection.openvpn_connect(selected_server["selected_server"], protocol, gui_enabled=True)
     else:
         for k, v in country_codes.items():
@@ -146,10 +146,10 @@ def connect_to_selected_server(interface, selected_server, messagedialog_label, 
                 selected_country = k
                 break
         # run subprocess
-        res = subprocess.run(["protonvpn", "connect", "--cc", selected_country, "-p", protocol], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        result = subprocess.run(["protonvpn", "connect", "--cc", selected_country, "-p", protocol], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         messagedialog_spinner.hide()
-        messagedialog_label.set_markup(res.stdout.decode())
-        gui_logger.debug(">>> Log during connection to country: {}".format(res))
+        messagedialog_label.set_markup(result.stdout.decode())
+        gui_logger.debug(">>> Log during connection to country: {}".format(result))
         # result, servers = connection.country_f(selected_country, protocol, gui_enabled=True)
 
     update_labels_dict = {
@@ -171,7 +171,7 @@ def quick_connect(interface, messagedialog_label, messagedialog_spinner):
 
     gui_logger.debug(">>> Running \"fastest\".")
 
-    res = subprocess.run(["protonvpn", "connect", "--fastest", "-p", protocol], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    result = subprocess.run(["protonvpn", "connect", "--fastest", "-p", protocol], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     # result, servers = connection.fastest(protocol, gui_enabled=True)
 
     update_labels_dict = {
@@ -181,10 +181,10 @@ def quick_connect(interface, messagedialog_label, messagedialog_spinner):
         "conn_info": False
     }
     
-    messagedialog_label.set_markup(res.stdout.decode())
+    messagedialog_label.set_markup(result.stdout.decode())
     messagedialog_spinner.hide()
 
-    gui_logger.debug(">>> Result: \"{0}\"".format(res))
+    gui_logger.debug(">>> Result: \"{0}\"".format(result))
     
     update_labels_status(update_labels_dict)
 
@@ -197,16 +197,17 @@ def last_connect(interface, messagedialog_label, messagedialog_spinner):
     gui_logger.debug(">>> Running \"reconnect\".")
 
     # openvpn needs to be changed
-    result, servers = connection.reconnect(gui_enabled=True)
+    result = subprocess.run(["protonvpn", "reconnect"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    # result, servers = connection.reconnect(gui_enabled=True)
 
     update_labels_dict = {
         "interface": interface,
-        "servers": servers if servers else False,
+        "servers": False,
         "disconnecting": False,
         "conn_info": False
     }
 
-    messagedialog_label.set_markup(result)
+    messagedialog_label.set_markup(result.stdout.decode())
     messagedialog_spinner.hide()
 
     gui_logger.debug(">>> Result: \"{0}\"".format(result))
@@ -252,9 +253,10 @@ def disconnect(interface, messagedialog_label, messagedialog_spinner):
 
     gui_logger.debug(">>> Running \"disconnect\".")
 
-    result = connection.disconnect(gui_enabled=True)
+    result = subprocess.run(["protonvpn", "disconnect"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    # result = connection.disconnect(gui_enabled=True)
     
-    messagedialog_label.set_markup(result)
+    messagedialog_label.set_markup(result.stdout.decode())
     messagedialog_spinner.hide()
 
     gui_logger.debug(">>> Result: \"{0}\"".format(result))
