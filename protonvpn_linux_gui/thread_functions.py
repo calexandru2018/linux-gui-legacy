@@ -223,16 +223,18 @@ def random_connect(interface, messagedialog_label, messagedialog_spinner):
 
     gui_logger.debug(">>> Running \"reconnect\"")
 
-    result, servers = connection.random_c(protocol, gui_enabled=True)
-    
     update_labels_dict = {
         "interface": interface,
-        "servers": servers if servers else False,
+        "servers": False,
         "disconnecting": False,
         "conn_info": False
     }
 
-    messagedialog_label.set_markup(result)
+    result = subprocess.run(["protonvpn", "connect", "--random", "-p", protocol], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    # result, servers = connection.random_c(protocol, gui_enabled=True)
+    
+
+    messagedialog_label.set_markup(result.stdout.decode())
     messagedialog_spinner.hide()
 
     gui_logger.debug(">>> Result: \"{0}\"".format(result))
