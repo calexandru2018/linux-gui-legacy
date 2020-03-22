@@ -602,7 +602,6 @@ def initialize_gui():
     messagedialog_label = interface.get_object("message_dialog_label")
     messagedialog_spinner = interface.get_object("message_dialog_spinner")
 
-    interface.connect_signals(Handler(interface))
 
     if not find_cli():
         messagedialog_spinner.hide()
@@ -618,10 +617,15 @@ def initialize_gui():
         cd protonvpn-cli-ng
         sudo python3 setup.py install
         """
+        message_dialog_close_button = interface.get_object("message_dialog_close_button")
+        message_dialog_close_button.hide()
+
         messagedialog_label.set_markup(message)
         messagedialog_window.show()
+        messagedialog_window.connect("destroy", Gtk.main_quit)
+
     else:
-        print("continued")
+        interface.connect_signals(Handler(interface))
 
         try:
             check_root()
