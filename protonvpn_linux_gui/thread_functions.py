@@ -1,8 +1,6 @@
 import os
 import re
 import time
-import requests
-import json
 import subprocess
 import concurrent.futures
 import configparser
@@ -81,6 +79,8 @@ def on_login(interface, username_field, password_field, messagedialog_label, use
         "dns_leak_protection": "1",
         "custom_dns": "None",
         "check_update_interval": "3",
+        "killswitch": "0",
+        "split_tunnel": "0",
         "autoconnect": "0"
     }
     config["metadata"] = {
@@ -112,6 +112,7 @@ def on_login(interface, username_field, password_field, messagedialog_label, use
     set_config_value("USER", "dns_leak_protection", 1)
     set_config_value("USER", "custom_dns", None)
     set_config_value("USER", "killswitch", 0)
+    set_config_value("USER", "split_tunnel", 0)
     set_config_value("USER", "autoconnect", "0")
 
     with open(PASSFILE, "w") as f:
@@ -133,26 +134,31 @@ def connect_to_selected_server(interface, selected_server, messagedialog_label, 
 
     #check if should connect to country or server
     if not selected_server["selected_country"]:
-        result, servers = connection.openvpn_connect(selected_server["selected_server"], protocol, gui_enabled=True)
+        # run subprocess
+        res = subprocess.run(["protonvpn", "connect", selected_server["selected_server"]], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        messagedialog_spinner.hide()
+        messagedialog_label.set_markup(res.stdout.decode())
+        gui_logger.debug(">>> Log during connection to specific server: {}".format(res))
+        # result, servers = connection.openvpn_connect(selected_server["selected_server"], protocol, gui_enabled=True)
     else:
         for k, v in country_codes.items():
             if v == selected_server["selected_country"]:
                 selected_country = k
                 break
-        result, servers = connection.country_f(selected_country, protocol, gui_enabled=True)
+        # run subprocess
+        res = subprocess.run(["protonvpn", "connect", "--cc", selected_country], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        messagedialog_spinner.hide()
+        messagedialog_label.set_markup(res.stdout.decode())
+        gui_logger.debug(">>> Log during connection to country: {}".format(res))
+        # result, servers = connection.country_f(selected_country, protocol, gui_enabled=True)
 
     update_labels_dict = {
         "interface": interface,
-        "servers": servers if servers else False,
+        "servers": False,
         "disconnecting": False,
         "conn_info": False
     }
-
-    messagedialog_label.set_markup(result)
-    messagedialog_spinner.hide()
-
-    gui_logger.debug(">>> Result: \"{0}\"".format(result))
-
+    
     update_labels_status(update_labels_dict)
 
     gui_logger.debug(">>> Ended tasks in \"openvpn_connect\" thread.")
