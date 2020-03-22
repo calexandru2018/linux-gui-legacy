@@ -1,4 +1,7 @@
-from protonvpn_cli.constants import VERSION as cli_version
+try:
+    from protonvpn_cli.constants import VERSION as cli_version
+except ModuleNotFoundError:
+    cli_version = "Not installed"
 VERSION = "1.6.0"
 GITHUB_URL_RELEASE = "https://github.com/calexandru2018/protonvpn-linux-gui/releases/latest"
 SERVICE_NAME = "custompvpn-autoconnect" 

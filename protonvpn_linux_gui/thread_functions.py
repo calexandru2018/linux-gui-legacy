@@ -5,11 +5,14 @@ import subprocess
 import concurrent.futures
 import configparser
 
-# Import ProtonVPN methods, utils and constants
-from protonvpn_cli.constants import USER, CONFIG_FILE, CONFIG_DIR, PASSFILE, SPLIT_TUNNEL_FILE #noqa
-from protonvpn_cli.utils import get_config_value, is_valid_ip, set_config_value, change_file_owner, pull_server_data, make_ovpn_template #noqa
-from protonvpn_cli import cli, connection #noqa
-from protonvpn_cli.country_codes import country_codes #noqa
+try:
+    # Import ProtonVPN methods, utils and constants
+    from protonvpn_cli.constants import USER, CONFIG_FILE, CONFIG_DIR, PASSFILE, SPLIT_TUNNEL_FILE #noqa
+    from protonvpn_cli.utils import get_config_value, is_valid_ip, set_config_value, change_file_owner, pull_server_data, make_ovpn_template #noqa
+    from protonvpn_cli import cli, connection #noqa
+    from protonvpn_cli.country_codes import country_codes #noqa
+except ModuleNotFoundError:
+    pass
 
 # Custom helper functions
 from .utils import (
@@ -18,7 +21,6 @@ from .utils import (
     prepare_initilizer,
     load_on_start,
     load_configurations,
-    is_connected,
     update_labels_server_list,
     get_gui_processes,
     manage_autoconnect,

@@ -7,21 +7,24 @@ import requests
 from threading import Thread
 import concurrent.futures
 
-from protonvpn_cli.utils import (
-    pull_server_data,
-    get_servers,
-    get_country_name,
-    get_server_value,
-    get_config_value,
-    is_connected,
-    get_transferred_data,
-    call_api
-)
+try:
+    from protonvpn_cli.utils import (
+        pull_server_data,
+        get_servers,
+        get_country_name,
+        get_server_value,
+        get_config_value,
+        is_connected,
+        get_transferred_data,
+        call_api
+    )
 
-from protonvpn_cli.country_codes import country_codes
+    from protonvpn_cli.country_codes import country_codes
 
-from protonvpn_cli.constants import SPLIT_TUNNEL_FILE, USER, CONFIG_FILE, PASSFILE
-from protonvpn_cli.utils import change_file_owner, make_ovpn_template, set_config_value
+    from protonvpn_cli.constants import SPLIT_TUNNEL_FILE, USER, CONFIG_FILE, PASSFILE
+    from protonvpn_cli.utils import change_file_owner, make_ovpn_template, set_config_value
+except ModuleNotFoundError:
+    pass
 
 from .constants import PATH_AUTOCONNECT_SERVICE, TEMPLATE, VERSION, GITHUB_URL_RELEASE, SERVICE_NAME
 
@@ -211,7 +214,7 @@ def custom_call_api(endpoint=False, request_bool=False):
         return True
 
     return response.json()
-    
+
 def check_for_updates():
 
     latest_release = ''
