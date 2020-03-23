@@ -1,9 +1,8 @@
-
-import subprocess
-import time
 import re
+import time
 import datetime
 import requests
+import subprocess
 from threading import Thread
 import concurrent.futures
 
@@ -36,6 +35,20 @@ import gi
 # Gtk3 import
 gi.require_version('Gtk', '3.0')
 from gi.repository import GObject as gobject, Gtk
+
+def get_server_protocol_from_cli(raw_result, return_protocol=False):
+    display_message = raw_result.stdout.decode().split("\n")
+    display_message = display_message[-3:]
+
+    server_name = [re.search("[A-Z-]{1,7}#[0-9]{1,4}", text) for text in display_message]
+
+    if any(server_name):
+        if return_protocol:
+            protocol = re.search("(UDP|TCP)", display_message[0])
+            return (server_name[0].group(), protocol.group())
+        return server_name[0].group()
+    else:
+        return False
 
 def message_dialog(interface, action, label_object, spinner_object, sub_label_object=False):
     # time.sleep(1)
