@@ -1,5 +1,4 @@
 import os
-import re
 import time
 import shutil
 import subprocess
@@ -25,7 +24,8 @@ from .utils import (
     update_labels_server_list,
     get_gui_processes,
     manage_autoconnect,
-    populate_autoconnect_list
+    populate_autoconnect_list,
+    get_server_protocol_from_cli
 )
 
 # Import GUI logger
@@ -139,8 +139,8 @@ def connect_to_selected_server(interface, selected_server, messagedialog_label, 
     if not selected_server["selected_country"]:
         # run subprocess
         result = subprocess.run(["protonvpn", "connect", selected_server["selected_server"], "-p", protocol], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        messagedialog_spinner.hide()
-        messagedialog_label.set_markup(result.stdout.decode())
+        # messagedialog_spinner.hide()
+        # messagedialog_label.set_markup(result.stdout.decode())
         gui_logger.debug(">>> Log during connection to specific server: {}".format(result))
         # result, servers = connection.openvpn_connect(selected_server["selected_server"], protocol, gui_enabled=True)
     else:
@@ -150,10 +150,21 @@ def connect_to_selected_server(interface, selected_server, messagedialog_label, 
                 break
         # run subprocess
         result = subprocess.run(["protonvpn", "connect", "--cc", selected_country, "-p", protocol], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        messagedialog_spinner.hide()
-        messagedialog_label.set_markup(result.stdout.decode())
+        # messagedialog_label.set_markup(result.stdout.decode())
+        # messagedialog_spinner.hide()
         gui_logger.debug(">>> Log during connection to country: {}".format(result))
         # result, servers = connection.country_f(selected_country, protocol, gui_enabled=True)
+
+
+    server_protocol = get_server_protocol_from_cli(result)
+
+    display_message = result.stdout.decode()
+
+    if server_protocol:
+        display_message = "You are connect to <b>{}</b> via <b>{}</b>!".format(server_protocol, protocol.upper())
+
+    messagedialog_label.set_markup(display_message)
+    messagedialog_spinner.hide()
 
     update_labels_dict = {
         "interface": interface,
@@ -167,10 +178,12 @@ def connect_to_selected_server(interface, selected_server, messagedialog_label, 
     gui_logger.debug(">>> Ended tasks in \"openvpn_connect\" thread.")
     
 def quick_connect(interface, messagedialog_label, messagedialog_spinner):
+# def quick_connect():
     """Button/Event handler to connect to the fastest server
     """
 
     protocol = get_config_value("USER", "default_protocol")
+    display_message = ""
 
     gui_logger.debug(">>> Running \"fastest\".")
 
@@ -183,8 +196,14 @@ def quick_connect(interface, messagedialog_label, messagedialog_spinner):
         "disconnecting": False,
         "conn_info": False
     }
-    
-    messagedialog_label.set_markup(result.stdout.decode())
+    server_protocol = get_server_protocol_from_cli(result)
+
+    display_message = result.stdout.decode()
+
+    if server_protocol:
+        display_message = "You are connect to <b>{}</b> via <b>{}</b>!".format(server_protocol, protocol.upper())
+
+    messagedialog_label.set_markup(display_message)
     messagedialog_spinner.hide()
 
     gui_logger.debug(">>> Result: \"{0}\"".format(result))
@@ -210,7 +229,14 @@ def last_connect(interface, messagedialog_label, messagedialog_spinner):
         "conn_info": False
     }
 
-    messagedialog_label.set_markup(result.stdout.decode())
+    server_protocol = get_server_protocol_from_cli(result, return_protocol=True)
+
+    display_message = result.stdout.decode()
+
+    if server_protocol:
+        display_message = "You are connect to <b>{}</b> via <b>{}</b>!".format(server_protocol[0], server_protocol[1].upper())
+
+    messagedialog_label.set_markup(display_message)
     messagedialog_spinner.hide()
 
     gui_logger.debug(">>> Result: \"{0}\"".format(result))
@@ -236,8 +262,14 @@ def random_connect(interface, messagedialog_label, messagedialog_spinner):
     result = subprocess.run(["protonvpn", "connect", "--random", "-p", protocol], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     # result, servers = connection.random_c(protocol, gui_enabled=True)
     
+    server_protocol = get_server_protocol_from_cli(result, return_protocol=True)
 
-    messagedialog_label.set_markup(result.stdout.decode())
+    display_message = result.stdout.decode()
+
+    if server_protocol:
+        display_message = "You are connect to <b>{}</b> via <b>{}</b>!".format(server_protocol[0], server_protocol[1].upper())
+
+    messagedialog_label.set_markup(display_message)
     messagedialog_spinner.hide()
 
     gui_logger.debug(">>> Result: \"{0}\"".format(result))
