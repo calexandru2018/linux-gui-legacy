@@ -171,9 +171,9 @@ class Handler:
         else:
             # Set text and show spinner
             if selected_server["selected_server"]:
-                msg = "Connecting to <b>{0}</b>".format(selected_server["selected_server"])
+                msg = "Connecting to <b>{0}</b>.".format(selected_server["selected_server"])
             else:
-                msg = "Connecting to the quickest server in <b>{0}</b>".format(selected_server["selected_country"])
+                msg = "Connecting to the quickest server in <b>{0}</b>.".format(selected_server["selected_country"])
                 
             messagedialog_label.set_markup(msg)
             messagedialog_spinner.show()
@@ -223,7 +223,7 @@ class Handler:
             gui_logger.debug("[!] Attempted to connect to previously connected server without having made any previous connections.")
             return
 
-        messagedialog_label.set_markup("Connecting to previously connected server <b>{0}</b> with <b>{1}</b>".format(servername, protocol.upper()))
+        messagedialog_label.set_markup("Connecting to previously connected server <b>{0}</b> with <b>{1}</b>.".format(servername, protocol.upper()))
         messagedialog_spinner.show()
 
         gui_logger.debug(">>> Starting \"last_connect\" thread.")
