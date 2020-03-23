@@ -15,6 +15,11 @@
     </a>
 </p>
 <p align="center">
+    <a href="https://liberapay.com/calexandru2018/donate">
+        <img src="http://img.shields.io/liberapay/goal/calexandru2018.svg?logo=liberapay">
+    </a>
+</p>
+<p align="center">
     <a href="https://actions-badge.atrox.dev/calexandru2018/protonvpn-linux-gui/goto?ref=master">
         <img alt="Master Branch Build Status" src="https://img.shields.io/endpoint.svg?url=https%3A%2F%2Factions-badge.atrox.dev%2Fcalexandru2018%2Fprotonvpn-linux-gui%2Fbadge%3Fref%3Dmaster&style=flat" />
     </a>
@@ -28,30 +33,20 @@
 
 <h3 align="center">An <b>unofficial</b> Linux GUI for ProtonVPN, written in Python. Layout designed in Glade.</h3>
 
-Protonvpn-linux-gui is based on <a href="https://github.com/ProtonVPN/protonvpn-cli-ng"><b>protonvpn-cli-ng</b></a> code. This was achieved by slightly modifying ProtonVPN's original Python code and adding a new layer on top of it for the GUI.
+Protonvpn-linux-gui works on top of <a href="https://github.com/ProtonVPN/protonvpn-cli-ng"><b>protonvpn-cli-ng</b></a>, making it a dependency. All local configurations are managed by the GUI (such as updating protocol, split tunneling, manage killswitch) while the connections are managed by the CLI. This way, you will be able to use the latest version of the CLI, while also being able to use the GUI.
 
 ### Installing Dependencies
 
 **Dependencies:**
 
-- openvpn
 - pip for python3 (pip3)
 - python3.5+
 - setuptools for python3 (python3-setuptools)
 - PyGObject
-
-If you have <b>NOT</b> previously installed <b><a href="https://github.com/ProtonVPN/protonvpn-cli-ng">protonvpn-cli-ng</b></a>, then install the following dependencies, based on your distribution:
-
-| **Distro**                              | **Command**                                                                                                                           |
-|:----------------------------------------|:---------------------------------------------------------------------------------------------------------                             |
-|Fedora/CentOS/RHEL                       | `sudo dnf install -y openvpn dialog python3-pip python3-setuptools python3-gobject gtk3`                                              |
-|Ubuntu/Linux Mint/Debian and derivatives | `sudo apt install -y openvpn dialog python3-pip python3-setuptools python3-gi python3-gi-cairo gir1.2-gtk-3.0`                        |
-|OpenSUSE/SLES                            | `sudo zypper in -y openvpn dialog python3-pip python3-setuptools python3-gobject python3-gobject-Gdk typelib-1_0-Gtk-3_0 libgtk-3-0`  |
-|Arch Linux/Manjaro                       | `sudo pacman -S openvpn dialog python-pip python-setuptools python-gobject gtk3`       |
+- <a href="https://github.com/ProtonVPN/protonvpn-cli-ng"><b>protonvpn-cli-ng</b></a>
 
 
-
-If you have already installed <a href="https://github.com/ProtonVPN/protonvpn-cli-ng"><b>protonvpn-cli-ng</b></a> and used the CLI, then you will only need to install the following dependencies for the GUI:
+If you have already installed <a href="https://github.com/ProtonVPN/protonvpn-cli-ng"><b>protonvpn-cli-ng</b></a>, then you will only need to install the following packages for the GUI:
 
 | **Distro**                              | **Command**                                                                               |
 |:----------------------------------------|:--------------------------------------------------------------------                      |
@@ -90,6 +85,10 @@ You can either install via <b>PIP</b> or by cloning the repository.
 ### How to use
 
  `sudo protonvpn-gui`
+
+## Virtual environment
+
+If you would like to run the the GUI within a virtual environment (for either development purpose or other), then you can easily do that with the help of <a href="https://pipenv.readthedocs.io/en/latest/">pipenv</a>. After cloning the repo and `cd` into the directory, start by installing the virtual environment with the help of `pipenv install`. This will install and configure the environment and also install all dependencies in the `Pipfile` file. After that the configuration and installation process is completed, you can enter the virtual environment with `pipenv shell`. To install the GUI in your virtual environment you can type the following in the terminal `sudo pip install -e .` and after that, you can start the GUI as you normally would with `sudo protonvpn-gui`.
 
 ## Create .desktop file
 

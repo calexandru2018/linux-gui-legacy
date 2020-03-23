@@ -4,14 +4,12 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 
 [dev-packages]
-pytest = "*"
 
 [packages]
-docopt = "*"
 requests = "*"
-pythondialog = "*"
 pycairo = "*"
 pygobject = "*"
+protonvpn-cli = "==2.2.2"
 
 [requires]
 python_version = "3.8"

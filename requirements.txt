@@ -1,4 +1,4 @@
 # Call with pip install -r requirements.txt
-docopt
-requests
-pythondialog
+requests==2.23.0
+protonvpn-cli==2.2.2
+

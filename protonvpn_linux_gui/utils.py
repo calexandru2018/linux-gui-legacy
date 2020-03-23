@@ -1,26 +1,29 @@
-
-import subprocess
-import time
 import re
+import time
 import datetime
 import requests
+import subprocess
 from threading import Thread
 import concurrent.futures
 
-from custom_pvpn_cli_ng.protonvpn_cli.utils import (
-    pull_server_data,
-    get_servers,
-    get_country_name,
-    get_server_value,
-    get_config_value,
-    is_connected,
-    get_ip_info,
-    get_transferred_data,
-)
+try:
+    from protonvpn_cli.utils import (
+        pull_server_data,
+        get_servers,
+        get_country_name,
+        get_server_value,
+        get_config_value,
+        is_connected,
+        get_transferred_data,
+        call_api
+    )
 
-from custom_pvpn_cli_ng.protonvpn_cli.country_codes import country_codes
+    from protonvpn_cli.country_codes import country_codes
 
-from custom_pvpn_cli_ng.protonvpn_cli.constants import SPLIT_TUNNEL_FILE, USER
+    from protonvpn_cli.constants import SPLIT_TUNNEL_FILE, USER, CONFIG_FILE, PASSFILE
+    from protonvpn_cli.utils import change_file_owner, make_ovpn_template, set_config_value
+except:
+    pass
 
 from .constants import PATH_AUTOCONNECT_SERVICE, TEMPLATE, VERSION, GITHUB_URL_RELEASE, SERVICE_NAME
 
@@ -32,6 +35,20 @@ import gi
 # Gtk3 import
 gi.require_version('Gtk', '3.0')
 from gi.repository import GObject as gobject, Gtk
+
+def get_server_protocol_from_cli(raw_result, return_protocol=False):
+    display_message = raw_result.stdout.decode().split("\n")
+    display_message = display_message[-3:]
+
+    server_name = [re.search("[A-Z-]{1,7}#[0-9]{1,4}", text) for text in display_message]
+
+    if any(server_name):
+        if return_protocol:
+            protocol = re.search("(UDP|TCP)", display_message[0])
+            return (server_name[0].group(), protocol.group())
+        return server_name[0].group()
+    else:
+        return False
 
 def message_dialog(interface, action, label_object, spinner_object, sub_label_object=False):
     # time.sleep(1)
@@ -64,7 +81,7 @@ def message_dialog(interface, action, label_object, spinner_object, sub_label_ob
         """
         # Check if there is internet connection
             # Depending on next questions, some actions might be suggested.
-        has_internet = check_internet_conn()
+        has_internet = check_internet_conn(request_bool=True)
         
         # Check if killswitch is enabled
             # Advice to restore IP tables manually and restart netowrk manager.
@@ -159,13 +176,57 @@ def message_dialog(interface, action, label_object, spinner_object, sub_label_ob
         sub_label_object.show()
         spinner_object.hide()
 
-def check_internet_conn(gui_enabled=True):
+def check_internet_conn(request_bool=False):
     gui_logger.debug(">>> Running \"check_internet_conn\".")
 
-    try:
-        return get_ip_info(gui_enabled=gui_enabled)
+    try:    
+        # check for internet connection
+        return custom_call_api(request_bool=request_bool)
     except:
         return False
+
+def custom_call_api(endpoint=False, request_bool=False):
+    api_domain = "https://api.protonvpn.ch"
+
+    if not endpoint:
+        endpoint = "/vpn/location"
+
+    url = api_domain + endpoint
+
+    headers = {
+        "x-pm-appversion": "Other",
+        "x-pm-apiversion": "3",
+        "Accept": "application/vnd.protonmail.v1+json"
+    }
+
+    gui_logger.debug("Initiating custom API Call: {0}".format(url))
+
+    try:
+        response = requests.get(url, headers=headers, timeout=6)
+    except (requests.exceptions.ConnectionError,
+            requests.exceptions.ConnectTimeout):
+        # print(
+        #     "[!] There was an error connecting to the ProtonVPN API.\n"
+        #     "[!] Please make sure your connection is working properly!"
+        # )
+        gui_logger.debug("Error connecting to ProtonVPN API")
+        return False
+
+    try:
+        response.raise_for_status()
+    except requests.exceptions.HTTPError:
+        # print(
+        #     "[!] There was an error with accessing the ProtonVPN API.\n"
+        #     "[!] Please make sure your connection is working properly!\n"
+        #     "[!] HTTP Error Code: {0}".format(response.status_code)
+        # )
+        gui_logger.debug("Bad Return Code: {0}".format(response.status_code))
+        return False
+
+    if request_bool:
+        return True
+
+    return response.json()
 
 def check_for_updates():
 
@@ -215,9 +276,6 @@ def prepare_initilizer(username_field, password_field, interface):
     protonvpn_plan = ''
     openvpn_protocol = 'tcp' if interface.get_object('protocol_tcp_checkbox').get_active() == True else 'udp'
     
-    if len(username_field) == 0 or len(password_field) == 0:
-        return
-
     protonvpn_plans = {
         '1': interface.get_object('member_free').get_active(),
         '2': interface.get_object('member_basic').get_active(),
@@ -246,9 +304,12 @@ def load_on_start(params_dict):
 
     gui_logger.debug(">>> Running \"load_on_start\". Params: {0}.".format(params_dict))
 
-    conn = check_internet_conn()
+    conn = custom_get_ip_info()
     if not conn == False and not conn == None:
-        params_dict["messagedialog_label"].set_markup("Populating dashboard...")
+        try:
+            params_dict["messagedialog_label"].set_markup("Populating dashboard...")
+        except:
+            pass
         update_labels_server_list(params_dict["interface"], conn_info=conn)
         return True
         # p = Thread(target=update_labels_server_list, args=[interface])
@@ -388,7 +449,7 @@ def right_grid_update_labels(interface, servers, is_connected, connected_server,
 
     # Get and set IP labels. Get also country and ISP
     if not conn_info:
-        result = get_ip_info(gui_enabled=True)
+        result = custom_get_ip_info()
         if result:
             ip, isp, country = result
         else:
@@ -707,14 +768,6 @@ def find_cli():
         gui_logger.debug("[!] Unable to run \"find protonvpn-cli-ng\" subprocess.")
         protonvpn_path = False
 
-    # If protonvpn-cli-ng is not installed then attempt to get the path of 'modified protonvpn-cli'
-    if not protonvpn_path == False and protonvpn_path.returncode == 1:
-        try:
-            protonvpn_path = subprocess.run(['sudo', 'which', 'custom-pvpn-cli'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        except:
-            gui_logger.debug("[!] Unable to run \"find custom protonvpn-cli\" subprocess.")
-            protonvpn_path = False
-
     return protonvpn_path.stdout.decode()[:-1] if (not protonvpn_path == False and protonvpn_path.returncode == 0) else False
         
 def generate_template(template):
@@ -818,6 +871,20 @@ def daemon_exists():
         return False
     else:
         return True
+
+def custom_get_ip_info():
+    """Return the current public IP Address"""
+    gui_logger.debug("Getting IP Information")
+    ip_info = custom_call_api(endpoint="/vpn/location")
+
+    if not ip_info:
+        return False
+        
+    ip = ip_info["IP"]
+    isp = ip_info["ISP"]
+    country = ip_info["Country"]
+
+    return ip, isp, country
 
 def get_gui_processes():
 

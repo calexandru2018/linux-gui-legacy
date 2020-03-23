@@ -1,19 +1,19 @@
 # Default package import
 import os
-import re
 import sys
 import pathlib
 from threading import Thread
+from queue import Queue
 import time
-import concurrent.futures
-import queue
 
-# ProtonVPN base CLI package import
-from custom_pvpn_cli_ng.protonvpn_cli.constants import (USER, CONFIG_FILE, CONFIG_DIR)
-from custom_pvpn_cli_ng.protonvpn_cli import cli
+try:
+    # ProtonVPN base CLI package import
+    from protonvpn_cli.constants import (CONFIG_FILE, CONFIG_DIR) #noqa
 
-# ProtonVPN helper funcitons
-from custom_pvpn_cli_ng.protonvpn_cli.utils import check_root, get_config_value, change_file_owner
+    # ProtonVPN helper funcitons
+    from protonvpn_cli.utils import check_root, get_config_value, change_file_owner #noqa
+except:
+    pass
 
 # Import GUI logger
 from .gui_logger import gui_logger
@@ -25,7 +25,8 @@ from .utils import (
     load_configurations,
     message_dialog,
     check_for_updates,
-    get_gui_processes
+    get_gui_processes,
+    find_cli
 )
 
 # Import functions that are called with threads
@@ -64,23 +65,36 @@ class Handler:
     """
     def __init__(self, interface): 
         self.interface = interface
+        self.queue = Queue()
 
     # Login BUTTON HANDLER
     def on_login_button_clicked(self, button):
         """Button/Event handler to intialize user account. Calls populate_server_list(server_list_object) to populate server list.
         """     
+        messagedialog_window = self.interface.get_object("MessageDialog")
+        messagedialog_label = self.interface.get_object("message_dialog_label")
+        messagedialog_sub_label = self.interface.get_object("message_dialog_sub_label").hide()
+        messagedialog_spinner = self.interface.get_object("message_dialog_spinner")
+        
         login_window = self.interface.get_object("LoginWindow")
         user_window = self.interface.get_object("DashboardWindow")
+        
+        username_field = self.interface.get_object('username_field').get_text().strip()
+        password_field = self.interface.get_object('password_field').get_text().strip()
 
-        with concurrent.futures.ThreadPoolExecutor() as executor:
-            future = executor.submit(on_login, self.interface)
-            return_value = future.result()
-            
-            if not return_value and not return_value is None:
-                return
+        if len(username_field) == 0 or len(password_field) == 0:
+            gui_logger.debug("[!] One of the fields were left empty upon profile initialization.")
+            messagedialog_spinner.hide()
+            messagedialog_label.set_markup("Username and password need to be provided.")
+            messagedialog_window.show()
+            return
 
-            user_window.show()
-            login_window.destroy()    
+        thread = Thread(target=on_login, args=[self.interface, username_field, password_field, messagedialog_label, user_window, login_window, messagedialog_window])
+        thread.daemon = True
+        thread.start()
+
+        user_window.show()
+        login_window.destroy()    
 
     # Dashboard BUTTON HANDLERS
     def server_filter_input_key_release(self, object, event):
@@ -157,9 +171,9 @@ class Handler:
         else:
             # Set text and show spinner
             if selected_server["selected_server"]:
-                msg = "Connecting to <b>{0}</b>".format(selected_server["selected_server"])
+                msg = "Connecting to <b>{0}</b>.".format(selected_server["selected_server"])
             else:
-                msg = "Connecting to the quickest server in <b>{0}</b>".format(selected_server["selected_country"])
+                msg = "Connecting to the quickest server in <b>{0}</b>.".format(selected_server["selected_country"])
                 
             messagedialog_label.set_markup(msg)
             messagedialog_spinner.show()
@@ -209,7 +223,7 @@ class Handler:
             gui_logger.debug("[!] Attempted to connect to previously connected server without having made any previous connections.")
             return
 
-        messagedialog_label.set_markup("Connecting to to previously connected server <b>{0}</b> with <b>{1}</b>".format(servername, protocol.upper()))
+        messagedialog_label.set_markup("Connecting to previously connected server <b>{0}</b> with <b>{1}</b>.".format(servername, protocol.upper()))
         messagedialog_spinner.show()
 
         gui_logger.debug(">>> Starting \"last_connect\" thread.")
@@ -568,9 +582,7 @@ def initialize_gui():
     sudo protonvpn-gui
     - Will start the GUI without invoking cli()
     """
-    check_root()
-    change_file_owner(os.path.join(CONFIG_DIR, "protonvpn-gui.log"))
-    gui_logger.debug("\n______________________________________\n\n\tINITIALIZING NEW GUI WINDOW\n______________________________________\n")
+
 
     interface = Gtk.Builder()
 
@@ -586,66 +598,97 @@ def initialize_gui():
             
     interface.add_from_file(glade_path[:-1])
 
-    interface.connect_signals(Handler(interface))
+    messagedialog_window = interface.get_object("MessageDialog")
+    messagedialog_label = interface.get_object("message_dialog_label")
+    messagedialog_spinner = interface.get_object("message_dialog_spinner")
 
-    if len(get_gui_processes()) > 1:
-        gui_logger.debug("[!] Two processes were found. Displaying MessageDialog to inform user.")
-        messagedialog_window = interface.get_object("MessageDialog")
-        messagedialog_label = interface.get_object("message_dialog_label")
-        messagedialog_spinner = interface.get_object("message_dialog_spinner")
 
-        messagedialog_label.set_markup("Another GUI process was found, attempting to end it...")
-        messagedialog_spinner.show()
+    if not find_cli():
+        messagedialog_spinner.hide()
+        message = """
+        <b>Could not find protonvpn-cli-ng installed on your system!</b>\t
+        Original protonvpn-cli-ng is needed for the GUI to work.
+
+        <b>Install via pip:</b>
+        sudo pip3 install protonvpn-cli
+
+        <b>Install via Github:</b>
+        git clone https://github.com/protonvpn/protonvpn-cli-ng
+        cd protonvpn-cli-ng
+        sudo python3 setup.py install
+        """
+        message_dialog_close_button = interface.get_object("message_dialog_close_button")
+        message_dialog_close_button.hide()
+
+        messagedialog_label.set_markup(message)
         messagedialog_window.show()
+        messagedialog_window.connect("destroy", Gtk.main_quit)
 
-        time.sleep(1)
-        # thread = Thread(target=kill_duplicate_gui_process, args=[interface, messagedialog_label, messagedialog_spinner])
-        # thread.daemon = True
-        # thread.start()
+    else:
+        interface.connect_signals(Handler(interface))
 
-        response = kill_duplicate_gui_process()
+        try:
+            check_root()
+            change_file_owner(os.path.join(CONFIG_DIR, "protonvpn-gui.log"))
+            gui_logger.debug("\n______________________________________\n\n\tINITIALIZING NEW GUI WINDOW\n______________________________________\n")
+        except NameError:
+            pass
 
-        if not response['success']:
+        if len(get_gui_processes()) > 1:
+            gui_logger.debug("[!] Two processes were found. Displaying MessageDialog to inform user.")
+
+            messagedialog_label.set_markup("Another GUI process was found, attempting to end it...")
+            messagedialog_spinner.show()
+            messagedialog_window.show()
+
+            time.sleep(1)
+            # thread = Thread(target=kill_duplicate_gui_process, args=[interface, messagedialog_label, messagedialog_spinner])
+            # thread.daemon = True
+            # thread.start()
+
+            response = kill_duplicate_gui_process()
+
+            if not response['success']:
+                messagedialog_label.set_markup(response['message'])
+                messagedialog_spinner.hide()
+                time.sleep(3)
+                sys.exit(1)
+
             messagedialog_label.set_markup(response['message'])
             messagedialog_spinner.hide()
-            time.sleep(3)
-            sys.exit(1)
 
-        messagedialog_label.set_markup(response['message'])
-        messagedialog_spinner.hide()
+        if not os.path.isfile(CONFIG_FILE):
+            gui_logger.debug(">>> Loading LoginWindow")
+            window = interface.get_object("LoginWindow")
+            dashboard = interface.get_object("DashboardWindow")
+            dashboard.connect("destroy", Gtk.main_quit)
+            window.show()
+        else:
+            window = interface.get_object("DashboardWindow")
+            gui_logger.debug(">>> Loading DashboardWindow")
+            window.connect("destroy", Gtk.main_quit)
+            
+            messagedialog_window = interface.get_object("MessageDialog")
+            messagedialog_label = interface.get_object("message_dialog_label")
+            interface.get_object("message_dialog_sub_label").hide()
+            messagedialog_spinner = interface.get_object("message_dialog_spinner")
 
-    if not os.path.isfile(CONFIG_FILE):
-        gui_logger.debug(">>> Loading LoginWindow")
-        window = interface.get_object("LoginWindow")
-        dashboard = interface.get_object("DashboardWindow")
-        dashboard.connect("destroy", Gtk.main_quit)
-        window.show()
-    else:
-        window = interface.get_object("DashboardWindow")
-        gui_logger.debug(">>> Loading DashboardWindow")
-        window.connect("destroy", Gtk.main_quit)
-        
-        messagedialog_window = interface.get_object("MessageDialog")
-        messagedialog_label = interface.get_object("message_dialog_label")
-        interface.get_object("message_dialog_sub_label").hide()
-        messagedialog_spinner = interface.get_object("message_dialog_spinner")
+            messagedialog_label.set_markup("Loading...")
+            messagedialog_spinner.show()
+            messagedialog_window.show()
 
-        messagedialog_label.set_markup("Loading...")
-        messagedialog_spinner.show()
-        messagedialog_window.show()
+            objects = {
+                "interface": interface,
+                "messagedialog_window": messagedialog_window,
+                "messagedialog_label": messagedialog_label,
+                "messagedialog_spinner": messagedialog_spinner,
+            }
 
-        objects = {
-            "interface": interface,
-            "messagedialog_window": messagedialog_window,
-            "messagedialog_label": messagedialog_label,
-            "messagedialog_spinner": messagedialog_spinner,
-        }
-
-        thread = Thread(target=load_content_on_start, args=[objects])
-        thread.daemon = True
-        thread.start()
+            thread = Thread(target=load_content_on_start, args=[objects])
+            thread.daemon = True
+            thread.start()
     
-    window.show()
+        window.show()
     
     # Gdk.threads_init()
     # Gdk.threads_enter()
