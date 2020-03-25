@@ -37,7 +37,8 @@ from .constants import VERSION, GITHUB_URL_RELEASE
 
 # Load on start
 def load_content_on_start(objects):
-
+    """Calls load_on_start, which returns False if there is no internet connection, otherwise populates dashboard labels and server list
+    """
     gui_logger.debug(">>> Running \"load_on_start\".")
 
     time.sleep(2)
@@ -48,7 +49,6 @@ def load_content_on_start(objects):
             "messagedialog_label": objects["messagedialog_label"]
         }
 
-        # objects["messagedialog_label"].set_markup("Populating dashboard...")
         objects["messagedialog_spinner"].hide()
 
         future = executor.submit(load_on_start, params_dict)
@@ -63,7 +63,7 @@ def load_content_on_start(objects):
 
 # Login handler
 def on_login(interface, username_field, password_field, messagedialog_label, user_window, login_window, messagedialog_window):
-    """Button/Event handler to intialize user account. Calls populate_server_list(server_list_object) to populate server list.
+    """Function that initializes a user profile.
     """     
     server_list_object = interface.get_object("ServerListStore")
     
@@ -130,32 +130,23 @@ def on_login(interface, username_field, password_field, messagedialog_label, use
 
 # Dashboard hanlder
 def connect_to_selected_server(interface, selected_server, messagedialog_label, messagedialog_spinner):
-    """Button/Event handler to connect to selected server
+    """Function that either connects by selected server or selected country.
     """     
     protocol = get_config_value("USER", "default_protocol")
 
     gui_logger.debug(">>> Running \"openvpn_connect\".")
 
-    #check if should connect to country or server
+    # Check if it should connect to country or server
     if not selected_server["selected_country"]:
-        # run subprocess
         result = subprocess.run(["protonvpn", "connect", selected_server["selected_server"], "-p", protocol], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        # messagedialog_spinner.hide()
-        # messagedialog_label.set_markup(result.stdout.decode())
         gui_logger.debug(">>> Log during connection to specific server: {}".format(result))
-        # result, servers = connection.openvpn_connect(selected_server["selected_server"], protocol, gui_enabled=True)
     else:
         for k, v in country_codes.items():
             if v == selected_server["selected_country"]:
                 selected_country = k
                 break
-        # run subprocess
         result = subprocess.run(["protonvpn", "connect", "--cc", selected_country, "-p", protocol], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        # messagedialog_label.set_markup(result.stdout.decode())
-        # messagedialog_spinner.hide()
         gui_logger.debug(">>> Log during connection to country: {}".format(result))
-        # result, servers = connection.country_f(selected_country, protocol, gui_enabled=True)
-
 
     server_protocol = get_server_protocol_from_cli(result)
 
@@ -179,17 +170,14 @@ def connect_to_selected_server(interface, selected_server, messagedialog_label, 
     gui_logger.debug(">>> Ended tasks in \"openvpn_connect\" thread.")
     
 def quick_connect(interface, messagedialog_label, messagedialog_spinner):
-# def quick_connect():
-    """Button/Event handler to connect to the fastest server
+    """Function that connects to the quickest server.
     """
-
     protocol = get_config_value("USER", "default_protocol")
     display_message = ""
 
     gui_logger.debug(">>> Running \"fastest\".")
 
     result = subprocess.run(["protonvpn", "connect", "--fastest", "-p", protocol], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    # result, servers = connection.fastest(protocol, gui_enabled=True)
 
     update_labels_dict = {
         "interface": interface,
@@ -214,14 +202,11 @@ def quick_connect(interface, messagedialog_label, messagedialog_spinner):
     gui_logger.debug(">>> Ended tasks in \"fastest\" thread.")
 
 def last_connect(interface, messagedialog_label, messagedialog_spinner):
-    """Button/Event handler to reconnect to previously connected server
+    """Function that connects to the last connected server.
     """        
-
     gui_logger.debug(">>> Running \"reconnect\".")
 
-    # openvpn needs to be changed
     result = subprocess.run(["protonvpn", "reconnect"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    # result, servers = connection.reconnect(gui_enabled=True)
 
     update_labels_dict = {
         "interface": interface,
@@ -247,7 +232,7 @@ def last_connect(interface, messagedialog_label, messagedialog_spinner):
     gui_logger.debug(">>> Ended tasks in \"reconnect\" thread.")
 
 def random_connect(interface, messagedialog_label, messagedialog_spinner):
-    """Button/Event handler to connect to a random server
+    """Function that connects to a random server.
     """
     protocol = get_config_value("USER", "default_protocol")
 
@@ -261,7 +246,6 @@ def random_connect(interface, messagedialog_label, messagedialog_spinner):
     }
 
     result = subprocess.run(["protonvpn", "connect", "--random", "-p", protocol], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    # result, servers = connection.random_c(protocol, gui_enabled=True)
     
     server_protocol = get_server_protocol_from_cli(result, return_protocol=True)
 
@@ -280,7 +264,7 @@ def random_connect(interface, messagedialog_label, messagedialog_spinner):
     gui_logger.debug(">>> Ended tasks in \"random_c\" thread.")
 
 def disconnect(interface, messagedialog_label, messagedialog_spinner):
-    """Button/Event handler to disconnect any existing connections
+    """Function that disconnects from the VPN.
     """
     update_labels_dict = {
         "interface": interface,
@@ -292,7 +276,6 @@ def disconnect(interface, messagedialog_label, messagedialog_spinner):
     gui_logger.debug(">>> Running \"disconnect\".")
 
     result = subprocess.run(["protonvpn", "disconnect"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    # result = connection.disconnect(gui_enabled=True)
     
     messagedialog_label.set_markup(result.stdout.decode())
     messagedialog_spinner.hide()
@@ -304,13 +287,11 @@ def disconnect(interface, messagedialog_label, messagedialog_spinner):
     gui_logger.debug(">>> Ended tasks in \"disconnect\" thread.")
     
 def refresh_server_list(interface, messagedialog_window, messagedialog_spinner):
-    """Button/Event handler to refresh/repopulate server list
-    - At the moment, will also refresh the Dashboard information, this will be fixed in the future.
+    """Function that refreshes dashboard labels and server list.
     """
     # Sleep is needed because it takes a second to update the information,
-    # which makes the button "lag".
+    # which makes the button "lag". Temporary solution.
     time.sleep(1)
-    # Temporary solution
 
     gui_logger.debug(">>> Running \"update_labels_server_list\".")
 
@@ -323,7 +304,7 @@ def refresh_server_list(interface, messagedialog_window, messagedialog_spinner):
 
 # Preferences/Configuration menu HANDLERS
 def update_user_pass(interface, messagedialog_label, messagedialog_spinner):
-    """Button/Event handler to update Username & Password
+    """Function that updates username and password.
     """
     username_field = interface.get_object("update_username_input")
     password_field = interface.get_object("update_password_input")
@@ -332,14 +313,12 @@ def update_user_pass(interface, messagedialog_label, messagedialog_spinner):
     password_text = password_field.get_text().strip()
 
     if len(username_text) == 0 or len(password_text) == 0:
-        messagedialog_label.set_markup("Both fields need to be filled.")
+        messagedialog_label.set_markup("Both fields need to be filled!")
         messagedialog_spinner.hide()
         return
 
     gui_logger.debug(">>> Running \"set_username_password\".")
 
-    # result = cli.set_username_password(write=True, gui_enabled=True, user_data=(username_text, password_text))
-    
     set_config_value("USER", "username", username_text)
 
     with open(PASSFILE, "w") as f:
@@ -347,7 +326,7 @@ def update_user_pass(interface, messagedialog_label, messagedialog_spinner):
         gui_logger.debug("Passfile updated")
         os.chmod(PASSFILE, 0o600)
 
-        messagedialog_label.set_markup("Username and password updated.")
+        messagedialog_label.set_markup("Username and password updated!")
         password_field.set_text("")
         messagedialog_spinner.hide()
         messagedialog_label.set_markup("Username and password updated.")
@@ -356,11 +335,12 @@ def update_user_pass(interface, messagedialog_label, messagedialog_spinner):
 
 
 def update_dns(interface, messagedialog_label, messagedialog_spinner):
-    """Button/Event handler to update DNS protection 
+    """Function that updates DNS settings.
     """
     dns_combobox = interface.get_object("dns_preferens_combobox")
     text_message = ""
     custom_dns_ip = "The following IPs were added:\n"
+
     if (not dns_combobox.get_active() == 0) and (not dns_combobox.get_active() == 2):
         dns_leak_protection = 0
 
@@ -396,13 +376,11 @@ def update_dns(interface, messagedialog_label, messagedialog_spinner):
         text_message = "enabled"
     
     gui_logger.debug(">>> Running \"set_dns_protection\".")
-
-    # result = cli.set_dns_protection(gui_enabled=True, dns_settings=(dns_leak_protection, custom_dns))
-
+    
     set_config_value("USER", "dns_leak_protection", dns_leak_protection)
     set_config_value("USER", "custom_dns", custom_dns)
 
-    messagedialog_label.set_markup("DNS Management updated to <b>{0}</b>.\n{1}".format(text_message, "" if not custom_dns else custom_dns_ip))
+    messagedialog_label.set_markup("DNS Management updated to <b>{0}</b>!\n{1}".format(text_message, "" if not custom_dns else custom_dns_ip))
     messagedialog_spinner.hide()
 
     gui_logger.debug(">>> Result: \"{0}\"".format("DNS Management updated."))
@@ -410,9 +388,10 @@ def update_dns(interface, messagedialog_label, messagedialog_spinner):
     gui_logger.debug(">>> Ended tasks in \"set_dns_protection\" thread.")
 
 def update_pvpn_plan(interface, messagedialog_label, messagedialog_spinner):
-    """Button/Event handler to update ProtonVPN Plan  
+    """Function that updates ProtonVPN plan.
     """
     protonvpn_plan = 0
+    visionary_compare = 0
     protonvpn_plans = {1: "Free", 2: "Basic", 3: "Plus", 4: "Visionary"}
     protonvpn_radios = {
         1: interface.get_object("member_free_update_checkbox").get_active(),
@@ -427,7 +406,8 @@ def update_pvpn_plan(interface, messagedialog_label, messagedialog_spinner):
         if v == True:
             protonvpn_plan = int(k)
             break
-    
+
+    visionary_compare = protonvpn_plan
     if protonvpn_plan == 4:
         protonvpn_plan = 3
 
@@ -435,38 +415,32 @@ def update_pvpn_plan(interface, messagedialog_label, messagedialog_spinner):
     protonvpn_plan -= 1    
 
     set_config_value("USER", "tier", str(protonvpn_plan))
-    # result = cli.set_protonvpn_tier(write=True, gui_enabled=True, tier=protonvpn_plan)
 
-    messagedialog_label.set_markup("ProtonVPN Plan has been updated to <b>{}</b>!\nServers list will be refreshed.".format(protonvpn_plans[int(protonvpn_plan+1)]))
+    messagedialog_label.set_markup("ProtonVPN Plan has been updated to <b>{}</b>!\nServers list will be refreshed.".format(protonvpn_plans[4 if visionary_compare == 4 else int(protonvpn_plan+1)]))
     messagedialog_spinner.hide()
 
     gui_logger.debug(">>> Result: \"{0}\"".format("ProtonVPN Plan has been updated!"))
 
-    # gobject.idle_add(load_on_start, {"interface":interface, "gui_enabled": True})
     load_on_start({"interface":interface, "gui_enabled": True})     
 
     gui_logger.debug(">>> Ended tasks in \"set_protonvpn_tier\" thread.")   
 
 def update_def_protocol(interface, messagedialog_label, messagedialog_spinner):
-    """Button/Event handler to update OpenVP Protocol  
+    """Function that updates default protocol.
     """
     openvpn_protocol = 'tcp' if interface.get_object('protocol_tcp_update_checkbox').get_active() == True else 'udp'
     
     gui_logger.debug(">>> Running \"set_default_protocol\".")
 
-    # result = cli.set_default_protocol(write=True, gui_enabled=True, protoc=openvpn_protocol)
-
     set_config_value("USER", "default_protocol", openvpn_protocol)
 
-    messagedialog_label.set_markup("Protocol updated to <b>{}</b>.".format(openvpn_protocol.upper()))
+    messagedialog_label.set_markup("Protocol updated to <b>{}</b>!".format(openvpn_protocol.upper()))
     messagedialog_spinner.hide()
-
-    # gui_logger.debug(">>> Result: \"{0}\"".format(result))
 
     gui_logger.debug(">>> Ended tasks in \"set_default_protocol\" thread.")   
 
 def update_autoconnect(interface, messagedialog_label, messagedialog_spinner):
-    """Button/Event handler to update Autoconnect  
+    """Function that updates autoconnect. 
     """
     autoconnect_combobox = interface.get_object("autoconnect_combobox")
     active_choice = autoconnect_combobox.get_active()
@@ -515,7 +489,7 @@ def update_autoconnect(interface, messagedialog_label, messagedialog_spinner):
     gui_logger.debug(">>> Ended tasks in \"update_autoconnect\" thread.") 
 
 def update_killswitch(interface, messagedialog_label, messagedialog_spinner):
-    """Button/Event handler to update Killswitch  
+    """Function that updates killswitch configurations. 
     """
     ks_combobox = interface.get_object("killswitch_combobox")
     killswitch = ks_combobox.get_active()
@@ -529,8 +503,6 @@ def update_killswitch(interface, messagedialog_label, messagedialog_spinner):
         split_tunnel_extra_message = "<b>enabled</b> and <b>allows</b> access to/from LAN"
 
     gui_logger.debug(">>> Running \"set_killswitch\".")
-
-    # result = cli.set_killswitch(gui_enabled=True, user_choice=ks_combobox.get_active())
 
     if killswitch and int(get_config_value("USER", "split_tunnel")):
         set_config_value("USER", "split_tunnel", 0)
@@ -547,7 +519,7 @@ def update_killswitch(interface, messagedialog_label, messagedialog_spinner):
     gui_logger.debug(">>> Ended tasks in \"set_killswitch\" thread.")   
 
 def update_split_tunneling(interface, messagedialog_label, messagedialog_spinner):
-    """Button/Event handler to update Split Tunneling 
+    """Function that updates split tunneling configurations.
     """
     result = "Split tunneling configurations updated!\n"
     split_tunneling_buffer = interface.get_object("split_tunneling_textview").get_buffer()
@@ -567,24 +539,22 @@ def update_split_tunneling(interface, messagedialog_label, messagedialog_spinner
     for ip in split_tunneling_content:
         if not is_valid_ip(ip):
             messagedialog_spinner.hide()
-            messagedialog_label.set_markup("<b>{0}</b> is not valid.\nNone of the IP's were added, please try again with a different IP.".format(ip))
+            messagedialog_label.set_markup("<b>{0}</b> is not valid.!\nNone of the IP's were added, please try again with a different IP.".format(ip))
             gui_logger.debug("[!] Invalid IP \"{0}\".".format(ip))
             return
 
     gui_logger.debug(">>> Running \"set_split_tunnel\".")
 
-    # result = cli.set_split_tunnel(gui_enabled=True, user_data=split_tunneling_content)
-
     if len(split_tunneling_content) == 0:
         set_config_value("USER", "split_tunnel", 0)
         if os.path.isfile(SPLIT_TUNNEL_FILE):
             os.remove(SPLIT_TUNNEL_FILE)
-            result = "Split tunneling <b>disabled</b>.\n\n"
+            result = "Split tunneling <b>disabled</b>!\n\n"
 
     if int(get_config_value("USER", "killswitch")):
         set_config_value("USER", "killswitch", 0)
 
-        result = result + "Split Tunneling <b>can't</b> be used with Kill Switch.\nKill Switch has been <b>disabled</b>.\n\n"
+        result = result + "Split Tunneling <b>can't</b> be used with Kill Switch.\nKill Switch has been <b>disabled</b>!\n\n"
         time.sleep(1)
 
     set_config_value("USER", "split_tunnel", 1)
@@ -603,7 +573,7 @@ def update_split_tunneling(interface, messagedialog_label, messagedialog_spinner
         # split tunneling should be disabled again
         gui_logger.debug("No split tunneling file existing.")
         set_config_value("USER", "split_tunnel", 0)
-        result = "No split tunneling file was found, split tunneling will be <b>disabled</b>.\n\n"
+        result = "No split tunneling file was found, split tunneling will be <b>disabled</b>!\n\n"
 
     messagedialog_label.set_markup(result)
     messagedialog_spinner.hide()
@@ -613,28 +583,26 @@ def update_split_tunneling(interface, messagedialog_label, messagedialog_spinner
     gui_logger.debug(">>> Ended tasks in \"set_split_tunnel\" thread.")   
 
 def purge_configurations(interface, messagedialog_label, messagedialog_spinner):
-    """Button/Event handler to purge configurations
+    """Function to purge all current configurations.
     """
     # To-do: Confirm prior to allowing user to do this
-
     gui_logger.debug(">>> Running \"set_split_tunnel\".")
 
-    # result = cli.purge_configuration(gui_enabled=True)
-
     connection.disconnect(passed=True)
+
     if os.path.isdir(CONFIG_DIR):
         shutil.rmtree(CONFIG_DIR)
         gui_logger.debug(">>> Result: \"{0}\"".format("Configurations purged."))
 
-    messagedialog_label.set_markup("Configurations purged.")
+    messagedialog_label.set_markup("Configurations purged!")
     messagedialog_spinner.hide()
 
 
     gui_logger.debug(">>> Ended tasks in \"set_split_tunnel\" thread.")   
 
-# def kill_duplicate_gui_process(interface, messagedialog_label, messagedialog_spinner):
 def kill_duplicate_gui_process():
-
+    """Function to kill duplicate/existing protonvpn-linux-gui processes.
+    """
     return_message = {
         "message": "Unable to automatically end service. Please manually end the process.",
         "success": False
@@ -668,6 +636,4 @@ def kill_duplicate_gui_process():
         return_message['success'] = True
         gui_logger.debug(">>> Only one process was found, continuing with normal startup.")
 
-    # messagedialog_label.set_markup(return_message['message'])
-    # messagedialog_spinner.hide()
     return return_message
