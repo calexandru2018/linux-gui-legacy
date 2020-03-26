@@ -35,7 +35,8 @@ setup(
     license="GPLv3",
     url="https://github.com/calexandru2018/protonvpn-linux-gui",
     install_requires=[
-        "protonvpn-cli"
+        "protonvpn-cli==2.2.2",
+        "requests==2.23.0"
     ],
     python_requires=">=3.5",
     classifiers=[

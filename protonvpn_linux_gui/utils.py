@@ -1,4 +1,5 @@
 import re
+import sys
 import time
 import datetime
 import requests
@@ -23,7 +24,7 @@ try:
     from protonvpn_cli.constants import SPLIT_TUNNEL_FILE, USER, CONFIG_FILE, PASSFILE
     from protonvpn_cli.utils import change_file_owner, make_ovpn_template, set_config_value
 except:
-    pass
+    sys.exit(1)
 
 from .constants import PATH_AUTOCONNECT_SERVICE, TEMPLATE, VERSION, GITHUB_URL_RELEASE, SERVICE_NAME
 
@@ -37,6 +38,8 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import GObject as gobject, Gtk
 
 def get_server_protocol_from_cli(raw_result, return_protocol=False):
+    """Function that collects servername and protocol from CLI print statement after establishing connection.
+    """
     display_message = raw_result.stdout.decode().split("\n")
     display_message = display_message[-3:]
 
@@ -51,8 +54,8 @@ def get_server_protocol_from_cli(raw_result, return_protocol=False):
         return False
 
 def message_dialog(interface, action, label_object, spinner_object, sub_label_object=False):
-    # time.sleep(1)
-    # messagedialog_window = interface.get_object("MessageDialog")
+    """Multipurpose message dialog function.
+    """
     if action == "check_for_update":
         with concurrent.futures.ThreadPoolExecutor() as executor:
             future = executor.submit(check_for_updates)
@@ -93,7 +96,6 @@ def message_dialog(interface, action, label_object, spinner_object, sub_label_ob
 
         # Check if custom DNS is enabled
             # If there is no VPN connection and also no internet, then it is a DNS issue.
-        
         is_dns_protection_enabled = False if get_config_value("USER", "dns_leak_protection") == "0" or (not get_config_value("USER", "custom_dns") == None and get_config_value("USER", "dns_leak_protection") == "0") else True
 
         # Check if custom DNS is in use. 
@@ -109,9 +111,6 @@ def message_dialog(interface, action, label_object, spinner_object, sub_label_ob
             lines = map(lambda l: l.strip(), lines)
             # remove empty elements
             lines = list(filter(None, lines))
-            
-            # False
-            # print("None==False ", None==False)
 
             if len(lines) < 2:
                 is_custom_resolv_conf["logical"] = None
@@ -125,9 +124,6 @@ def message_dialog(interface, action, label_object, spinner_object, sub_label_ob
             is_splitunn_enabled = True if get_config_value("USER", "split_tunnel") == "1" else False
         except KeyError:
             is_splitunn_enabled = False
-
-        # Check if servers are cached
-            # Maybe to-do
         
         # Reccomendations based on known issues
         if not has_internet:
@@ -177,17 +173,19 @@ def message_dialog(interface, action, label_object, spinner_object, sub_label_ob
         spinner_object.hide()
 
 def check_internet_conn(request_bool=False):
+    """Function that checks for internet connection.
+    """
     gui_logger.debug(">>> Running \"check_internet_conn\".")
 
     try:    
-        # check for internet connection
         return custom_call_api(request_bool=request_bool)
     except:
         return False
 
 def custom_call_api(endpoint=False, request_bool=False):
+    """Function that is a custom call_api with a timeout of 6 seconds. This is mostly used to check for API access and also for internet access.
+    """
     api_domain = "https://api.protonvpn.ch"
-
     if not endpoint:
         endpoint = "/vpn/location"
 
@@ -205,21 +203,12 @@ def custom_call_api(endpoint=False, request_bool=False):
         response = requests.get(url, headers=headers, timeout=6)
     except (requests.exceptions.ConnectionError,
             requests.exceptions.ConnectTimeout):
-        # print(
-        #     "[!] There was an error connecting to the ProtonVPN API.\n"
-        #     "[!] Please make sure your connection is working properly!"
-        # )
         gui_logger.debug("Error connecting to ProtonVPN API")
         return False
 
     try:
         response.raise_for_status()
     except requests.exceptions.HTTPError:
-        # print(
-        #     "[!] There was an error with accessing the ProtonVPN API.\n"
-        #     "[!] Please make sure your connection is working properly!\n"
-        #     "[!] HTTP Error Code: {0}".format(response.status_code)
-        # )
         gui_logger.debug("Bad Return Code: {0}".format(response.status_code))
         return False
 
@@ -229,7 +218,8 @@ def custom_call_api(endpoint=False, request_bool=False):
     return response.json()
 
 def check_for_updates():
-
+    """Function that searches for existing updates by checking the latest releases on github.
+    """
     latest_release = ''
     pip3_installed = False
 
@@ -251,7 +241,6 @@ def check_for_updates():
         check_version = requests.get(GITHUB_URL_RELEASE, timeout=2)
         latest_release =  check_version.url.split("/")[-1][1:]
     except:
-        print()
         return "Failed to check for updates."
 
     if latest_release == VERSION:
@@ -267,7 +256,7 @@ def check_for_updates():
         return "Developer Mode."
 
 def prepare_initilizer(username_field, password_field, interface):
-    """Collects and prepares user input from login window.
+    """Funciton that collects and prepares user input from login window.
     Returns:
     ----
     - A dictionary with username, password, plan type and default protocol.
@@ -299,9 +288,8 @@ def prepare_initilizer(username_field, password_field, interface):
     return user_data
 
 def load_on_start(params_dict):
-    """Updates Dashboard labels and populates server list content before showing it to the user
+    """Function that checks if there is an internet connection, if not then return False, else calls update_labels_server_list.
     """
-
     gui_logger.debug(">>> Running \"load_on_start\". Params: {0}.".format(params_dict))
 
     conn = custom_get_ip_info()
@@ -310,15 +298,15 @@ def load_on_start(params_dict):
             params_dict["messagedialog_label"].set_markup("Populating dashboard...")
         except:
             pass
+
         update_labels_server_list(params_dict["interface"], conn_info=conn)
         return True
-        # p = Thread(target=update_labels_server_list, args=[interface])
-        # p.daemon = True
-        # p.start()
     else:
         return False
 
 def update_labels_server_list(interface, server_tree_list_object=False, conn_info=False):
+    """Function that updates dashboard labels and server list.
+    """
     if not server_tree_list_object:
         server_tree_list_obj = interface.get_object("ServerTreeStore")
     else:
@@ -343,16 +331,14 @@ def update_labels_server_list(interface, server_tree_list_object=False, conn_inf
     }
 
     # Update labels
-    # Should be done with gobject_idle_add
     gobject.idle_add(update_labels_status, update_labels_dict)
 
     # Populate server list
-    # Should be done with gobject_idle_add
     gobject.idle_add(populate_server_list, populate_servers_dict)
 
 def update_labels_status(update_labels_dict):
-    """Updates labels status"""
-
+    """Function that updates labels, calls on left_grid_update_labels and right_grid_update_labels.
+    """
     gui_logger.debug(">>> Running \"update_labels_status\" getting servers, is_connected and connected_server.")
 
     if not update_labels_dict["servers"]:
@@ -372,8 +358,8 @@ def update_labels_status(update_labels_dict):
     right_grid_update_labels(update_labels_dict["interface"], servers, is_vpn_connected, connected_server, update_labels_dict["disconnecting"], conn_info=update_labels_dict["conn_info"])
     
 def left_grid_update_labels(interface, servers, is_connected, connected_server, disconnecting):
-    """Holds labels that are position within the left-side grid"""
-
+    """Function that updates the labels that are position within the left-side of the dashboard grid.
+    """
     gui_logger.debug(">>> Running \"left_grid_update_labels\".")
 
     # Left grid
@@ -429,11 +415,11 @@ def left_grid_update_labels(interface, servers, is_connected, connected_server, 
         feature = False
     
     feature = all_features[feature] if not disconnecting and is_connected else ""
-    server_features_label.set_markup('<span>{0}</span>'.format(feature))
+    server_features_label.set_markup('<span>{0}</span>'.format(feature.upper()))
 
 def right_grid_update_labels(interface, servers, is_connected, connected_server, disconnecting, conn_info=False):
-    """Holds labels that are position within the right-side grid"""
-
+    """Function that updates the labels that are position within the right-side of the dashboard grid.
+    """
     gui_logger.debug(">>> Running \"right_grid_update_labels\".")
 
     # Right grid
@@ -495,7 +481,7 @@ def right_grid_update_labels(interface, servers, is_connected, connected_server,
     data_sent_label.set_markup('<span>{0}</span>'.format(tx_amount))
 
 def load_configurations(interface):
-    """Set and populate user configurations before showing the configurations window
+    """Function that sets and populates user configurations before showing the configurations window.
     """
     pref_dialog = interface.get_object("ConfigurationsWindow")
      
@@ -561,7 +547,7 @@ def load_configurations(interface):
     # Populate Split Tunelling
     split_tunneling = interface.get_object("split_tunneling_textview")
 
-    # Check if killswtich is != 0, if it is then disable split tunneling funciton
+    # Check if killswtich is != 0, if it is then disable split tunneling Function
     if killswitch != '0':
         split_tunneling.set_property('sensitive', False)
         interface.get_object("update_split_tunneling_button").set_property('sensitive', False)
@@ -583,7 +569,7 @@ def load_configurations(interface):
     pref_dialog.show()
 
 def populate_server_list(populate_servers_dict):
-    """Populates Dashboard with servers
+    """Function that updates server list.
     """
     pull_server_data(force=True)
 
@@ -630,16 +616,15 @@ def populate_server_list(populate_servers_dict):
                 populate_servers_dict["tree_object"].append(country_row, [country, servername, tier, load, feature])
 
 def get_country_avrg_features(country, country_servers, servers, features):
-    """Returns average load and features of a specific country."""
-    # Variables for aberage per country
+    """Function that returns average load and features of a specific country.
+    """
+    # Variables for average per country
     count = 0
     load_sum = 0
-
-    # Variables for feature per country
+    # Variable for feature per country
     features_per_country = set()
 
     for servername in country_servers[country]:
-
         # Get average per country
         load_sum = load_sum + int(str(get_server_value(servername, "Load", servers)).rjust(3, " "))
         count += 1
@@ -657,6 +642,8 @@ def get_country_avrg_features(country, country_servers, servers, features):
             )    
 
 def populate_autoconnect_list(interface, return_list=False):
+    """Function that populates autoconnect dropdown list.
+    """
     autoconnect_liststore = interface.get_object("AutoconnectListStore")
     countries = {}
     servers = get_servers()
@@ -670,6 +657,7 @@ def populate_autoconnect_list(interface, return_list=False):
     }
     autoconnect_alternatives = ["dis", "fast", "rand", "p2p", "sc", "tor"]
     return_values = []
+
     for server in servers:
         country = get_country_name(server["ExitCountry"])
         if country not in countries.keys():
@@ -696,16 +684,9 @@ def populate_autoconnect_list(interface, return_list=False):
     if return_list:
         return return_values
 
-# Autoconnect 
-#
-# To- do
-#
-# Autoconnect
-
 def manage_autoconnect(mode, command=False):
-    """Manages autoconnect functionality
+    """Function that manages autoconnect functionality. It takes a mode (enabled/disabled) and a command that is to be passed to the CLI.
     """
-    # Check if protonvpn-cli-ng is installed, and return the path to a CLI
     if mode == 'enable':
 
         if not enable_autoconnect(command):
@@ -716,7 +697,7 @@ def manage_autoconnect(mode, command=False):
         print("Autoconnect on boot enabled")
         gui_logger.debug(">>> Autoconnect on boot enabled")
         return True
-        
+
     elif mode == 'disable':
 
         if not disable_autoconnect():
@@ -729,13 +710,13 @@ def manage_autoconnect(mode, command=False):
         return True
 
 def enable_autoconnect(command):
-    """Enables autoconnect
+    """Function that enables autoconnect.
     """
     protonvpn_path = find_cli()
     if not protonvpn_path:
         return False
 
-    # Fill template with CLI path and username
+    # Injects CLIs start and stop path and username
     with_cli_path = TEMPLATE.replace("PATH", (protonvpn_path + " " + command))
     template = with_cli_path.replace("STOP", protonvpn_path + " disconnect")
     template = template.replace("=user", "="+USER)
@@ -746,9 +727,8 @@ def enable_autoconnect(command):
     return enable_daemon() 
 
 def disable_autoconnect():
-    """Disables autoconnect
+    """Function that disables autoconnect.
     """
-
     if not stop_and_disable_daemon():
         return False
     elif not remove_template():
@@ -757,7 +737,7 @@ def disable_autoconnect():
         return True
 
 def find_cli():
-    """Find intalled CLI and returns it's path
+    """Function that searches for the CLI. Returns CLIs path if it is found, otherwise it returns False.
     """
     cli_ng_err = ''
     custom_cli_err = ''
@@ -771,7 +751,7 @@ def find_cli():
     return protonvpn_path.stdout.decode()[:-1] if (not protonvpn_path == False and protonvpn_path.returncode == 0) else False
         
 def generate_template(template):
-    """Generates service file
+    """Function that generates the service file for autoconnect.
     """
     generate_service_command = "cat > {0} <<EOF {1}\nEOF".format(PATH_AUTOCONNECT_SERVICE, template)
     gui_logger.debug(">>> Template:\n{}".format(generate_service_command))
@@ -788,7 +768,7 @@ def generate_template(template):
         return False
 
 def remove_template():
-    """Remove service file from /etc/systemd/system/
+    """Function that removes the service file from /etc/systemd/system/.
     """
     try:
         resp = subprocess.run(["sudo", "rm", PATH_AUTOCONNECT_SERVICE], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -805,9 +785,8 @@ def remove_template():
         return False  
 
 def enable_daemon():
-    """Reloads daemon and enables the autoconnect service
+    """Function that enables the autoconnect daemon service.
     """
-
     reload_daemon()
 
     try:
@@ -823,7 +802,7 @@ def enable_daemon():
     return True
     
 def stop_and_disable_daemon():
-    """Stops the autoconnect service and disables it
+    """Function that stops and disables the autoconnect daemon service.
     """
     if not daemon_exists():
         return True
@@ -851,6 +830,8 @@ def stop_and_disable_daemon():
         return True
 
 def reload_daemon():
+    """Function that reloads the autoconnect daemon service.
+    """
     try:
         resp = subprocess.run(['sudo', 'systemctl', 'daemon-reload'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         if resp.returncode == 1:
@@ -862,18 +843,20 @@ def reload_daemon():
         return False
 
 def daemon_exists():
-
+    """Function that checks if autoconnect daemon service exists.
+    """
     # Return code 3: service exists
     # Return code 4: service could not be found
     resp_stop = subprocess.run(['systemctl', 'status' , SERVICE_NAME], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    # print(resp_stop)
+
     if resp_stop.returncode == 4:
         return False
     else:
         return True
 
 def custom_get_ip_info():
-    """Return the current public IP Address"""
+    """Custom get_ip_info that also returns the country.
+    """
     gui_logger.debug("Getting IP Information")
     ip_info = custom_call_api(endpoint="/vpn/location")
 
@@ -887,7 +870,8 @@ def custom_get_ip_info():
     return ip, isp, country
 
 def get_gui_processes():
-
+    """Function that returns all possible running GUI processes. 
+    """
     gui_logger.debug(">>> Running \"get_gui_processes\".")
 
     processes = subprocess.run(["pgrep", "protonvpn-gui"],stdout=subprocess.PIPE)

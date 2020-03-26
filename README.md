@@ -15,21 +15,25 @@
     </a>
 </p>
 <p align="center">
-    <a href="https://liberapay.com/calexandru2018/donate">
-        <img src="http://img.shields.io/liberapay/goal/calexandru2018.svg?logo=liberapay">
-    </a>
+  <a href="https://liberapay.com/calexandru2018/donate">
+      <img src="http://img.shields.io/liberapay/goal/calexandru2018.svg?logo=liberapay">
+  </a>
+</p>
+<p align="center">
+  <img alt="PyPI - Python Version" src="https://img.shields.io/pypi/pyversions/protonvpn-linux-gui-calexandru2018?color=Yellow&label=python&logo=Python&logoColor=Yellow">
 </p>
 <p align="center">
     <a href="https://actions-badge.atrox.dev/calexandru2018/protonvpn-linux-gui/goto?ref=master">
-        <img alt="Master Branch Build Status" src="https://img.shields.io/endpoint.svg?url=https%3A%2F%2Factions-badge.atrox.dev%2Fcalexandru2018%2Fprotonvpn-linux-gui%2Fbadge%3Fref%3Dmaster&style=flat" />
+        <img alt="GitHub Workflow Status (branch)" src="https://img.shields.io/github/workflow/status/calexandru2018/protonvpn-linux-gui/Master branch Flake8/master?label=Master%20branch%20Flake8&logo=Github">
     </a>
     <a href="https://github.com/calexandru2018/protonvpn-linux-gui/blob/master/LICENSE">
         <img src="https://img.shields.io/github/license/calexandru2018/protonvpn-linux-gui">
     </a>
     <a href="https://actions-badge.atrox.dev/calexandru2018/protonvpn-linux-gui/goto?ref=testing">
-        <img alt="Testing Branch Build Status" src="https://img.shields.io/endpoint.svg?url=https%3A%2F%2Factions-badge.atrox.dev%2Fcalexandru2018%2Fprotonvpn-linux-gui%2Fbadge%3Fref%3Dtesting&style=flat" />
+        <img alt="GitHub Workflow Status (branch)" src="https://img.shields.io/github/workflow/status/calexandru2018/protonvpn-linux-gui/Testing branch Flake8/testing?label=Testing%20branch%20Flake8&logo=Github">
     </a> 
 </p>
+
 
 <h3 align="center">An <b>unofficial</b> Linux GUI for ProtonVPN, written in Python. Layout designed in Glade.</h3>
 
