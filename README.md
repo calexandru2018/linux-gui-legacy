@@ -54,10 +54,10 @@ If you have already installed <a href="https://github.com/ProtonVPN/protonvpn-cl
 
 | **Distro**                              | **Command**                                                                               |
 |:----------------------------------------|:--------------------------------------------------------------------                      |
-|Fedora/CentOS/RHEL                       | `sudo dnf install -y python3-gobject gtk3`                               |
-|Ubuntu/Linux Mint/Debian and derivatives | `sudo apt install -y python3-gi python3-gi-cairo gir1.2-gtk-3.0`                          |
-|OpenSUSE/SLES                            | `sudo zypper install python3-gobject python3-gobject-Gdk typelib-1_0-Gtk-3_0 libgtk-3-0`  |
-|Arch Linux/Manjaro                       | `sudo pacman -S python-gobject gtk3`                                                      |
+|Fedora/CentOS/RHEL                       | `sudo dnf install -y python3-gobject gtk3 libappindicator-gtk3`                               |
+|Ubuntu/Linux Mint/Debian and derivatives | `sudo apt install -y python3-gi python3-gi-cairo gir1.2-gtk-3.0 python-appindicator`                          |
+|OpenSUSE/SLES                            | `sudo zypper install python3-gobject python3-gobject-Gdk typelib-1_0-Gtk-3_0 libgtk-3-0 libappindicator-gtk3`  |
+|Arch Linux/Manjaro                       | `sudo pacman -S python-gobject gtk3 libappindicator-gtk3`                                                      |
 
 
 ## Installing ProtonVPN Linux GUI
