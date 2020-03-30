@@ -57,7 +57,9 @@ import gi
 
 # Gtk3 import
 gi.require_version('Gtk', '3.0')
-from gi.repository import GLib, Gtk, GObject, Gdk
+gi.require_version('AppIndicator3', '0.1')
+from gi.repository import  Gtk
+from gi.repository import AppIndicator3 as appindicator
 
 class Handler:
     """Handler that has all callback functions.
