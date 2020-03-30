@@ -626,7 +626,6 @@ def initialize_gui():
             thread.start()
     
         window.show()
-    
-    GObject.threads_init()
+
     Gtk.main()
     
