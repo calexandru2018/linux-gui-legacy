@@ -2373,11 +2373,11 @@
     <property name="gravity">center</property>
     <property name="attached_to">DashboardWindow</property>
     <property name="program_name">Unofficial ProntVPN GUI for Linux</property>
+    <property name="copyright" translatable="yes">Proton Technologies AG</property>
     <property name="comments" translatable="yes">Based on protonvpn-cli-ng</property>
     <property name="website">https://github.com/calexandru2018/protonvpn-linux-gui</property>
-    <property name="website_label" translatable="yes">Github</property>
-    <property name="authors">ProtonVPN CLI: Rafficer and ProtonVPN
-ProtonVPN Unofficial GUI: calexandru2018</property>
+    <property name="website_label" translatable="yes">Github Repo</property>
+    <property name="authors">calexandru2018</property>
     <property name="logo">protonvpn_logo_full.png</property>
     <property name="license_type">gpl-3-0</property>
     <signal name="delete-event" handler="AboutDialog_delete_event" swapped="no"/>
