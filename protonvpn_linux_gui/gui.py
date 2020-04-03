@@ -57,9 +57,9 @@ import gi
 
 # Gtk3 import
 gi.require_version('Gtk', '3.0')
-gi.require_version('AppIndicator3', '0.1')
 from gi.repository import  Gtk
-from gi.repository import AppIndicator3 as appindicator
+
+from .tray_icon import indicator
 
 class Handler:
     """Handler that has all callback functions.
@@ -626,7 +626,8 @@ def initialize_gui():
             thread = Thread(target=load_content_on_start, args=[objects])
             thread.daemon = True
             thread.start()
-    
+            
+        indicator(Gtk)
         window.show()
 
     Gtk.main()
