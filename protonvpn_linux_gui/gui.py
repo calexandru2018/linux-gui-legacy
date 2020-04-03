@@ -627,7 +627,7 @@ def initialize_gui():
             thread.daemon = True
             thread.start()
             
-        indicator(Gtk)
+        # indicator(Gtk)
         window.show()
 
     Gtk.main()

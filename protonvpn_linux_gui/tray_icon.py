@@ -7,13 +7,16 @@ from gi.repository import Gtk
 from gi.repository import AppIndicator3 as appindicator
 
 def indicator(gtk=False):
+    itself = False
     if not gtk:
+        itself = True
         gtk = Gtk 
     indicator = appindicator.Indicator.new("ProtonVPN Indicator", "protonvpn-gui", appindicator.IndicatorCategory.APPLICATION_STATUS)
     indicator.set_status(appindicator.IndicatorStatus.ACTIVE)
     indicator.set_menu(menu(gtk))
     indicator.set_icon_full("/home/alexandru/protonvpn-linux-gui/protonvpn_linux_gui/resources/protonvpn_logo.png", 'protonvpn')
-    # gtk.main()
+    if itself:
+        gtk.main()
 
 def menu(gtk):
     menu = gtk.Menu()
