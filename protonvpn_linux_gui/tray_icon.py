@@ -38,7 +38,7 @@ def menu(gtk):
     menu.append(command_one) 
     
     exittray = gtk.MenuItem(label='Quit')
-    # exittray.connect('activate', quit)
+    exittray.connect('activate', quit, gtk)
     menu.append(exittray)
 
     menu.show_all()
@@ -47,7 +47,7 @@ def menu(gtk):
 def note(_):
     os.system("gedit $HOME/Documents/notes.txt")
 
-def quit(_):
+def quit(_, gtk):
     gtk.main_quit()
 
 # if __name__ == "__main__":
