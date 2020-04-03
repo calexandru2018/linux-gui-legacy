@@ -535,7 +535,10 @@ def load_configurations(interface):
     populate_autoconnect_list(interface)
     autoconnect_combobox = interface.get_object("autoconnect_combobox")
 
-    autoconnect_setting = get_config_value("USER", "autoconnect")
+    try:
+        autoconnect_setting = get_config_value("USER", "autoconnect")
+    except KeyError:
+        autoconnect_setting = 0
 
     autoconnect_combobox.set_active(int(autoconnect_setting))
 
