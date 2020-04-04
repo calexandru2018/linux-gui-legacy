@@ -172,11 +172,7 @@ If you would like to launch the GUI without having to type in your sudo password
 - ~~Kill Switch~~
 - ~~Filtering servers~~
 - ~~Start on Boot~~ (only for systemd/systemctl based OS's)
-<<<<<<< HEAD
 - ~~Systray/AppIndicator~~
-=======
-- Systray/AppIndicator
->>>>>>> master
 
 ## GUI Layout
 <p align="center">
