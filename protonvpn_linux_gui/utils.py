@@ -331,8 +331,7 @@ def update_labels_server_list(interface, server_tree_list_object=False, conn_inf
     }
 
     # Update labels
-    # gobject.idle_add(update_labels_status, update_labels_dict)
-    gobject.timeout_add_seconds(1, update_labels_status, update_labels_dict)
+    gobject.idle_add(update_labels_status, update_labels_dict)
 
     # Populate server list
     gobject.idle_add(populate_server_list, populate_servers_dict)
@@ -357,8 +356,6 @@ def update_labels_status(update_labels_dict):
         
     left_grid_update_labels(update_labels_dict["interface"], servers, is_vpn_connected, connected_server, update_labels_dict["disconnecting"])
     right_grid_update_labels(update_labels_dict["interface"], servers, is_vpn_connected, connected_server, update_labels_dict["disconnecting"], conn_info=update_labels_dict["conn_info"])
-    
-    return True
 
 def left_grid_update_labels(interface, servers, is_connected, connected_server, disconnecting):
     """Function that updates the labels that are position within the left-side of the dashboard grid.
@@ -374,7 +371,6 @@ def left_grid_update_labels(interface, servers, is_connected, connected_server, 
     server_features_label = interface.get_object("server_features_label")
 
     all_features = {0: "Normal", 1: "Secure-Core", 2: "Tor", 4: "P2P"}
-    connection_time = False
     connected_to_protocol = False
 
     # Check and set VPN status label. Get also protocol status if vpn is connected
@@ -383,12 +379,8 @@ def left_grid_update_labels(interface, servers, is_connected, connected_server, 
     else:
         vpn_status_label.set_markup('<span foreground="#4E9A06">Connected</span>')
         try:
-            connected_time = get_config_value("metadata", "connected_time")
-            connection_time = time.time() - int(connected_time)
-            connection_time = str(datetime.timedelta(seconds=connection_time)).split(".")[0]
             connected_to_protocol = get_config_value("metadata", "connected_proto")
         except KeyError:
-            connection_time = False
             connected_to_protocol = False
     
     # Check and set DNS status label
@@ -398,9 +390,8 @@ def left_grid_update_labels(interface, servers, is_connected, connected_server, 
     else:
         dns_status_label.set_markup('<span foreground="#4E9A06">Enabled</span>')
 
-    # Set time connected label
-    connection_time = connection_time if connection_time else ""
-    time_connected_label.set_markup('<span>{0}</span>'.format(connection_time))
+    # Update time connected label
+    gobject.timeout_add_seconds(1, update_connection_time, {"is_connected":is_connected, "label":time_connected_label})
 
     # Check and set killswitch label
     connected_time = get_config_value("USER", "killswitch")
@@ -433,8 +424,6 @@ def right_grid_update_labels(interface, servers, is_connected, connected_server,
     country_label =         interface.get_object("country_label")
     data_received_label =   interface.get_object("data_received_label")
     data_sent_label =       interface.get_object("data_sent_label") 
-
-    tx_amount, rx_amount = get_transferred_data()
 
     # Get and set IP labels. Get also country and ISP
     if not conn_info:
@@ -475,13 +464,38 @@ def right_grid_update_labels(interface, servers, is_connected, connected_server,
     ip = "<span>" + ip + "</span>"
     country_label.set_markup(country_isp)
 
-    # Get and set recieved data
+    # Update sent and received data
+    gobject.timeout_add_seconds(1, update_sent_received_data, {"received_label": data_received_label, "sent_label": data_sent_label})
+    
+
+def update_sent_received_data(dict_labels):
+    tx_amount, rx_amount = get_transferred_data()
+
     rx_amount = rx_amount if is_connected else ""
-    data_received_label.set_markup('<span>{0}</span>'.format(rx_amount))
+    
+    dict_labels["received_label"].set_markup('<span>{0}</span>'.format(rx_amount))
 
     # Get and set sent data
     tx_amount = tx_amount if is_connected else ""
-    data_sent_label.set_markup('<span>{0}</span>'.format(tx_amount))
+    dict_labels["sent_label"].set_markup('<span>{0}</span>'.format(tx_amount))
+    
+    return True
+
+def update_connection_time(dict_data):
+    connection_time = False
+    
+    if dict_data["is_connected"]:
+        try:
+            connected_time = get_config_value("metadata", "connected_time")
+            connection_time = time.time() - int(connected_time)
+            connection_time = str(datetime.timedelta(seconds=connection_time)).split(".")[0]
+        except KeyError:
+            connection_time = False
+    
+    connection_time = connection_time if connection_time else ""
+    dict_data["label"].set_markup('<span>{0}</span>'.format(connection_time))
+
+    return True
 
 def load_configurations(interface):
     """Function that sets and populates user configurations before showing the configurations window.
