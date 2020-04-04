@@ -35,6 +35,13 @@ from .gui_logger import gui_logger
 # Import constants
 from .constants import VERSION, GITHUB_URL_RELEASE
 
+# PyGObject import
+import gi
+
+# Gtk3 import
+gi.require_version('Gtk', '3.0')
+from gi.repository import GObject as gobject
+
 # Load on start
 def load_content_on_start(objects):
     """Calls load_on_start, which returns False if there is no internet connection, otherwise populates dashboard labels and server list
@@ -294,8 +301,14 @@ def refresh_server_list(interface, messagedialog_window, messagedialog_spinner):
     time.sleep(1)
 
     gui_logger.debug(">>> Running \"update_labels_server_list\".")
+    
+    # update_labels_server_list(interface)
+    populate_servers_dict = {
+        "tree_object": interface.get_object("ServerTreeStore"),
+        "servers": False
+    }
 
-    update_labels_server_list(interface)
+    gobject.idle_add(populate_server_list, populate_servers_dict)
 
     messagedialog_window.hide()
     messagedialog_spinner.hide()
@@ -421,7 +434,15 @@ def update_pvpn_plan(interface, messagedialog_label, messagedialog_spinner):
 
     gui_logger.debug(">>> Result: \"{0}\"".format("ProtonVPN Plan has been updated!"))
 
-    load_on_start({"interface":interface, "gui_enabled": True})     
+    time.sleep(1.5)
+
+    # load_on_start({"interface":interface, "gui_enabled": True})     
+    populate_servers_dict = {
+        "tree_object": interface.get_object("ServerTreeStore"),
+        "servers": False
+    }
+
+    gobject.idle_add(populate_server_list, populate_servers_dict)
 
     gui_logger.debug(">>> Ended tasks in \"set_protonvpn_tier\" thread.")   
 
