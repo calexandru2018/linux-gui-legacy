@@ -57,7 +57,7 @@ import gi
 
 # Gtk3 import
 gi.require_version('Gtk', '3.0')
-from gi.repository import GLib, Gtk, GObject, Gdk
+from gi.repository import  Gtk
 
 class Handler:
     """Handler that has all callback functions.
@@ -624,7 +624,8 @@ def initialize_gui():
             thread = Thread(target=load_content_on_start, args=[objects])
             thread.daemon = True
             thread.start()
-    
+            
+        # indicator(Gtk)
         window.show()
 
     Gtk.main()

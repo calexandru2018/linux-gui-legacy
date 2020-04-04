@@ -50,15 +50,32 @@ Protonvpn-linux-gui works on top of <a href="https://github.com/ProtonVPN/proton
 - <a href="https://github.com/ProtonVPN/protonvpn-cli-ng"><b>protonvpn-cli-ng</b></a>
 
 
-If you have already installed <a href="https://github.com/ProtonVPN/protonvpn-cli-ng"><b>protonvpn-cli-ng</b></a>, then you will only need to install the following packages for the GUI:
+If you have already installed <a href="https://github.com/ProtonVPN/protonvpn-cli-ng"><b>protonvpn-cli-ng</b></a>, then you will only need to <b>install the following packages for the GUI</b>:
 
-| **Distro**                              | **Command**                                                                               |
-|:----------------------------------------|:--------------------------------------------------------------------                      |
-|Fedora/CentOS/RHEL                       | `sudo dnf install -y python3-gobject gtk3`                               |
-|Ubuntu/Linux Mint/Debian and derivatives | `sudo apt install -y python3-gi python3-gi-cairo gir1.2-gtk-3.0`                          |
-|OpenSUSE/SLES                            | `sudo zypper install python3-gobject python3-gobject-Gdk typelib-1_0-Gtk-3_0 libgtk-3-0`  |
-|Arch Linux/Manjaro                       | `sudo pacman -S python-gobject gtk3`                                                      |
+| **Distro**                              | **Command**                                                                                                     |
+|:----------------------------------------|:----------------------------------------------------------------------------------------------------------------|
+|Fedora/CentOS/RHEL                       | `sudo dnf install -y python3-gobject gtk3`                                                                      |
+|Ubuntu/Linux Mint/Debian and derivatives | `sudo apt install -y python3-gi python3-gi-cairo gir1.2-gtk-3.0`                                                |
+|OpenSUSE/SLES                            | `sudo zypper install python3-gobject python3-gobject-Gdk typelib-1_0-Gtk-3_0 libgtk-3-0`                        |
+|Arch Linux/Manjaro                       | `sudo pacman -S python-gobject gtk3`                                                                            |
 
+If you would also like to use <b>systray/appindicator then you will need to install the following packages</b>:
+
+| **Distro**                              | **Command**                                                                                                     |
+|:----------------------------------------|:----------------------------------------------------------------------------------------------------------------|
+|Fedora/CentOS/RHEL                       | `sudo dnf install -y libappindicator-gtk3`                                                                      |
+|Ubuntu/Linux Mint/Debian and derivatives | `sudo apt install -y python-appindicator`                                                                       |
+|OpenSUSE/SLES                            | `sudo zypper install libappindicator-gtk3`                                                                      |
+|Arch Linux/Manjaro                       | `sudo pacman -S libappindicator-gtk3`                                                                           |
+
+**NOTE:**
+Gnome users will to install and additional extension for this to work: <a href="https://extensions.gnome.org/extension/615/appindicator-support/"> KStatusNotifierItem/AppIndicator Support</a>
+
+### Known issue:
+There is a known issue when user attempts to start the systray/appindicator. This might throw an error that is simillar to this one: `(<app-name>:<pid>) LIBDBUSMENU-GLIB-WARNING **: Unable to get session bus: Failed to execute child process "dbus-launch" (No such file or directory)` if a user does not have a specific package installed. If you are unable to use the systray/appindicator and have a simillar error then a solution is provided below.
+
+**Solution:**
+Install `dbus-x11` package for your distribution, more information can be found on this <a href="https://askubuntu.com/questions/1005623/libdbusmenu-glib-warning-unable-to-get-session-bus-failed-to-execute-child">stackoverflow</a> post.
 
 ## Installing ProtonVPN Linux GUI
 
@@ -96,6 +113,7 @@ If you would like to run the the GUI within a virtual environment (for either de
 
 ## Create .desktop file
 
+### ProtonVPN GUI
 To create at <i>desktop</i> launcher with a .desktop file, follow the instrucitons below.
 
 1. Find the path to the package with `pip3 show protonvpn-linux-gui-calexandru2018`
@@ -114,9 +132,32 @@ To create at <i>desktop</i> launcher with a .desktop file, follow the instrucito
     Icon=<YOUR_ICON_PATH>
     Type=Application
     Terminal=False
-    Categories=Utility;GUI;Network;VPN>
+    Categories=Utility;GUI;Network;VPN
     ```
-### Further enhancement
+
+### ProtonVPN Tray
+To create at <i>tray icon</i> launcher with a .desktop file, follow the instrucitons below.
+
+1. Find the path to the package with `pip3 show protonvpn-linux-gui-calexandru2018`
+
+   You should get something like `Location: /usr/local/lib/<YOUR_PYTHON_VERSION>/dist-packages` , this is where your Python packages reside. **Note:** Based on your distro, your `Location` path may not look exactly like this one, so make sure to use your own and `Location` path.
+
+2. Based on previous information, the path to your icon should be `<PATH_DISPLAYED_IN_STEP_1>/protonvpn_linux_gui/resources/protonvpn_logo.png`
+
+3. Create a `protonvpn-tray.desktop` file in `.local/share/applications/`, and paste in the following code. Remember to change the **`Icon`** path to your own path.
+
+    ```
+    [Desktop Entry]
+    Name=ProtonVPN GUI Tray
+    GenericName=Unofficial ProtonVPN GUI Tray for Linux
+    Exec=protonvpn-tray
+    Icon=<YOUR_ICON_PATH>
+    Type=Application
+    Terminal=False
+    Categories=Utility;GUI;Network;VPN
+    ```
+
+## Further enhancement
 If you would like to launch the GUI without having to type in your sudo password everytime, then you could add the bin to `visudo`. This is extremly useful when you have a .desktop file, and all you want to do is click the launcher to have the GUI pop-up without being prompted for sudo password.
 
 1. First you will need the path to the GUI. This can be found by typing `which protonvpn-gui`. You should get something like this: `/usr/bin/protonvpn-gui`. Save it since you will need it later. **Note:** As previously mentioned, the path may look different for you, based on your distro.
@@ -125,13 +166,13 @@ If you would like to launch the GUI without having to type in your sudo password
 4. Once you are at the botton, type: `<YOUR_USERNAME_FROM_STEP2> ALL = (root) NOPASSWD: <YOUR_PATH_FROM_STEP1>`
 5. Exit and save! Have fun :)
 
-### Not yet implemented:
+## Not yet implemented:
 
 - ~~Split Tunneling~~
 - ~~Kill Switch~~
 - ~~Filtering servers~~
 - ~~Start on Boot~~ (only for systemd/systemctl based OS's)
-- Systray/AppIndicator
+- ~~Systray/AppIndicator~~
 
 ## GUI Layout
 <p align="center">
