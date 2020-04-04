@@ -59,8 +59,6 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import  Gtk
 
-# from .tray_icon import indicator
-
 class Handler:
     """Handler that has all callback functions.
     """
