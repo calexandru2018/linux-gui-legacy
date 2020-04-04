@@ -25,7 +25,7 @@ setup(
     entry_points={
             "console_scripts": [
                 "protonvpn-gui = protonvpn_linux_gui.gui:initialize_gui",
-                "tray = protonvpn_linux_gui.tray_icon:indicator",
+                "protonvpn-gui-tray = protonvpn_linux_gui.tray_icon:ProtonVPNIndicator",
             ]
         },
     include_package_data=True,
