@@ -331,7 +331,8 @@ def update_labels_server_list(interface, server_tree_list_object=False, conn_inf
     }
 
     # Update labels
-    gobject.idle_add(update_labels_status, update_labels_dict)
+    # gobject.idle_add(update_labels_status, update_labels_dict)
+    gobject.timeout_add_seconds(1, update_labels_status, update_labels_dict)
 
     # Populate server list
     gobject.idle_add(populate_server_list, populate_servers_dict)
@@ -357,6 +358,8 @@ def update_labels_status(update_labels_dict):
     left_grid_update_labels(update_labels_dict["interface"], servers, is_vpn_connected, connected_server, update_labels_dict["disconnecting"])
     right_grid_update_labels(update_labels_dict["interface"], servers, is_vpn_connected, connected_server, update_labels_dict["disconnecting"], conn_info=update_labels_dict["conn_info"])
     
+    return True
+
 def left_grid_update_labels(interface, servers, is_connected, connected_server, disconnecting):
     """Function that updates the labels that are position within the left-side of the dashboard grid.
     """
