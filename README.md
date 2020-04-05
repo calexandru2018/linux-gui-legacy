@@ -80,24 +80,23 @@ Install `dbus-x11` package for your distribution, more information can be found 
 ## Installing ProtonVPN Linux GUI
 
 ### Distribution based
-- Fedora: To-do
-- Ubuntu: To-do
-- OpenSUSE: To-do
-- Arch Linux: <a href="https://aur.archlinux.org/packages/protonvpn-linux-gui/" target="_blank">Available at AUR</a>
+- Fedora/CentOS/RHEL: To-do
+- Ubuntu derivatives: To-do
+- OpenSUSE/SLES: To-do
+- Arch Linux/Manjaro: <a href="https://aur.archlinux.org/packages/protonvpn-linux-gui/" target="_blank">Available at AUR</a>
 
 
 ### PIP based
-You can either install via <b>PIP</b> or by cloning the repository.
 
 *Note: Make sure to run pip with sudo*
 
 `sudo pip3 install protonvpn-linux-gui-calexandru2018`
 
-### To update to a new version
+#### To update to a new version
 
 `sudo pip3 install protonvpn-linux-gui-calexandru2018 --upgrade`
 
-## Manual Installation
+### Manual Installation
 
 1. Clone this repository
 
@@ -111,9 +110,15 @@ You can either install via <b>PIP</b> or by cloning the repository.
 
     `sudo python3 setup.py install`
 
-### How to use
+## How to use
+
+### ProtonVPN GUI
 
  `sudo protonvpn-gui`
+
+### ProtonVPN Tray
+
+ `protonvpn-tray`
 
 ## Virtual environment
 
