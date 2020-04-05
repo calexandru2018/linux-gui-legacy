@@ -79,6 +79,14 @@ Install `dbus-x11` package for your distribution, more information can be found 
 
 ## Installing ProtonVPN Linux GUI
 
+### Distribution based
+- Fedora: To-do
+- Ubuntu: To-do
+- OpenSUSE: To-do
+- Arch Linux: <a href="https://aur.archlinux.org/packages/protonvpn-linux-gui/" target="_blank">Available at AUR</a>
+
+
+### PIP based
 You can either install via <b>PIP</b> or by cloning the repository.
 
 *Note: Make sure to run pip with sudo*
