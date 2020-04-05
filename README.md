@@ -64,7 +64,7 @@ If you would also like to use <b>systray/appindicator then you will need to inst
 | **Distro**                              | **Command**                                                                                                     |
 |:----------------------------------------|:----------------------------------------------------------------------------------------------------------------|
 |Fedora/CentOS/RHEL                       | `sudo dnf install -y libappindicator-gtk3`                                                                      |
-|Ubuntu/Linux Mint/Debian and derivatives | `sudo apt install -y python-appindicator`                                                                       |
+|Ubuntu/Linux Mint/Debian and derivatives | `sudo apt install -y gir1.2-appindicator3`                                                                       |
 |OpenSUSE/SLES                            | `sudo zypper install libappindicator-gtk3`                                                                      |
 |Arch Linux/Manjaro                       | `sudo pacman -S libappindicator-gtk3`                                                                           |
 
