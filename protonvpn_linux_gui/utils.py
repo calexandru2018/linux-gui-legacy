@@ -586,6 +586,32 @@ def load_configurations(interface):
     except FileNotFoundError:
         split_tunneling_buffer.set_text(content)
 
+    # Load tray configurations
+    display_server = 0
+    display_data_tx = 0
+    display_time_conn = 0
+
+    try: 
+        display_data_tx = int(get_config_value("USER", "display_user_tx"))
+    except KeyError:
+        gui_logger.debug("[!] Unable to find display_data_tx key.")
+    try: 
+        display_server = int(get_config_value("USER", "display_server"))
+    except KeyError:
+        gui_logger.debug("[!] Unable to find display_server key.")
+    try: 
+        display_time_conn = int(get_config_value("USER", "display_time_conn"))
+    except KeyError:
+        gui_logger.debug("[!] Unable to find display_time_conn key.")
+
+    tray_data_tx_combobox = interface.get_object("tray_data_tx_combobox")
+    tray_servername_combobox = interface.get_object("tray_servername_combobox")
+    tray_time_connected_combobox = interface.get_object("tray_time_connected_combobox")
+
+    tray_data_tx_combobox.set_active(display_data_tx)
+    tray_servername_combobox.set_active(display_server)
+    tray_time_connected_combobox.set_active(display_time_conn)
+
     pref_dialog.show()
 
 def populate_server_list(populate_servers_dict):
