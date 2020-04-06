@@ -46,7 +46,8 @@ from .thread_functions import(
     purge_configurations,
     kill_duplicate_gui_process,
     load_content_on_start,
-    update_autoconnect
+    update_autoconnect,
+    tray_configurations
 )
 
 # Import version
@@ -489,6 +490,21 @@ class Handler:
         gui_logger.debug(">>> Starting \"update_split_tunneling\" thread.")
 
         thread = Thread(target=update_split_tunneling, args=[self.interface, self.messagedialog_label, self.messagedialog_spinner])
+        thread.daemon = True
+        thread.start()
+
+        self.messagedialog_window.show()    
+    
+    def update_tray_configurations_button_clicked(self, button):
+        """Button/Event handler to update Tray display configurations
+        """
+        self.messagedialog_sub_label.hide()
+        self.messagedialog_label.set_markup("Updating tray display configurations...")
+        self.messagedialog_spinner.show()
+
+        gui_logger.debug(">>> Starting \"tray_configurations\" thread.")
+
+        thread = Thread(target=tray_configurations, args=[self.interface, self.messagedialog_label, self.messagedialog_spinner])
         thread.daemon = True
         thread.start()
 
