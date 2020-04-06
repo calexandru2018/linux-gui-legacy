@@ -21,7 +21,6 @@ from .utils import (
     populate_server_list,
     prepare_initilizer,
     load_on_start,
-    load_configurations,
     update_labels_server_list,
     get_gui_processes,
     manage_autoconnect,
@@ -603,6 +602,33 @@ def update_split_tunneling(interface, messagedialog_label, messagedialog_spinner
 
     gui_logger.debug(">>> Ended tasks in \"set_split_tunnel\" thread.")   
 
+def tray_configurations(interface, messagedialog_label, messagedialog_spinner):
+    """Function to update what the tray should display.
+    """    
+    gui_logger.debug(">>> Running \"tray_configurations\".")
+
+    tray_data_tx_combobox = interface.get_object("tray_data_tx_combobox").get_active()
+    tray_servername_combobox = interface.get_object("tray_servername_combobox").get_active()
+    tray_time_connected_combobox = interface.get_object("tray_time_connected_combobox").get_active()
+
+    set_config_value("USER", "display_server", tray_servername_combobox)
+    set_config_value("USER", "display_user_tx", tray_data_tx_combobox)
+    set_config_value("USER", "display_time_conn", tray_time_connected_combobox)
+
+    data_tx_msg = "Display" if tray_data_tx_combobox == 1 else "Do not display"
+    servername_msg = "Display" if tray_servername_combobox == 1 else "Do not display"
+    time_connected_msg = "Display" if tray_time_connected_combobox == 1 else "Do not display"
+
+    custom_msg = "Data Transmitted: {0}\nServername: {1}\nTime Connected: {2}".format(data_tx_msg, servername_msg, time_connected_msg)
+
+    result = "Tray configurations <b>updated</b>!\n\n" + custom_msg
+    messagedialog_label.set_markup(result)
+    messagedialog_spinner.hide()
+
+    gui_logger.debug(">>> Result: \"{0}\"".format(result))
+
+    gui_logger.debug(">>> Ended tasks in \"tray_configurations\" thread.")   
+    
 def purge_configurations(interface, messagedialog_label, messagedialog_spinner):
     """Function to purge all current configurations.
     """
