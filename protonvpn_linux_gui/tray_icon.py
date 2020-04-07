@@ -1,8 +1,10 @@
 import os
 import time
 import datetime
-import gi
 import subprocess
+
+# Import GTK3 and AppIndicator3
+import gi
 
 gi.require_version('Gtk', '3.0')
 gi.require_version('AppIndicator3', '0.1')
@@ -10,12 +12,21 @@ gi.require_version('AppIndicator3', '0.1')
 from gi.repository import Gtk, GObject
 from gi.repository import AppIndicator3 as appindicator
 
-from protonvpn_cli.utils import (
-    get_country_name,
-    get_config_value,
-    is_connected,
-    get_transferred_data
-)
+# Import protonvpn-cli-ng util functions
+try:
+    from protonvpn_cli.utils import (
+        get_country_name,
+        get_config_value,
+        is_connected,
+        get_transferred_data,
+        pull_server_data,
+        get_servers,
+        get_server_value
+    )
+except:
+    sys.exit(1)
+
+from .gui_logger import gui_logger
 
 CURRDIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -23,7 +34,8 @@ class ProtonVPNIndicator:
     def __init__(self):
         self.gtk = Gtk
         self.gobject = GObject
-        self.VARL = 0
+        self.display_serverload = False
+        self.serverload_msg = "Load: -"
         self.menu = self.menu()
         self.ind = appindicator.Indicator.new(
             "ProtonVPN GUI Indicator", 
@@ -31,13 +43,22 @@ class ProtonVPNIndicator:
             appindicator.IndicatorCategory.APPLICATION_STATUS)
         self.ind.set_status(appindicator.IndicatorStatus.ACTIVE)
         self.ind.set_menu(self.menu)
-        # self.gobject.timeout_add_seconds(1, self.update_label, None)
-        self.connection_status(None)
-        self.gobject.timeout_add_seconds(5, self.connection_status, None)
+
+        # Get first server load
+        self.update_serverload(None)
+        # Call main loop
+        self.main_loop(None)
+        
+        self.gobject.timeout_add_seconds(5, self.main_loop, None)
+        self.gobject.timeout_add_seconds(910, self.update_serverload, None)
+
         self.gtk.main()
 
     def menu(self):
         self.menu = self.gtk.Menu()
+        
+        self.server_load = self.gtk.MenuItem(label='')
+        self.menu.append(self.server_load)
         
         self.data_sent = self.gtk.MenuItem(label='')
         self.menu.append(self.data_sent)
@@ -85,8 +106,11 @@ class ProtonVPNIndicator:
 
         return self.menu
 
-    def connection_status(self, _):
+    def main_loop(self, _):
+        """Main loop that updates all labels.
+        """
         icon_path = "/resources/protonvpn_logo_alt.png"
+        self.display_serverload = False
         display_data_rec = False
         display_server = False
         display_time_conn = False
@@ -95,11 +119,13 @@ class ProtonVPNIndicator:
             icon_path = "/resources/protonvpn_logo.png"
             settings = self.get_tray_settings()
 
+            self.display_serverload = True if settings["display_serverload"] else False
             display_data_rec = True if settings["display_data_tx"] else False
             display_server = True if settings["display_server"] else False
             display_time_conn = True if settings["display_time_conn"] else False
-
+            
         self.display_extra_info(
+                                display_serverload=self.display_serverload,
                                 display_data_rec=display_data_rec,
                                 display_server=display_server, 
                                 display_time_conn=display_time_conn)
@@ -107,42 +133,103 @@ class ProtonVPNIndicator:
         self.ind.set_icon_full(CURRDIR + icon_path, 'protonvpn')
 
         return True
-  
+    
+    def update_serverload(self, _):
+        """Updates server load.
+        """
+
+        connected_server = False
+        load = False
+
+        try:
+            connected_server = get_config_value("metadata", "connected_server")
+        except KeyError:
+            gui_logger.debug("[!] Could not find specified key: ".format(KeyError))
+            return True
+
+        # force_pull servers
+        try:
+            pull_server_data(force=True)
+        except:
+            gui_logger.debug("[!] Could not pull from servers, possible due to unstable connection.")
+            return True
+
+        # get_servers
+        servers = get_servers()
+
+        # get server load
+        try:
+            load = get_server_value(connected_server, "Load", servers)
+        except:
+            gui_logger.debug("[!] Unable to get server load.")
+            return True
+
+        self.serverload_msg = "Load: {}%".format(load)
+        
+        return True
+
     def quick_connect(self, _):
+        """Makes a quick connection by making a cli call to protonvpn-cli-ng"""
         subprocess.Popen(["sudo", "protonvpn", "connect", "--fastest"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        self.update_serverload(None)
 
     def show_gui(self, _):
+        """Displays the GUI."""
         subprocess.Popen(["sudo", "protonvpn-gui"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
     def disconnect(self, _):
+        """Disconnects from a current vpn connection."""
         subprocess.Popen(["sudo", "protonvpn", "disconnect"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
     def get_tray_settings(self):
+        """Gets and returns tray settings from config file.
+        Returns: dict
+            - Dictionary with boolean values for each display configuration.
+        """
 
         resp_dict = {
+            "display_serverload": False,
             "display_data_tx": False,
             "display_server": False,
             "display_time_conn": False,
         }
 
         try: 
+            resp_dict["display_serverload"] = int(get_config_value("USER", "display_serverload"))
+        except KeyError:
+            gui_logger.debug("[!] Could not find display_serverload in config file: ".format(KeyError))
+            pass
+        
+        try: 
             resp_dict["display_server"] = int(get_config_value("USER", "display_server"))
         except KeyError:
+            gui_logger.debug("[!] Could not find display_server in config file: ".format(KeyError))
             pass
 
         try: 
             resp_dict["display_data_tx"] = int(get_config_value("USER", "display_user_tx"))
         except KeyError:
+            gui_logger.debug("[!] Could not find display_data_tx in config file: ".format(KeyError))
             pass 
         
         try: 
             resp_dict["display_time_conn"] = int(get_config_value("USER", "display_time_conn"))
         except KeyError:
+            gui_logger.debug("[!] Could not find display_time_conn in config file: ".format(KeyError))
             pass
 
         return resp_dict
 
     def display_extra_info(self, **kwrgs):
+        """Either displays or hides information based on tray display configurations.
+        """
+
+        if kwrgs["display_serverload"]: 
+            self.server_load.get_child().set_text(self.serverload_msg)
+            self.server_load.show()
+        else:
+            self.server_load.get_child().set_text("Load: -")
+            self.server_load.hide()
 
         if kwrgs["display_server"]: 
             server = get_config_value("metadata", "connected_server")
@@ -175,6 +262,9 @@ class ProtonVPNIndicator:
             self.time_conn.hide()
 
     def data_sent_received(self):
+        """Get and returns ammount of sent and received data.
+        """
+
         sent_amount, received_amount = get_transferred_data()
 
         sent_amount = sent_amount if is_connected else ""
@@ -183,6 +273,9 @@ class ProtonVPNIndicator:
         return (received_amount, sent_amount)
 
     def time_connected(self):
+        """Gets and returns the connection time length.
+        """
+
         try:
             connected_time = get_config_value("metadata", "connected_time")
             connection_time = time.time() - int(connected_time)
@@ -195,4 +288,6 @@ class ProtonVPNIndicator:
         return connection_time
 
     def quit_indicator(self, _):
+        """Quit/Stop the tray icon.
+        """
         self.gtk.main_quit()
