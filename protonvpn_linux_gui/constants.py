@@ -2,8 +2,22 @@ try:
     from protonvpn_cli.constants import VERSION as cli_version
 except:
     cli_version = "Not installed"
-VERSION = "1.8.1"
+VERSION = "1.8.2"
 GITHUB_URL_RELEASE = "https://github.com/calexandru2018/protonvpn-linux-gui/releases/latest"
+
+# Tray configuration naming
+TRAY_CFG_SERVERLOAD = "display_serverload"
+TRAY_CFG_SERVENAME = "display_server"
+TRAY_CFG_DATA_TX = "display_data_tx"
+TRAY_CFG_TIME_CONN = "display_time_conn"
+
+TRAY_CFG_DICT = {
+    "tray_data_tx_combobox": TRAY_CFG_DATA_TX,
+    "tray_servername_combobox": TRAY_CFG_SERVENAME,
+    "tray_time_connected_combobox": TRAY_CFG_TIME_CONN,
+    "tray_serverload_combobox": TRAY_CFG_SERVERLOAD
+}
+
 SERVICE_NAME = "custompvpn-autoconnect" 
 PATH_AUTOCONNECT_SERVICE = "/etc/systemd/system/{}.service".format(SERVICE_NAME)
 TEMPLATE ="""

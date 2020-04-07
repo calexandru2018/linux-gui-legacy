@@ -32,7 +32,7 @@ from .utils import (
 from .gui_logger import gui_logger
 
 # Import constants
-from .constants import VERSION, GITHUB_URL_RELEASE
+from .constants import VERSION, GITHUB_URL_RELEASE, TRAY_CFG_SERVERLOAD, TRAY_CFG_SERVENAME, TRAY_CFG_DATA_TX, TRAY_CFG_TIME_CONN, TRAY_CFG_DICT
 
 # PyGObject import
 import gi
@@ -607,19 +607,14 @@ def tray_configurations(interface, messagedialog_label, messagedialog_spinner):
     """    
     gui_logger.debug(">>> Running \"tray_configurations\".")
 
-    tray_data_tx_combobox = interface.get_object("tray_data_tx_combobox").get_active()
-    tray_servername_combobox = interface.get_object("tray_servername_combobox").get_active()
-    tray_time_connected_combobox = interface.get_object("tray_time_connected_combobox").get_active()
+    response_list = []
+    custom_msg = ""
+    for k,v in TRAY_CFG_DICT.items(): 
+        combobox_val = interface.get_object(k).get_active()
+        set_config_value("USER", v, combobox_val)
+        response_list.append("Display" if combobox_val == 1 else "Do not display")
 
-    set_config_value("USER", "display_server", tray_servername_combobox)
-    set_config_value("USER", "display_user_tx", tray_data_tx_combobox)
-    set_config_value("USER", "display_time_conn", tray_time_connected_combobox)
-
-    data_tx_msg = "Display" if tray_data_tx_combobox == 1 else "Do not display"
-    servername_msg = "Display" if tray_servername_combobox == 1 else "Do not display"
-    time_connected_msg = "Display" if tray_time_connected_combobox == 1 else "Do not display"
-
-    custom_msg = "Data Transmitted: {0}\nServername: {1}\nTime Connected: {2}".format(data_tx_msg, servername_msg, time_connected_msg)
+    custom_msg = "Data Transmitted: {0}\nServername: {1}\nTime Connected: {2}\nServer load: {3}".format(*response_list)
 
     result = "Tray configurations <b>updated</b>!\n\n" + custom_msg
     messagedialog_label.set_markup(result)
