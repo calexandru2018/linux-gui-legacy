@@ -26,6 +26,8 @@ try:
 except:
     sys.exit(1)
 
+from .constants import TRAY_CFG_SERVERLOAD, TRAY_CFG_SERVENAME, TRAY_CFG_DATA_TX, TRAY_CFG_TIME_CONN
+
 from .gui_logger import gui_logger
 
 CURRDIR = os.path.dirname(os.path.abspath(__file__))
@@ -195,25 +197,25 @@ class ProtonVPNIndicator:
         }
 
         try: 
-            resp_dict["display_serverload"] = int(get_config_value("USER", "display_serverload"))
+            resp_dict["display_serverload"] = int(get_config_value("USER", TRAY_CFG_SERVERLOAD))
         except KeyError:
             gui_logger.debug("[!] Could not find display_serverload in config file: ".format(KeyError))
             pass
         
         try: 
-            resp_dict["display_server"] = int(get_config_value("USER", "display_server"))
+            resp_dict["display_server"] = int(get_config_value("USER", TRAY_CFG_SERVENAME))
         except KeyError:
             gui_logger.debug("[!] Could not find display_server in config file: ".format(KeyError))
             pass
 
         try: 
-            resp_dict["display_data_tx"] = int(get_config_value("USER", "display_user_tx"))
+            resp_dict["display_data_tx"] = int(get_config_value("USER", TRAY_CFG_DATA_TX))
         except KeyError:
             gui_logger.debug("[!] Could not find display_data_tx in config file: ".format(KeyError))
             pass 
         
         try: 
-            resp_dict["display_time_conn"] = int(get_config_value("USER", "display_time_conn"))
+            resp_dict["display_time_conn"] = int(get_config_value("USER", TRAY_CFG_TIME_CONN))
         except KeyError:
             gui_logger.debug("[!] Could not find display_time_conn in config file: ".format(KeyError))
             pass
