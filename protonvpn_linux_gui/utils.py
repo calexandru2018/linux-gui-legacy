@@ -26,7 +26,17 @@ try:
 except:
     sys.exit(1)
 
-from .constants import PATH_AUTOCONNECT_SERVICE, TEMPLATE, VERSION, GITHUB_URL_RELEASE, SERVICE_NAME
+from .constants import (
+    PATH_AUTOCONNECT_SERVICE, 
+    TEMPLATE, VERSION, 
+    GITHUB_URL_RELEASE, 
+    SERVICE_NAME, 
+    TRAY_CFG_SERVERLOAD, 
+    TRAY_CFG_SERVENAME, 
+    TRAY_CFG_DATA_TX, 
+    TRAY_CFG_TIME_CONN, 
+    TRAY_CFG_DICT
+)
 
 from .gui_logger import gui_logger
 
@@ -587,30 +597,39 @@ def load_configurations(interface):
         split_tunneling_buffer.set_text(content)
 
     # Load tray configurations
-    display_server = 0
-    display_data_tx = 0
-    display_time_conn = 0
+    for k,v in TRAY_CFG_DICT.items(): 
+        setter = 0
+        try: 
+            setter = int(get_config_value("USER", v))
+        except KeyError:
+            gui_logger.debug("[!] Unable to find {} key.".format(v))
 
-    try: 
-        display_data_tx = int(get_config_value("USER", "display_user_tx"))
-    except KeyError:
-        gui_logger.debug("[!] Unable to find display_data_tx key.")
-    try: 
-        display_server = int(get_config_value("USER", "display_server"))
-    except KeyError:
-        gui_logger.debug("[!] Unable to find display_server key.")
-    try: 
-        display_time_conn = int(get_config_value("USER", "display_time_conn"))
-    except KeyError:
-        gui_logger.debug("[!] Unable to find display_time_conn key.")
+        combobox = interface.get_object(k)
+        combobox.set_active(setter)
 
-    tray_data_tx_combobox = interface.get_object("tray_data_tx_combobox")
-    tray_servername_combobox = interface.get_object("tray_servername_combobox")
-    tray_time_connected_combobox = interface.get_object("tray_time_connected_combobox")
+        
 
-    tray_data_tx_combobox.set_active(display_data_tx)
-    tray_servername_combobox.set_active(display_server)
-    tray_time_connected_combobox.set_active(display_time_conn)
+    # display_server = 0
+    # display_data_tx = 0
+    # display_time_conn = 0
+
+    
+    # try: 
+    #     display_server = int(get_config_value("USER", TRAY_CFG_SERVENAME))
+    # except KeyError:
+    #     gui_logger.debug("[!] Unable to find display_server key.")
+    # try: 
+    #     display_time_conn = int(get_config_value("USER", TRAY_CFG_TIME_CONN))
+    # except KeyError:
+    #     gui_logger.debug("[!] Unable to find display_time_conn key.")
+
+    # tray_data_tx_combobox = interface.get_object("tray_data_tx_combobox")
+    # tray_servername_combobox = interface.get_object("tray_servername_combobox")
+    # tray_time_connected_combobox = interface.get_object("tray_time_connected_combobox")
+
+    # tray_data_tx_combobox.set_active(display_data_tx)
+    # tray_servername_combobox.set_active(display_server)
+    # tray_time_connected_combobox.set_active(display_time_conn)
 
     pref_dialog.show()
 
