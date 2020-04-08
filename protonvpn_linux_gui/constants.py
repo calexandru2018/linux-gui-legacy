@@ -2,7 +2,7 @@ try:
     from protonvpn_cli.constants import VERSION as cli_version
 except:
     cli_version = "Not installed"
-VERSION = "1.8.2"
+VERSION = "1.8.3"
 GITHUB_URL_RELEASE = "https://github.com/calexandru2018/protonvpn-linux-gui/releases/latest"
 
 # Tray configuration naming
