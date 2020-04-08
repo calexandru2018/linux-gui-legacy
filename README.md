@@ -59,7 +59,7 @@ Protonvpn-linux-gui works on top of <a href="https://github.com/ProtonVPN/proton
   - [Create .desktop file](#create-desktop-file)
     - [ProtonVPN GUI](#protonvpn-gui-1)
     - [ProtonVPN Tray](#protonvpn-tray-1)
-  - [Visudo/Sudoless](#visudo/sudoless)
+  - [Visudo/Sudoless](#visudosudoless)
 - [Not yet implemented](#not-yet-implemented)
 - [GUI Layout](#gui-layout)
 
