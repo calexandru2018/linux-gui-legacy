@@ -529,6 +529,12 @@ def update_killswitch(interface, messagedialog_label, messagedialog_spinner):
         split_tunnel_message = "Kill Switch <b>can't</b> be used with Split Tunneling.\nSplit Tunneling has been <b>disabled</b>.\n"
 
     set_config_value("USER", "killswitch", killswitch)
+
+    # Update killswitch label
+    killswitch_status = "<span>Disabled</span>" if str(killswitch) == "0" else "<span foreground=\"#4E9A06\">Enabled</span>"
+    killswitch_label = interface.get_object("killswitch_label")
+    killswitch_label.set_markup('<span>{0}</span>'.format(killswitch_status))
+
     result = split_tunnel_message + "Kill Switch configuration updated to {}!".format(split_tunnel_extra_message)
 
     messagedialog_label.set_markup(result)

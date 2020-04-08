@@ -404,9 +404,9 @@ def left_grid_update_labels(interface, servers, is_connected, connected_server, 
     gobject.timeout_add_seconds(1, update_connection_time, {"is_connected":is_connected, "label":time_connected_label})
 
     # Check and set killswitch label
-    connected_time = get_config_value("USER", "killswitch")
-    killswitch_status = "Enabled" if connected_time == 0 else "Disabled"
-    killswitch_label.set_markup('<span>{0}</span>'.format(killswitch_status))
+    killswitch_setting = get_config_value("USER", "killswitch")
+    killswitch_status = "<span>Disabled</span>" if killswitch_setting == "0" else "<span foreground=\"#4E9A06\">Enabled</span>"
+    killswitch_label.set_markup('{0}'.format(killswitch_status))
 
     # Check and set protocol label
     connected_to_protocol = connected_to_protocol if connected_to_protocol else ""
