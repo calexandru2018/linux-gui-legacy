@@ -47,6 +47,8 @@ class ProtonVPNIndicator:
         self.ind.set_status(appindicator.IndicatorStatus.ACTIVE)
         self.ind.set_menu(self.menu)
 
+        gui_logger.debug("TRAY >>> Starting tray.")
+
         # Get first server load
         self.update_serverload(None)
         # Call main loop
@@ -140,6 +142,7 @@ class ProtonVPNIndicator:
     def update_serverload(self, _):
         """Updates server load.
         """
+        gui_logger.debug("TRAY >>> Updating server load in update_serverload.")
 
         connected_server = False
         load = False
@@ -173,16 +176,23 @@ class ProtonVPNIndicator:
 
     def quick_connect(self, _):
         """Makes a quick connection by making a cli call to protonvpn-cli-ng"""
-        subprocess.Popen(["sudo", "protonvpn", "connect", "--fastest"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        gui_logger.debug("TRAY >>> Starting quick connect.")
+        proces = subprocess.Popen(["sudo", "protonvpn", "connect", "--fastest"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        resp = proces.communicate()
         self.update_serverload(None)
+        gui_logger.debug("TRAY >>> Successfully started quick connect: {}".format(resp))
 
     def show_gui(self, _):
         """Displays the GUI."""
+        gui_logger.debug("TRAY >>> Starting to display GUI.")
         subprocess.Popen(["sudo", "protonvpn-gui"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        gui_logger.debug("TRAY >>> GUI display called, GUI should be visible.")
 
     def disconnect(self, _):
         """Disconnects from a current vpn connection."""
+        gui_logger.debug("TRAY >>> Starting disconnect.")
         subprocess.Popen(["sudo", "protonvpn", "disconnect"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        gui_logger.debug("TRAY >>> Successfully disconnected user.")
 
     def get_tray_settings(self):
         """Gets and returns tray settings from config file.

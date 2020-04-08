@@ -39,10 +39,35 @@
 
 Protonvpn-linux-gui works on top of <a href="https://github.com/ProtonVPN/protonvpn-cli-ng"><b>protonvpn-cli-ng</b></a>, making it a dependency. All local configurations are managed by the GUI (such as updating protocol, split tunneling, manage killswitch) while the connections are managed by the CLI. This way, you will be able to use the latest version of the CLI, while also being able to use the GUI.
 
+## Table of Contents
+- [Installing and Updating](#installing-and-updating)
+  - [Installing Dependencies](#installing-dependencies)
+    - [Python dependencies](#python-dependencies)
+    - [ProtonVPN GUI dependencies](#protonvpn-gui-dependencies)
+    - [ProtonVPN Tray dependencies](#protonvpn-tray-dependencies)
+      - [Known Issue](#known-issue)
+  - [Installing protonvpn-linux-gui](#installing-protonvpn-linux-gui)
+    - [Distribution based](#distribution-based)
+    - [PIP based](#pip-based)
+      - [How to Update](#to-update-to-a-new-version) 
+  - [Manual installation](#manual-installation)
+  - [Virtual environment](#virtual-environment)
+- [How to use](#how-to-use)
+   - [ProtonVPN GUI](#protonvpn-gui)
+   - [ProtonVPN Tray](#protonvpn-tray)
+- [Enhancements]()
+  - [Create .desktop file](#create-desktop-file)
+    - [ProtonVPN GUI](#protonvpn-gui-1)
+    - [ProtonVPN Tray](#protonvpn-tray-1)
+  - [Visudo/Sudoless](#visudo/sudoless)
+- [Not yet implemented](#not-yet-implemented)
+- [GUI Layout](#gui-layout)
+
+# Installing and Updating
+
 ### Installing Dependencies
 
-**Dependencies:**
-
+#### Python dependencies
 - requests
 - python3.5+
 - pip for python3 (pip3)
@@ -50,7 +75,7 @@ Protonvpn-linux-gui works on top of <a href="https://github.com/ProtonVPN/proton
 - <a href="https://github.com/ProtonVPN/protonvpn-cli-ng"><b>protonvpn-cli-ng</b></a>
 
 
-If you have already installed <a href="https://github.com/ProtonVPN/protonvpn-cli-ng"><b>protonvpn-cli-ng</b></a>, then you will only need to <b>install the following packages for the GUI</b>:
+#### ProtonVPN GUI dependencies
 
 | **Distro**                              | **Command**                                                                                                     |
 |:----------------------------------------|:----------------------------------------------------------------------------------------------------------------|
@@ -59,7 +84,7 @@ If you have already installed <a href="https://github.com/ProtonVPN/protonvpn-cl
 |OpenSUSE/SLES                            | `sudo zypper install python3-gobject python3-gobject-Gdk typelib-1_0-Gtk-3_0 libgtk-3-0`                        |
 |Arch Linux/Manjaro                       | `sudo pacman -S python-gobject gtk3`                                                                            |
 
-If you would also like to use <b>systray/appindicator then you will need to install the following packages</b>:
+#### ProtonVPN Tray dependencies
 
 | **Distro**                              | **Command**                                                                                                     |
 |:----------------------------------------|:----------------------------------------------------------------------------------------------------------------|
@@ -110,7 +135,18 @@ Install `dbus-x11` package for your distribution, more information can be found 
 
     `sudo python3 setup.py install`
 
-## How to use
+### Virtual environment
+
+If you would like to run the the GUI within a virtual environment (for either development purpose or other), then you can easily do that with the help of <a href="https://pipenv.readthedocs.io/en/latest/">pipenv</a>. Make sure to install pipenv beforehand following the next steps.
+
+1. `git clone https://github.com/calexandru2018/protonvpn-linux-gui` 
+2. `cd protonvpn-linux-gui`
+3. `pipenv install` installs the virtual environment and all necessary dependencies from `Pipfile`.
+4. `pipenv shell` enters the virtual environment.
+5. `sudo pip install -e .` installs the GUI in your virtual environment. 
+6. `sudo protonvpn-gui` starts the GUI from within the virtual environment.
+
+# How to use
 
 ### ProtonVPN GUI
 
@@ -120,13 +156,11 @@ Install `dbus-x11` package for your distribution, more information can be found 
 
  `protonvpn-tray`
 
-## Virtual environment
+# Enhancements
 
-If you would like to run the the GUI within a virtual environment (for either development purpose or other), then you can easily do that with the help of <a href="https://pipenv.readthedocs.io/en/latest/">pipenv</a>. After cloning the repo and `cd` into the directory, start by installing the virtual environment with the help of `pipenv install`. This will install and configure the environment and also install all dependencies in the `Pipfile` file. After that the configuration and installation process is completed, you can enter the virtual environment with `pipenv shell`. To install the GUI in your virtual environment you can type the following in the terminal `sudo pip install -e .` and after that, you can start the GUI as you normally would with `sudo protonvpn-gui`.
+### Create .desktop file
 
-## Create .desktop file
-
-### ProtonVPN GUI
+#### ProtonVPN GUI
 To create at <i>desktop</i> launcher with a .desktop file, follow the instrucitons below.
 
 1. Find the path to the package with `pip3 show protonvpn-linux-gui-calexandru2018`
@@ -148,7 +182,7 @@ To create at <i>desktop</i> launcher with a .desktop file, follow the instrucito
     Categories=Utility;GUI;Network;VPN
     ```
 
-### ProtonVPN Tray
+#### ProtonVPN Tray
 To create at <i>tray icon</i> launcher with a .desktop file, follow the instrucitons below.
 
 1. Find the path to the package with `pip3 show protonvpn-linux-gui-calexandru2018`
@@ -170,7 +204,7 @@ To create at <i>tray icon</i> launcher with a .desktop file, follow the instruci
     Categories=Utility;GUI;Network;VPN
     ```
 
-## Further enhancement
+## Visudo/Sudoless
 If you would like to launch the GUI without having to type in your sudo password everytime, then you could add the bin to `visudo`. This is extremly useful when you have a .desktop file, and all you want to do is click the launcher to have the GUI pop-up without being prompted for sudo password.
 
 1. First you will need the path to the GUI. This can be found by typing `which protonvpn-gui`. You should get something like this: `/usr/bin/protonvpn-gui`. Save it since you will need it later. **Note:** As previously mentioned, the path may look different for you, based on your distro.
@@ -179,7 +213,7 @@ If you would like to launch the GUI without having to type in your sudo password
 4. Once you are at the botton, type: `<YOUR_USERNAME_FROM_STEP2> ALL = (root) NOPASSWD: <YOUR_PATH_FROM_STEP1>`
 5. Exit and save! Have fun :)
 
-## Not yet implemented:
+# Not yet implemented:
 
 - ~~Split Tunneling~~
 - ~~Kill Switch~~
@@ -187,7 +221,7 @@ If you would like to launch the GUI without having to type in your sudo password
 - ~~Start on Boot~~ (only for systemd/systemctl based OS's)
 - ~~Systray/AppIndicator~~
 
-## GUI Layout
+# GUI Layout
 <p align="center">
   <img src="https://i.imgur.com/VnOMaeg.png" alt="Logo"></img>
 </p>
