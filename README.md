@@ -41,7 +41,7 @@ Protonvpn-linux-gui works on top of <a href="https://github.com/ProtonVPN/proton
 
 ## Table of Contents
 - [Installing and Updating](#installing-and-updating)
-  - [Installing Dependencies](#installing-dependencies)
+  - [Dependencies](#dependencies)
     - [Python dependencies](#python-dependencies)
     - [ProtonVPN GUI dependencies](#protonvpn-gui-dependencies)
     - [ProtonVPN Tray dependencies](#protonvpn-tray-dependencies)
@@ -55,17 +55,17 @@ Protonvpn-linux-gui works on top of <a href="https://github.com/ProtonVPN/proton
 - [How to use](#how-to-use)
    - [ProtonVPN GUI](#protonvpn-gui)
    - [ProtonVPN Tray](#protonvpn-tray)
-- [Enhancements]()
+- [Enhancements](#enhancements)
   - [Create .desktop file](#create-desktop-file)
     - [ProtonVPN GUI](#protonvpn-gui-1)
     - [ProtonVPN Tray](#protonvpn-tray-1)
-  - [Visudo/Sudoless](#visudo/sudoless)
+  - [Visudo/Sudoless](#visudosudoless)
 - [Not yet implemented](#not-yet-implemented)
 - [GUI Layout](#gui-layout)
 
 # Installing and Updating
 
-### Installing Dependencies
+### Dependencies
 
 #### Python dependencies
 - requests
