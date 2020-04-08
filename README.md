@@ -42,7 +42,10 @@ Protonvpn-linux-gui works on top of <a href="https://github.com/ProtonVPN/proton
 ## Table of Contents
 - [Installing and Updating](#installing-and-updating)
   - [Installing Dependencies](#installing-dependencies)
-    - [Known Issue](#known-issue)
+    - [Python dependencies](#python-dependencies)
+    - [ProtonVPN GUI dependencies](#protonvpn-gui-dependencies)
+    - [ProtonVPN Tray dependencies](#protonvpn-tray-dependencies)
+      - [Known Issue](#known-issue)
   - [Installing protonvpn-linux-gui](#installing-protonvpn-linux-gui)
     - [Distribution based](#distribution-based)
     - [PIP based](#pip-based)
@@ -64,6 +67,7 @@ Protonvpn-linux-gui works on top of <a href="https://github.com/ProtonVPN/proton
 
 ### Installing Dependencies
 
+#### Python dependencies
 - requests
 - python3.5+
 - pip for python3 (pip3)
@@ -71,7 +75,7 @@ Protonvpn-linux-gui works on top of <a href="https://github.com/ProtonVPN/proton
 - <a href="https://github.com/ProtonVPN/protonvpn-cli-ng"><b>protonvpn-cli-ng</b></a>
 
 
-If you have already installed <a href="https://github.com/ProtonVPN/protonvpn-cli-ng"><b>protonvpn-cli-ng</b></a>, then you will only need to <b>install the following packages for the GUI</b>:
+#### ProtonVPN GUI dependencies
 
 | **Distro**                              | **Command**                                                                                                     |
 |:----------------------------------------|:----------------------------------------------------------------------------------------------------------------|
@@ -80,7 +84,7 @@ If you have already installed <a href="https://github.com/ProtonVPN/protonvpn-cl
 |OpenSUSE/SLES                            | `sudo zypper install python3-gobject python3-gobject-Gdk typelib-1_0-Gtk-3_0 libgtk-3-0`                        |
 |Arch Linux/Manjaro                       | `sudo pacman -S python-gobject gtk3`                                                                            |
 
-If you would also like to use <b>systray/appindicator then you will need to install the following packages</b>:
+#### ProtonVPN Tray dependencies
 
 | **Distro**                              | **Command**                                                                                                     |
 |:----------------------------------------|:----------------------------------------------------------------------------------------------------------------|
