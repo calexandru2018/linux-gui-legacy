@@ -40,7 +40,7 @@
 Protonvpn-linux-gui works on top of <a href="https://github.com/ProtonVPN/protonvpn-cli-ng"><b>protonvpn-cli-ng</b></a>, making it a dependency. All local configurations are managed by the GUI (such as updating protocol, split tunneling, manage killswitch) while the connections are managed by the CLI. This way, you will be able to use the latest version of the CLI, while also being able to use the GUI.
 
 ## Table of Contents
-- [Installation and Updating](#installation-and-updating)
+- [Installing and Updating](#installing-and-updating)
   - [Installing Dependencies](#installing-dependencies)
     - [Known Issue](#known-issue)
   - [Installing protonvpn-linux-gui](#installing-protonvpn-linux-gui)
@@ -60,11 +60,9 @@ Protonvpn-linux-gui works on top of <a href="https://github.com/ProtonVPN/proton
 - [Not yet implemented](#not-yet-implemented)
 - [GUI Layout](#gui-layout)
 
-# Installation and Updating
+# Installing and Updating
 
-## Installing Dependencies
-
-**Dependencies:**
+### Installing Dependencies
 
 - requests
 - python3.5+
@@ -146,19 +144,19 @@ If you would like to run the the GUI within a virtual environment (for either de
 
 # How to use
 
-## ProtonVPN GUI
+### ProtonVPN GUI
 
  `sudo protonvpn-gui`
 
-## ProtonVPN Tray
+### ProtonVPN Tray
 
  `protonvpn-tray`
 
 # Enhancements
 
-## Create .desktop file
+### Create .desktop file
 
-### ProtonVPN GUI
+#### ProtonVPN GUI
 To create at <i>desktop</i> launcher with a .desktop file, follow the instrucitons below.
 
 1. Find the path to the package with `pip3 show protonvpn-linux-gui-calexandru2018`
@@ -180,7 +178,7 @@ To create at <i>desktop</i> launcher with a .desktop file, follow the instrucito
     Categories=Utility;GUI;Network;VPN
     ```
 
-### ProtonVPN Tray
+#### ProtonVPN Tray
 To create at <i>tray icon</i> launcher with a .desktop file, follow the instrucitons below.
 
 1. Find the path to the package with `pip3 show protonvpn-linux-gui-calexandru2018`
