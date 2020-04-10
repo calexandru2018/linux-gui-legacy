@@ -78,7 +78,7 @@ class Handler:
         self.messagedialog_sub_label.hide()
         
         login_window = self.interface.get_object("LoginWindow")
-        user_window = self.interface.get_object("DashboardWindow")
+        user_window = self.interface.get_object("DashboardWindow1")
         
         username_field = self.interface.get_object('username_field').get_text().strip()
         password_field = self.interface.get_object('password_field').get_text().strip()
@@ -613,12 +613,12 @@ def initialize_gui():
         if not os.path.isfile(CONFIG_FILE):
             gui_logger.debug(">>> Loading LoginWindow")
             window = interface.get_object("LoginWindow")
-            dashboard = interface.get_object("DashboardWindow")
+            dashboard = interface.get_object("DashboardWindow1")
             dashboard.connect("destroy", Gtk.main_quit)
             window.show()
         else:
-            window = interface.get_object("DashboardWindow")
-            gui_logger.debug(">>> Loading DashboardWindow")
+            window = interface.get_object("DashboardWindow1")
+            gui_logger.debug(">>> Loading DashboardWindow1")
             window.connect("destroy", Gtk.main_quit)
             
             messagedialog_window = interface.get_object("MessageDialog")

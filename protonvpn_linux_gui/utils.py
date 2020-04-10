@@ -385,9 +385,10 @@ def left_grid_update_labels(interface, servers, is_connected, connected_server, 
 
     # Check and set VPN status label. Get also protocol status if vpn is connected
     if is_connected != True or disconnecting:
-        vpn_status_label.set_markup('<span>Disconnected</span>')
+        # vpn_status_label.set_markup('<span>Disconnected</span>')
+        print("True")
     else:
-        vpn_status_label.set_markup('<span foreground="#4E9A06">Connected</span>')
+        # vpn_status_label.set_markup('<span foreground="#4E9A06">Connected</span>')
         try:
             connected_to_protocol = get_config_value("metadata", "connected_proto")
         except KeyError:
@@ -395,22 +396,22 @@ def left_grid_update_labels(interface, servers, is_connected, connected_server, 
     
     # Check and set DNS status label
     dns_enabled = get_config_value("USER", "dns_leak_protection")
-    if int(dns_enabled) != 1:
-        dns_status_label.set_markup('<span>Not Enabled</span>')
-    else:
-        dns_status_label.set_markup('<span foreground="#4E9A06">Enabled</span>')
+    # if int(dns_enabled) != 1:
+        # dns_status_label.set_markup('<span>Not Enabled</span>')
+    # else:
+        # dns_status_label.set_markup('<span foreground="#4E9A06">Enabled</span>')
 
     # Update time connected label
-    gobject.timeout_add_seconds(1, update_connection_time, {"is_connected":is_connected, "label":time_connected_label})
+    # gobject.timeout_add_seconds(1, update_connection_time, {"is_connected":is_connected, "label":time_connected_label})
 
     # Check and set killswitch label
     killswitch_setting = get_config_value("USER", "killswitch")
     killswitch_status = "<span>Disabled</span>" if killswitch_setting == "0" else "<span foreground=\"#4E9A06\">Enabled</span>"
-    killswitch_label.set_markup('{0}'.format(killswitch_status))
+    # killswitch_label.set_markup('{0}'.format(killswitch_status))
 
     # Check and set protocol label
     connected_to_protocol = connected_to_protocol if connected_to_protocol else ""
-    protocol_label.set_markup('<span>{0}</span>'.format(connected_to_protocol))
+    # protocol_label.set_markup('<span>{0}</span>'.format(connected_to_protocol))
 
     # Check and set feature label
     try:
@@ -419,7 +420,7 @@ def left_grid_update_labels(interface, servers, is_connected, connected_server, 
         feature = False
     
     feature = all_features[feature] if not disconnecting and is_connected else ""
-    server_features_label.set_markup('<span>{0}</span>'.format(feature.upper()))
+    # server_features_label.set_markup('<span>{0}</span>'.format(feature.upper()))
 
 def right_grid_update_labels(interface, servers, is_connected, connected_server, disconnecting, conn_info=False):
     """Function that updates the labels that are position within the right-side of the dashboard grid.
@@ -427,13 +428,13 @@ def right_grid_update_labels(interface, servers, is_connected, connected_server,
     gui_logger.debug(">>> Running \"right_grid_update_labels\".")
 
     # Right grid
-    ip_label =              interface.get_object("ip_label")
-    server_load_label =     interface.get_object("server_load_label")
-    server_name_label =     interface.get_object("server_name_label")
-    server_city_label =     interface.get_object("server_city_label")
-    country_label =         interface.get_object("country_label")
-    data_received_label =   interface.get_object("data_received_label")
-    data_sent_label =       interface.get_object("data_sent_label") 
+    ip_label =              interface.get_object("ip_label1")
+    server_load_label =     interface.get_object("server_load_label1")
+    # server_name_label =     interface.get_object("server_name_label")
+    # server_city_label =     interface.get_object("server_city_label")
+    country_label =         interface.get_object("country_label1")
+    data_received_label =   interface.get_object("data_received_label1")
+    data_sent_label =       interface.get_object("data_sent_label1") 
 
     # Get and set IP labels. Get also country and ISP
     if not conn_info:
@@ -460,7 +461,7 @@ def right_grid_update_labels(interface, servers, is_connected, connected_server,
 
     # Get and set server name
     connected_server = connected_server if connected_server and is_connected else ""
-    server_name_label.set_markup('<span>{0}</span>'.format(connected_server))
+    # server_name_label.set_markup('<span>{0}</span>'.format(connected_server))
 
     # Get and set city label
     try:
@@ -468,7 +469,7 @@ def right_grid_update_labels(interface, servers, is_connected, connected_server,
     except:
         city = False
     city = city if city else ""
-    server_city_label.set_markup('<span>{0}</span>'.format(city))
+    # server_city_label.set_markup('<span>{0}</span>'.format(city))
 
     # Set country label and ISP labels
     ip = "<span>" + ip + "</span>"
