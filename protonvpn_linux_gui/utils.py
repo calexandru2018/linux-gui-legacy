@@ -375,9 +375,9 @@ def left_grid_update_labels(interface, servers, is_connected, connected_server, 
     # Left grid
     vpn_status_label =      interface.get_object("vpn_status_label")
     dns_status_label =      interface.get_object("dns_status_label")
-    time_connected_label =  interface.get_object("time_connected_label")
+    time_connected_label =  interface.get_object("time_connected_label1")
     killswitch_label =      interface.get_object("killswitch_label")
-    protocol_label =        interface.get_object("openvpn_protocol_label")
+    protocol_label =        interface.get_object("protocol_label")
     server_features_label = interface.get_object("server_features_label")
 
     all_features = {0: "Normal", 1: "Secure-Core", 2: "Tor", 4: "P2P"}
@@ -402,7 +402,7 @@ def left_grid_update_labels(interface, servers, is_connected, connected_server, 
         # dns_status_label.set_markup('<span foreground="#4E9A06">Enabled</span>')
 
     # Update time connected label
-    # gobject.timeout_add_seconds(1, update_connection_time, {"is_connected":is_connected, "label":time_connected_label})
+    gobject.timeout_add_seconds(1, update_connection_time, {"is_connected":is_connected, "label":time_connected_label})
 
     # Check and set killswitch label
     killswitch_setting = get_config_value("USER", "killswitch")
@@ -411,7 +411,7 @@ def left_grid_update_labels(interface, servers, is_connected, connected_server, 
 
     # Check and set protocol label
     connected_to_protocol = connected_to_protocol if connected_to_protocol else ""
-    # protocol_label.set_markup('<span>{0}</span>'.format(connected_to_protocol))
+    protocol_label.set_markup('<span>OpenVPN -> {0}</span>'.format(connected_to_protocol))
 
     # Check and set feature label
     try:
@@ -433,6 +433,7 @@ def right_grid_update_labels(interface, servers, is_connected, connected_server,
     # server_name_label =     interface.get_object("server_name_label")
     # server_city_label =     interface.get_object("server_city_label")
     country_label =         interface.get_object("country_label1")
+    isp_label    =          interface.get_object("isp_label")
     data_received_label =   interface.get_object("data_received_label1")
     data_sent_label =       interface.get_object("data_sent_label1") 
 
@@ -448,20 +449,31 @@ def right_grid_update_labels(interface, servers, is_connected, connected_server,
     else:
         ip, isp, country = conn_info
 
-    country_isp = "<span>" + country + "/" + isp + "</span>"
+    country_cc = False
+
+    for k,v in country_codes.items():
+        if k == country:
+            country_cc = v
+
+    # Get and set server name
+    connected_server = connected_server if connected_server and is_connected else ""
+    # server_name_label.set_markup('<span>{0}</span>'.format(connected_server))
+
+    # country_isp = "<span>" + country + "/" + isp + "</span>"
+    country_isp = "<span>" + country_cc + " -> " + connected_server + "</span>"
     ip_label.set_markup(ip)
+
+    isp_label.set_markup(isp)
 
     # Get and set server load label
     try:
         load = get_server_value(connected_server, "Load", servers)
     except:
         load = False
-    load = "{0}%".format(load) if load and is_connected else ""
+    print(load)
+    load = "{0}% Load".format(load) if load and is_connected else ""
     server_load_label.set_markup('<span>{0}</span>'.format(load))
 
-    # Get and set server name
-    connected_server = connected_server if connected_server and is_connected else ""
-    # server_name_label.set_markup('<span>{0}</span>'.format(connected_server))
 
     # Get and set city label
     try:
