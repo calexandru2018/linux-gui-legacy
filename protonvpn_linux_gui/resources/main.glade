@@ -2708,6 +2708,7 @@
                             <property name="pixbuf">img/flags/large/pt.jpg</property>
                           </object>
                           <packing>
+                            <property name="x">-90</property>
                             <property name="y">-65</property>
                           </packing>
                         </child>
@@ -2720,13 +2721,14 @@
                       <object class="GtkGrid">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="margin_left">15</property>
-                        <property name="margin_right">5</property>
-                        <property name="margin_top">15</property>
+                        <property name="margin_left">60</property>
+                        <property name="margin_right">60</property>
+                        <property name="margin_top">30</property>
                         <property name="margin_bottom">15</property>
                         <property name="hexpand">True</property>
                         <property name="vexpand">True</property>
                         <property name="row_spacing">10</property>
+                        <property name="column_homogeneous">True</property>
                         <child>
                           <object class="GtkButton">
                             <property name="label" translatable="yes">Delete Profile</property>
@@ -2749,10 +2751,13 @@
                             <property name="width_request">-1</property>
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <property name="halign">start</property>
+                            <property name="halign">end</property>
                             <property name="hexpand">True</property>
                             <property name="label" translatable="yes">9% Load</property>
                             <property name="justify">fill</property>
+                            <attributes>
+                              <attribute name="weight" value="medium"/>
+                            </attributes>
                           </object>
                           <packing>
                             <property name="left_attach">1</property>
@@ -2765,7 +2770,8 @@
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="receives_default">True</property>
-                            <property name="halign">center</property>
+                            <property name="halign">start</property>
+                            <property name="margin_left">60</property>
                             <property name="relief">half</property>
                           </object>
                           <packing>
@@ -2775,28 +2781,17 @@
                           </packing>
                         </child>
                         <child>
-                          <object class="GtkLabel" id="country_label1">
-                            <property name="width_request">-1</property>
-                            <property name="visible">True</property>
-                            <property name="can_focus">False</property>
-                            <property name="halign">start</property>
-                            <property name="hexpand">True</property>
-                            <property name="label" translatable="yes">Portugal -&gt; PT#1</property>
-                          </object>
-                          <packing>
-                            <property name="left_attach">0</property>
-                            <property name="top_attach">0</property>
-                          </packing>
-                        </child>
-                        <child>
                           <object class="GtkLabel" id="time_connected_label1">
                             <property name="width_request">-1</property>
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <property name="halign">start</property>
+                            <property name="halign">end</property>
                             <property name="hexpand">True</property>
                             <property name="label" translatable="yes">10:23:30</property>
                             <property name="justify">fill</property>
+                            <attributes>
+                              <attribute name="weight" value="medium"/>
+                            </attributes>
                           </object>
                           <packing>
                             <property name="left_attach">1</property>
@@ -2811,6 +2806,9 @@
                             <property name="halign">start</property>
                             <property name="hexpand">True</property>
                             <property name="label" translatable="yes">192.168.91.1</property>
+                            <attributes>
+                              <attribute name="weight" value="medium"/>
+                            </attributes>
                           </object>
                           <packing>
                             <property name="left_attach">0</property>
@@ -2825,6 +2823,9 @@
                             <property name="halign">start</property>
                             <property name="hexpand">True</property>
                             <property name="label" translatable="yes">ProtonVPN AG</property>
+                            <attributes>
+                              <attribute name="weight" value="medium"/>
+                            </attributes>
                           </object>
                           <packing>
                             <property name="left_attach">0</property>
@@ -2839,6 +2840,9 @@
                             <property name="halign">start</property>
                             <property name="hexpand">True</property>
                             <property name="label" translatable="yes">OpenVPN -&gt; UDP</property>
+                            <attributes>
+                              <attribute name="weight" value="medium"/>
+                            </attributes>
                           </object>
                           <packing>
                             <property name="left_attach">0</property>
@@ -2849,6 +2853,7 @@
                           <object class="GtkGrid">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
+                            <property name="halign">end</property>
                             <property name="column_spacing">5</property>
                             <child>
                               <object class="GtkImage">
@@ -2857,7 +2862,7 @@
                                 <property name="pixbuf">img/utils/bitrate-download-arrow.png</property>
                               </object>
                               <packing>
-                                <property name="left_attach">0</property>
+                                <property name="left_attach">1</property>
                                 <property name="top_attach">0</property>
                               </packing>
                             </child>
@@ -2866,13 +2871,15 @@
                                 <property name="width_request">-1</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
-                                <property name="halign">start</property>
                                 <property name="hexpand">True</property>
                                 <property name="label" translatable="yes">1.0 KB/s</property>
                                 <property name="justify">fill</property>
+                                <attributes>
+                                  <attribute name="weight" value="medium"/>
+                                </attributes>
                               </object>
                               <packing>
-                                <property name="left_attach">1</property>
+                                <property name="left_attach">0</property>
                                 <property name="top_attach">0</property>
                               </packing>
                             </child>
@@ -2886,6 +2893,7 @@
                           <object class="GtkGrid">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
+                            <property name="halign">end</property>
                             <property name="column_spacing">5</property>
                             <child>
                               <object class="GtkImage">
@@ -2894,7 +2902,7 @@
                                 <property name="pixbuf">img/utils/bitrate-upload-arrow.png</property>
                               </object>
                               <packing>
-                                <property name="left_attach">0</property>
+                                <property name="left_attach">1</property>
                                 <property name="top_attach">0</property>
                               </packing>
                             </child>
@@ -2907,6 +2915,48 @@
                                 <property name="hexpand">True</property>
                                 <property name="label" translatable="yes">0.0 B/s</property>
                                 <property name="justify">fill</property>
+                                <attributes>
+                                  <attribute name="weight" value="medium"/>
+                                </attributes>
+                              </object>
+                              <packing>
+                                <property name="left_attach">0</property>
+                                <property name="top_attach">0</property>
+                              </packing>
+                            </child>
+                          </object>
+                          <packing>
+                            <property name="left_attach">1</property>
+                            <property name="top_attach">2</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkGrid">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <child>
+                              <object class="GtkImage" id="protonvpn_sign_green">
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="pixbuf">img/logo/protonvpn_sign_green.png</property>
+                              </object>
+                              <packing>
+                                <property name="left_attach">0</property>
+                                <property name="top_attach">0</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <object class="GtkLabel" id="country_label1">
+                                <property name="width_request">-1</property>
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="halign">start</property>
+                                <property name="hexpand">True</property>
+                                <property name="label" translatable="yes">Portugal &gt;&gt; PT#1</property>
+                                <attributes>
+                                  <attribute name="weight" value="medium"/>
+                                  <attribute name="size" value="12000"/>
+                                </attributes>
                               </object>
                               <packing>
                                 <property name="left_attach">1</property>
@@ -2915,8 +2965,8 @@
                             </child>
                           </object>
                           <packing>
-                            <property name="left_attach">1</property>
-                            <property name="top_attach">2</property>
+                            <property name="left_attach">0</property>
+                            <property name="top_attach">0</property>
                           </packing>
                         </child>
                         <child>
