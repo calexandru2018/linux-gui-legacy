@@ -2652,7 +2652,7 @@
   </object>
   <object class="GtkApplicationWindow" id="DashboardWindow1">
     <property name="width_request">-1</property>
-    <property name="height_request">400</property>
+    <property name="height_request">-1</property>
     <property name="can_focus">False</property>
     <property name="no_show_all">True</property>
     <property name="hexpand">True</property>
@@ -2675,8 +2675,9 @@
         <property name="vexpand">True</property>
         <property name="shadow_type">etched-in</property>
         <property name="min_content_width">400</property>
-        <property name="max_content_width">2024</property>
-        <property name="max_content_height">2024</property>
+        <property name="min_content_height">400</property>
+        <property name="max_content_width">400</property>
+        <property name="max_content_height">1024</property>
         <property name="propagate_natural_width">True</property>
         <property name="propagate_natural_height">True</property>
         <child>
@@ -2743,8 +2744,8 @@
                               <object class="GtkGrid">
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
-                                <property name="margin_left">60</property>
-                                <property name="margin_right">60</property>
+                                <property name="margin_left">35</property>
+                                <property name="margin_right">35</property>
                                 <property name="margin_top">30</property>
                                 <property name="margin_bottom">15</property>
                                 <property name="hexpand">True</property>
