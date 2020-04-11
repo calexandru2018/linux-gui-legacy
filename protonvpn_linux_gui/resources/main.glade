@@ -2708,6 +2708,7 @@
                         <property name="can_focus">False</property>
                         <property name="hexpand">True</property>
                         <property name="vexpand">True</property>
+                        <property name="orientation">vertical</property>
                         <property name="baseline_row">2</property>
                         <child>
                           <object class="GtkOverlay">
@@ -3021,12 +3022,13 @@
                             <property name="can_focus">True</property>
                             <property name="has_focus">True</property>
                             <property name="is_focus">True</property>
+                            <property name="valign">baseline</property>
                             <property name="vexpand">True</property>
                             <property name="show_border">False</property>
                             <property name="enable_popup">True</property>
                             <child>
                               <object class="GtkBox">
-                                <property name="height_request">0</property>
+                                <property name="height_request">400</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
                                 <property name="margin_left">15</property>
