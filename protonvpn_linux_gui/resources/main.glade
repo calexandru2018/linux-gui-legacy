@@ -1184,7 +1184,7 @@
                 <property name="propagate_natural_width">True</property>
                 <property name="propagate_natural_height">True</property>
                 <child>
-                  <object class="GtkTreeView" id="ServerList">
+                  <object class="GtkTreeView" id="ServerList2">
                     <property name="height_request">100</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
@@ -1383,12 +1383,11 @@
               </packing>
             </child>
             <child>
-              <object class="GtkEntry" id="server_filter_input">
+              <object class="GtkEntry" id="server_filter_input2">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="has_frame">False</property>
                 <property name="placeholder_text" translatable="yes">Type to filter...</property>
-                <signal name="key-release-event" handler="server_filter_input_key_release" swapped="no"/>
               </object>
               <packing>
                 <property name="left_attach">1</property>
@@ -3077,11 +3076,12 @@
                                   </packing>
                                 </child>
                                 <child>
-                                  <object class="GtkEntry" id="server_filter_input1">
+                                  <object class="GtkEntry" id="server_filter_input">
                                     <property name="visible">True</property>
                                     <property name="can_focus">True</property>
                                     <property name="margin_bottom">10</property>
                                     <property name="placeholder_text" translatable="yes">Search for country/server/feature</property>
+                                    <signal name="key-release-event" handler="server_filter_input_key_release" swapped="no"/>
                                   </object>
                                   <packing>
                                     <property name="expand">False</property>
@@ -3103,7 +3103,7 @@
                                     <property name="propagate_natural_width">True</property>
                                     <property name="propagate_natural_height">True</property>
                                     <child>
-                                      <object class="GtkTreeView" id="ServerList1">
+                                      <object class="GtkTreeView" id="ServerList">
                                         <property name="height_request">-1</property>
                                         <property name="visible">True</property>
                                         <property name="can_focus">True</property>
