@@ -62,7 +62,7 @@
     <property name="window_position">center-always</property>
     <property name="default_width">440</property>
     <property name="default_height">250</property>
-    <property name="icon">protonvpn_logo.png</property>
+    <property name="icon">img/logo/protonvpn_logo.png</property>
     <property name="gravity">center</property>
     <property name="has_resize_grip">True</property>
     <property name="show_menubar">False</property>
@@ -161,7 +161,7 @@
                 <property name="can_focus">False</property>
                 <property name="margin_top">30</property>
                 <property name="margin_bottom">40</property>
-                <property name="pixbuf">protonvpn_logo_full.png</property>
+                <property name="pixbuf">img/logo/protonvpn_logo_full.png</property>
               </object>
               <packing>
                 <property name="left_attach">0</property>
@@ -448,7 +448,7 @@
     <property name="modal">True</property>
     <property name="window_position">center</property>
     <property name="destroy_with_parent">True</property>
-    <property name="icon">protonvpn_logo.png</property>
+    <property name="icon">img/logo/protonvpn_logo.png</property>
     <property name="type_hint">dialog</property>
     <property name="skip_taskbar_hint">True</property>
     <property name="skip_pager_hint">True</property>
@@ -611,7 +611,7 @@
     <property name="window_position">center</property>
     <property name="default_width">680</property>
     <property name="default_height">520</property>
-    <property name="icon">protonvpn_logo.png</property>
+    <property name="icon">img/logo/protonvpn_logo.png</property>
     <property name="gravity">west</property>
     <signal name="delete-event" handler="ConfigurationsWindow_delete_event" swapped="no"/>
     <child type="titlebar">
@@ -1698,7 +1698,7 @@
     <property name="window_position">center-always</property>
     <property name="default_width">440</property>
     <property name="default_height">250</property>
-    <property name="icon">protonvpn_logo.png</property>
+    <property name="icon">img/logo/protonvpn_logo.png</property>
     <property name="gravity">center</property>
     <property name="has_resize_grip">True</property>
     <child type="titlebar">
@@ -1814,7 +1814,7 @@
                 <property name="can_focus">False</property>
                 <property name="margin_top">30</property>
                 <property name="margin_bottom">20</property>
-                <property name="pixbuf">protonvpn_logo_full.png</property>
+                <property name="pixbuf">img/logo/protonvpn_logo_full.png</property>
               </object>
               <packing>
                 <property name="left_attach">0</property>
@@ -2608,7 +2608,7 @@
     <property name="window_position">center-always</property>
     <property name="destroy_with_parent">True</property>
     <property name="icon">protonvpn_logo.png</property>
-    <property name="type_hint">dialog</property>
+    <property name="type_hint">notification</property>
     <property name="urgency_hint">True</property>
     <property name="accept_focus">False</property>
     <property name="focus_on_map">False</property>
@@ -2620,7 +2620,7 @@
     <property name="website">https://github.com/calexandru2018/protonvpn-linux-gui</property>
     <property name="website_label" translatable="yes">Github Repo</property>
     <property name="authors">calexandru2018</property>
-    <property name="logo">protonvpn_logo_full.png</property>
+    <property name="logo">img/logo/protonvpn_logo_full.png</property>
     <property name="license_type">gpl-3-0</property>
     <signal name="delete-event" handler="AboutDialog_delete_event" swapped="no"/>
     <child type="titlebar">
@@ -2743,6 +2743,11 @@
       </object>
     </child>
   </object>
+  <object class="GtkImage" id="gtk-preferences1">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="stock">gtk-preferences</property>
+  </object>
   <object class="GtkApplicationWindow" id="DashboardWindow1">
     <property name="width_request">-1</property>
     <property name="height_request">400</property>
@@ -2752,7 +2757,7 @@
     <property name="vexpand">True</property>
     <property name="title" translatable="yes">ProtonVPN GUI - Dashboard</property>
     <property name="window_position">center-always</property>
-    <property name="icon">protonvpn_logo.png</property>
+    <property name="icon">img/logo/protonvpn_logo.png</property>
     <property name="gravity">center</property>
     <child type="titlebar">
       <placeholder/>
@@ -2796,8 +2801,11 @@
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
                             <property name="opacity">0.5</property>
-                            <property name="pixbuf">pt.jpg</property>
+                            <property name="pixbuf">img/flags/large/pt.jpg</property>
                           </object>
+                          <packing>
+                            <property name="y">-65</property>
+                          </packing>
                         </child>
                       </object>
                       <packing>
@@ -2947,7 +2955,7 @@
                                   <object class="GtkImage">
                                     <property name="visible">True</property>
                                     <property name="can_focus">False</property>
-                                    <property name="pixbuf">bitrate-download-arrow.png</property>
+                                    <property name="pixbuf">img/utils/bitrate-download-arrow.png</property>
                                   </object>
                                   <packing>
                                     <property name="left_attach">0</property>
@@ -2984,7 +2992,7 @@
                                   <object class="GtkImage">
                                     <property name="visible">True</property>
                                     <property name="can_focus">False</property>
-                                    <property name="pixbuf">bitrate-upload-arrow.png</property>
+                                    <property name="pixbuf">img/utils/bitrate-upload-arrow.png</property>
                                   </object>
                                   <packing>
                                     <property name="left_attach">0</property>
@@ -3258,7 +3266,7 @@
             <property name="can_focus">False</property>
             <property name="hexpand">True</property>
             <property name="vexpand">True</property>
-            <property name="pixbuf">protonvpn_logo_full.png</property>
+            <property name="pixbuf">img/logo/protonvpn_logo_full.png</property>
           </object>
           <packing>
             <property name="left_attach">1</property>
@@ -3354,10 +3362,5 @@
         </child>
       </object>
     </child>
-  </object>
-  <object class="GtkImage" id="gtk-preferences1">
-    <property name="visible">True</property>
-    <property name="can_focus">False</property>
-    <property name="stock">gtk-preferences</property>
   </object>
 </interface>
