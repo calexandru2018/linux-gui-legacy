@@ -1,0 +1,68 @@
+headerbar.default-decoration {
+    padding-top: 3px;
+    padding-bottom: 3px;
+    min-height: 0px;
+    font-size: 0.8em;
+    background-color: black;
+}
+
+.default_background{
+    background-color: rgba(62, 68, 73, 1);
+    color: white;
+}
+.white_text{
+    color: white;
+}
+
+.initialize_profile_btn{
+    background-color: transparent;
+    color: white;
+    padding: 10px 50px;
+    border-style: solid;
+    border-width: 2px;
+    border-radius: 20px;
+}
+
+.default_tab_conf{
+    padding: 15px 70px;
+    background-color: rgba(62, 68, 73, 1);
+    /* background-color: transparent; */
+    color: white;
+    -GtkWidget-focus-line-width: 0;
+    margin-top: -6px;
+    margin-bottom: -6px;
+}
+
+.left_tab{
+    border-top-right-radius: 80px;
+    margin-left: -20px;
+    margin-right: -25px;
+
+}
+.right_tab{
+    border-top-left-radius: 80px;
+    margin-right: -20px;
+}
+
+.left_tab:active{
+    background-color: white;
+}
+.right_tab{
+    border-top-left-radius: 80px;
+    margin-right: -20px;
+}
+
+.countries_tab_content{
+    padding: 30px 15px;
+}
+
+.profile_grid{
+    padding: 20px;
+}
+
+.profile_buttons{
+    padding: 5px 5px;
+    background-color: rgba(68, 73, 78, 1);
+}
+
+

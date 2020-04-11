@@ -1,5 +1,6 @@
 # Default package import
 import os
+import re
 import sys
 import pathlib
 from threading import Thread
@@ -58,7 +59,7 @@ import gi
 
 # Gtk3 import
 gi.require_version('Gtk', '3.0')
-from gi.repository import  Gtk
+from gi.repository import  Gtk, Gdk
 
 class Handler:
     """Handler that has all callback functions.
@@ -525,6 +526,9 @@ class Handler:
 
         self.messagedialog_window.show()
 
+    def test(self, notebook, selected_tab, actual_tab_index):
+        print("Inside test")
+
 def initialize_gui():
     """Initializes the GUI 
     ---
@@ -549,8 +553,19 @@ def initialize_gui():
         else:
             glade_path = glade_path + path + "/"
 
-            
+    
     interface.add_from_file(glade_path[:-1])
+
+    css = re.sub("main.glade", "main.css", glade_path) 
+
+    style_provider = Gtk.CssProvider()
+    style_provider.load_from_path(css[:-1])
+
+    Gtk.StyleContext.add_provider_for_screen(
+        Gdk.Screen.get_default(),
+        style_provider,
+        Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
+    )
 
     messagedialog_window = interface.get_object("MessageDialog")
     messagedialog_label = interface.get_object("message_dialog_label")
@@ -609,13 +624,13 @@ def initialize_gui():
 
             messagedialog_label.set_markup(response['message'])
             messagedialog_spinner.hide()
+            
 
-        if not os.path.isfile(CONFIG_FILE):
+        if not os.path.isfile(CONFIG_FILE):   
             gui_logger.debug(">>> Loading LoginWindow")
             window = interface.get_object("LoginWindow")
             dashboard = interface.get_object("DashboardWindow1")
             dashboard.connect("destroy", Gtk.main_quit)
-            window.show()
         else:
             window = interface.get_object("DashboardWindow1")
             gui_logger.debug(">>> Loading DashboardWindow1")
@@ -641,7 +656,6 @@ def initialize_gui():
             thread.daemon = True
             thread.start()
             
-        # indicator(Gtk)
         window.show()
 
     Gtk.main()
