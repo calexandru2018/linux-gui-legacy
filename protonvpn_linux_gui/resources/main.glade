@@ -122,7 +122,7 @@ Author: Alexandru Cheltuitor
                 <property name="can_focus">False</property>
                 <property name="margin_top">30</property>
                 <property name="margin_bottom">40</property>
-                <property name="pixbuf">img/logo/protonvpn-logo-white (copy).png</property>
+                <property name="pixbuf">img/logo/protonvpn-logo-white.png</property>
               </object>
               <packing>
                 <property name="left_attach">0</property>
@@ -1458,7 +1458,7 @@ Author: Alexandru Cheltuitor
     <property name="website">https://github.com/calexandru2018/protonvpn-linux-gui</property>
     <property name="website_label" translatable="yes">Github Repo</property>
     <property name="authors">calexandru2018</property>
-    <property name="logo">img/logo/protonvpn_logo_full.png</property>
+    <property name="logo">img/logo/protonvpn-logo-white.png</property>
     <property name="license_type">gpl-3-0</property>
     <signal name="delete-event" handler="AboutDialog_delete_event" swapped="no"/>
     <child type="titlebar">
@@ -3292,6 +3292,7 @@ Author: Alexandru Cheltuitor
                               </object>
                               <packing>
                                 <property name="tab_expand">True</property>
+                                <property name="tab_fill">False</property>
                               </packing>
                             </child>
                             <child>
