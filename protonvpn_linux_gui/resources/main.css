@@ -27,14 +27,13 @@ headerbar.default-decoration {
     box-shadow: 64px 64px 12px 40px rgba(0,0,0,0.4);
 }
 
-.default_tab_conf{
+.default_main_tab_conf{
     padding: 15px 70px;
     /* background-color: transparent; */
     color: white;
-    -GtkWidget-focus-line-width: 0;
     margin-top: -6px;
     margin-bottom: -6px;
-    transition: all .3s ease-in-out;
+    transition: all .115s ease-in-out;
 }
 
 .default_tab_conf:active,
@@ -81,4 +80,40 @@ headerbar.default-decoration {
     background-color: rgba(68, 73, 78, 1);
 }
 
+/* Settings */
+.settings_label_bg{
+    background-color: rgba(45, 51, 56, 1);
+}
+.settings_label{
+    padding: 30px 50px;
+}
 
+.settings_notebook_grid{
+    padding: 30px 100px;
+    padding-bottom: 200px;
+}
+
+.default_settings_tab_conf{
+    padding: 15px 90px;
+    /* background-color: transparent; */
+    margin-top: -6px;
+    margin-bottom: -6px;
+    transition: all .115s ease-in-out;
+}
+
+.settings_left_tab{
+    border-top-right-radius: 80px;
+    margin-left: -20px;
+    margin-right: -25px;
+}
+.settings_center_tab{
+    margin-left: -10px;
+    border-top-left-radius: 80px;
+    border-top-right-radius: 80px;
+}
+
+.settings_right_tab{
+    border-top-left-radius: 80px;
+    margin-left: -33px;
+    margin-right: -20px;
+}
