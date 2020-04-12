@@ -2972,7 +2972,7 @@ Author: Alexandru Cheltuitor
                                     <property name="visible">True</property>
                                     <property name="can_focus">False</property>
                                     <property name="opacity">0.5</property>
-                                    <property name="pixbuf">img/flags/large/pt.jpg</property>
+                                    <property name="pixbuf">img/logo/protonvpn_logo.png</property>
                                   </object>
                                   <packing>
                                     <property name="x">-90</property>
@@ -3375,7 +3375,6 @@ Author: Alexandru Cheltuitor
                                         <property name="expander_column">country_col</property>
                                         <property name="search_column">1</property>
                                         <property name="level_indentation">1</property>
-                                        <property name="enable_tree_lines">False</property>
                                         <property name="activate_on_single_click">True</property>
                                         <child internal-child="selection">
                                           <object class="GtkTreeSelection">
