@@ -11,7 +11,7 @@ try:
     from protonvpn_cli.constants import (CONFIG_FILE, CONFIG_DIR) #noqa
 
     # ProtonVPN helper funcitons
-    from protonvpn_cli.utils import check_root, get_config_value, change_file_owner #noqa
+    from protonvpn_cli.utils import check_root, get_config_value, change_file_owner, is_connected #noqa
 except:
     sys.exit(1)
 
@@ -70,6 +70,7 @@ class Handler:
         self.messagedialog_label = self.interface.get_object("message_dialog_label")
         self.messagedialog_sub_label = self.interface.get_object("message_dialog_sub_label")
         self.messagedialog_spinner = self.interface.get_object("message_dialog_spinner")
+        self.conn_disc_button_label = self.interface.get_object("main_conn_disc_button_label")
         self.messagedialog_sub_label.hide()
         self.main_initial_tab = 0
         self.settings_initial_tab = 0
@@ -602,6 +603,28 @@ class Handler:
             
             account_tab_style.remove_class("inactive_tab")
             account_tab_style.add_class("active_tab")
+
+    def main_conn_disc_button_label(self, button):
+        """Button/Event handler to connect to the fastest server
+        """
+        self.messagedialog_sub_label.hide()
+
+        gui_logger.debug(">>> Starting \"main_conn_disc_button_label\" thread.")
+
+        target = quick_connect
+        message = "Connecting to the fastest server..."
+        if is_connected():
+            target = disconnect
+            message = "Disconnecting..."
+
+        self.messagedialog_label.set_markup(message)
+        self.messagedialog_spinner.show()
+
+        thread = Thread(target=target, args=[self.interface, self.messagedialog_label, self.messagedialog_spinner])
+        thread.daemon = True
+        thread.start()
+
+        self.messagedialog_window.show()
 
 def initialize_gui():
     """Initializes the GUI 
