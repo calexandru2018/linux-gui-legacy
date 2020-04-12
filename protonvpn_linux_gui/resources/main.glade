@@ -717,35 +717,6 @@ Author: Alexandru Cheltuitor
               </packing>
             </child>
             <child>
-              <object class="GtkButton">
-                <property name="label" translatable="yes">Fastest Connect</property>
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="receives_default">True</property>
-                <property name="halign">center</property>
-                <signal name="clicked" handler="quick_connect_button_clicked" swapped="no"/>
-              </object>
-              <packing>
-                <property name="left_attach">2</property>
-                <property name="top_attach">2</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkButton">
-                <property name="label" translatable="yes">Random Connect</property>
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="receives_default">True</property>
-                <property name="halign">start</property>
-                <property name="margin_right">30</property>
-                <signal name="clicked" handler="random_connect_button_clicked" swapped="no"/>
-              </object>
-              <packing>
-                <property name="left_attach">1</property>
-                <property name="top_attach">2</property>
-              </packing>
-            </child>
-            <child>
               <object class="GtkEntry" id="server_filter_input2">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
@@ -757,6 +728,12 @@ Author: Alexandru Cheltuitor
                 <property name="top_attach">0</property>
                 <property name="width">2</property>
               </packing>
+            </child>
+            <child>
+              <placeholder/>
+            </child>
+            <child>
+              <placeholder/>
             </child>
           </object>
           <packing>
@@ -818,6 +795,9 @@ Author: Alexandru Cheltuitor
             <child>
               <placeholder/>
             </child>
+            <style>
+              <class name="default_background"/>
+            </style>
           </object>
           <packing>
             <property name="expand">False</property>
@@ -841,6 +821,7 @@ Author: Alexandru Cheltuitor
                 <property name="can_focus">False</property>
                 <property name="halign">center</property>
                 <property name="spacing">20</property>
+                <property name="homogeneous">True</property>
                 <property name="layout_style">start</property>
                 <child>
                   <placeholder/>
@@ -855,6 +836,9 @@ Author: Alexandru Cheltuitor
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
                     <signal name="clicked" handler="check_for_updates_button_clicked" swapped="no"/>
+                    <style>
+                      <class name="initialize_profile_btn"/>
+                    </style>
                   </object>
                   <packing>
                     <property name="expand">True</property>
@@ -869,6 +853,9 @@ Author: Alexandru Cheltuitor
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
                     <signal name="clicked" handler="help_button_clicked" swapped="no"/>
+                    <style>
+                      <class name="initialize_profile_btn"/>
+                    </style>
                   </object>
                   <packing>
                     <property name="expand">True</property>
@@ -901,6 +888,9 @@ Author: Alexandru Cheltuitor
             <child>
               <placeholder/>
             </child>
+            <style>
+              <class name="default_background"/>
+            </style>
           </object>
           <packing>
             <property name="expand">True</property>
@@ -911,8 +901,14 @@ Author: Alexandru Cheltuitor
         <child type="center">
           <placeholder/>
         </child>
+        <style>
+          <class name="default_background"/>
+        </style>
       </object>
     </child>
+    <style>
+      <class name="default_background"/>
+    </style>
   </object>
   <object class="GtkListStore" id="KillSwitchListStore">
     <columns>
@@ -1364,12 +1360,25 @@ Author: Alexandru Cheltuitor
             </child>
             <child>
               <object class="GtkButton" id="message_dialog_close_button">
-                <property name="label" translatable="yes">Close</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
                 <property name="always_show_image">True</property>
                 <signal name="clicked" handler="close_message_dialog" swapped="no"/>
+                <child>
+                  <object class="GtkLabel">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="label" translatable="yes">Close</property>
+                    <attributes>
+                      <attribute name="weight" value="medium"/>
+                      <attribute name="size" value="12000"/>
+                    </attributes>
+                  </object>
+                </child>
+                <style>
+                  <class name="initialize_profile_btn"/>
+                </style>
               </object>
               <packing>
                 <property name="expand">True</property>
@@ -1398,6 +1407,9 @@ Author: Alexandru Cheltuitor
             <attributes>
               <attribute name="size" value="12000"/>
             </attributes>
+            <style>
+              <class name="default_background"/>
+            </style>
           </object>
           <packing>
             <property name="expand">True</property>
@@ -1438,8 +1450,14 @@ Author: Alexandru Cheltuitor
             <property name="position">2</property>
           </packing>
         </child>
+        <style>
+          <class name="default_background"/>
+        </style>
       </object>
     </child>
+    <style>
+      <class name="default_background"/>
+    </style>
   </object>
   <object class="GtkTreeStore" id="ServerTreeStore">
     <columns>
@@ -3020,7 +3038,6 @@ Author: Alexandru Cheltuitor
                                     <property name="can_focus">False</property>
                                     <property name="halign">end</property>
                                     <property name="hexpand">True</property>
-                                    <property name="label" translatable="yes">9% Load</property>
                                     <property name="justify">fill</property>
                                     <attributes>
                                       <attribute name="weight" value="medium"/>
@@ -3032,7 +3049,7 @@ Author: Alexandru Cheltuitor
                                   </packing>
                                 </child>
                                 <child>
-                                  <object class="GtkButton">
+                                  <object class="GtkButton" id="main_conn_disc_button">
                                     <property name="visible">True</property>
                                     <property name="can_focus">True</property>
                                     <property name="receives_default">True</property>
@@ -3040,11 +3057,11 @@ Author: Alexandru Cheltuitor
                                     <property name="margin_left">10</property>
                                     <property name="margin_right">10</property>
                                     <property name="relief">none</property>
+                                    <signal name="clicked" handler="main_conn_disc_button_label" swapped="no"/>
                                     <child>
-                                      <object class="GtkLabel" id="main_connect_button">
+                                      <object class="GtkLabel" id="main_conn_disc_button_label">
                                         <property name="visible">True</property>
                                         <property name="can_focus">False</property>
-                                        <property name="label" translatable="yes">Connect</property>
                                         <attributes>
                                           <attribute name="weight" value="bold"/>
                                           <attribute name="size" value="12000"/>
@@ -3068,7 +3085,6 @@ Author: Alexandru Cheltuitor
                                     <property name="can_focus">False</property>
                                     <property name="halign">end</property>
                                     <property name="hexpand">True</property>
-                                    <property name="label" translatable="yes">10:23:30</property>
                                     <property name="justify">fill</property>
                                     <attributes>
                                       <attribute name="weight" value="medium"/>
@@ -3086,7 +3102,6 @@ Author: Alexandru Cheltuitor
                                     <property name="can_focus">False</property>
                                     <property name="halign">start</property>
                                     <property name="hexpand">True</property>
-                                    <property name="label" translatable="yes">192.168.91.1</property>
                                     <attributes>
                                       <attribute name="weight" value="medium"/>
                                     </attributes>
@@ -3103,7 +3118,6 @@ Author: Alexandru Cheltuitor
                                     <property name="can_focus">False</property>
                                     <property name="halign">start</property>
                                     <property name="hexpand">True</property>
-                                    <property name="label" translatable="yes">ProtonVPN AG</property>
                                     <attributes>
                                       <attribute name="weight" value="medium"/>
                                     </attributes>
@@ -3120,7 +3134,6 @@ Author: Alexandru Cheltuitor
                                     <property name="can_focus">False</property>
                                     <property name="halign">start</property>
                                     <property name="hexpand">True</property>
-                                    <property name="label" translatable="yes">OpenVPN -&gt; UDP</property>
                                     <attributes>
                                       <attribute name="weight" value="medium"/>
                                     </attributes>
@@ -3153,7 +3166,6 @@ Author: Alexandru Cheltuitor
                                         <property name="visible">True</property>
                                         <property name="can_focus">False</property>
                                         <property name="hexpand">True</property>
-                                        <property name="label" translatable="yes">1.0 KB/s</property>
                                         <property name="justify">fill</property>
                                         <attributes>
                                           <attribute name="weight" value="medium"/>
@@ -3194,7 +3206,6 @@ Author: Alexandru Cheltuitor
                                         <property name="can_focus">False</property>
                                         <property name="halign">start</property>
                                         <property name="hexpand">True</property>
-                                        <property name="label" translatable="yes">0.0 B/s</property>
                                         <property name="justify">fill</property>
                                         <attributes>
                                           <attribute name="weight" value="medium"/>
@@ -3217,7 +3228,6 @@ Author: Alexandru Cheltuitor
                                     <property name="can_focus">False</property>
                                     <child>
                                       <object class="GtkImage" id="protonvpn_sign_green">
-                                        <property name="visible">True</property>
                                         <property name="can_focus">False</property>
                                         <property name="pixbuf">img/logo/protonvpn_sign_green.png</property>
                                       </object>
@@ -3233,7 +3243,6 @@ Author: Alexandru Cheltuitor
                                         <property name="can_focus">False</property>
                                         <property name="halign">start</property>
                                         <property name="hexpand">True</property>
-                                        <property name="label" translatable="yes">Portugal &gt;&gt; PT#1</property>
                                         <attributes>
                                           <attribute name="weight" value="medium"/>
                                           <attribute name="size" value="12000"/>
@@ -3506,6 +3515,7 @@ Author: Alexandru Cheltuitor
                                     <property name="visible">True</property>
                                     <property name="can_focus">True</property>
                                     <property name="receives_default">True</property>
+                                    <signal name="clicked" handler="quick_connect_button_clicked" swapped="no"/>
                                     <child>
                                       <object class="GtkGrid">
                                         <property name="visible">True</property>
@@ -3556,6 +3566,7 @@ Author: Alexandru Cheltuitor
                                     <property name="visible">True</property>
                                     <property name="can_focus">True</property>
                                     <property name="receives_default">True</property>
+                                    <signal name="clicked" handler="random_connect_button_clicked" swapped="no"/>
                                     <child>
                                       <object class="GtkGrid">
                                         <property name="visible">True</property>
