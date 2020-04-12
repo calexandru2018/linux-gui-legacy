@@ -703,6 +703,7 @@ def populate_server_list(populate_servers_dict):
             country_row = populate_servers_dict["tree_object"].append(None, [flag, country, plus_feature, feature, avrg_load])
 
             for servername in country_servers[country]:
+                secure_core = False
                 load = str(get_server_value(servername, "Load", servers)).rjust(3, " ")
                 load = load + "%"               
 
@@ -723,9 +724,10 @@ def populate_server_list(populate_servers_dict):
                     feature = tor_pix
                 else:
                     # Should be secure core
-                    feature = empty_pix
-
-                populate_servers_dict["tree_object"].append(country_row, [empty_pix, servername, plus_feature, feature, load])
+                    secure_core = True
+                    
+                if not secure_core:
+                    populate_servers_dict["tree_object"].append(country_row, [empty_pix, servername, plus_feature, feature, load])
 
 def get_country_avrg_features(country, country_servers, servers, features):
     """Function that returns average load and features of a specific country.
