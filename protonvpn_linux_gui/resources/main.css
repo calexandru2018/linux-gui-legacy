@@ -65,6 +65,7 @@ headerbar.default-decoration {
 
 .countries_tab_content{
     padding: 10px 15px;
+    transition: all 5s ease-in-out;
 }
 
 .profiles_tab_content{

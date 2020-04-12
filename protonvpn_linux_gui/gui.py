@@ -530,13 +530,16 @@ class Handler:
 
     def main_notebook_switch_page(self, notebook, selected_tab, actual_tab_index):
         countries_tab = self.interface.get_object("countries_tab_label")
-        countries_content_holder = self.interface.get_object("countries_content_holder")
-        
         profiles_tab = self.interface.get_object("profiles_tab_label")
+        
+        countries_content_holder = self.interface.get_object("countries_content_holder")
         profiles_content_holder = self.interface.get_object("profiles_content_holder")
 
         countries_tab_style = countries_tab.get_style_context()
         profiles_tab_style = profiles_tab.get_style_context()
+        
+        countries_content_holder_style = countries_content_holder.get_style_context()
+        profiles_content_holder_style = profiles_content_holder.get_style_context()
 
         if self.main_initial_tab < actual_tab_index:
             # Profiles selected
