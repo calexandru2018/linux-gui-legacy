@@ -5,6 +5,7 @@ import time
 import datetime
 import requests
 import subprocess
+import collections
 from threading import Thread
 import concurrent.futures
 
@@ -646,17 +647,31 @@ def populate_server_list(populate_servers_dict):
                 countries[country] = []
             countries[country].append(server["Name"])
 
-        country_servers = {}            
+        country_servers = {} 
+
+        # Order server list by country alphabetically
+        countries = collections.OrderedDict(sorted(countries.items()))
+
         for country in countries:
-            country_servers[country] = sorted(
-                countries[country],
-                key=lambda s: get_server_value(s, "Load", servers)
-            )
+            country_servers[country] = sorted(countries[country], key=lambda s: get_server_value(s, "Load", servers))
         populate_servers_dict["tree_object"].clear()
 
         CURRDIR = os.path.dirname(os.path.abspath(__file__))
         flags_base_path = CURRDIR+"/resources/img/flags/small/"
         features_base_path = CURRDIR+"/resources/img/utils/"
+
+        # Create empty image
+        empty_path = features_base_path+"normal.png"
+        empty_pix = empty = GdkPixbuf.Pixbuf.new_from_file_at_size(empty_path, 15,15)
+        # Create P2P image
+        p2p_path = features_base_path+"p2p-arrows.png"
+        p2p_pix = empty = GdkPixbuf.Pixbuf.new_from_file_at_size(p2p_path, 15,15)
+        # Create TOR image
+        tor_path = features_base_path+"tor-onion.png"
+        tor_pix = empty = GdkPixbuf.Pixbuf.new_from_file_at_size(tor_path, 15,15)
+        # Create Plus image
+        plus_server_path = features_base_path+"plus-server.png"
+        plus_pix = GdkPixbuf.Pixbuf.new_from_file_at_size(plus_server_path, 15,15)
 
         for country in country_servers:
             for k,v in country_codes.items():
@@ -669,21 +684,21 @@ def populate_server_list(populate_servers_dict):
             # Get average load and highest feature
             avrg_load, country_feature = get_country_avrg_features(country, country_servers, servers, features)
 
-            # Create empty image
-            empty_pixbuff = features_base_path+"normal.png"
-            empty = GdkPixbuf.Pixbuf.new_from_file_at_size(empty_pixbuff, 15,15)
-
             flag = GdkPixbuf.Pixbuf.new_from_file_at_size(flag_path, 15,15)
             
             # Check plus servers
-            plus_feature = empty
-            if not country_feature == "normal.png" and not country_feature == "p2p-arrows.png":
-                plus_server_path = features_base_path+"plus-server.png"
-                plus_feature = GdkPixbuf.Pixbuf.new_from_file_at_size(plus_server_path, 15,15)
+            if country_feature == "normal" or country_feature == "p2p":
+                plus_feature = empty_pix
+            else:
+                plus_feature = plus_pix
 
-            # Feate img creation
-            feature_path = features_base_path+country_feature
-            feature = GdkPixbuf.Pixbuf.new_from_file_at_size(feature_path, 15,15)
+            # Check correct feature
+            if country_feature == "normal":
+                feature = empty_pix
+            elif country_feature == "p2p":
+                feature = p2p_pix
+            elif country_feature == "tor":
+                feature = tor_pix
 
             country_row = populate_servers_dict["tree_object"].append(None, [flag, country, plus_feature, feature, avrg_load])
 
@@ -691,12 +706,26 @@ def populate_server_list(populate_servers_dict):
                 load = str(get_server_value(servername, "Load", servers)).rjust(3, " ")
                 load = load + "%"               
 
-                country_servername = country+" >> "+servername
+                tier = server_tiers[get_server_value(servername, "Tier", servers)]
+                
+                if not "Plus/Visionary".lower() == tier.lower():
+                    plus_feature = empty_pix
+                else:
+                    plus_feature = plus_pix
 
-                if "free" in servername.lower():
-                    plus_feature = empty
+                server_feature = features[get_server_value(servername, 'Features', servers)].lower()
+                
+                if server_feature == "Normal".lower():
+                    feature = empty_pix
+                elif server_feature == "P2P".lower():
+                    feature = p2p_pix
+                elif server_feature == "Tor".lower():
+                    feature = tor_pix
+                else:
+                    # Should be secure core
+                    feature = empty_pix
 
-                populate_servers_dict["tree_object"].append(country_row, [empty, servername, plus_feature, feature, load])
+                populate_servers_dict["tree_object"].append(country_row, [empty_pix, servername, plus_feature, feature, load])
 
 def get_country_avrg_features(country, country_servers, servers, features):
     """Function that returns average load and features of a specific country.
@@ -733,11 +762,11 @@ def get_country_avrg_features(country, country_servers, servers, features):
                     top_choice = v
 
     if top_choice == 0:
-        top_choice = "normal.png"
+        top_choice = "normal"
     elif top_choice == 1:
-        top_choice = "p2p-arrows.png"
+        top_choice = "p2p"
     elif top_choice == 2:
-        top_choice = "tor-onion.png"
+        top_choice = "tor"
         
     return  (str(int(round(load_sum/count)))+"%", top_choice)    
 
