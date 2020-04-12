@@ -523,126 +523,102 @@ def update_connection_time(dict_data):
 def load_configurations(interface):
     """Function that sets and populates user configurations before showing the configurations window.
     """
-    pref_dialog = interface.get_object("ConfigurationsWindow")
-     
-    username = get_config_value("USER", "username")
-    dns_leak_protection = get_config_value("USER", "dns_leak_protection")
-    custom_dns = get_config_value("USER", "custom_dns")
-    tier = int(get_config_value("USER", "tier")) + 1
-    default_protocol = get_config_value("USER", "default_protocol")
-    killswitch = get_config_value("USER", "killswitch")
+    # pref_dialog = interface.get_object("ConfigurationsWindow")
+    pref_dialog = interface.get_object("SettingsWindow")
+    # username = get_config_value("USER", "username")
+    # dns_leak_protection = get_config_value("USER", "dns_leak_protection")
+    # custom_dns = get_config_value("USER", "custom_dns")
+    # tier = int(get_config_value("USER", "tier")) + 1
+    # default_protocol = get_config_value("USER", "default_protocol")
+    # killswitch = get_config_value("USER", "killswitch")
 
-    # Populate username
-    username_field = interface.get_object("update_username_input")
-    username_field.set_text(username)
+    # # Populate username
+    # username_field = interface.get_object("update_username_input")
+    # username_field.set_text(username)
 
-    # Set DNS combobox
-    dns_combobox = interface.get_object("dns_preferens_combobox")
-    dns_custom_input = interface.get_object("dns_custom_input")
+    # # Set DNS combobox
+    # dns_combobox = interface.get_object("dns_preferens_combobox")
+    # dns_custom_input = interface.get_object("dns_custom_input")
 
-    # DNS ComboBox
-    # 0 - Leak Protection Enabled
-    # 1 - Custom DNS
-    # 2 - None
+    # # DNS ComboBox
+    # # 0 - Leak Protection Enabled
+    # # 1 - Custom DNS
+    # # 2 - None
 
-    if dns_leak_protection == '1':
-        dns_combobox.set_active(0)
-    elif dns_leak_protection != '1' and custom_dns.lower != "none":
-        dns_combobox.set_active(1)
-        dns_custom_input.set_property('sensitive', True)
-    else:
-        dns_combobox.set_active(2)
+    # if dns_leak_protection == '1':
+    #     dns_combobox.set_active(0)
+    # elif dns_leak_protection != '1' and custom_dns.lower != "none":
+    #     dns_combobox.set_active(1)
+    #     dns_custom_input.set_property('sensitive', True)
+    # else:
+    #     dns_combobox.set_active(2)
     
-    dns_custom_input.set_text(custom_dns)
+    # dns_custom_input.set_text(custom_dns)
 
-    # Set ProtonVPN Plan
-    protonvpn_plans = {
-        1: interface.get_object("member_free_update_checkbox"),
-        2: interface.get_object("member_basic_update_checkbox"),
-        3: interface.get_object("member_plus_update_checkbox"),
-        4: interface.get_object("member_visionary_update_checkbox")
-    }
+    # # Set ProtonVPN Plan
+    # protonvpn_plans = {
+    #     1: interface.get_object("member_free_update_checkbox"),
+    #     2: interface.get_object("member_basic_update_checkbox"),
+    #     3: interface.get_object("member_plus_update_checkbox"),
+    #     4: interface.get_object("member_visionary_update_checkbox")
+    # }
 
-    for tier_val, object in protonvpn_plans.items():
-        if tier_val == tier:
-            object.set_active(True)
-            break
+    # for tier_val, object in protonvpn_plans.items():
+    #     if tier_val == tier:
+    #         object.set_active(True)
+    #         break
 
-    # Set OpenVPN Protocol        
-    interface.get_object("protocol_tcp_update_checkbox").set_active(True) if default_protocol == "tcp" else interface.get_object("protocol_udp_update_checkbox").set_active(True)
+    # # Set OpenVPN Protocol        
+    # interface.get_object("protocol_tcp_update_checkbox").set_active(True) if default_protocol == "tcp" else interface.get_object("protocol_udp_update_checkbox").set_active(True)
 
-    # Set Autoconnect on boot combobox 
-    populate_autoconnect_list(interface)
-    autoconnect_combobox = interface.get_object("autoconnect_combobox")
+    # # Set Autoconnect on boot combobox 
+    # populate_autoconnect_list(interface)
+    # autoconnect_combobox = interface.get_object("autoconnect_combobox")
 
-    try:
-        autoconnect_setting = get_config_value("USER", "autoconnect")
-    except KeyError:
-        autoconnect_setting = 0
-
-    autoconnect_combobox.set_active(int(autoconnect_setting))
-
-    # Set Kill Switch combobox
-    killswitch_combobox = interface.get_object("killswitch_combobox")
-
-    killswitch_combobox.set_active(int(killswitch))
-
-    # Populate Split Tunelling
-    split_tunneling = interface.get_object("split_tunneling_textview")
-
-    # Check if killswtich is != 0, if it is then disable split tunneling Function
-    if killswitch != '0':
-        split_tunneling.set_property('sensitive', False)
-        interface.get_object("update_split_tunneling_button").set_property('sensitive', False)
-        
-    split_tunneling_buffer = split_tunneling.get_buffer()
-    content = ""
-    try:
-        with open(SPLIT_TUNNEL_FILE) as f:
-            lines = f.readlines()
-
-            for line in lines:
-                content = content + line
-
-            split_tunneling_buffer.set_text(content)
-
-    except FileNotFoundError:
-        split_tunneling_buffer.set_text(content)
-
-    # Load tray configurations
-    for k,v in TRAY_CFG_DICT.items(): 
-        setter = 0
-        try: 
-            setter = int(get_config_value("USER", v))
-        except KeyError:
-            gui_logger.debug("[!] Unable to find {} key.".format(v))
-
-        combobox = interface.get_object(k)
-        combobox.set_active(setter)
-
-        
-
-    # display_server = 0
-    # display_data_tx = 0
-    # display_time_conn = 0
-
-    
-    # try: 
-    #     display_server = int(get_config_value("USER", TRAY_CFG_SERVENAME))
+    # try:
+    #     autoconnect_setting = get_config_value("USER", "autoconnect")
     # except KeyError:
-    #     gui_logger.debug("[!] Unable to find display_server key.")
-    # try: 
-    #     display_time_conn = int(get_config_value("USER", TRAY_CFG_TIME_CONN))
-    # except KeyError:
-    #     gui_logger.debug("[!] Unable to find display_time_conn key.")
+    #     autoconnect_setting = 0
 
-    # tray_data_tx_combobox = interface.get_object("tray_data_tx_combobox")
-    # tray_servername_combobox = interface.get_object("tray_servername_combobox")
-    # tray_time_connected_combobox = interface.get_object("tray_time_connected_combobox")
+    # autoconnect_combobox.set_active(int(autoconnect_setting))
 
-    # tray_data_tx_combobox.set_active(display_data_tx)
-    # tray_servername_combobox.set_active(display_server)
-    # tray_time_connected_combobox.set_active(display_time_conn)
+    # # Set Kill Switch combobox
+    # killswitch_combobox = interface.get_object("killswitch_combobox")
+
+    # killswitch_combobox.set_active(int(killswitch))
+
+    # # Populate Split Tunelling
+    # split_tunneling = interface.get_object("split_tunneling_textview")
+
+    # # Check if killswtich is != 0, if it is then disable split tunneling Function
+    # if killswitch != '0':
+    #     split_tunneling.set_property('sensitive', False)
+    #     interface.get_object("update_split_tunneling_button").set_property('sensitive', False)
+        
+    # split_tunneling_buffer = split_tunneling.get_buffer()
+    # content = ""
+    # try:
+    #     with open(SPLIT_TUNNEL_FILE) as f:
+    #         lines = f.readlines()
+
+    #         for line in lines:
+    #             content = content + line
+
+    #         split_tunneling_buffer.set_text(content)
+
+    # except FileNotFoundError:
+    #     split_tunneling_buffer.set_text(content)
+
+    # # Load tray configurations
+    # for k,v in TRAY_CFG_DICT.items(): 
+    #     setter = 0
+    #     try: 
+    #         setter = int(get_config_value("USER", v))
+    #     except KeyError:
+    #         gui_logger.debug("[!] Unable to find {} key.".format(v))
+
+    #     combobox = interface.get_object(k)
+    #     combobox.set_active(setter)
 
     pref_dialog.show()
 
