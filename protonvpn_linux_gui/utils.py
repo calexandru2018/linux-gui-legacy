@@ -1,4 +1,5 @@
 import re
+import os
 import sys
 import time
 import datetime
@@ -45,7 +46,7 @@ import gi
 
 # Gtk3 import
 gi.require_version('Gtk', '3.0')
-from gi.repository import GObject as gobject, Gtk
+from gi.repository import GObject as gobject, Gtk, GdkPixbuf
 
 def get_server_protocol_from_cli(raw_result, return_protocol=False):
     """Function that collects servername and protocol from CLI print statement after establishing connection.
@@ -652,22 +653,39 @@ def populate_server_list(populate_servers_dict):
                 key=lambda s: get_server_value(s, "Load", servers)
             )
         populate_servers_dict["tree_object"].clear()
-        
+
+        CURRDIR = os.path.dirname(os.path.abspath(__file__))
+        flags_base_path = CURRDIR+"/resources/img/flags/small/"
+        features_base_path = CURRDIR+"/resources/img/utils/"
+
         for country in country_servers:
+            for k,v in country_codes.items():
+                if country == v:
+                    flag_path = flags_base_path+"{}.png".format(v)
+                    break
+                else:
+                    flag_path = flags_base_path+"Unknown.png"
 
-            avrg_load, country_features = get_country_avrg_features(country, country_servers, servers, features)
+            avrg_load, country_feature = get_country_avrg_features(country, country_servers, servers, features)
 
-            country_row = populate_servers_dict["tree_object"].append(None, [country, "", "", avrg_load, country_features])
+            flag = GdkPixbuf.Pixbuf.new_from_file_at_size(flag_path, 15,15)
+
+            plus_server_path = features_base_path+"plus-server.png"
+            plus_feature = GdkPixbuf.Pixbuf.new_from_file_at_size(plus_server_path, 15,15)
+
+            feature_path = features_base_path+country_feature
+            feature = GdkPixbuf.Pixbuf.new_from_file_at_size(feature_path, 15,15)
+
+            country_row = populate_servers_dict["tree_object"].append(None, [flag, country, plus_feature, feature, avrg_load])
 
             for servername in country_servers[country]:
                 load = str(get_server_value(servername, "Load", servers)).rjust(3, " ")
                 load = load + "%"
 
-                feature = features[get_server_value(servername, 'Features', servers)]
+                no_flag_path = features_base_path+"normal.png"
+                no_flag = GdkPixbuf.Pixbuf.new_from_file_at_size(none_path, 15,15)
 
-                tier = server_tiers[get_server_value(servername, "Tier", servers)]
-
-                populate_servers_dict["tree_object"].append(country_row, [country, servername, tier, load, feature])
+                populate_servers_dict["tree_object"].append(country_row, [no_flag, country, plus_feature, feature, load])
 
 def get_country_avrg_features(country, country_servers, servers, features):
     """Function that returns average load and features of a specific country.
@@ -677,6 +695,13 @@ def get_country_avrg_features(country, country_servers, servers, features):
     load_sum = 0
     # Variable for feature per country
     features_per_country = set()
+
+    order_dict = {
+        "normal": 0,
+        "p2p": 1,
+        "tor": 2
+    }
+    top_choice = 0
 
     for servername in country_servers[country]:
         # Get average per country
@@ -690,9 +715,23 @@ def get_country_avrg_features(country, country_servers, servers, features):
     # Convert set to list
     country_feature_list = list(features_per_country)
 
+    for feature in country_feature_list:
+        for k,v in order_dict.items():
+            if feature.lower() == k.lower():
+                if top_choice < v:
+                    top_choice = v
+
+    if top_choice == 0:
+        top_choice = "normal.png"
+    elif top_choice == 1:
+        top_choice = "p2p-arrows.png"
+    elif top_choice == 2:
+        top_choice = "tor-onion.png"
+        
     return  (
             str(int(round(load_sum/count)))+"%", 
-            ' / '.join(str(feature) for feature in country_feature_list) if len(country_feature_list) > 1 else country_feature_list[0]
+            # ' / '.join(str(feature) for feature in country_feature_list) if len(country_feature_list) > 1 else country_feature_list[0]
+            top_choice
             )    
 
 def populate_autoconnect_list(interface, return_list=False):
