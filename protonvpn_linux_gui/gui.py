@@ -71,6 +71,7 @@ class Handler:
         self.messagedialog_sub_label = self.interface.get_object("message_dialog_sub_label")
         self.messagedialog_spinner = self.interface.get_object("message_dialog_spinner")
         self.messagedialog_sub_label.hide()
+        self.initial_tab = 0
 
     # Login BUTTON HANDLER
     def on_login_button_clicked(self, button):
@@ -526,8 +527,30 @@ class Handler:
 
         self.messagedialog_window.show()
 
-    def test(self, notebook, selected_tab, actual_tab_index):
-        print("Inside test")
+    def main_notebook_switch_page(self, notebook, selected_tab, actual_tab_index):
+        countries_tab = self.interface.get_object("countries_tab_label")
+        countries_content_holder = self.interface.get_object("councountries_content_holdertries_tab_label")
+        
+        profiles_tab = self.interface.get_object("profiles_tab_label")
+        profiles_content_holder = self.interface.get_object("profiles_content_holder")
+
+        countries_tab_style = countries_tab.get_style_context()
+        profiles_tab_style = profiles_tab.get_style_context()
+
+        if self.initial_tab < actual_tab_index:
+            # Profiles selected
+            countries_tab_style.remove_class("active_tab")
+            countries_tab_style.add_class("inactive_tab")
+
+            profiles_tab_style.remove_class("inactive_tab")
+            profiles_tab_style.add_class("active_tab")
+        else:
+            # Countries selected
+            countries_tab_style.remove_class("inactive_tab")
+            countries_tab_style.add_class("active_tab")
+
+            profiles_tab_style.remove_class("active_tab")
+            profiles_tab_style.add_class("inactive_tab")
 
 def initialize_gui():
     """Initializes the GUI 

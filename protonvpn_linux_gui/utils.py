@@ -411,7 +411,7 @@ def left_grid_update_labels(interface, servers, is_connected, connected_server, 
 
     # Check and set protocol label
     connected_to_protocol = connected_to_protocol if connected_to_protocol else ""
-    protocol_label.set_markup('<span>OpenVPN -> {0}</span>'.format(connected_to_protocol))
+    protocol_label.set_markup('<span>OpenVPN >> {0}</span>'.format(connected_to_protocol.upper()))
 
     # Check and set feature label
     try:
@@ -460,7 +460,7 @@ def right_grid_update_labels(interface, servers, is_connected, connected_server,
     # server_name_label.set_markup('<span>{0}</span>'.format(connected_server))
 
     # country_isp = "<span>" + country + "/" + isp + "</span>"
-    country_isp = "<span>" + country_cc + " -> " + connected_server + "</span>"
+    country_isp = "<span>" + country_cc + " >> " + connected_server + "</span>"
     ip_label.set_markup(ip)
 
     isp_label.set_markup(isp)
