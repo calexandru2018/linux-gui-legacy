@@ -1651,6 +1651,9 @@ Author: Alexandru Cheltuitor
                 <child>
                   <placeholder/>
                 </child>
+                <child>
+                  <placeholder/>
+                </child>
                 <style>
                   <class name="settings_notebook_grid"/>
                   <class name="default_background"/>
@@ -3497,13 +3500,11 @@ Author: Alexandru Cheltuitor
                                         <property name="vexpand">True</property>
                                         <property name="hscroll_policy">natural</property>
                                         <property name="model">ServerTreeStore</property>
+                                        <property name="headers_visible">False</property>
                                         <property name="expander_column">country_col</property>
                                         <property name="search_column">0</property>
-                                        <property name="fixed_height_mode">True</property>
-                                        <property name="hover_selection">True</property>
                                         <property name="level_indentation">1</property>
-                                        <property name="enable_grid_lines">horizontal</property>
-                                        <property name="enable_tree_lines">True</property>
+                                        <property name="activate_on_single_click">True</property>
                                         <child internal-child="selection">
                                           <object class="GtkTreeSelection">
                                             <property name="mode">multiple</property>
