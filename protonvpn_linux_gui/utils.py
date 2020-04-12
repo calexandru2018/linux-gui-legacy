@@ -666,13 +666,22 @@ def populate_server_list(populate_servers_dict):
                 else:
                     flag_path = flags_base_path+"Unknown.png"
 
+            # Get average load and highest feature
             avrg_load, country_feature = get_country_avrg_features(country, country_servers, servers, features)
 
+            # Create empty image
+            empty_pixbuff = features_base_path+"normal.png"
+            empty = GdkPixbuf.Pixbuf.new_from_file_at_size(empty_pixbuff, 15,15)
+
             flag = GdkPixbuf.Pixbuf.new_from_file_at_size(flag_path, 15,15)
+            
+            # Check plus servers
+            plus_feature = empty
+            if not country_feature == "normal.png" and not country_feature == "p2p-arrows.png":
+                plus_server_path = features_base_path+"plus-server.png"
+                plus_feature = GdkPixbuf.Pixbuf.new_from_file_at_size(plus_server_path, 15,15)
 
-            plus_server_path = features_base_path+"plus-server.png"
-            plus_feature = GdkPixbuf.Pixbuf.new_from_file_at_size(plus_server_path, 15,15)
-
+            # Feate img creation
             feature_path = features_base_path+country_feature
             feature = GdkPixbuf.Pixbuf.new_from_file_at_size(feature_path, 15,15)
 
@@ -680,12 +689,14 @@ def populate_server_list(populate_servers_dict):
 
             for servername in country_servers[country]:
                 load = str(get_server_value(servername, "Load", servers)).rjust(3, " ")
-                load = load + "%"
+                load = load + "%"               
 
-                no_flag_path = features_base_path+"normal.png"
-                no_flag = GdkPixbuf.Pixbuf.new_from_file_at_size(none_path, 15,15)
+                country_servername = country+" >> "+servername
 
-                populate_servers_dict["tree_object"].append(country_row, [no_flag, country, plus_feature, feature, load])
+                if "free" in servername.lower():
+                    plus_feature = empty
+
+                populate_servers_dict["tree_object"].append(country_row, [empty, servername, plus_feature, feature, load])
 
 def get_country_avrg_features(country, country_servers, servers, features):
     """Function that returns average load and features of a specific country.
@@ -728,11 +739,7 @@ def get_country_avrg_features(country, country_servers, servers, features):
     elif top_choice == 2:
         top_choice = "tor-onion.png"
         
-    return  (
-            str(int(round(load_sum/count)))+"%", 
-            # ' / '.join(str(feature) for feature in country_feature_list) if len(country_feature_list) > 1 else country_feature_list[0]
-            top_choice
-            )    
+    return  (str(int(round(load_sum/count)))+"%", top_choice)    
 
 def populate_autoconnect_list(interface, return_list=False):
     """Function that populates autoconnect dropdown list.
