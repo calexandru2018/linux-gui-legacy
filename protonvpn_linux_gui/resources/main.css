@@ -23,14 +23,34 @@ headerbar.default-decoration {
     border-radius: 20px;
 }
 
+.banner_shadow{
+    box-shadow: 64px 64px 12px 40px rgba(0,0,0,0.4);
+}
+
 .default_tab_conf{
     padding: 15px 70px;
-    background-color: rgba(62, 68, 73, 1);
     /* background-color: transparent; */
     color: white;
     -GtkWidget-focus-line-width: 0;
     margin-top: -6px;
     margin-bottom: -6px;
+    transition: all .3s ease-in-out;
+}
+
+.default_tab_conf:active,
+.default_tab_conf{
+  outline: 0;
+  -webkit-box-shadow: inset 0 3px 5px rgba(0, 0, 0, .125);
+          box-shadow: inset 0 3px 5px rgba(0, 0, 0, .125);
+}
+
+.active_tab{
+    background-color: rgba(62, 68, 73, 1);
+}
+
+.inactive_tab{
+    background-color: rgba(55, 61, 66, 1);
+    color: gray;
 }
 
 .left_tab{
@@ -44,16 +64,12 @@ headerbar.default-decoration {
     margin-right: -20px;
 }
 
-.left_tab:active{
-    background-color: white;
-}
-.right_tab{
-    border-top-left-radius: 80px;
-    margin-right: -20px;
+.countries_tab_content{
+    padding: 10px 15px;
 }
 
-.countries_tab_content{
-    padding: 30px 15px;
+.profiles_tab_content{
+    padding: 10px 15px;
 }
 
 .profile_grid{
