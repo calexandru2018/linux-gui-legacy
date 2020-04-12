@@ -3375,6 +3375,8 @@ Author: Alexandru Cheltuitor
                                         <property name="expander_column">country_col</property>
                                         <property name="search_column">1</property>
                                         <property name="level_indentation">1</property>
+                                        <property name="enable_tree_lines">False</property>
+                                        <property name="activate_on_single_click">True</property>
                                         <child internal-child="selection">
                                           <object class="GtkTreeSelection">
                                             <property name="mode">multiple</property>
