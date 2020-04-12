@@ -71,7 +71,8 @@ class Handler:
         self.messagedialog_sub_label = self.interface.get_object("message_dialog_sub_label")
         self.messagedialog_spinner = self.interface.get_object("message_dialog_spinner")
         self.messagedialog_sub_label.hide()
-        self.initial_tab = 0
+        self.main_initial_tab = 0
+        self.settings_initial_tab = 0
 
     # Login BUTTON HANDLER
     def on_login_button_clicked(self, button):
@@ -326,7 +327,7 @@ class Handler:
         load_configurations(self.interface)
         
     # To avoid getting the ConfigurationsWindow destroyed and not being re-rendered again
-    def ConfigurationsWindow_delete_event(self, object, event):
+    def SettingsWindow_delete_event(self, object, event):
         """On Delete handler is used to hide the window so it renders next time the dialog is called
         
         -Returns:Boolean
@@ -529,7 +530,7 @@ class Handler:
 
     def main_notebook_switch_page(self, notebook, selected_tab, actual_tab_index):
         countries_tab = self.interface.get_object("countries_tab_label")
-        countries_content_holder = self.interface.get_object("councountries_content_holdertries_tab_label")
+        countries_content_holder = self.interface.get_object("countries_content_holder")
         
         profiles_tab = self.interface.get_object("profiles_tab_label")
         profiles_content_holder = self.interface.get_object("profiles_content_holder")
@@ -537,7 +538,7 @@ class Handler:
         countries_tab_style = countries_tab.get_style_context()
         profiles_tab_style = profiles_tab.get_style_context()
 
-        if self.initial_tab < actual_tab_index:
+        if self.main_initial_tab < actual_tab_index:
             # Profiles selected
             countries_tab_style.remove_class("active_tab")
             countries_tab_style.add_class("inactive_tab")
@@ -551,6 +552,53 @@ class Handler:
 
             profiles_tab_style.remove_class("active_tab")
             profiles_tab_style.add_class("inactive_tab")
+
+    def settings_notebook_switch_page(self, notebook, selected_tab, actual_tab_index):
+        general_tab = self.interface.get_object("general_tab_label")
+        general_content_holder = self.interface.get_object("general_content_holder")
+        
+        connection_tab = self.interface.get_object("connection_tab_label")
+        connection_content_holder = self.interface.get_object("connection_content_holder")
+
+        account_tab = self.interface.get_object("account_tab_label")
+        account_content_holder = self.interface.get_object("account_content_holder")
+
+        general_tab_style = general_tab.get_style_context()
+        connection_tab_style = connection_tab.get_style_context()
+        account_tab_style = account_tab.get_style_context()
+
+        if actual_tab_index == 0:
+            # General selected
+            general_tab_style.add_class("active_tab")
+            general_tab_style.remove_class("inactive_tab")
+
+            connection_tab_style.add_class("inactive_tab")
+            connection_tab_style.remove_class("active_tab")
+            
+            account_tab_style.add_class("inactive_tab")
+            account_tab_style.remove_class("active_tab")
+
+        elif actual_tab_index == 1:
+            # Connection selected
+            general_tab_style.remove_class("active_tab")
+            general_tab_style.add_class("inactive_tab")
+
+            connection_tab_style.remove_class("inactive_tab")
+            connection_tab_style.add_class("active_tab")
+            
+            account_tab_style.add_class("inactive_tab")
+            account_tab_style.remove_class("active_tab")
+
+        else:
+            # Account selected
+            general_tab_style.remove_class("active_tab")
+            general_tab_style.add_class("inactive_tab")
+
+            connection_tab_style.add_class("inactive_tab")
+            connection_tab_style.remove_class("active_tab")
+            
+            account_tab_style.remove_class("inactive_tab")
+            account_tab_style.add_class("active_tab")
 
 def initialize_gui():
     """Initializes the GUI 
