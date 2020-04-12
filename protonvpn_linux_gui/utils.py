@@ -438,6 +438,11 @@ def right_grid_update_labels(interface, servers, is_connected, connected_server,
     isp_label    =          interface.get_object("isp_label")
     data_received_label =   interface.get_object("data_received_label1")
     data_sent_label =       interface.get_object("data_sent_label1") 
+    background_large_flag = interface.get_object("background_large_flag")
+
+    CURRDIR = os.path.dirname(os.path.abspath(__file__))
+    flags_base_path = CURRDIR+"/resources/img/flags/large/"
+
 
     # Get and set IP labels. Get also country and ISP
     if not conn_info:
@@ -456,6 +461,9 @@ def right_grid_update_labels(interface, servers, is_connected, connected_server,
     for k,v in country_codes.items():
         if k == country:
             country_cc = v
+            flag_path = flags_base_path+"{}.jpg".format(k.lower()) 
+            background_large_flag.set_from_file(flag_path)
+
 
     # Get and set server name
     connected_server = connected_server if connected_server and is_connected else ""
@@ -725,7 +733,7 @@ def populate_server_list(populate_servers_dict):
                 else:
                     # Should be secure core
                     secure_core = True
-                    
+
                 if not secure_core:
                     populate_servers_dict["tree_object"].append(country_row, [empty_pix, servername, plus_feature, feature, load])
 
