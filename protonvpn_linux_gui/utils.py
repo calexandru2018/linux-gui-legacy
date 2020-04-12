@@ -471,7 +471,7 @@ def right_grid_update_labels(interface, servers, is_connected, connected_server,
         load = get_server_value(connected_server, "Load", servers)
     except:
         load = False
-    print(load)
+        
     load = "{0}% Load".format(load) if load and is_connected else ""
     server_load_label.set_markup('<span>{0}</span>'.format(load))
 
