@@ -129,11 +129,12 @@ class Handler:
         treeview = self.interface.get_object("ServerList")
         
         for col in range(0, treeview.get_n_columns()):
-            value = model.get_value(iter, col).lower();
-            if data.lower() in value.lower():
-                return True
-            else:
-                continue
+            value = model.get_value(iter, col);
+            if isinstance(value, str):
+                if data.lower() in value.lower():
+                    return True
+                else:
+                    continue
 
     def connect_to_selected_server_button_clicked(self, button):
         """Button/Event handler to connect to selected server
@@ -626,10 +627,53 @@ class Handler:
 
         self.messagedialog_window.show()
 
-    def test(self, a, b, c):
-        print(a)
-        print(b)
-        print(c)
+    def test(self, a):
+        self.messagedialog_sub_label.hide()
+        selected_server = {
+            "selected_server": False,
+            "selected_country": False
+        }
+        
+        # Get the server list object
+        server_list = self.interface.get_object("ServerList").get_selection() 
+
+        # Get the selected server
+        (model, pathlist) = server_list.get_selected_rows()
+
+        for path in pathlist :
+            tree_iter = model.get_iter(path)
+
+            # the second param of get_value() specifies the column number, starting at 0
+            user_selected_server = model.get_value(tree_iter, 1)
+
+            # Check if user selected a specific server
+            if len(user_selected_server) == 0:
+                selected_server["selected_country"] = model.get_value(tree_iter, 0)
+            else:
+                selected_server["selected_server"] = user_selected_server
+
+        print(selected_server)
+        # if not selected_server["selected_server"] and not selected_server["selected_country"]:
+        #     self.messagedialog_spinner.hide()
+        #     self.messagedialog_label.set_markup("No server was selected!\nPlease select a server before attempting to connect.")
+        #     gui_logger.debug("[!] No server was selected to be connected to.")
+        # else:
+        #     # Set text and show spinner
+        #     if selected_server["selected_server"]:
+        #         msg = "Connecting to <b>{0}</b>.".format(selected_server["selected_server"])
+        #     else:
+        #         msg = "Connecting to the quickest server in <b>{0}</b>.".format(selected_server["selected_country"])
+                
+        #     self.messagedialog_label.set_markup(msg)
+        #     self.messagedialog_spinner.show()
+
+        #     gui_logger.debug(">>> Starting \"connect_to_selected_server\" thread.")
+
+        #     thread = Thread(target=connect_to_selected_server, args=[self.interface, selected_server, self.messagedialog_label, self.messagedialog_spinner])
+        #     thread.daemon = True
+        #     thread.start()
+
+        # self.messagedialog_window.show()
 
 def initialize_gui():
     """Initializes the GUI 
