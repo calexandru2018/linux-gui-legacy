@@ -414,8 +414,12 @@ def update_labels(interface, servers, is_connected, connected_server, disconnect
     for k,v in country_codes.items():
         if k == country:
             if is_connected:
-                flag_path = flags_base_path+"{}.jpg".format(k.lower()) 
-                background_large_flag.set_from_file(flag_path)
+                try:
+                    flag_path = flags_base_path+"{}.jpg".format(k.lower()) 
+                    background_large_flag.set_from_file(flag_path)
+                except:
+                    pass
+                
             country_cc = v
 
     protonvpn_sign_green.hide()
