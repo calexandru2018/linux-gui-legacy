@@ -175,7 +175,6 @@ def connect_to_selected_server(*args):
 
     gui_logger.debug(">>> Ended tasks in \"openvpn_connect\" thread.")
     
-# def quick_connect(interface, messagedialog_label, messagedialog_spinner):
 def quick_connect(*args):
     """Function that connects to the quickest server.
     """
@@ -270,7 +269,6 @@ def random_connect(interface, messagedialog_label, messagedialog_spinner):
 
     gui_logger.debug(">>> Ended tasks in \"random_c\" thread.")
 
-# def disconnect(interface, messagedialog_label, messagedialog_spinner):
 def disconnect(*args):
     """Function that disconnects from the VPN.
     """
