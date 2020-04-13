@@ -135,20 +135,20 @@ def on_login(interface, username_field, password_field, messagedialog_label, use
     load_on_start({"interface":interface, "gui_enabled": True, "messagedialog_label": messagedialog_label})
 
 # Dashboard hanlder
-def connect_to_selected_server(interface, selected_server, messagedialog_label, messagedialog_spinner):
+def connect_to_selected_server(*args):
     """Function that either connects by selected server or selected country.
     """     
     protocol = get_config_value("USER", "default_protocol")
 
     gui_logger.debug(">>> Running \"openvpn_connect\".")
-
+        
     # Check if it should connect to country or server
-    if not selected_server["selected_country"]:
-        result = subprocess.run(["protonvpn", "connect", selected_server["selected_server"], "-p", protocol], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    if "#" in args[0]["user_selected_server"]:
+        result = subprocess.run(["protonvpn", "connect", args[0]["user_selected_server"], "-p", protocol], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         gui_logger.debug(">>> Log during connection to specific server: {}".format(result))
     else:
         for k, v in country_codes.items():
-            if v == selected_server["selected_country"]:
+            if v == args[0]["user_selected_server"]:
                 selected_country = k
                 break
         result = subprocess.run(["protonvpn", "connect", "--cc", selected_country, "-p", protocol], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -161,11 +161,11 @@ def connect_to_selected_server(interface, selected_server, messagedialog_label, 
     if server_protocol:
         display_message = "You are connect to <b>{}</b> via <b>{}</b>!".format(server_protocol, protocol.upper())
 
-    messagedialog_label.set_markup(display_message)
-    messagedialog_spinner.hide()
+    args[0]["messagedialog_label"].set_markup(display_message)
+    args[0]["messagedialog_spinner"].hide()
 
     update_labels_dict = {
-        "interface": interface,
+        "interface": args[0]["interface"],
         "servers": False,
         "disconnecting": False,
         "conn_info": False
@@ -175,7 +175,8 @@ def connect_to_selected_server(interface, selected_server, messagedialog_label, 
 
     gui_logger.debug(">>> Ended tasks in \"openvpn_connect\" thread.")
     
-def quick_connect(interface, messagedialog_label, messagedialog_spinner):
+# def quick_connect(interface, messagedialog_label, messagedialog_spinner):
+def quick_connect(*args):
     """Function that connects to the quickest server.
     """
     protocol = get_config_value("USER", "default_protocol")
@@ -186,7 +187,7 @@ def quick_connect(interface, messagedialog_label, messagedialog_spinner):
     result = subprocess.run(["protonvpn", "connect", "--fastest", "-p", protocol], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
     update_labels_dict = {
-        "interface": interface,
+        "interface": args[0]["interface"],
         "servers": False,
         "disconnecting": False,
         "conn_info": False
@@ -198,8 +199,8 @@ def quick_connect(interface, messagedialog_label, messagedialog_spinner):
     if server_protocol:
         display_message = "You are connect to <b>{}</b> via <b>{}</b>!".format(server_protocol, protocol.upper())
 
-    messagedialog_label.set_markup(display_message)
-    messagedialog_spinner.hide()
+    args[0]["messagedialog_label"].set_markup(display_message)
+    args[0]["messagedialog_spinner"].hide()
 
     gui_logger.debug(">>> Result: \"{0}\"".format(result))
     
@@ -269,11 +270,12 @@ def random_connect(interface, messagedialog_label, messagedialog_spinner):
 
     gui_logger.debug(">>> Ended tasks in \"random_c\" thread.")
 
-def disconnect(interface, messagedialog_label, messagedialog_spinner):
+# def disconnect(interface, messagedialog_label, messagedialog_spinner):
+def disconnect(*args):
     """Function that disconnects from the VPN.
     """
     update_labels_dict = {
-        "interface": interface,
+        "interface": args[0]["interface"],
         "servers": False,
         "disconnecting": True,
         "conn_info": False
@@ -283,8 +285,8 @@ def disconnect(interface, messagedialog_label, messagedialog_spinner):
 
     result = subprocess.run(["protonvpn", "disconnect"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     
-    messagedialog_label.set_markup(result.stdout.decode())
-    messagedialog_spinner.hide()
+    args[0]["messagedialog_label"].set_markup(result.stdout.decode())
+    args[0]["messagedialog_spinner"].hide()
 
     gui_logger.debug(">>> Result: \"{0}\"".format(result))
 
