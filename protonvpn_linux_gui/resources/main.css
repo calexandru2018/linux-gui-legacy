@@ -18,6 +18,11 @@ headerbar.default-decoration {
     color: white;
 }
 
+.top_menu_hamburger{
+    margin-top: 2px;
+    margin-bottom: 2px;
+}
+
 .initialize_profile_btn{
     background-color: transparent;
     color: white;

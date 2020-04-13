@@ -865,7 +865,7 @@ Author: Alexandru Cheltuitor
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="halign">start</property>
-                    <property name="label" translatable="yes">Start on Boot</property>
+                    <property name="label" translatable="yes">Start Autoconnect on Boot</property>
                     <attributes>
                       <attribute name="weight" value="medium"/>
                       <attribute name="size" value="12000"/>
@@ -905,7 +905,7 @@ Author: Alexandru Cheltuitor
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkSwitch">
+                  <object class="GtkSwitch" id="start_autoconnect_on_boot_switch">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="halign">end</property>
@@ -917,7 +917,7 @@ Author: Alexandru Cheltuitor
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkSwitch">
+                  <object class="GtkSwitch" id="start_on_boot_tray_switch">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="halign">end</property>
@@ -1030,7 +1030,7 @@ Author: Alexandru Cheltuitor
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkSwitch">
+                  <object class="GtkSwitch" id="dns_leak_switch">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="halign">end</property>
@@ -1042,7 +1042,7 @@ Author: Alexandru Cheltuitor
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkSwitch">
+                  <object class="GtkSwitch" id="killswitch_switch">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="halign">end</property>
@@ -2270,10 +2270,29 @@ Author: Alexandru Cheltuitor
     <property name="can_focus">False</property>
     <property name="stock">gtk-execute</property>
   </object>
+  <object class="GtkImage" id="gtk-justify-fill">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="pixbuf">img/utils/hamburger-menu-icon (copy).png</property>
+    <property name="icon_size">3</property>
+    <style>
+      <class name="top_menu_hamburger"/>
+    </style>
+  </object>
   <object class="GtkImage" id="gtk-preferences">
     <property name="visible">True</property>
     <property name="can_focus">False</property>
     <property name="stock">gtk-preferences</property>
+  </object>
+  <object class="GtkImage" id="gtk-quit">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="stock">gtk-quit</property>
+  </object>
+  <object class="GtkImage" id="protonvpn-logo">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="pixbuf">img/logo/protonvpn_sign_green.png</property>
   </object>
   <object class="GtkApplicationWindow" id="DashboardWindow">
     <property name="height_request">-1</property>
@@ -3084,11 +3103,21 @@ Author: Alexandru Cheltuitor
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <child>
-                      <object class="GtkMenuItem">
+                      <object class="GtkImageMenuItem">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="label" translatable="yes">_File</property>
-                        <property name="use_underline">True</property>
+                        <property name="image">protonvpn-logo</property>
+                        <property name="use_stock">False</property>
+                        <property name="always_show_image">True</property>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkImageMenuItem" id="settings_button">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="image">gtk-justify-fill</property>
+                        <property name="use_stock">False</property>
+                        <property name="always_show_image">True</property>
                         <child type="submenu">
                           <object class="GtkMenu">
                             <property name="visible">True</property>
@@ -3102,6 +3131,17 @@ Author: Alexandru Cheltuitor
                                 <property name="use_stock">False</property>
                                 <property name="always_show_image">True</property>
                                 <signal name="activate" handler="configuration_menu_button_clicked" swapped="no"/>
+                              </object>
+                            </child>
+                            <child>
+                              <object class="GtkImageMenuItem" id="diagnose_menu_button">
+                                <property name="label">Diagnose</property>
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="image">gtk-execute</property>
+                                <property name="use_stock">False</property>
+                                <property name="always_show_image">True</property>
+                                <signal name="activate" handler="diagnose_menu_button_clicked" swapped="no"/>
                               </object>
                             </child>
                             <child>
@@ -3128,30 +3168,6 @@ Author: Alexandru Cheltuitor
                               </object>
                             </child>
                             <child>
-                              <object class="GtkImageMenuItem">
-                                <property name="label">gtk-quit</property>
-                                <property name="visible">True</property>
-                                <property name="can_focus">False</property>
-                                <property name="use_underline">True</property>
-                                <property name="use_stock">True</property>
-                                <property name="always_show_image">True</property>
-                              </object>
-                            </child>
-                          </object>
-                        </child>
-                      </object>
-                    </child>
-                    <child>
-                      <object class="GtkMenuItem">
-                        <property name="visible">True</property>
-                        <property name="can_focus">False</property>
-                        <property name="label" translatable="yes">_Help</property>
-                        <property name="use_underline">True</property>
-                        <child type="submenu">
-                          <object class="GtkMenu">
-                            <property name="visible">True</property>
-                            <property name="can_focus">False</property>
-                            <child>
                               <object class="GtkImageMenuItem" id="about_menu_button">
                                 <property name="label">gtk-about</property>
                                 <property name="visible">True</property>
@@ -3163,14 +3179,19 @@ Author: Alexandru Cheltuitor
                               </object>
                             </child>
                             <child>
-                              <object class="GtkImageMenuItem" id="diagnose_menu_button">
-                                <property name="label">Diagnose</property>
+                              <object class="GtkSeparatorMenuItem">
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
-                                <property name="image">gtk-execute</property>
+                              </object>
+                            </child>
+                            <child>
+                              <object class="GtkImageMenuItem">
+                                <property name="label">Exit</property>
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="image">gtk-quit</property>
                                 <property name="use_stock">False</property>
                                 <property name="always_show_image">True</property>
-                                <signal name="activate" handler="diagnose_menu_button_clicked" swapped="no"/>
                               </object>
                             </child>
                           </object>
@@ -3178,7 +3199,7 @@ Author: Alexandru Cheltuitor
                       </object>
                     </child>
                     <style>
-                      <class name="default_background"/>
+                      <class name="overlay_background"/>
                     </style>
                   </object>
                   <packing>
