@@ -24,6 +24,10 @@ headerbar.default-decoration {
     margin-bottom: 2px;
 }
 
+.text_hamburger_identation{
+    margin-left: -20px;
+}
+
 .initialize_profile_btn{
     background-color: transparent;
     color: white;

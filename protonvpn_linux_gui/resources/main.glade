@@ -2277,11 +2277,6 @@ Author: Alexandru Cheltuitor
     <property name="can_focus">False</property>
     <property name="stock">gtk-delete</property>
   </object>
-  <object class="GtkImage" id="gtk-execute">
-    <property name="visible">True</property>
-    <property name="can_focus">False</property>
-    <property name="stock">gtk-execute</property>
-  </object>
   <object class="GtkImage" id="gtk-justify-fill">
     <property name="visible">True</property>
     <property name="can_focus">False</property>
@@ -2290,16 +2285,6 @@ Author: Alexandru Cheltuitor
     <style>
       <class name="top_menu_hamburger"/>
     </style>
-  </object>
-  <object class="GtkImage" id="gtk-preferences">
-    <property name="visible">True</property>
-    <property name="can_focus">False</property>
-    <property name="stock">gtk-preferences</property>
-  </object>
-  <object class="GtkImage" id="gtk-quit">
-    <property name="visible">True</property>
-    <property name="can_focus">False</property>
-    <property name="stock">gtk-quit</property>
   </object>
   <object class="GtkImage" id="protonvpn-logo">
     <property name="visible">True</property>
@@ -3145,30 +3130,24 @@ Author: Alexandru Cheltuitor
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
                             <child>
-                              <object class="GtkImageMenuItem" id="configurations_menu_button">
-                                <property name="label">Configurations</property>
+                              <object class="GtkMenuItem" id="configurations_menu_button">
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
-                                <property name="image">gtk-preferences</property>
-                                <property name="use_stock">False</property>
-                                <property name="always_show_image">True</property>
-                                <signal name="activate" handler="configuration_menu_button_clicked" swapped="no"/>
+                                <property name="label" translatable="yes">Configurations</property>
                                 <style>
                                   <class name="white_text"/>
+                                  <class name="text_hamburger_identation"/>
                                 </style>
                               </object>
                             </child>
                             <child>
-                              <object class="GtkImageMenuItem" id="diagnose_menu_button">
-                                <property name="label">Diagnose</property>
+                              <object class="GtkMenuItem" id="diagnose_menu_button">
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
-                                <property name="image">gtk-execute</property>
-                                <property name="use_stock">False</property>
-                                <property name="always_show_image">True</property>
-                                <signal name="activate" handler="diagnose_menu_button_clicked" swapped="no"/>
+                                <property name="label" translatable="yes">Diagnose</property>
                                 <style>
                                   <class name="white_text"/>
+                                  <class name="text_hamburger_identation"/>
                                 </style>
                               </object>
                             </child>
@@ -3179,16 +3158,14 @@ Author: Alexandru Cheltuitor
                               </object>
                             </child>
                             <child>
-                              <object class="GtkImageMenuItem" id="disconnect_vpn">
-                                <property name="label">gtk-disconnect</property>
+                              <object class="GtkMenuItem" id="disconnect_vpn">
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
+                                <property name="label" translatable="yes">Disconnect</property>
                                 <property name="use_underline">True</property>
-                                <property name="use_stock">True</property>
-                                <property name="always_show_image">True</property>
-                                <signal name="activate" handler="disconnect_button_clicked" swapped="no"/>
                                 <style>
                                   <class name="white_text"/>
+                                  <class name="text_hamburger_identation"/>
                                 </style>
                               </object>
                             </child>
@@ -3199,16 +3176,14 @@ Author: Alexandru Cheltuitor
                               </object>
                             </child>
                             <child>
-                              <object class="GtkImageMenuItem" id="about_menu_button">
-                                <property name="label">gtk-about</property>
+                              <object class="GtkMenuItem" id="about_menu_button">
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
+                                <property name="label" translatable="yes">About</property>
                                 <property name="use_underline">True</property>
-                                <property name="use_stock">True</property>
-                                <property name="always_show_image">True</property>
-                                <signal name="activate" handler="about_menu_button_clicked" swapped="no"/>
                                 <style>
                                   <class name="white_text"/>
+                                  <class name="text_hamburger_identation"/>
                                 </style>
                               </object>
                             </child>
@@ -3219,15 +3194,13 @@ Author: Alexandru Cheltuitor
                               </object>
                             </child>
                             <child>
-                              <object class="GtkImageMenuItem">
-                                <property name="label">Exit</property>
+                              <object class="GtkMenuItem">
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
-                                <property name="image">gtk-quit</property>
-                                <property name="use_stock">False</property>
-                                <property name="always_show_image">True</property>
+                                <property name="label" translatable="yes">Exit</property>
                                 <style>
                                   <class name="white_text"/>
+                                  <class name="text_hamburger_identation"/>
                                 </style>
                               </object>
                             </child>
