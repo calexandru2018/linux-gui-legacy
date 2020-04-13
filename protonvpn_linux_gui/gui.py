@@ -189,7 +189,10 @@ class Handler:
 
         gui_logger.debug(">>> Starting \"random_connect\" thread.")
 
-        thread = Thread(target=random_connect, args=[self.interface, self.messagedialog_label, self.messagedialog_spinner])
+        thread = Thread(target=random_connect, args=[{
+                                                    "interface":self.interface, 
+                                                    "messagedialog_label": self.messagedialog_label, 
+                                                    "messagedialog_spinner": self.messagedialog_spinner}])
         thread.daemon = True
         thread.start()
 
@@ -707,6 +710,7 @@ def initialize_gui():
             dashboard.connect("destroy", Gtk.main_quit)
         else:
             window = interface.get_object("DashboardWindow")
+            # window = interface.get_object("SettingsWindow")
             gui_logger.debug(">>> Loading DashboardWindow")
             window.connect("destroy", Gtk.main_quit)
             
