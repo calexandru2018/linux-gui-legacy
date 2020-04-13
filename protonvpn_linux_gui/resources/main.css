@@ -56,9 +56,9 @@ headerbar.default-decoration {
     margin-right: -20px;
 }
 
-.countries_tab_content{
-    padding: 10px 15px;
-    transition: all 5s ease-in-out;
+.countries_content_style{
+    padding: 5px 10px;
+    /* transition: all 5s ease-in-out; */
 }
 
 .profiles_tab_content{

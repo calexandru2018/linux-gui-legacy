@@ -258,6 +258,9 @@ Author: Alexandru Cheltuitor
             <child>
               <placeholder/>
             </child>
+            <child>
+              <placeholder/>
+            </child>
           </object>
           <packing>
             <property name="expand">False</property>
@@ -2912,6 +2915,7 @@ Author: Alexandru Cheltuitor
                                     </child>
                                     <style>
                                       <class name="default_background"/>
+                                      <class name="countries_content_style"/>
                                     </style>
                                   </object>
                                   <packing>
@@ -2930,6 +2934,7 @@ Author: Alexandru Cheltuitor
                                     <signal name="key-release-event" handler="server_filter_input_key_release" swapped="no"/>
                                     <style>
                                       <class name="default_background"/>
+                                      <class name="countries_content_style"/>
                                     </style>
                                   </object>
                                   <packing>
@@ -2962,9 +2967,6 @@ Author: Alexandru Cheltuitor
                                         <property name="headers_visible">False</property>
                                         <property name="expander_column">country_col</property>
                                         <property name="search_column">1</property>
-                                        <property name="hover_selection">True</property>
-                                        <property name="activate_on_single_click">True</property>
-                                        <signal name="select-cursor-row" handler="test" swapped="no"/>
                                         <child internal-child="selection">
                                           <object class="GtkTreeSelection">
                                             <property name="mode">multiple</property>
@@ -3050,6 +3052,7 @@ Author: Alexandru Cheltuitor
                                     </child>
                                     <style>
                                       <class name="default_background"/>
+                                      <class name="countries_content_style"/>
                                     </style>
                                   </object>
                                   <packing>
@@ -3060,7 +3063,6 @@ Author: Alexandru Cheltuitor
                                 </child>
                                 <style>
                                   <class name="default_background"/>
-                                  <class name="countries_tab_content"/>
                                 </style>
                               </object>
                               <packing>
