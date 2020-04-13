@@ -104,11 +104,17 @@ headerbar.default-decoration {
 .server_list_bakground_row_selected{
     background-color: black;
 }
-.server_list_bakground_row:hover{
+
+.server_list_bakground_row:hover, .menu_list_hover:hover{
     background-color: rgb(86, 179, 102);
 }
 
-/* Settings */
+/*
+||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+----------------------- Settings Window -----------------------
+|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+*/
+
 .settings_label_bg{
     background-color: rgba(45, 51, 56, 1);
 }
@@ -122,7 +128,7 @@ headerbar.default-decoration {
 }
 
 .default_settings_tab_conf{
-    padding: 15px 90px;
+    padding: 15px 40px;
     /* background-color: transparent; */
     margin-top: -6px;
     margin-bottom: -6px;
@@ -132,16 +138,23 @@ headerbar.default-decoration {
 .settings_left_tab{
     border-top-right-radius: 80px;
     margin-left: -20px;
-    margin-right: -25px;
+    padding-right: 60px;
 }
-.settings_center_tab{
-    margin-left: -10px;
+
+.settings_center_left_tab{
+    margin-left: -38px;
+    border-top-left-radius: 80px;
+    border-top-right-radius: 80px;
+}
+.settings_center_right_tab{
+    margin-left: -40px;
     border-top-left-radius: 80px;
     border-top-right-radius: 80px;
 }
 
 .settings_right_tab{
     border-top-left-radius: 80px;
-    margin-left: -33px;
+    margin-left: -40px;
     margin-right: -20px;
+    padding-left: 60px;
 }
