@@ -201,39 +201,6 @@ Author: Alexandru Cheltuitor
             </child>
             <child>
               <object class="GtkButton">
-                <property name="label">gtk-connect</property>
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="receives_default">True</property>
-                <property name="halign">end</property>
-                <property name="use_stock">True</property>
-                <property name="always_show_image">True</property>
-                <signal name="clicked" handler="connect_to_selected_server_button_clicked" swapped="no"/>
-              </object>
-              <packing>
-                <property name="left_attach">3</property>
-                <property name="top_attach">0</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkButton">
-                <property name="label">gtk-refresh</property>
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="receives_default">True</property>
-                <property name="halign">start</property>
-                <property name="use_stock">True</property>
-                <property name="image_position">right</property>
-                <property name="always_show_image">True</property>
-                <signal name="clicked" handler="refresh_server_list_button_clicked" swapped="no"/>
-              </object>
-              <packing>
-                <property name="left_attach">0</property>
-                <property name="top_attach">0</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkButton">
                 <property name="label" translatable="yes">Reconnect</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
@@ -245,6 +212,12 @@ Author: Alexandru Cheltuitor
                 <property name="left_attach">0</property>
                 <property name="top_attach">2</property>
               </packing>
+            </child>
+            <child>
+              <placeholder/>
+            </child>
+            <child>
+              <placeholder/>
             </child>
             <child>
               <placeholder/>
@@ -2578,6 +2551,9 @@ Author: Alexandru Cheltuitor
                                     <property name="y">-65</property>
                                   </packing>
                                 </child>
+                                <style>
+                                  <class name="overlay_background"/>
+                                </style>
                               </object>
                               <packing>
                                 <property name="index">-1</property>
@@ -2699,7 +2675,6 @@ Author: Alexandru Cheltuitor
                                     <property name="can_focus">False</property>
                                     <property name="halign">start</property>
                                     <property name="hexpand">True</property>
-                                    <property name="wrap">True</property>
                                     <attributes>
                                       <attribute name="weight" value="medium"/>
                                     </attributes>
@@ -2825,7 +2800,6 @@ Author: Alexandru Cheltuitor
                                         <property name="can_focus">False</property>
                                         <property name="halign">start</property>
                                         <property name="hexpand">True</property>
-                                        <property name="wrap">True</property>
                                         <attributes>
                                           <attribute name="weight" value="medium"/>
                                           <attribute name="size" value="12000"/>
@@ -2851,7 +2825,7 @@ Author: Alexandru Cheltuitor
                               </packing>
                             </child>
                             <style>
-                              <class name="default_background"/>
+                              <class name="overlay_background"/>
                             </style>
                           </object>
                           <packing>
@@ -2957,7 +2931,7 @@ Author: Alexandru Cheltuitor
                                     <property name="propagate_natural_width">True</property>
                                     <property name="propagate_natural_height">True</property>
                                     <child>
-                                      <object class="GtkTreeView" id="ServerList">
+                                      <object class="GtkTreeView" id="TreeViewServerList">
                                         <property name="visible">True</property>
                                         <property name="can_focus">True</property>
                                         <property name="hexpand">True</property>
@@ -2967,6 +2941,7 @@ Author: Alexandru Cheltuitor
                                         <property name="headers_visible">False</property>
                                         <property name="expander_column">country_col</property>
                                         <property name="search_column">1</property>
+                                        <signal name="cursor-changed" handler="TreeViewServerList_cursor_changed" swapped="no"/>
                                         <child internal-child="selection">
                                           <object class="GtkTreeSelection">
                                             <property name="mode">multiple</property>
@@ -2991,6 +2966,7 @@ Author: Alexandru Cheltuitor
                                             <property name="spacing">5</property>
                                             <property name="sizing">fixed</property>
                                             <property name="title" translatable="yes">Country</property>
+                                            <property name="expand">True</property>
                                             <property name="clickable">True</property>
                                             <property name="sort_column_id">0</property>
                                             <child>
@@ -3021,6 +2997,7 @@ Author: Alexandru Cheltuitor
                                             <property name="spacing">5</property>
                                             <property name="sizing">fixed</property>
                                             <property name="title" translatable="yes">Feature</property>
+                                            <property name="expand">True</property>
                                             <property name="clickable">True</property>
                                             <child>
                                               <object class="GtkCellRendererPixbuf"/>
@@ -3046,13 +3023,14 @@ Author: Alexandru Cheltuitor
                                           </object>
                                         </child>
                                         <style>
+                                          <class name="server_list_bakground_row"/>
                                           <class name="default_background"/>
                                         </style>
                                       </object>
                                     </child>
                                     <style>
-                                      <class name="default_background"/>
                                       <class name="countries_content_style"/>
+                                      <class name="default_background"/>
                                     </style>
                                   </object>
                                   <packing>
@@ -3324,6 +3302,23 @@ Author: Alexandru Cheltuitor
                                 <property name="use_stock">False</property>
                                 <property name="always_show_image">True</property>
                                 <signal name="activate" handler="configuration_menu_button_clicked" swapped="no"/>
+                              </object>
+                            </child>
+                            <child>
+                              <object class="GtkSeparatorMenuItem">
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                              </object>
+                            </child>
+                            <child>
+                              <object class="GtkImageMenuItem" id="disconnect_vpn">
+                                <property name="label">gtk-disconnect</property>
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="use_underline">True</property>
+                                <property name="use_stock">True</property>
+                                <property name="always_show_image">True</property>
+                                <signal name="activate" handler="disconnect_button_clicked" swapped="no"/>
                               </object>
                             </child>
                             <child>

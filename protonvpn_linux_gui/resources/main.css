@@ -10,6 +10,10 @@ headerbar.default-decoration {
     background-color: rgba(62, 68, 73, 1);
     color: white;
 }
+.overlay_background{
+    background-color: rgba(52, 58, 63, 1);
+}
+
 .white_text{
     color: white;
 }
@@ -21,7 +25,14 @@ headerbar.default-decoration {
     border-style: solid;
     border-width: 2px;
     border-radius: 20px;
+    transition: all .115s ease-in-out;
 }
+
+.initialize_profile_btn:hover {
+    border-color: transparent;
+    background-color: rgb(86, 179, 102);
+}
+
 
 .banner_shadow{
     box-shadow: 64px 64px 12px 40px rgba(0,0,0,0.4);
@@ -72,6 +83,13 @@ headerbar.default-decoration {
 .profile_buttons{
     padding: 5px 5px;
     background-color: rgba(68, 73, 78, 1);
+}
+
+.server_list_bakground_row_selected{
+    background-color: black;
+}
+.server_list_bakground_row:hover{
+    background-color: rgb(86, 179, 102);
 }
 
 /* Settings */
