@@ -77,7 +77,7 @@ class Handler:
 
     # Login BUTTON HANDLER
     def on_login_button_clicked(self, button):
-        """Button/Event handler to intialize user account. Calls populate_server_list(server_list_object) to populate server list.
+        """Button/Event handler to intialize user account. Calls populate_server_list(server_tree_store) to populate server list.
         """     
         self.messagedialog_sub_label.hide()
         
@@ -106,11 +106,11 @@ class Handler:
         """Event handler, to filter servers after each key release
         """
         user_filter_by = object.get_text()
-        server_list_object = self.interface.get_object("ServerTreeStore")
-        tree_view_object = self.interface.get_object("ServerList")
+        server_tree_store = self.interface.get_object("ServerTreeStore")
+        tree_view_object = self.interface.get_object("TreeViewServerList")
 
         # Creates a new filter from a ListStore/TreeStore
-        n_filter = server_list_object.filter_new()
+        n_filter = server_tree_store.filter_new()
 
         # set_visible_func:
         # first_param: filter function
@@ -126,7 +126,7 @@ class Handler:
     def column_filter(self, model, iter, data=None):
         """Filter by columns and returns the corresponding rows
         """
-        treeview = self.interface.get_object("ServerList")
+        treeview = self.interface.get_object("TreeViewServerList")
         
         for col in range(0, treeview.get_n_columns()):
             value = model.get_value(iter, col);
@@ -136,54 +136,6 @@ class Handler:
                 else:
                     continue
 
-    def connect_to_selected_server_button_clicked(self, button):
-        """Button/Event handler to connect to selected server
-        """     
-        self.messagedialog_sub_label.hide()
-        selected_server = {
-            "selected_server": False,
-            "selected_country": False
-        }
-        
-        # Get the server list object
-        server_list = self.interface.get_object("ServerList").get_selection() 
-
-        # Get the selected server
-        (model, pathlist) = server_list.get_selected_rows()
-
-        for path in pathlist :
-            tree_iter = model.get_iter(path)
-
-            # the second param of get_value() specifies the column number, starting at 0
-            user_selected_server = model.get_value(tree_iter, 1)
-
-            # Check if user selected a specific server
-            if len(user_selected_server) == 0:
-                selected_server["selected_country"] = model.get_value(tree_iter, 0)
-            else:
-                selected_server["selected_server"] = user_selected_server
-
-        if not selected_server["selected_server"] and not selected_server["selected_country"]:
-            self.messagedialog_spinner.hide()
-            self.messagedialog_label.set_markup("No server was selected!\nPlease select a server before attempting to connect.")
-            gui_logger.debug("[!] No server was selected to be connected to.")
-        else:
-            # Set text and show spinner
-            if selected_server["selected_server"]:
-                msg = "Connecting to <b>{0}</b>.".format(selected_server["selected_server"])
-            else:
-                msg = "Connecting to the quickest server in <b>{0}</b>.".format(selected_server["selected_country"])
-                
-            self.messagedialog_label.set_markup(msg)
-            self.messagedialog_spinner.show()
-
-            gui_logger.debug(">>> Starting \"connect_to_selected_server\" thread.")
-
-            thread = Thread(target=connect_to_selected_server, args=[self.interface, selected_server, self.messagedialog_label, self.messagedialog_spinner])
-            thread.daemon = True
-            thread.start()
-
-        self.messagedialog_window.show()
 
     def quick_connect_button_clicked(self, button):
         """Button/Event handler to connect to the fastest server
@@ -255,22 +207,6 @@ class Handler:
 
         self.messagedialog_window.show()
         
-    def refresh_server_list_button_clicked(self, button):
-        """Button/Event handler to refresh/repopulate server list
-        - At the moment, will also refresh the Dashboard information, this will be fixed in the future.
-        """
-        self.messagedialog_sub_label.hide()
-        self.messagedialog_label.set_markup("Refreshing server list...")
-        self.messagedialog_spinner.show()
-
-        gui_logger.debug(">>> Starting \"refresh_server_list\" thread.")
-
-        thread = Thread(target=refresh_server_list, args=[self.interface, self.messagedialog_window, self.messagedialog_spinner])
-        thread.daemon = True
-        thread.start()
-
-        self.messagedialog_window.show()
-
     def about_menu_button_clicked(self, button):
         """Button /Event handler to open About dialog
         """
@@ -611,69 +547,58 @@ class Handler:
         self.messagedialog_sub_label.hide()
 
         gui_logger.debug(">>> Starting \"main_conn_disc_button_label\" thread.")
+        
+        server_list = self.interface.get_object("TreeViewServerList").get_selection() 
+        (model, pathlist) = server_list.get_selected_rows()
 
-        target = quick_connect
+        user_selected_server = False
+
+        for path in pathlist :
+            tree_iter = model.get_iter(path)
+            # the second param of get_value() specifies the column number, starting at 0
+            user_selected_server = model.get_value(tree_iter, 1)
+
+        server_list.unselect_all()
+
+        target = quick_connect 
         message = "Connecting to the fastest server..."
-        if is_connected():
+
+        if is_connected() and not user_selected_server:
             target = disconnect
             message = "Disconnecting..."
+
+        if user_selected_server:
+            target = connect_to_selected_server
+            message = "Connecting to <b>{}</b>".format(user_selected_server) 
 
         self.messagedialog_label.set_markup(message)
         self.messagedialog_spinner.show()
 
-        thread = Thread(target=target, args=[self.interface, self.messagedialog_label, self.messagedialog_spinner])
+        thread = Thread(target=target, args=[{
+                                            "interface":self.interface, 
+                                            "user_selected_server": user_selected_server, 
+                                            "messagedialog_label": self.messagedialog_label, 
+                                            "messagedialog_spinner": self.messagedialog_spinner}])
         thread.daemon = True
         thread.start()
 
         self.messagedialog_window.show()
 
-    def test(self, a):
+    def TreeViewServerList_cursor_changed(self, treeview):
         self.messagedialog_sub_label.hide()
-        selected_server = {
-            "selected_server": False,
-            "selected_country": False
-        }
-        
-        # Get the server list object
-        server_list = self.interface.get_object("ServerList").get_selection() 
 
         # Get the selected server
-        (model, pathlist) = server_list.get_selected_rows()
+        (model, pathlist) = treeview.get_selection().get_selected_rows()
 
         for path in pathlist :
             tree_iter = model.get_iter(path)
-
             # the second param of get_value() specifies the column number, starting at 0
             user_selected_server = model.get_value(tree_iter, 1)
 
-            # Check if user selected a specific server
-            if len(user_selected_server) == 0:
-                selected_server["selected_country"] = model.get_value(tree_iter, 0)
-            else:
-                selected_server["selected_server"] = user_selected_server
-
-        print(selected_server)
-        # if not selected_server["selected_server"] and not selected_server["selected_country"]:
-        #     self.messagedialog_spinner.hide()
-        #     self.messagedialog_label.set_markup("No server was selected!\nPlease select a server before attempting to connect.")
-        #     gui_logger.debug("[!] No server was selected to be connected to.")
-        # else:
-        #     # Set text and show spinner
-        #     if selected_server["selected_server"]:
-        #         msg = "Connecting to <b>{0}</b>.".format(selected_server["selected_server"])
-        #     else:
-        #         msg = "Connecting to the quickest server in <b>{0}</b>.".format(selected_server["selected_country"])
-                
-        #     self.messagedialog_label.set_markup(msg)
-        #     self.messagedialog_spinner.show()
-
-        #     gui_logger.debug(">>> Starting \"connect_to_selected_server\" thread.")
-
-        #     thread = Thread(target=connect_to_selected_server, args=[self.interface, selected_server, self.messagedialog_label, self.messagedialog_spinner])
-        #     thread.daemon = True
-        #     thread.start()
-
-        # self.messagedialog_window.show()
+        try:
+            self.conn_disc_button_label.set_markup("Connecto to {}".format(user_selected_server))
+        except UnboundLocalError:
+            self.conn_disc_button_label.set_markup("Quick Connect")
 
 def initialize_gui():
     """Initializes the GUI 
