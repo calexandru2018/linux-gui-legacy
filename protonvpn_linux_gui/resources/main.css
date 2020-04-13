@@ -12,6 +12,7 @@ headerbar.default-decoration {
 }
 .overlay_background{
     background-color: rgba(52, 58, 63, 1);
+    color: white;
 }
 
 .white_text{
@@ -45,14 +46,19 @@ headerbar.default-decoration {
 
 .default_main_tab_conf{
     padding: 20px 70px;
-    /* background-color: transparent; */
+    background-color: red;
     color: white;
     margin-top: -6px;
     margin-bottom: -6px;
     transition: all .115s ease-in-out;
 }
 
+.test{
+    background-color: red;
+    color: red;
+}
 .active_tab{
+    color: white;
     background-color: rgba(62, 68, 73, 1);
 }
 
@@ -87,6 +93,7 @@ headerbar.default-decoration {
 
 .profile_buttons{
     padding: 5px 5px;
+    color: white;
     background-color: rgba(68, 73, 78, 1);
 }
 
