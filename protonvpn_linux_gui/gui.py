@@ -626,6 +626,11 @@ class Handler:
 
         self.messagedialog_window.show()
 
+    def test(self, a, b, c):
+        print(a)
+        print(b)
+        print(c)
+
 def initialize_gui():
     """Initializes the GUI 
     ---
