@@ -348,7 +348,7 @@ def update_labels_server_list(interface, server_tree_list_object=False, conn_inf
     gobject.idle_add(populate_server_list, populate_servers_dict)
 
 def update_labels_status(update_labels_dict):
-    """Function that updates labels, calls on left_grid_update_labels and right_grid_update_labels.
+    """Function prepares data to update labels.
     """
     gui_logger.debug(">>> Running \"update_labels_status\" getting servers, is_connected and connected_server.")
 
@@ -365,65 +365,28 @@ def update_labels_status(update_labels_dict):
     except:
         connected_server = False
         
-    left_grid_update_labels(update_labels_dict["interface"], servers, is_vpn_connected, connected_server, update_labels_dict["disconnecting"])
-    right_grid_update_labels(update_labels_dict["interface"], servers, is_vpn_connected, connected_server, update_labels_dict["disconnecting"], conn_info=update_labels_dict["conn_info"])
+    update_labels(update_labels_dict["interface"], servers, is_vpn_connected, connected_server, update_labels_dict["disconnecting"], conn_info=update_labels_dict["conn_info"])
 
-def left_grid_update_labels(interface, servers, is_connected, connected_server, disconnecting):
-    """Function that updates the labels that are position within the left-side of the dashboard grid.
-    """
-    gui_logger.debug(">>> Running \"left_grid_update_labels\".")
-
-    # Left grid
-    vpn_status_label =      interface.get_object("vpn_status_label")
-    dns_status_label =      interface.get_object("dns_status_label")
-    time_connected_label =  interface.get_object("time_connected_label1")
-    killswitch_label =      interface.get_object("killswitch_label")
-    protocol_label =        interface.get_object("protocol_label")
-    server_features_label = interface.get_object("server_features_label")
-    conn_disc_button_label = interface.get_object("main_conn_disc_button_label")
-
-    all_features = {0: "Normal", 1: "Secure-Core", 2: "Tor", 4: "P2P"}
-    protocol = "No VPN Connection"
-
-    # Check and set VPN status label. Get also protocol status if vpn is connected
-    conn_disc_button = "Quick Connect"
-    if is_connected and not disconnecting:
-        try:
-            connected_to_protocol = get_config_value("metadata", "connected_proto")
-            protocol = '<span>OpenVPN >> {0}</span>'.format(connected_to_protocol.upper())
-        except KeyError:
-            pass
-        conn_disc_button = "Disconnect"
-    
-    conn_disc_button_label.set_markup(conn_disc_button)
-    # Check and set DNS status label
-    dns_enabled = get_config_value("USER", "dns_leak_protection")
-
-    # Update time connected label
-    gobject.timeout_add_seconds(1, update_connection_time, {"is_connected":is_connected, "label":time_connected_label})
-
-    # Check and set protocol label
-    protocol_label.set_markup(protocol)
-
-
-def right_grid_update_labels(interface, servers, is_connected, connected_server, disconnecting, conn_info=False):
-    """Function that updates the labels that are position within the right-side of the dashboard grid.
+def update_labels(interface, servers, is_connected, connected_server, disconnecting, conn_info=False):
+    """Function that updates the labels.
     """
     gui_logger.debug(">>> Running \"right_grid_update_labels\".")
 
     # Right grid
-    ip_label =              interface.get_object("ip_label1")
-    server_load_label =     interface.get_object("server_load_label1")
-    country_label =         interface.get_object("country_label1")
+    time_connected_label =  interface.get_object("time_connected_label")
+    protocol_label =        interface.get_object("protocol_label")
+    conn_disc_button_label = interface.get_object("main_conn_disc_button_label")
+    ip_label =              interface.get_object("ip_label")
+    server_load_label =     interface.get_object("server_load_label")
+    country_label =         interface.get_object("country_label")
     isp_label    =          interface.get_object("isp_label")
-    data_received_label =   interface.get_object("data_received_label1")
-    data_sent_label =       interface.get_object("data_sent_label1") 
+    data_received_label =   interface.get_object("data_received_label")
+    data_sent_label =       interface.get_object("data_sent_label") 
     background_large_flag = interface.get_object("background_large_flag")
     protonvpn_sign_green =  interface.get_object("protonvpn_sign_green")
 
     CURRDIR = os.path.dirname(os.path.abspath(__file__))
     flags_base_path = CURRDIR+"/resources/img/flags/large/"
-
 
     # Get and set server load label
     try:
@@ -480,6 +443,29 @@ def right_grid_update_labels(interface, servers, is_connected, connected_server,
     # Update sent and received data
     gobject.timeout_add_seconds(1, update_sent_received_data, {"received_label": data_received_label, "sent_label": data_sent_label})
     
+    # Left grid
+    all_features = {0: "Normal", 1: "Secure-Core", 2: "Tor", 4: "P2P"}
+    protocol = "No VPN Connection"
+
+    # Check and set VPN status label. Get also protocol status if vpn is connected
+    conn_disc_button = "Quick Connect"
+    if is_connected and not disconnecting:
+        try:
+            connected_to_protocol = get_config_value("metadata", "connected_proto")
+            protocol = '<span>OpenVPN >> {0}</span>'.format(connected_to_protocol.upper())
+        except KeyError:
+            pass
+        conn_disc_button = "Disconnect"
+    
+    conn_disc_button_label.set_markup(conn_disc_button)
+    # Check and set DNS status label
+    dns_enabled = get_config_value("USER", "dns_leak_protection")
+
+    # Update time connected label
+    gobject.timeout_add_seconds(1, update_connection_time, {"is_connected":is_connected, "label":time_connected_label})
+
+    # Check and set protocol label
+    protocol_label.set_markup(protocol)
 
 def update_sent_received_data(dict_labels):
     tx_amount, rx_amount = get_transferred_data()
