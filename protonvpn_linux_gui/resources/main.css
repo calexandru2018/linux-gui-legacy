@@ -3,7 +3,7 @@ headerbar.default-decoration {
     padding-bottom: 3px;
     min-height: 0px;
     font-size: 0.8em;
-    background-color: black;
+    background-color: green;
 }
 
 .default_background{
@@ -28,19 +28,12 @@ headerbar.default-decoration {
 }
 
 .default_main_tab_conf{
-    padding: 15px 70px;
+    padding: 20px 70px;
     /* background-color: transparent; */
     color: white;
     margin-top: -6px;
     margin-bottom: -6px;
     transition: all .115s ease-in-out;
-}
-
-.default_tab_conf:active,
-.default_tab_conf{
-  outline: 0;
-  -webkit-box-shadow: inset 0 3px 5px rgba(0, 0, 0, .125);
-          box-shadow: inset 0 3px 5px rgba(0, 0, 0, .125);
 }
 
 .active_tab{
