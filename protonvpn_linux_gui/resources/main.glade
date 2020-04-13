@@ -2297,6 +2297,7 @@ Author: Alexandru Cheltuitor
     <property name="no_show_all">True</property>
     <property name="vexpand">True</property>
     <property name="title" translatable="yes">ProtonVPN GUI - Dashboard</property>
+    <property name="resizable">False</property>
     <property name="window_position">center-always</property>
     <property name="icon">img/logo/protonvpn_logo.png</property>
     <property name="gravity">center</property>
@@ -2314,7 +2315,7 @@ Author: Alexandru Cheltuitor
         <property name="min_content_width">412</property>
         <property name="min_content_height">400</property>
         <property name="max_content_width">450</property>
-        <property name="max_content_height">1024</property>
+        <property name="max_content_height">740</property>
         <property name="propagate_natural_width">True</property>
         <property name="propagate_natural_height">True</property>
         <child>
@@ -3134,9 +3135,11 @@ Author: Alexandru Cheltuitor
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
                                 <property name="label" translatable="yes">Configurations</property>
+                                <signal name="activate" handler="configuration_menu_button_clicked" swapped="no"/>
                                 <style>
                                   <class name="white_text"/>
                                   <class name="text_hamburger_identation"/>
+                                  <class name="menu_list_hover"/>
                                 </style>
                               </object>
                             </child>
@@ -3145,9 +3148,11 @@ Author: Alexandru Cheltuitor
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
                                 <property name="label" translatable="yes">Diagnose</property>
+                                <signal name="activate" handler="diagnose_menu_button_clicked" swapped="no"/>
                                 <style>
                                   <class name="white_text"/>
                                   <class name="text_hamburger_identation"/>
+                                  <class name="menu_list_hover"/>
                                 </style>
                               </object>
                             </child>
@@ -3158,14 +3163,16 @@ Author: Alexandru Cheltuitor
                               </object>
                             </child>
                             <child>
-                              <object class="GtkMenuItem" id="disconnect_vpn">
+                              <object class="GtkMenuItem" id="disconnect">
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
                                 <property name="label" translatable="yes">Disconnect</property>
                                 <property name="use_underline">True</property>
+                                <signal name="activate" handler="disconnect_button_clicked" swapped="no"/>
                                 <style>
                                   <class name="white_text"/>
                                   <class name="text_hamburger_identation"/>
+                                  <class name="menu_list_hover"/>
                                 </style>
                               </object>
                             </child>
@@ -3181,9 +3188,11 @@ Author: Alexandru Cheltuitor
                                 <property name="can_focus">False</property>
                                 <property name="label" translatable="yes">About</property>
                                 <property name="use_underline">True</property>
+                                <signal name="activate" handler="about_menu_button_clicked" swapped="no"/>
                                 <style>
                                   <class name="white_text"/>
                                   <class name="text_hamburger_identation"/>
+                                  <class name="menu_list_hover"/>
                                 </style>
                               </object>
                             </child>
@@ -3201,6 +3210,7 @@ Author: Alexandru Cheltuitor
                                 <style>
                                   <class name="white_text"/>
                                   <class name="text_hamburger_identation"/>
+                                  <class name="menu_list_hover"/>
                                 </style>
                               </object>
                             </child>
