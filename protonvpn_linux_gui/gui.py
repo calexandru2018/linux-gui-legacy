@@ -146,7 +146,10 @@ class Handler:
 
         gui_logger.debug(">>> Starting \"quick_connect\" thread.")
 
-        thread = Thread(target=quick_connect, args=[self.interface, self.messagedialog_label, self.messagedialog_spinner])
+        thread = Thread(target=quick_connect, args=[{
+                                            "interface":self.interface, 
+                                            "messagedialog_label": self.messagedialog_label, 
+                                            "messagedialog_spinner": self.messagedialog_spinner}])
         thread.daemon = True
         thread.start()
 
