@@ -602,7 +602,8 @@ def load_connection_settings(interface):
     # Get objects
     update_autoconnect_combobox = interface.get_object("update_autoconnect_combobox")
     update_quick_connect_combobox = interface.get_object("update_quick_connect_combobox")
-    
+    update_protocol_combobox = interface.get_object("update_protocol_combobox")
+
     #Get values
     try:
         autoconnect_setting = get_gui_config("conn_tab", "autoconnect")
@@ -611,7 +612,8 @@ def load_connection_settings(interface):
     try:
         quick_connect_setting = get_gui_config("conn_tab", "quick_connect")
     except KeyError:
-        quick_connect = 0
+        quick_connect = 0 
+    default_protocol = get_config_value("USER", "default_protocol")
 
     # Get indexes
     autoconnect_index = list(server_list.keys()).index(autoconnect_setting)
@@ -620,6 +622,7 @@ def load_connection_settings(interface):
     # Set values
     update_autoconnect_combobox.set_active(autoconnect_index)
     update_quick_connect_combobox.set_active(quick_connect_index)
+    update_protocol_combobox.set_active(0) if default_protocol == "tcp" else update_protocol_combobox.set_active(1)
 
 def load_advanced_settings(interface):
     # User values

@@ -478,11 +478,9 @@ def update_pvpn_plan(interface, messagedialog_label, messagedialog_spinner):
 
     gui_logger.debug(">>> Ended tasks in \"set_protonvpn_tier\" thread.")   
 
-def update_def_protocol(interface, messagedialog_label, messagedialog_spinner):
+def update_def_protocol(interface, messagedialog_label, messagedialog_spinner, openvpn_protocol):
     """Function that updates default protocol.
     """
-    openvpn_protocol = 'tcp' if interface.get_object('protocol_tcp_update_checkbox').get_active() == True else 'udp'
-    
     gui_logger.debug(">>> Running \"set_default_protocol\".")
 
     set_config_value("USER", "default_protocol", openvpn_protocol)
