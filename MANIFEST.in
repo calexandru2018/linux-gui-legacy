@@ -2,5 +2,5 @@ include protonvpn_linux_gui/resources/main.glade
 include protonvpn_linux_gui/resources/main.css
 include protonvpn_linux_gui/resources/img/logo/*.png 
 include protonvpn_linux_gui/resources/img/utils/*.png 
-include protonvpn_linux_gui/resources/img/flags/large/*.png 
+include protonvpn_linux_gui/resources/img/flags/large/*.jpg 
 include protonvpn_linux_gui/resources/img/flags/small/*.png 
