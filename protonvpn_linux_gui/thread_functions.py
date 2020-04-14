@@ -234,6 +234,59 @@ def connect_to_selected_server(*args):
 
     gui_logger.debug(">>> Ended tasks in \"openvpn_connect\" thread.")
     
+def custom_quick_connect(*args):
+    """Make a custom quick connection 
+    """
+    quick_conn_pref = get_gui_config("conn_tab","quick_connect")
+    protocol = get_config_value("USER","default_protocol")
+    
+    display_message = ""
+    command = "--fastest"
+    country = False
+
+    if quick_conn_pref == "fast":
+        command="-f"
+    elif quick_conn_pref == "rand":
+        command="-r"
+    elif quick_conn_pref == "p2p":
+        command="--p2p"
+    elif quick_conn_pref == "sc":
+        command="--sc"
+    elif quick_conn_pref == "tor":
+        command="--tor"
+    else:
+        command="--cc"
+        country=quick_conn_pref.upper()
+    
+    command_list = ["protonvpn", "connect", command, "-p" ,protocol]
+    if country:
+        command_list = ["protonvpn", "connect", command, country, "-p" ,protocol]
+    
+    result = subprocess.run(command_list, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+    update_labels_dict = {
+        "interface": args[0]["interface"],
+        "servers": False,
+        "disconnecting": False,
+        "conn_info": False
+    }
+
+    server_protocol = get_server_protocol_from_cli(result)
+
+    display_message = result.stdout.decode()
+
+    if server_protocol:
+        display_message = "You are connect to <b>{}</b> via <b>{}</b>!".format(server_protocol, protocol.upper())
+
+    args[0]["messagedialog_label"].set_markup(display_message)
+    args[0]["messagedialog_spinner"].hide()
+
+    gui_logger.debug(">>> Result: \"{0}\"".format(result))
+    
+    update_labels_status(update_labels_dict)
+
+    gui_logger.debug(">>> Ended tasks in \"custom_quick_connect\" thread.")
+
 def quick_connect(*args):
     """Function that connects to the quickest server.
     """

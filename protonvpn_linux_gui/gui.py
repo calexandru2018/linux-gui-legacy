@@ -35,6 +35,7 @@ from .utils import (
 # Import functions that are called with threads
 from .thread_functions import(
     quick_connect,
+    custom_quick_connect,
     disconnect,
     random_connect,
     last_connect,
@@ -145,7 +146,6 @@ class Handler:
                     return True
                 else:
                     continue
-
 
     def quick_connect_button_clicked(self, button):
         """Button/Event handler to connect to the fastest server
@@ -591,8 +591,11 @@ class Handler:
 
         server_list.unselect_all()
 
-        target = quick_connect 
+        target = custom_quick_connect 
         message = "Connecting to the fastest server..."
+        
+        if get_gui_config("conn_tab","quick_connect") != "dis":
+            message = "Connecting to custom quick connect..."
 
         if is_connected() and not user_selected_server:
             target = disconnect
