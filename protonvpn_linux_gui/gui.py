@@ -36,7 +36,6 @@ from .utils import (
 from .thread_functions import(
     quick_connect,
     disconnect,
-    refresh_server_list,
     random_connect,
     last_connect,
     connect_to_selected_server,
@@ -52,7 +51,8 @@ from .thread_functions import(
     load_content_on_start,
     update_connect_preference,
     tray_configurations,
-    update_split_tunneling_status
+    update_split_tunneling_status,
+    reload_secure_core_servers
 )
 
 # Import version
@@ -786,7 +786,28 @@ class Handler:
 
                 self.messagedialog_window.show()
 
+    def secure_core_switch_changed(self, object, state):
+        display_secure_core = get_gui_config("connections", "display_secure_core")
+ 
+        if display_secure_core == "False":
+            update_to = "True"
+        else:
+            update_to = "False"
+        
+        if (state and display_secure_core == "False") or (not state and display_secure_core != "False"):
+            self.messagedialog_sub_label.hide()        
+            self.messagedialog_label.set_markup("Loading {} servers...".format("secure-core" if update_to == "True" else "non secure-core"))
+            self.messagedialog_spinner.show()
+            thread = Thread(target=reload_secure_core_servers, args=[
+                                                    self.interface,
+                                                    self.messagedialog_label, 
+                                                    self.messagedialog_spinner,
+                                                    update_to])
+            thread.daemon = True
+            thread.start()
 
+            self.messagedialog_window.show()
+            
 def initialize_gui():
     """Initializes the GUI 
     ---

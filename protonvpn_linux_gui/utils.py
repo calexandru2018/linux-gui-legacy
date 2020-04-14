@@ -334,6 +334,14 @@ def load_on_start(params_dict):
             params_dict["messagedialog_label"].set_markup("Populating dashboard...")
         except:
             pass
+        
+        display_secure_core = get_gui_config("connections", "display_secure_core")
+        secure_core_switch = params_dict["interface"].get_object("secure_core_switch")
+
+        if display_secure_core == "True":
+            secure_core_switch.set_state(True)
+        else:
+            secure_core_switch.set_state(False)
 
         update_labels_server_list(params_dict["interface"], conn_info=conn)
         return True
@@ -654,6 +662,8 @@ def load_advanced_settings(interface):
 def populate_server_list(populate_servers_dict):
     """Function that updates server list.
     """
+    only_secure_core = True if get_gui_config("connections", "display_secure_core") == "True" else False
+
     pull_server_data(force=True)
 
     features = {0: "Normal", 1: "Secure-Core", 2: "Tor", 4: "P2P"}
@@ -720,14 +730,17 @@ def populate_server_list(populate_servers_dict):
                 plus_feature = plus_pix
 
             # Check correct feature
-            if country_feature == "normal":
+            if country_feature == "normal" or country_feature == "secure-core":
                 feature = empty_pix
             elif country_feature == "p2p":
                 feature = p2p_pix
             elif country_feature == "tor":
                 feature = tor_pix
 
-            country_row = populate_servers_dict["tree_object"].append(None, [flag, country, plus_feature, feature, avrg_load])
+            if country_feature == "secure-core" and only_secure_core:
+                country_row = populate_servers_dict["tree_object"].append(None, [flag, country, plus_feature, feature, avrg_load])
+            elif not only_secure_core:
+                country_row = populate_servers_dict["tree_object"].append(None, [flag, country, plus_feature, feature, avrg_load])
 
             for servername in country_servers[country]:
                 secure_core = False
@@ -753,7 +766,9 @@ def populate_server_list(populate_servers_dict):
                     # Should be secure core
                     secure_core = True
 
-                if not secure_core:
+                if secure_core and only_secure_core:
+                    populate_servers_dict["tree_object"].append(country_row, [empty_pix, servername, plus_feature, feature, load])
+                elif not secure_core and not only_secure_core:
                     populate_servers_dict["tree_object"].append(country_row, [empty_pix, servername, plus_feature, feature, load])
 
 def get_country_avrg_features(country, country_servers, servers, features):
@@ -768,7 +783,8 @@ def get_country_avrg_features(country, country_servers, servers, features):
     order_dict = {
         "normal": 0,
         "p2p": 1,
-        "tor": 2
+        "tor": 2,
+        "secure-core": 3,
     }
     top_choice = 0
 
@@ -776,14 +792,14 @@ def get_country_avrg_features(country, country_servers, servers, features):
         # Get average per country
         load_sum = load_sum + int(str(get_server_value(servername, "Load", servers)).rjust(3, " "))
         count += 1
-
+        
         # Get features per country
         feature = features[get_server_value(servername, 'Features', servers)]
         features_per_country.add(feature)
     
     # Convert set to list
     country_feature_list = list(features_per_country)
-
+    
     for feature in country_feature_list:
         for k,v in order_dict.items():
             if feature.lower() == k.lower():
@@ -796,7 +812,9 @@ def get_country_avrg_features(country, country_servers, servers, features):
         top_choice = "p2p"
     elif top_choice == 2:
         top_choice = "tor"
-        
+    else:
+        top_choice = "secure-core"
+
     return  (str(int(round(load_sum/count)))+"%", top_choice)    
 
 def populate_autoconnect_list(interface, return_list=False):

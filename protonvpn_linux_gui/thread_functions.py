@@ -142,6 +142,9 @@ def on_login(interface, username_field, password_field, messagedialog_label, use
         os.chmod(PASSFILE, 0o600)
 
     gui_config = configparser.ConfigParser()
+    gui_config["connections"] = {
+        "display_secure_core": False
+    }
     gui_config["general_tab"] = {
         "start_min": False,
         "start_on_boot": False,
@@ -166,6 +169,29 @@ def on_login(interface, username_field, password_field, messagedialog_label, use
     set_config_value("USER", "initialized", 1)
 
     load_on_start({"interface":interface, "gui_enabled": True, "messagedialog_label": messagedialog_label})
+
+def reload_secure_core_servers(interface, messagedialog_label, messagedialog_spinner, update_to):
+    """Function that reloads server list to either secure-core or non-secure-core.
+    """  
+    # Sleep is needed because it takes a second to update the information,
+    # which makes the button "lag". Temporary solution.
+    time.sleep(1)
+    gui_logger.debug(">>> Running \"update_reload_secure_core_serverslabels_server_list\".")
+
+    set_gui_config("connections", "display_secure_core", update_to)
+    
+    # update_labels_server_list(interface)
+    populate_servers_dict = {
+        "tree_object": interface.get_object("ServerTreeStore"),
+        "servers": False
+    }
+
+    gobject.idle_add(populate_server_list, populate_servers_dict)
+
+    messagedialog_label.set_markup("Displaying <b>{}</b> servers!".format("secure-core" if update_to == "True" else "non secure-core"))
+    messagedialog_spinner.hide()
+
+    gui_logger.debug(">>> Ended tasks in \"reload_secure_core_servers\" thread.")
 
 # Dashboard hanlder
 def connect_to_selected_server(*args):
@@ -324,28 +350,6 @@ def disconnect(*args):
     update_labels_status(update_labels_dict)
 
     gui_logger.debug(">>> Ended tasks in \"disconnect\" thread.")
-    
-def refresh_server_list(interface, messagedialog_window, messagedialog_spinner):
-    """Function that refreshes dashboard labels and server list.
-    """
-    # Sleep is needed because it takes a second to update the information,
-    # which makes the button "lag". Temporary solution.
-    time.sleep(1)
-
-    gui_logger.debug(">>> Running \"update_labels_server_list\".")
-    
-    # update_labels_server_list(interface)
-    populate_servers_dict = {
-        "tree_object": interface.get_object("ServerTreeStore"),
-        "servers": False
-    }
-
-    gobject.idle_add(populate_server_list, populate_servers_dict)
-
-    messagedialog_window.hide()
-    messagedialog_spinner.hide()
-
-    gui_logger.debug(">>> Ended tasks in \"update_labels_server_list\" thread.")
 
 # Preferences/Configuration menu HANDLERS
 def update_user_pass(interface, messagedialog_label, messagedialog_spinner):
