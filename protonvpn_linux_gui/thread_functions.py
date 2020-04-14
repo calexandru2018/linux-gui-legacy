@@ -488,41 +488,19 @@ def update_connect_preference(interface, messagedialog_label, messagedialog_spin
 
     gui_logger.debug(">>> Ended tasks in \"update_autoconnect\" thread.") 
 
-def update_killswitch(interface, messagedialog_label, messagedialog_spinner):
+def update_killswitch(interface, messagedialog_label, messagedialog_spinner, ks_value):
     """Function that updates killswitch configurations. 
     """
-    ks_combobox = interface.get_object("killswitch_combobox")
-    killswitch = ks_combobox.get_active()
-    split_tunnel_message = ""
-
-    if int(killswitch) == 0:
-        split_tunnel_extra_message = "<b>disabled</b>"
-    elif int(killswitch) == 1:
-        split_tunnel_extra_message = "<b>enabled</b> but <b>blocks</b> access to/from LAN"
-    elif int(killswitch) == 2:
-        split_tunnel_extra_message = "<b>enabled</b> and <b>allows</b> access to/from LAN"
-
-    gui_logger.debug(">>> Running \"set_killswitch\".")
-
-    if killswitch and int(get_config_value("USER", "split_tunnel")):
-        set_config_value("USER", "split_tunnel", 0)
-        split_tunnel_message = "Kill Switch <b>can't</b> be used with Split Tunneling.\nSplit Tunneling has been <b>disabled</b>.\n"
-
-    set_config_value("USER", "killswitch", killswitch)
+    set_config_value("USER", "killswitch", ks_value)
 
     # Update killswitch label
-    killswitch_status = "<span>Disabled</span>" if str(killswitch) == "0" else "<span foreground=\"#4E9A06\">Enabled</span>"
-    killswitch_label = interface.get_object("killswitch_label")
-    killswitch_label.set_markup('<span>{0}</span>'.format(killswitch_status))
-
-    result = split_tunnel_message + "Kill Switch configuration updated to {}!".format(split_tunnel_extra_message)
-
-    messagedialog_label.set_markup(result)
+    result = "Kill Switch configuration updated to <b>{}</b>!".format("enabled" if ks_value == "1" else "disabled")
+    messagedialog_label.set_markup()
     messagedialog_spinner.hide()
 
     gui_logger.debug(">>> Result: \"{0}\"".format(result))
 
-    gui_logger.debug(">>> Ended tasks in \"set_killswitch\" thread.")   
+    gui_logger.debug(">>> Ended tasks in \"update_killswitch_switch_changed\" thread.")   
 
 def update_split_tunneling(interface, messagedialog_label, messagedialog_spinner):
     """Function that updates split tunneling configurations.
