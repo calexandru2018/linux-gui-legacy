@@ -3,6 +3,7 @@ try:
     from protonvpn_cli.constants import VERSION as cli_version, USER
 except:
     cli_version = "Not installed"
+    USER = '/home'
 
 VERSION = "2.0.0"
 GITHUB_URL_RELEASE = "https://github.com/calexandru2018/protonvpn-linux-gui/releases/latest"
