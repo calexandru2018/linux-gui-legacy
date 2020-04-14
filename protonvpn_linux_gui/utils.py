@@ -531,6 +531,7 @@ def load_configurations(interface):
     # pref_dialog = interface.get_object("ConfigurationsWindow")
     pref_dialog = interface.get_object("SettingsWindow")
 
+    load_tray_settings(interface)
     load_connection_settings(interface)
     load_advanced_settings(interface)
     # username = get_config_value("USER", "username")
@@ -556,10 +557,6 @@ def load_configurations(interface):
     #         object.set_active(True)
     #         break
 
-    # # Set OpenVPN Protocol        
-    # interface.get_object("protocol_tcp_update_checkbox").set_active(True) if default_protocol == "tcp" else interface.get_object("protocol_udp_update_checkbox").set_active(True)
-    
-
     # # Populate Split Tunelling
     # split_tunneling = interface.get_object("split_tunneling_textview")
 
@@ -582,18 +579,19 @@ def load_configurations(interface):
     # except FileNotFoundError:
     #     split_tunneling_buffer.set_text(content)
 
-    # # Load tray configurations
-    # for k,v in TRAY_CFG_DICT.items(): 
-    #     setter = 0
-    #     try: 
-    #         setter = int(get_config_value("USER", v))
-    #     except KeyError:
-    #         gui_logger.debug("[!] Unable to find {} key.".format(v))
-
-    #     combobox = interface.get_object(k)
-    #     combobox.set_active(setter)
-
     pref_dialog.show()
+
+def load_tray_settings(interface):
+    # Load tray configurations
+    for k,v in TRAY_CFG_DICT.items(): 
+        setter = 0
+        try: 
+            setter = int(get_gui_config("tray_tab", v))
+        except KeyError:
+            gui_logger.debug("[!] Unable to find {} key.".format(v))
+
+        combobox = interface.get_object(k)
+        combobox.set_active(setter)
 
 def load_connection_settings(interface):
     # Set Autoconnect on boot combobox 

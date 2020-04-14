@@ -566,21 +566,23 @@ def update_split_tunneling(interface, messagedialog_label, messagedialog_spinner
 
     gui_logger.debug(">>> Ended tasks in \"set_split_tunnel\" thread.")   
 
-def tray_configurations(interface, messagedialog_label, messagedialog_spinner):
+def tray_configurations(interface, messagedialog_label, messagedialog_spinner, setting_value, setting_display):
     """Function to update what the tray should display.
     """    
     gui_logger.debug(">>> Running \"tray_configurations\".")
+    msg = ''
+    if "serverload" in setting_display:
+        msg = "server load"
+    elif "server" in setting_display:
+        msg = "server name"
+    elif "data" in setting_display:
+        msg = "data transmission"
+    elif "time" in setting_display:
+        msg = "time connected"
 
-    response_list = []
-    custom_msg = ""
-    for k,v in TRAY_CFG_DICT.items(): 
-        combobox_val = interface.get_object(k).get_active()
-        set_config_value("USER", v, combobox_val)
-        response_list.append("Display" if combobox_val == 1 else "Do not display")
+    set_gui_config("tray_tab", TRAY_CFG_DICT[setting_display], setting_value)
 
-    custom_msg = "Data Transmitted: {0}\nServername: {1}\nTime Connected: {2}\nServer load: {3}".format(*response_list)
-
-    result = "Tray configurations <b>updated</b>!\n\n" + custom_msg
+    result = "Tray {0} is <b>{1}</b>!".format(msg, "displayed" if setting_value == 1 else "hidden")
     messagedialog_label.set_markup(result)
     messagedialog_spinner.hide()
 
