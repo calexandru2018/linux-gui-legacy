@@ -42,7 +42,7 @@ setup(
     install_requires=[
         "protonvpn-cli==2.2.2",
         "requests==2.23.0",
-        "configparser==5.0.0"
+        "configparser==4.0.2"
     ],
     python_requires=">=3.5",
     classifiers=[
