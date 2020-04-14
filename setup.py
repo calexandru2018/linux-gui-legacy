@@ -41,7 +41,8 @@ setup(
     url="https://github.com/calexandru2018/protonvpn-linux-gui",
     install_requires=[
         "protonvpn-cli==2.2.2",
-        "requests==2.23.0"
+        "requests==2.23.0",
+        "configparser==2020.4.5.1"
     ],
     python_requires=">=3.5",
     classifiers=[
