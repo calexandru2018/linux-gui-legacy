@@ -2,12 +2,13 @@ import re
 import os
 import sys
 import time
-import datetime
 import requests
+import datetime
 import subprocess
 import collections
-from threading import Thread
+import configparser
 import concurrent.futures
+from threading import Thread
 
 try:
     from protonvpn_cli.utils import (
@@ -26,7 +27,8 @@ try:
     from protonvpn_cli.constants import SPLIT_TUNNEL_FILE, USER, CONFIG_FILE, PASSFILE
     from protonvpn_cli.utils import change_file_owner, make_ovpn_template, set_config_value
 except:
-    sys.exit(1)
+    print("Unable to import from CLI, can not find CLI modules.")
+    pass
 
 from .constants import (
     PATH_AUTOCONNECT_SERVICE, 
@@ -37,7 +39,8 @@ from .constants import (
     TRAY_CFG_SERVENAME, 
     TRAY_CFG_DATA_TX, 
     TRAY_CFG_TIME_CONN, 
-    TRAY_CFG_DICT
+    TRAY_CFG_DICT,
+    GUI_CONFIG_FILE
 )
 
 from .gui_logger import gui_logger
@@ -48,6 +51,28 @@ import gi
 # Gtk3 import
 gi.require_version('Gtk', '3.0')
 from gi.repository import GObject as gobject, Gtk, GdkPixbuf
+
+def get_gui_config(group, key):
+    """Return specific value from GUI_CONFIG_FILE as string"""
+    config = configparser.ConfigParser()
+    config.read(GUI_CONFIG_FILE)
+
+    return config[group][key]
+
+
+def set_gui_config(group, key, value):
+    """Write a specific value to GUI_CONFIG_FILE"""
+
+    config = configparser.ConfigParser()
+    config.read(GUI_CONFIG_FILE)
+    config[group][key] = str(value)
+
+    gui_logger.debug(
+        "Writing {0} to [{1}] in config file".format(key, group)
+    )
+
+    with open(GUI_CONFIG_FILE, "w+") as f:
+        config.write(f)
 
 def get_server_protocol_from_cli(raw_result, return_protocol=False):
     """Function that collects servername and protocol from CLI print statement after establishing connection.
@@ -584,7 +609,7 @@ def load_connection_settings(interface):
     autoconnect_combobox = interface.get_object("update_autoconnect_combobox")
 
     try:
-        autoconnect_setting = get_config_value("USER", "autoconnect")
+        autoconnect_setting = get_gui_config("conn_tab", "autoconnect")
     except KeyError:
         autoconnect_setting = 0
 
@@ -603,8 +628,6 @@ def load_connection_settings(interface):
         killswitch_switch.set_state(True)
     else:
         killswitch_switch.set_state(False)
-
-
 
 def populate_server_list(populate_servers_dict):
     """Function that updates server list.

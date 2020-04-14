@@ -25,7 +25,9 @@ from .utils import (
     get_gui_processes,
     manage_autoconnect,
     populate_autoconnect_list,
-    get_server_protocol_from_cli
+    get_server_protocol_from_cli,
+    get_gui_config,
+    set_gui_config
 )
 
 # Import GUI logger
@@ -152,8 +154,8 @@ def on_login(interface, username_field, password_field, messagedialog_label, use
         TRAY_CFG_SERVERLOAD: "0",
     }
     gui_config["conn_tab"] = {
-        "autoconnect": "0",
-        "quick_connect": "0",
+        "autoconnect": "dis",
+        "quick_connect": "dis",
     }
 
     with open(GUI_CONFIG_FILE, "w") as f:
@@ -497,7 +499,6 @@ def update_autoconnect_preference(interface, messagedialog_label, messagedialog_
 
     gui_logger.debug(">>> Running \"update_autoconnect\".")
 
-    set_config_value("USER", "autoconnect", active_choice)
 
     # autoconnect_alternatives = ["dis", "fast", "rand", "p2p", "sc", "tor"]
     manage_autoconnect(mode="disable")
@@ -517,6 +518,8 @@ def update_autoconnect_preference(interface, messagedialog_label, messagedialog_
     else:
         # Connect to a specific country
         manage_autoconnect(mode="enable", command="connect --cc " + active_choice.upper())
+
+    set_gui_config("conn_tab", "autoconnect", active_choice)
 
     messagedialog_label.set_markup("Autoconnect setting updated to connect to <b>{}</b>!".format(display_choice))
     messagedialog_spinner.hide()
