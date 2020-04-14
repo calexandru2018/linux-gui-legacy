@@ -2150,6 +2150,7 @@ Author: Alexandru Cheltuitor
                                         <property name="halign">start</property>
                                         <property name="valign">center</property>
                                         <property name="margin_right">15</property>
+                                        <signal name="state-set" handler="secure_core_switch_changed" swapped="no"/>
                                       </object>
                                       <packing>
                                         <property name="left_attach">0</property>

@@ -162,12 +162,13 @@ headerbar.default-decoration {
 }
 
 .split_tunnling_list{
-    background-color: white;
+    background-color: rgba(52, 58, 63, 1);
+    color: white;
     padding: 10px 10px;
     /* border-radius: 5px; */
 }
 .split_tunnling_list text{
-    background-color: white;
-    color: black;
+    background-color: rgba(52, 58, 63, 1);
+    color: white;
     /* border-radius: 5px; */
 }
