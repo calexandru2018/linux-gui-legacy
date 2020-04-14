@@ -627,6 +627,7 @@ def load_connection_settings(interface):
 def load_advanced_settings(interface):
     # User values
     dns_leak_protection = get_config_value("USER", "dns_leak_protection")
+    custom_dns = get_config_value("USER", "custom_dns")
     killswitch = get_config_value("USER", "killswitch")
 
     # Object
@@ -634,7 +635,8 @@ def load_advanced_settings(interface):
     killswitch_switch = interface.get_object("killswitch_switch")
 
     # Set DNS Protection
-    if dns_leak_protection == '1' or (dns_leak_protection != '1' and custom_dns.lower != "none"):
+    if dns_leak_protection == '1':
+    # if dns_leak_protection == '1' or (dns_leak_protection != '1' and custom_dns.lower() != "none"):
         dns_leak_switch.set_state(True)
     else:
         dns_leak_switch.set_state(False)

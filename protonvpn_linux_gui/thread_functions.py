@@ -379,58 +379,19 @@ def update_user_pass(interface, messagedialog_label, messagedialog_spinner):
     gui_logger.debug(">>> Ended tasks in \"set_username_password\" thread.")
 
 
-def update_dns(interface, messagedialog_label, messagedialog_spinner):
+def update_dns(interface, messagedialog_label, messagedialog_spinner, dns_value):
     """Function that updates DNS settings.
     """
-    dns_combobox = interface.get_object("dns_preferens_combobox")
-    text_message = ""
-    custom_dns_ip = "The following IPs were added:\n"
-
-    if (not dns_combobox.get_active() == 0) and (not dns_combobox.get_active() == 2):
-        dns_leak_protection = 0
-
-        custom_dns = interface.get_object("dns_custom_input").get_text()
-        
-        if len(custom_dns) == 0:
-            messagedialog_spinner.hide()
-            messagedialog_label.set_markup("Custom DNS field input can not be left empty.")
-            gui_logger.debug("[!] Custom DNS field left emtpy.")
-            return
-
-        custom_dns = custom_dns.split(" ")
-
-        for ip in custom_dns:
-            if not is_valid_ip(ip):
-                messagedialog_spinner.hide()
-                messagedialog_label.set_markup("<b>{0}</b> is not valid.\nNone of the DNS were added, please try again with a different DNS.".format(ip))
-                gui_logger.debug("[!] Invalid IP \"{0}\".".format(ip))
-                return
-            custom_dns_ip = custom_dns_ip + " " + ip + "\n"
-        
-        text_message = "custom setting"
-
-    elif dns_combobox.get_active() == 2:
-        dns_leak_protection = 0
-        custom_dns = None
-        interface.get_object("dns_custom_input").set_text("")
-        text_message = "disabled"
-    else:
-        dns_leak_protection = 1
-        custom_dns = None
-        interface.get_object("dns_custom_input").set_text("")
-        text_message = "enabled"
     
-    gui_logger.debug(">>> Running \"set_dns_protection\".")
-    
-    set_config_value("USER", "dns_leak_protection", dns_leak_protection)
-    set_config_value("USER", "custom_dns", custom_dns)
+    set_config_value("USER", "dns_leak_protection", dns_value)
+    # set_config_value("USER", "custom_dns", custom_dns)
 
-    messagedialog_label.set_markup("DNS Management updated to <b>{0}</b>!\n{1}".format(text_message, "" if not custom_dns else custom_dns_ip))
+    messagedialog_label.set_markup("DNS Management updated to <b>{0}</b>!".format("enabled" if dns_value == "1" else "disabled"))
     messagedialog_spinner.hide()
 
     gui_logger.debug(">>> Result: \"{0}\"".format("DNS Management updated."))
 
-    gui_logger.debug(">>> Ended tasks in \"set_dns_protection\" thread.")
+    gui_logger.debug(">>> Ended tasks in \"dns_leak_switch_clicked\" thread.")
 
 def update_pvpn_plan(interface, messagedialog_label, messagedialog_spinner):
     """Function that updates ProtonVPN plan.
