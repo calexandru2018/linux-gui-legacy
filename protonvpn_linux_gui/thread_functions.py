@@ -32,7 +32,16 @@ from .utils import (
 from .gui_logger import gui_logger
 
 # Import constants
-from .constants import VERSION, GITHUB_URL_RELEASE, TRAY_CFG_SERVERLOAD, TRAY_CFG_SERVENAME, TRAY_CFG_DATA_TX, TRAY_CFG_TIME_CONN, TRAY_CFG_DICT
+from .constants import (
+    VERSION, 
+    GITHUB_URL_RELEASE, 
+    TRAY_CFG_SERVERLOAD, 
+    TRAY_CFG_SERVENAME, 
+    TRAY_CFG_DATA_TX, 
+    TRAY_CFG_TIME_CONN, 
+    TRAY_CFG_DICT, 
+    GUI_CONFIG_FILE
+)
 
 # PyGObject import
 import gi
@@ -129,6 +138,28 @@ def on_login(interface, username_field, password_field, messagedialog_label, use
         f.write("{0}\n{1}".format(ovpn_username, ovpn_password))
         gui_logger.debug("Passfile created")
         os.chmod(PASSFILE, 0o600)
+
+    gui_config = configparser.ConfigParser()
+    gui_config["general_tab"] = {
+        "start_min": False,
+        "start_on_boot": False,
+        "show_notifications": False,
+    }
+    gui_config["tray_tab"] = {
+        TRAY_CFG_DATA_TX: "0",
+        TRAY_CFG_SERVENAME: "0",
+        TRAY_CFG_TIME_CONN: "0",
+        TRAY_CFG_SERVERLOAD: "0",
+    }
+    gui_config["conn_tab"] = {
+        "autoconnect": "0",
+        "quick_connect": "0",
+    }
+
+    with open(GUI_CONFIG_FILE, "w") as f:
+        gui_config.write(f)
+    change_file_owner(GUI_CONFIG_FILE)
+    gui_logger.debug("pvpn-gui.cfg initialized")
 
     set_config_value("USER", "initialized", 1)
 
