@@ -849,10 +849,8 @@ class Handler:
 
             self.messagedialog_window.show()
 
-    def test(self, a,b):
-        print("Test")
-    def test2(self, a,b):
-        print("Test2")
+    def pvpn_tier_combobox_changed(self, object):
+        print(1)
 
 def initialize_gui():
     """Initializes the GUI 
