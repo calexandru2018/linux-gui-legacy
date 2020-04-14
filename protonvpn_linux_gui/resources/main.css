@@ -164,9 +164,10 @@ headerbar.default-decoration {
 .split_tunnling_list{
     background-color: white;
     padding: 10px 10px;
+    /* border-radius: 5px; */
 }
 .split_tunnling_list text{
     background-color: white;
     color: black;
-    border-radius: 5px;
+    /* border-radius: 5px; */
 }
