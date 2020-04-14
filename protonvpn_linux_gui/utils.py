@@ -1,11 +1,14 @@
 import re
+import os
 import sys
 import time
-import datetime
 import requests
+import datetime
 import subprocess
-from threading import Thread
+import collections
+import configparser
 import concurrent.futures
+from threading import Thread
 
 try:
     from protonvpn_cli.utils import (
@@ -24,7 +27,8 @@ try:
     from protonvpn_cli.constants import SPLIT_TUNNEL_FILE, USER, CONFIG_FILE, PASSFILE
     from protonvpn_cli.utils import change_file_owner, make_ovpn_template, set_config_value
 except:
-    sys.exit(1)
+    print("Unable to import from CLI, can not find CLI modules.")
+    pass
 
 from .constants import (
     PATH_AUTOCONNECT_SERVICE, 
@@ -35,7 +39,8 @@ from .constants import (
     TRAY_CFG_SERVENAME, 
     TRAY_CFG_DATA_TX, 
     TRAY_CFG_TIME_CONN, 
-    TRAY_CFG_DICT
+    TRAY_CFG_DICT,
+    GUI_CONFIG_FILE
 )
 
 from .gui_logger import gui_logger
@@ -45,7 +50,29 @@ import gi
 
 # Gtk3 import
 gi.require_version('Gtk', '3.0')
-from gi.repository import GObject as gobject, Gtk
+from gi.repository import GObject as gobject, Gtk, GdkPixbuf
+
+def get_gui_config(group, key):
+    """Return specific value from GUI_CONFIG_FILE as string"""
+    config = configparser.ConfigParser()
+    config.read(GUI_CONFIG_FILE)
+
+    return config[group][key]
+
+
+def set_gui_config(group, key, value):
+    """Write a specific value to GUI_CONFIG_FILE"""
+
+    config = configparser.ConfigParser()
+    config.read(GUI_CONFIG_FILE)
+    config[group][key] = str(value)
+
+    gui_logger.debug(
+        "Writing {0} to [{1}] in config file".format(key, group)
+    )
+
+    with open(GUI_CONFIG_FILE, "w+") as f:
+        config.write(f)
 
 def get_server_protocol_from_cli(raw_result, return_protocol=False):
     """Function that collects servername and protocol from CLI print statement after establishing connection.
@@ -273,7 +300,6 @@ def prepare_initilizer(username_field, password_field, interface):
     """
     # Get user specified protocol
     protonvpn_plan = ''
-    openvpn_protocol = 'tcp' if interface.get_object('protocol_tcp_checkbox').get_active() == True else 'udp'
     
     protonvpn_plans = {
         '1': interface.get_object('member_free').get_active(),
@@ -292,7 +318,7 @@ def prepare_initilizer(username_field, password_field, interface):
         'username': username_field,
         'password': password_field,
         'protonvpn_plan': int(protonvpn_plan),
-        'openvpn_protocol': openvpn_protocol
+        'openvpn_protocol': "tcp"
     }
 
     return user_data
@@ -347,7 +373,7 @@ def update_labels_server_list(interface, server_tree_list_object=False, conn_inf
     gobject.idle_add(populate_server_list, populate_servers_dict)
 
 def update_labels_status(update_labels_dict):
-    """Function that updates labels, calls on left_grid_update_labels and right_grid_update_labels.
+    """Function prepares data to update labels.
     """
     gui_logger.debug(">>> Running \"update_labels_status\" getting servers, is_connected and connected_server.")
 
@@ -364,76 +390,37 @@ def update_labels_status(update_labels_dict):
     except:
         connected_server = False
         
-    left_grid_update_labels(update_labels_dict["interface"], servers, is_vpn_connected, connected_server, update_labels_dict["disconnecting"])
-    right_grid_update_labels(update_labels_dict["interface"], servers, is_vpn_connected, connected_server, update_labels_dict["disconnecting"], conn_info=update_labels_dict["conn_info"])
+    update_labels(update_labels_dict["interface"], servers, is_vpn_connected, connected_server, update_labels_dict["disconnecting"], conn_info=update_labels_dict["conn_info"])
 
-def left_grid_update_labels(interface, servers, is_connected, connected_server, disconnecting):
-    """Function that updates the labels that are position within the left-side of the dashboard grid.
-    """
-    gui_logger.debug(">>> Running \"left_grid_update_labels\".")
-
-    # Left grid
-    vpn_status_label =      interface.get_object("vpn_status_label")
-    dns_status_label =      interface.get_object("dns_status_label")
-    time_connected_label =  interface.get_object("time_connected_label")
-    killswitch_label =      interface.get_object("killswitch_label")
-    protocol_label =        interface.get_object("openvpn_protocol_label")
-    server_features_label = interface.get_object("server_features_label")
-
-    all_features = {0: "Normal", 1: "Secure-Core", 2: "Tor", 4: "P2P"}
-    connected_to_protocol = False
-
-    # Check and set VPN status label. Get also protocol status if vpn is connected
-    if is_connected != True or disconnecting:
-        vpn_status_label.set_markup('<span>Disconnected</span>')
-    else:
-        vpn_status_label.set_markup('<span foreground="#4E9A06">Connected</span>')
-        try:
-            connected_to_protocol = get_config_value("metadata", "connected_proto")
-        except KeyError:
-            connected_to_protocol = False
-    
-    # Check and set DNS status label
-    dns_enabled = get_config_value("USER", "dns_leak_protection")
-    if int(dns_enabled) != 1:
-        dns_status_label.set_markup('<span>Not Enabled</span>')
-    else:
-        dns_status_label.set_markup('<span foreground="#4E9A06">Enabled</span>')
-
-    # Update time connected label
-    gobject.timeout_add_seconds(1, update_connection_time, {"is_connected":is_connected, "label":time_connected_label})
-
-    # Check and set killswitch label
-    killswitch_setting = get_config_value("USER", "killswitch")
-    killswitch_status = "<span>Disabled</span>" if killswitch_setting == "0" else "<span foreground=\"#4E9A06\">Enabled</span>"
-    killswitch_label.set_markup('{0}'.format(killswitch_status))
-
-    # Check and set protocol label
-    connected_to_protocol = connected_to_protocol if connected_to_protocol else ""
-    protocol_label.set_markup('<span>{0}</span>'.format(connected_to_protocol))
-
-    # Check and set feature label
-    try:
-        feature = get_server_value(connected_server, "Features", servers)
-    except:
-        feature = False
-    
-    feature = all_features[feature] if not disconnecting and is_connected else ""
-    server_features_label.set_markup('<span>{0}</span>'.format(feature.upper()))
-
-def right_grid_update_labels(interface, servers, is_connected, connected_server, disconnecting, conn_info=False):
-    """Function that updates the labels that are position within the right-side of the dashboard grid.
+def update_labels(interface, servers, is_connected, connected_server, disconnecting, conn_info=False):
+    """Function that updates the labels.
     """
     gui_logger.debug(">>> Running \"right_grid_update_labels\".")
 
     # Right grid
+    time_connected_label =  interface.get_object("time_connected_label")
+    protocol_label =        interface.get_object("protocol_label")
+    conn_disc_button_label = interface.get_object("main_conn_disc_button_label")
     ip_label =              interface.get_object("ip_label")
     server_load_label =     interface.get_object("server_load_label")
-    server_name_label =     interface.get_object("server_name_label")
-    server_city_label =     interface.get_object("server_city_label")
     country_label =         interface.get_object("country_label")
+    isp_label    =          interface.get_object("isp_label")
     data_received_label =   interface.get_object("data_received_label")
     data_sent_label =       interface.get_object("data_sent_label") 
+    background_large_flag = interface.get_object("background_large_flag")
+    protonvpn_sign_green =  interface.get_object("protonvpn_sign_green")
+
+    CURRDIR = os.path.dirname(os.path.abspath(__file__))
+    flags_base_path = CURRDIR+"/resources/img/flags/large/"
+
+    # Get and set server load label
+    try:
+        load = get_server_value(connected_server, "Load", servers)
+    except:
+        load = False
+        
+    load = "{0}% Load".format(load) if load and is_connected else ""
+    server_load_label.set_markup('<span>{0}</span>'.format(load))
 
     # Get and set IP labels. Get also country and ISP
     if not conn_info:
@@ -447,20 +434,33 @@ def right_grid_update_labels(interface, servers, is_connected, connected_server,
     else:
         ip, isp, country = conn_info
 
-    country_isp = "<span>" + country + "/" + isp + "</span>"
-    ip_label.set_markup(ip)
+    country_cc = False
 
-    # Get and set server load label
-    try:
-        load = get_server_value(connected_server, "Load", servers)
-    except:
-        load = False
-    load = "{0}%".format(load) if load and is_connected else ""
-    server_load_label.set_markup('<span>{0}</span>'.format(load))
+    for k,v in country_codes.items():
+        if k == country:
+            if is_connected:
+                try:
+                    flag_path = flags_base_path+"{}.jpg".format(k.lower()) 
+                    background_large_flag.set_from_file(flag_path)
+                except:
+                    pass
+                
+            country_cc = v
+
+    protonvpn_sign_green.hide()
+    country_server = country_cc
+
+    if is_connected:
+        country_server = country_server + " >> " + connected_server
+        protonvpn_sign_green.show()
 
     # Get and set server name
     connected_server = connected_server if connected_server and is_connected else ""
-    server_name_label.set_markup('<span>{0}</span>'.format(connected_server))
+
+    country_label.set_markup(country_server)
+    ip_label.set_markup(ip)
+
+    isp_label.set_markup(isp)
 
     # Get and set city label
     try:
@@ -468,15 +468,33 @@ def right_grid_update_labels(interface, servers, is_connected, connected_server,
     except:
         city = False
     city = city if city else ""
-    server_city_label.set_markup('<span>{0}</span>'.format(city))
-
-    # Set country label and ISP labels
-    ip = "<span>" + ip + "</span>"
-    country_label.set_markup(country_isp)
 
     # Update sent and received data
     gobject.timeout_add_seconds(1, update_sent_received_data, {"received_label": data_received_label, "sent_label": data_sent_label})
     
+    # Left grid
+    all_features = {0: "Normal", 1: "Secure-Core", 2: "Tor", 4: "P2P"}
+    protocol = "No VPN Connection"
+
+    # Check and set VPN status label. Get also protocol status if vpn is connected
+    conn_disc_button = "Quick Connect"
+    if is_connected and not disconnecting:
+        try:
+            connected_to_protocol = get_config_value("metadata", "connected_proto")
+            protocol = '<span>OpenVPN >> {0}</span>'.format(connected_to_protocol.upper())
+        except KeyError:
+            pass
+        conn_disc_button = "Disconnect"
+    
+    conn_disc_button_label.set_markup(conn_disc_button)
+    # Check and set DNS status label
+    dns_enabled = get_config_value("USER", "dns_leak_protection")
+
+    # Update time connected label
+    gobject.timeout_add_seconds(1, update_connection_time, {"is_connected":is_connected, "label":time_connected_label})
+
+    # Check and set protocol label
+    protocol_label.set_markup(protocol)
 
 def update_sent_received_data(dict_labels):
     tx_amount, rx_amount = get_transferred_data()
@@ -510,128 +528,128 @@ def update_connection_time(dict_data):
 def load_configurations(interface):
     """Function that sets and populates user configurations before showing the configurations window.
     """
-    pref_dialog = interface.get_object("ConfigurationsWindow")
-     
+    # pref_dialog = interface.get_object("ConfigurationsWindow")
+    pref_dialog = interface.get_object("SettingsWindow")
+
+    load_general_settings(interface)
+    load_tray_settings(interface)
+    load_connection_settings(interface)
+    load_advanced_settings(interface)
+   
+    pref_dialog.show()
+
+def load_general_settings(interface):
+    username_field = interface.get_object("update_username_input")
+    pvpn_plan_combobox = interface.get_object("update_tier_combobox")
+
     username = get_config_value("USER", "username")
-    dns_leak_protection = get_config_value("USER", "dns_leak_protection")
-    custom_dns = get_config_value("USER", "custom_dns")
-    tier = int(get_config_value("USER", "tier")) + 1
-    default_protocol = get_config_value("USER", "default_protocol")
-    killswitch = get_config_value("USER", "killswitch")
+    tier = int(get_config_value("USER", "tier"))
 
     # Populate username
-    username_field = interface.get_object("update_username_input")
-    username_field.set_text(username)
+    username_field.set_text(username)   
+    # Set tier
+    pvpn_plan_combobox.set_active(tier)
 
-    # Set DNS combobox
-    dns_combobox = interface.get_object("dns_preferens_combobox")
-    dns_custom_input = interface.get_object("dns_custom_input")
 
-    # DNS ComboBox
-    # 0 - Leak Protection Enabled
-    # 1 - Custom DNS
-    # 2 - None
-
-    if dns_leak_protection == '1':
-        dns_combobox.set_active(0)
-    elif dns_leak_protection != '1' and custom_dns.lower != "none":
-        dns_combobox.set_active(1)
-        dns_custom_input.set_property('sensitive', True)
-    else:
-        dns_combobox.set_active(2)
-    
-    dns_custom_input.set_text(custom_dns)
-
-    # Set ProtonVPN Plan
-    protonvpn_plans = {
-        1: interface.get_object("member_free_update_checkbox"),
-        2: interface.get_object("member_basic_update_checkbox"),
-        3: interface.get_object("member_plus_update_checkbox"),
-        4: interface.get_object("member_visionary_update_checkbox")
-    }
-
-    for tier_val, object in protonvpn_plans.items():
-        if tier_val == tier:
-            object.set_active(True)
-            break
-
-    # Set OpenVPN Protocol        
-    interface.get_object("protocol_tcp_update_checkbox").set_active(True) if default_protocol == "tcp" else interface.get_object("protocol_udp_update_checkbox").set_active(True)
-
-    # Set Autoconnect on boot combobox 
-    populate_autoconnect_list(interface)
-    autoconnect_combobox = interface.get_object("autoconnect_combobox")
-
-    try:
-        autoconnect_setting = get_config_value("USER", "autoconnect")
-    except KeyError:
-        autoconnect_setting = 0
-
-    autoconnect_combobox.set_active(int(autoconnect_setting))
-
-    # Set Kill Switch combobox
-    killswitch_combobox = interface.get_object("killswitch_combobox")
-
-    killswitch_combobox.set_active(int(killswitch))
-
-    # Populate Split Tunelling
-    split_tunneling = interface.get_object("split_tunneling_textview")
-
-    # Check if killswtich is != 0, if it is then disable split tunneling Function
-    if killswitch != '0':
-        split_tunneling.set_property('sensitive', False)
-        interface.get_object("update_split_tunneling_button").set_property('sensitive', False)
-        
-    split_tunneling_buffer = split_tunneling.get_buffer()
-    content = ""
-    try:
-        with open(SPLIT_TUNNEL_FILE) as f:
-            lines = f.readlines()
-
-            for line in lines:
-                content = content + line
-
-            split_tunneling_buffer.set_text(content)
-
-    except FileNotFoundError:
-        split_tunneling_buffer.set_text(content)
-
+def load_tray_settings(interface):
     # Load tray configurations
     for k,v in TRAY_CFG_DICT.items(): 
         setter = 0
         try: 
-            setter = int(get_config_value("USER", v))
+            setter = int(get_gui_config("tray_tab", v))
         except KeyError:
             gui_logger.debug("[!] Unable to find {} key.".format(v))
 
         combobox = interface.get_object(k)
         combobox.set_active(setter)
 
-        
+def load_connection_settings(interface):
+    # Set Autoconnect on boot combobox 
+    server_list = populate_autoconnect_list(interface, return_list=True)
 
-    # display_server = 0
-    # display_data_tx = 0
-    # display_time_conn = 0
+    # Get objects
+    update_autoconnect_combobox = interface.get_object("update_autoconnect_combobox")
+    update_quick_connect_combobox = interface.get_object("update_quick_connect_combobox")
+    update_protocol_combobox = interface.get_object("update_protocol_combobox")
 
-    
-    # try: 
-    #     display_server = int(get_config_value("USER", TRAY_CFG_SERVENAME))
-    # except KeyError:
-    #     gui_logger.debug("[!] Unable to find display_server key.")
-    # try: 
-    #     display_time_conn = int(get_config_value("USER", TRAY_CFG_TIME_CONN))
-    # except KeyError:
-    #     gui_logger.debug("[!] Unable to find display_time_conn key.")
+    #Get values
+    try:
+        autoconnect_setting = get_gui_config("conn_tab", "autoconnect")
+    except KeyError:
+        autoconnect_setting = 0
+    try:
+        quick_connect_setting = get_gui_config("conn_tab", "quick_connect")
+    except KeyError:
+        quick_connect = 0 
+    default_protocol = get_config_value("USER", "default_protocol")
 
-    # tray_data_tx_combobox = interface.get_object("tray_data_tx_combobox")
-    # tray_servername_combobox = interface.get_object("tray_servername_combobox")
-    # tray_time_connected_combobox = interface.get_object("tray_time_connected_combobox")
+    # Get indexes
+    autoconnect_index = list(server_list.keys()).index(autoconnect_setting)
+    quick_connect_index = list(server_list.keys()).index(quick_connect_setting)
 
-    # tray_data_tx_combobox.set_active(display_data_tx)
-    # tray_servername_combobox.set_active(display_server)
-    # tray_time_connected_combobox.set_active(display_time_conn)
+    # Set values
+    update_autoconnect_combobox.set_active(autoconnect_index)
+    update_quick_connect_combobox.set_active(quick_connect_index)
+    update_protocol_combobox.set_active(0) if default_protocol == "tcp" else update_protocol_combobox.set_active(1)
 
-    pref_dialog.show()
+def load_advanced_settings(interface):
+    # User values
+    dns_leak_protection = get_config_value("USER", "dns_leak_protection")
+    custom_dns = get_config_value("USER", "custom_dns")
+    killswitch = get_config_value("USER", "killswitch")
+    split_tunnel = 0
+
+    try:
+        split_tunnel = get_config_value("USER", "split_tunnel")
+    except KeyError:
+        pass
+
+    # Object
+    dns_leak_switch = interface.get_object("update_dns_leak_switch")
+    killswitch_switch = interface.get_object("update_killswitch_switch")
+    split_tunneling_switch = interface.get_object("split_tunneling_switch")
+    split_tunneling_list = interface.get_object("split_tunneling_textview")
+
+    # Set DNS Protection
+    if dns_leak_protection == '1':
+    # if dns_leak_protection == '1' or (dns_leak_protection != '1' and custom_dns.lower() != "none"):
+        dns_leak_switch.set_state(True)
+    else:
+        dns_leak_switch.set_state(False)
+
+    # Set Kill Switch
+    if killswitch != '0':
+        killswitch_switch.set_state(True)
+    else:
+        killswitch_switch.set_state(False)
+
+    # Populate Split Tunelling
+    # Check if killswtich is != 0, if it is then disable split tunneling Function
+    if killswitch != '0':
+        killswitch_switch.set_state(True)
+    else:
+        killswitch_switch.set_state(False)
+
+    if split_tunnel != '0':
+        split_tunneling_switch.set_state(True)
+        if killswitch != '0':
+            split_tunneling_list.set_property('sensitive', False)
+            interface.get_object("update_split_tunneling_button").set_property('sensitive', False)
+            
+        split_tunneling_buffer = split_tunneling_list.get_buffer()
+        content = ""
+        try:
+            with open(SPLIT_TUNNEL_FILE) as f:
+                lines = f.readlines()
+
+                for line in lines:
+                    content = content + line
+
+                split_tunneling_buffer.set_text(content)
+        except FileNotFoundError:
+            split_tunneling_buffer.set_text(content)
+    else:
+        split_tunneling_switch.set_state(False)  
 
 def populate_server_list(populate_servers_dict):
     """Function that updates server list.
@@ -656,29 +674,87 @@ def populate_server_list(populate_servers_dict):
                 countries[country] = []
             countries[country].append(server["Name"])
 
-        country_servers = {}            
+        country_servers = {} 
+
+        # Order server list by country alphabetically
+        countries = collections.OrderedDict(sorted(countries.items()))
+
         for country in countries:
-            country_servers[country] = sorted(
-                countries[country],
-                key=lambda s: get_server_value(s, "Load", servers)
-            )
+            country_servers[country] = sorted(countries[country], key=lambda s: get_server_value(s, "Load", servers))
         populate_servers_dict["tree_object"].clear()
-        
+
+        CURRDIR = os.path.dirname(os.path.abspath(__file__))
+        flags_base_path = CURRDIR+"/resources/img/flags/small/"
+        features_base_path = CURRDIR+"/resources/img/utils/"
+
+        # Create empty image
+        empty_path = features_base_path+"normal.png"
+        empty_pix = empty = GdkPixbuf.Pixbuf.new_from_file_at_size(empty_path, 15,15)
+        # Create P2P image
+        p2p_path = features_base_path+"p2p-arrows.png"
+        p2p_pix = empty = GdkPixbuf.Pixbuf.new_from_file_at_size(p2p_path, 15,15)
+        # Create TOR image
+        tor_path = features_base_path+"tor-onion.png"
+        tor_pix = empty = GdkPixbuf.Pixbuf.new_from_file_at_size(tor_path, 15,15)
+        # Create Plus image
+        plus_server_path = features_base_path+"plus-server.png"
+        plus_pix = GdkPixbuf.Pixbuf.new_from_file_at_size(plus_server_path, 15,15)
+
         for country in country_servers:
+            for k,v in country_codes.items():
+                if country == v:
+                    flag_path = flags_base_path+"{}.png".format(v)
+                    break
+                else:
+                    flag_path = flags_base_path+"Unknown.png"
 
-            avrg_load, country_features = get_country_avrg_features(country, country_servers, servers, features)
+            # Get average load and highest feature
+            avrg_load, country_feature = get_country_avrg_features(country, country_servers, servers, features)
 
-            country_row = populate_servers_dict["tree_object"].append(None, [country, "", "", avrg_load, country_features])
+            flag = GdkPixbuf.Pixbuf.new_from_file_at_size(flag_path, 15,15)
+            
+            # Check plus servers
+            if country_feature == "normal" or country_feature == "p2p":
+                plus_feature = empty_pix
+            else:
+                plus_feature = plus_pix
+
+            # Check correct feature
+            if country_feature == "normal":
+                feature = empty_pix
+            elif country_feature == "p2p":
+                feature = p2p_pix
+            elif country_feature == "tor":
+                feature = tor_pix
+
+            country_row = populate_servers_dict["tree_object"].append(None, [flag, country, plus_feature, feature, avrg_load])
 
             for servername in country_servers[country]:
+                secure_core = False
                 load = str(get_server_value(servername, "Load", servers)).rjust(3, " ")
-                load = load + "%"
-
-                feature = features[get_server_value(servername, 'Features', servers)]
+                load = load + "%"               
 
                 tier = server_tiers[get_server_value(servername, "Tier", servers)]
+                
+                if not "Plus/Visionary".lower() == tier.lower():
+                    plus_feature = empty_pix
+                else:
+                    plus_feature = plus_pix
 
-                populate_servers_dict["tree_object"].append(country_row, [country, servername, tier, load, feature])
+                server_feature = features[get_server_value(servername, 'Features', servers)].lower()
+                
+                if server_feature == "Normal".lower():
+                    feature = empty_pix
+                elif server_feature == "P2P".lower():
+                    feature = p2p_pix
+                elif server_feature == "Tor".lower():
+                    feature = tor_pix
+                else:
+                    # Should be secure core
+                    secure_core = True
+
+                if not secure_core:
+                    populate_servers_dict["tree_object"].append(country_row, [empty_pix, servername, plus_feature, feature, load])
 
 def get_country_avrg_features(country, country_servers, servers, features):
     """Function that returns average load and features of a specific country.
@@ -688,6 +764,13 @@ def get_country_avrg_features(country, country_servers, servers, features):
     load_sum = 0
     # Variable for feature per country
     features_per_country = set()
+
+    order_dict = {
+        "normal": 0,
+        "p2p": 1,
+        "tor": 2
+    }
+    top_choice = 0
 
     for servername in country_servers[country]:
         # Get average per country
@@ -701,10 +784,20 @@ def get_country_avrg_features(country, country_servers, servers, features):
     # Convert set to list
     country_feature_list = list(features_per_country)
 
-    return  (
-            str(int(round(load_sum/count)))+"%", 
-            ' / '.join(str(feature) for feature in country_feature_list) if len(country_feature_list) > 1 else country_feature_list[0]
-            )    
+    for feature in country_feature_list:
+        for k,v in order_dict.items():
+            if feature.lower() == k.lower():
+                if top_choice < v:
+                    top_choice = v
+
+    if top_choice == 0:
+        top_choice = "normal"
+    elif top_choice == 1:
+        top_choice = "p2p"
+    elif top_choice == 2:
+        top_choice = "tor"
+        
+    return  (str(int(round(load_sum/count)))+"%", top_choice)    
 
 def populate_autoconnect_list(interface, return_list=False):
     """Function that populates autoconnect dropdown list.
@@ -721,7 +814,8 @@ def populate_autoconnect_list(interface, return_list=False):
         "tor": "Tor (Plus/Visionary)"
     }
     autoconnect_alternatives = ["dis", "fast", "rand", "p2p", "sc", "tor"]
-    return_values = []
+    # return_values = collections.OrderedDict()
+    return_values = collections.OrderedDict()
 
     for server in servers:
         country = get_country_name(server["ExitCountry"])
@@ -734,17 +828,17 @@ def populate_autoconnect_list(interface, return_list=False):
 
     for alt in autoconnect_alternatives:
         if alt in other_choice_dict:
-            if return_list:
-                return_values.append(other_choice_dict[alt])
-            else:
-                autoconnect_liststore.append([alt, other_choice_dict[alt]])
+            # if return_list:
+            return_values[alt] = other_choice_dict[alt]
+            # else:
+            autoconnect_liststore.append([alt, other_choice_dict[alt], alt])
         else:
             for k,v in country_codes.items():
                 if alt.lower() == v.lower():
-                    if return_list:
-                        return_values.append(v)
-                    else:
-                        autoconnect_liststore.append([k, v])
+                    # if return_list:
+                    return_values[k] = v
+                    # else:
+                    autoconnect_liststore.append([k, v, k])
     
     if return_list:
         return return_values

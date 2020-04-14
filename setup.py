@@ -20,7 +20,11 @@ setup(
     packages=[
         "protonvpn_linux_gui",
         "protonvpn_linux_gui.resources",
-        "protonvpn_linux_gui.resources.flags",
+        "protonvpn_linux_gui.resources.img.flags",
+        "protonvpn_linux_gui.resources.img.flags.small",
+        "protonvpn_linux_gui.resources.img.flags.large",
+        "protonvpn_linux_gui.resources.img.logo",
+        "protonvpn_linux_gui.resources.img.utils",
         ],
     entry_points={
             "console_scripts": [
