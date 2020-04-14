@@ -532,7 +532,7 @@ def load_configurations(interface):
     pref_dialog = interface.get_object("SettingsWindow")
 
     load_connection_settings(interface)
-
+    load_advanced_settings(interface)
     # username = get_config_value("USER", "username")
     # custom_dns = get_config_value("USER", "custom_dns")
     # tier = int(get_config_value("USER", "tier")) + 1
@@ -596,6 +596,32 @@ def load_configurations(interface):
     pref_dialog.show()
 
 def load_connection_settings(interface):
+    # Set Autoconnect on boot combobox 
+    server_list = populate_autoconnect_list(interface, return_list=True)
+
+    # Get objects
+    update_autoconnect_combobox = interface.get_object("update_autoconnect_combobox")
+    update_quick_connect_combobox = interface.get_object("update_quick_connect_combobox")
+    
+    #Get values
+    try:
+        autoconnect_setting = get_gui_config("conn_tab", "autoconnect")
+    except KeyError:
+        autoconnect_setting = 0
+    try:
+        quick_connect_setting = get_gui_config("conn_tab", "quick_connect")
+    except KeyError:
+        quick_connect = 0
+
+    # Get indexes
+    autoconnect_index = list(server_list.keys()).index(autoconnect_setting)
+    quick_connect_index = list(server_list.keys()).index(quick_connect_setting)
+
+    # Set values
+    update_autoconnect_combobox.set_active(autoconnect_index)
+    update_quick_connect_combobox.set_active(quick_connect_index)
+
+def load_advanced_settings(interface):
     # User values
     dns_leak_protection = get_config_value("USER", "dns_leak_protection")
     killswitch = get_config_value("USER", "killswitch")
@@ -603,19 +629,6 @@ def load_connection_settings(interface):
     # Object
     dns_leak_switch = interface.get_object("dns_leak_switch")
     killswitch_switch = interface.get_object("killswitch_switch")
-
-    # Set Autoconnect on boot combobox 
-    server_list = populate_autoconnect_list(interface, return_list=True)
-    autoconnect_combobox = interface.get_object("update_autoconnect_combobox")
-
-    try:
-        autoconnect_setting = get_gui_config("conn_tab", "autoconnect")
-    except KeyError:
-        autoconnect_setting = 0
-
-    index = list(server_list.keys()).index(autoconnect_setting)
-    
-    autoconnect_combobox.set_active(index)
 
     # Set DNS Protection
     if dns_leak_protection == '1' or (dns_leak_protection != '1' and custom_dns.lower != "none"):
