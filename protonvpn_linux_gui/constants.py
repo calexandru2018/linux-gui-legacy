@@ -4,7 +4,7 @@ try:
 except:
     cli_version = "Not installed"
 
-VERSION = "1.8.3"
+VERSION = "2.0.0"
 GITHUB_URL_RELEASE = "https://github.com/calexandru2018/protonvpn-linux-gui/releases/latest"
 
 # GUI configurations
