@@ -116,14 +116,14 @@ class ProtonVPNIndicator:
     def main_loop(self, _):
         """Main loop that updates all labels.
         """
-        icon_path = "/resources/protonvpn_logo_alt.png"
+        icon_path = "/resources/img/logo/protonvpn_logo_alt.png"
         self.display_serverload = False
         display_data_rec = False
         display_server = False
         display_time_conn = False
 
         if is_connected():
-            icon_path = "/resources/protonvpn_logo.png"
+            icon_path = "/resources/img/logo/protonvpn_logo.png"
             settings = self.get_tray_settings()
 
             self.display_serverload = True if settings["display_serverload"] else False
@@ -210,25 +210,25 @@ class ProtonVPNIndicator:
         }
 
         try: 
-            resp_dict["display_serverload"] = int(get_gui_config("USER", TRAY_CFG_SERVERLOAD))
+            resp_dict["display_serverload"] = int(get_gui_config("tray_tab", TRAY_CFG_SERVERLOAD))
         except KeyError:
             gui_logger.debug("[!] Could not find display_serverload in config file: ".format(KeyError))
             pass
         
         try: 
-            resp_dict["display_server"] = int(get_gui_config("USER", TRAY_CFG_SERVENAME))
+            resp_dict["display_server"] = int(get_gui_config("tray_tab", TRAY_CFG_SERVENAME))
         except KeyError:
             gui_logger.debug("[!] Could not find display_server in config file: ".format(KeyError))
             pass
 
         try: 
-            resp_dict["display_data_tx"] = int(get_gui_config("USER", TRAY_CFG_DATA_TX))
+            resp_dict["display_data_tx"] = int(get_gui_config("tray_tab", TRAY_CFG_DATA_TX))
         except KeyError:
             gui_logger.debug("[!] Could not find display_data_tx in config file: ".format(KeyError))
             pass 
         
         try: 
-            resp_dict["display_time_conn"] = int(get_gui_config("USER", TRAY_CFG_TIME_CONN))
+            resp_dict["display_time_conn"] = int(get_gui_config("tray_tab", TRAY_CFG_TIME_CONN))
         except KeyError:
             gui_logger.debug("[!] Could not find display_time_conn in config file: ".format(KeyError))
             pass
