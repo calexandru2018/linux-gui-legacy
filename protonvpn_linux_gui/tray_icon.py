@@ -116,14 +116,14 @@ class ProtonVPNIndicator:
     def main_loop(self, _):
         """Main loop that updates all labels.
         """
-        icon_path = "/resources/protonvpn_logo_alt.png"
+        icon_path = "/resources/img/logo/protonvpn_logo_alt.png"
         self.display_serverload = False
         display_data_rec = False
         display_server = False
         display_time_conn = False
 
         if is_connected():
-            icon_path = "/resources/protonvpn_logo.png"
+            icon_path = "/resources/img/logo/protonvpn_logo.png"
             settings = self.get_tray_settings()
 
             self.display_serverload = True if settings["display_serverload"] else False

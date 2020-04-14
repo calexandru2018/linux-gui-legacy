@@ -5,7 +5,7 @@ except:
     cli_version = "Not installed"
     USER = '/home'
 
-VERSION = "2.0.0"
+VERSION = "2.0.1"
 GITHUB_URL_RELEASE = "https://github.com/calexandru2018/protonvpn-linux-gui/releases/latest"
 
 # GUI configurations
