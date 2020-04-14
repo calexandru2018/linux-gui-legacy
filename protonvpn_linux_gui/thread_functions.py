@@ -492,36 +492,39 @@ def update_def_protocol(interface, messagedialog_label, messagedialog_spinner):
 
     gui_logger.debug(">>> Ended tasks in \"set_default_protocol\" thread.")   
 
-def update_autoconnect_preference(interface, messagedialog_label, messagedialog_spinner, user_choice, display_choice):
+def update_connect_preference(interface, messagedialog_label, messagedialog_spinner, user_choice, display_choice, quick_connect=False):
     """Function that updates autoconnect. 
     """
     active_choice = user_choice
 
-    gui_logger.debug(">>> Running \"update_autoconnect\".")
+    gui_logger.debug(">>> Running \"update_connect_preference\".")
 
 
     # autoconnect_alternatives = ["dis", "fast", "rand", "p2p", "sc", "tor"]
-    manage_autoconnect(mode="disable")
+    if not quick_connect:
+        manage_autoconnect(mode="disable")
 
-    if active_choice == "dis":
-        pass
-    elif active_choice == "fast":
-        manage_autoconnect(mode="enable", command="connect -f")
-    elif active_choice == "rand":
-        manage_autoconnect(mode="enable", command="connect -r")
-    elif active_choice == "p2p":
-        manage_autoconnect(mode="enable", command="connect --p2p")
-    elif active_choice == "sc":
-        manage_autoconnect(mode="enable", command="connect --sc")
-    elif active_choice == "tor":
-        manage_autoconnect(mode="enable", command="connect --tor")
+        if active_choice == "dis":
+            pass
+        elif active_choice == "fast":
+            manage_autoconnect(mode="enable", command="connect -f")
+        elif active_choice == "rand":
+            manage_autoconnect(mode="enable", command="connect -r")
+        elif active_choice == "p2p":
+            manage_autoconnect(mode="enable", command="connect --p2p")
+        elif active_choice == "sc":
+            manage_autoconnect(mode="enable", command="connect --sc")
+        elif active_choice == "tor":
+            manage_autoconnect(mode="enable", command="connect --tor")
+        else:
+            # Connect to a specific country
+            manage_autoconnect(mode="enable", command="connect --cc " + active_choice.upper())
+
+        set_gui_config("conn_tab", "autoconnect", active_choice)
     else:
-        # Connect to a specific country
-        manage_autoconnect(mode="enable", command="connect --cc " + active_choice.upper())
+        set_gui_config("conn_tab", "quick_connect", active_choice)
 
-    set_gui_config("conn_tab", "autoconnect", active_choice)
-
-    messagedialog_label.set_markup("Autoconnect setting updated to connect to <b>{}</b>!".format(display_choice))
+    messagedialog_label.set_markup("{} setting updated to connect to <b>{}</b>!".format("Autoconnect" if not quick_connect else "Quick connect", display_choice))
     messagedialog_spinner.hide()
 
     gui_logger.debug(">>> Ended tasks in \"update_autoconnect\" thread.") 
