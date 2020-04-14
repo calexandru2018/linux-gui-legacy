@@ -1,9 +1,15 @@
+import os
 try:
-    from protonvpn_cli.constants import VERSION as cli_version
+    from protonvpn_cli.constants import VERSION as cli_version, USER
 except:
     cli_version = "Not installed"
-VERSION = "1.8.3"
+
+VERSION = "2.0.0"
 GITHUB_URL_RELEASE = "https://github.com/calexandru2018/protonvpn-linux-gui/releases/latest"
+
+# GUI configurations
+GUI_CONFIG_DIR = os.path.join(os.path.expanduser("~{0}".format(USER)), ".pvpn-gui")
+GUI_CONFIG_FILE = os.path.join(GUI_CONFIG_DIR, "pvpn-gui.cfg")
 
 # Tray configuration naming
 TRAY_CFG_SERVERLOAD = "display_serverload"

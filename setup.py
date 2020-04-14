@@ -20,7 +20,11 @@ setup(
     packages=[
         "protonvpn_linux_gui",
         "protonvpn_linux_gui.resources",
-        "protonvpn_linux_gui.resources.flags",
+        "protonvpn_linux_gui.resources.img.flags",
+        "protonvpn_linux_gui.resources.img.flags.small",
+        "protonvpn_linux_gui.resources.img.flags.large",
+        "protonvpn_linux_gui.resources.img.logo",
+        "protonvpn_linux_gui.resources.img.utils",
         ],
     entry_points={
             "console_scripts": [
@@ -37,7 +41,8 @@ setup(
     url="https://github.com/calexandru2018/protonvpn-linux-gui",
     install_requires=[
         "protonvpn-cli==2.2.2",
-        "requests==2.23.0"
+        "requests==2.23.0",
+        "configparser==4.0.2"
     ],
     python_requires=">=3.5",
     classifiers=[

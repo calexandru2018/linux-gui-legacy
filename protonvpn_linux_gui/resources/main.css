@@ -1,0 +1,174 @@
+headerbar.default-decoration {
+    padding-top: 3px;
+    padding-bottom: 3px;
+    min-height: 0px;
+    font-size: 0.8em;
+    background-color: green;
+}
+
+.default_background{
+    background-color: rgba(62, 68, 73, 1);
+    color: white;
+}
+.overlay_background{
+    background-color: rgba(52, 58, 63, 1);
+    color: white;
+}
+
+.white_text{
+    color: white;
+}
+
+.top_menu_hamburger{
+    margin-top: 2px;
+    margin-bottom: 2px;
+}
+
+.text_hamburger_identation{
+    margin-left: -20px;
+}
+
+.initialize_profile_btn{
+    background-color: transparent;
+    color: white;
+    padding: 10px 50px;
+    border-style: solid;
+    border-width: 2px;
+    border-radius: 20px;
+    transition: all .115s ease-in-out;
+}
+
+.initialize_profile_btn:hover {
+    border-color: transparent;
+    background-color: rgb(86, 179, 102);
+}
+
+
+.banner_shadow{
+    box-shadow: 64px 64px 12px 40px rgba(0,0,0,0.4);
+}
+
+.default_main_tab_conf{
+    padding: 20px 70px;
+    background-color: red;
+    color: white;
+    margin-top: -6px;
+    margin-bottom: -6px;
+    transition: all .115s ease-in-out;
+}
+
+.test{
+    background-color: red;
+    color: red;
+}
+.active_tab{
+    color: white;
+    background-color: rgba(62, 68, 73, 1);
+}
+
+.inactive_tab{
+    background-color: rgba(55, 61, 66, 1);
+    color: gray;
+}
+
+.left_tab{
+    /* border-top-right-radius: 80px; */
+    margin-left: -20px;
+    margin-right: -25px;
+
+}
+.right_tab{
+    /* border-top-left-radius: 80px; */
+    margin-right: -20px;
+}
+
+.countries_content_style{
+    padding: 5px 10px;
+    /* transition: all 5s ease-in-out; */
+}
+
+.profiles_tab_content{
+    padding: 10px 15px;
+}
+
+.profile_grid{
+    padding: 20px;
+}
+
+.profile_buttons{
+    padding: 5px 5px;
+    color: white;
+    background-color: rgba(68, 73, 78, 1);
+}
+
+.server_list_bakground_row_selected{
+    background-color: black;
+}
+
+.server_list_bakground_row:hover, .menu_list_hover:hover{
+    background-color: rgb(86, 179, 102);
+}
+
+/*
+||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+----------------------- Settings Window -----------------------
+|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+*/
+
+.settings_label_bg{
+    background-color: rgba(45, 51, 56, 1);
+}
+.settings_label{
+    padding: 30px 50px;
+}
+
+.settings_notebook_grid{
+    padding: 30px 100px;
+    padding-bottom: 200px;
+}
+
+.default_settings_tab_conf{
+    padding: 15px 40px;
+    /* background-color: transparent; */
+    margin-top: -6px;
+    margin-bottom: -6px;
+    transition: all .115s ease-in-out;
+}
+
+.settings_left_tab{
+    /* border-top-left-radius: 20px; */
+    /* border-top-right-radius: 20px; */
+    margin-left: -20px;
+    /* padding-right: 60px; */
+}
+
+.settings_center_left_tab{
+    margin-left: -24px;
+    /* border-top-left-radius: 20px;
+    border-top-right-radius: 20px; */
+}
+.settings_center_right_tab{
+    margin-left: -24px;
+    /* border-top-left-radius: 20px;
+    border-top-right-radius: 20px; */
+}
+
+.settings_right_tab{
+    /* border-top-left-radius: 20px; */
+    /* border-top-right-radius: 20px; */
+    margin-left: -24px;
+    margin-right: -20px;
+    /* padding-left: 60px; */
+}
+
+.split_tunnling_list{
+    background-color: rgba(52, 58, 63, 1);
+    color: white;
+    padding: 10px 10px;
+    /* border-radius: 5px; */
+}
+.split_tunnling_list text{
+    background-color: rgba(52, 58, 63, 1);
+    color: white;
+    /* border-radius: 5px; */
+}

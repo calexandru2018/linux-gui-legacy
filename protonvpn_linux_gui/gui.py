@@ -1,5 +1,6 @@
 # Default package import
 import os
+import re
 import sys
 import pathlib
 from threading import Thread
@@ -7,12 +8,13 @@ import time
 
 try:
     # ProtonVPN base CLI package import
-    from protonvpn_cli.constants import (CONFIG_FILE, CONFIG_DIR) #noqa
+    from protonvpn_cli.constants import (CONFIG_FILE) #noqa
 
     # ProtonVPN helper funcitons
-    from protonvpn_cli.utils import check_root, get_config_value, change_file_owner #noqa
+    from protonvpn_cli.utils import check_root, get_config_value, change_file_owner, is_connected, set_config_value #noqa
 except:
-    sys.exit(1)
+    print("Unable to import from CLI, can not find CLI modules.")
+    pass
 
 # Import GUI logger
 from .gui_logger import gui_logger
@@ -25,14 +27,16 @@ from .utils import (
     message_dialog,
     check_for_updates,
     get_gui_processes,
-    find_cli
+    find_cli,
+    get_gui_config,
+    set_gui_config
 )
 
 # Import functions that are called with threads
 from .thread_functions import(
     quick_connect,
+    custom_quick_connect,
     disconnect,
-    refresh_server_list,
     random_connect,
     last_connect,
     connect_to_selected_server,
@@ -46,19 +50,21 @@ from .thread_functions import(
     purge_configurations,
     kill_duplicate_gui_process,
     load_content_on_start,
-    update_autoconnect,
-    tray_configurations
+    update_connect_preference,
+    tray_configurations,
+    update_split_tunneling_status,
+    reload_secure_core_servers
 )
 
 # Import version
-from .constants import VERSION, HELP_TEXT
+from .constants import VERSION, HELP_TEXT, GUI_CONFIG_DIR
 
 # PyGObject import
 import gi
 
 # Gtk3 import
 gi.require_version('Gtk', '3.0')
-from gi.repository import  Gtk
+from gi.repository import  Gtk, Gdk
 
 class Handler:
     """Handler that has all callback functions.
@@ -69,11 +75,20 @@ class Handler:
         self.messagedialog_label = self.interface.get_object("message_dialog_label")
         self.messagedialog_sub_label = self.interface.get_object("message_dialog_sub_label")
         self.messagedialog_spinner = self.interface.get_object("message_dialog_spinner")
+        self.conn_disc_button_label = self.interface.get_object("main_conn_disc_button_label")
         self.messagedialog_sub_label.hide()
+        self.main_initial_tab = 0
+        self.settings_initial_tab = 0
+        try:
+            self.onload_dns_protection = get_config_value("USER", "dns_leak_protection")
+            self.onload_dns_custom = get_config_value("USER", "custom_dns")
+        except:
+            self.onload_dns_protection = 0
+            self.onload_dns_custom = "none"
 
     # Login BUTTON HANDLER
     def on_login_button_clicked(self, button):
-        """Button/Event handler to intialize user account. Calls populate_server_list(server_list_object) to populate server list.
+        """Button/Event handler to intialize user account. Calls populate_server_list(server_tree_store) to populate server list.
         """     
         self.messagedialog_sub_label.hide()
         
@@ -102,11 +117,11 @@ class Handler:
         """Event handler, to filter servers after each key release
         """
         user_filter_by = object.get_text()
-        server_list_object = self.interface.get_object("ServerTreeStore")
-        tree_view_object = self.interface.get_object("ServerList")
+        server_tree_store = self.interface.get_object("ServerTreeStore")
+        tree_view_object = self.interface.get_object("TreeViewServerList")
 
         # Creates a new filter from a ListStore/TreeStore
-        n_filter = server_list_object.filter_new()
+        n_filter = server_tree_store.filter_new()
 
         # set_visible_func:
         # first_param: filter function
@@ -122,63 +137,15 @@ class Handler:
     def column_filter(self, model, iter, data=None):
         """Filter by columns and returns the corresponding rows
         """
-        treeview = self.interface.get_object("ServerList")
+        treeview = self.interface.get_object("TreeViewServerList")
         
         for col in range(0, treeview.get_n_columns()):
-            value = model.get_value(iter, col).lower();
-            if data.lower() in value.lower():
-                return True
-            else:
-                continue
-
-    def connect_to_selected_server_button_clicked(self, button):
-        """Button/Event handler to connect to selected server
-        """     
-        self.messagedialog_sub_label.hide()
-        selected_server = {
-            "selected_server": False,
-            "selected_country": False
-        }
-        
-        # Get the server list object
-        server_list = self.interface.get_object("ServerList").get_selection() 
-
-        # Get the selected server
-        (model, pathlist) = server_list.get_selected_rows()
-
-        for path in pathlist :
-            tree_iter = model.get_iter(path)
-
-            # the second param of get_value() specifies the column number, starting at 0
-            user_selected_server = model.get_value(tree_iter, 1)
-
-            # Check if user selected a specific server
-            if len(user_selected_server) == 0:
-                selected_server["selected_country"] = model.get_value(tree_iter, 0)
-            else:
-                selected_server["selected_server"] = user_selected_server
-
-        if not selected_server["selected_server"] and not selected_server["selected_country"]:
-            self.messagedialog_spinner.hide()
-            self.messagedialog_label.set_markup("No server was selected!\nPlease select a server before attempting to connect.")
-            gui_logger.debug("[!] No server was selected to be connected to.")
-        else:
-            # Set text and show spinner
-            if selected_server["selected_server"]:
-                msg = "Connecting to <b>{0}</b>.".format(selected_server["selected_server"])
-            else:
-                msg = "Connecting to the quickest server in <b>{0}</b>.".format(selected_server["selected_country"])
-                
-            self.messagedialog_label.set_markup(msg)
-            self.messagedialog_spinner.show()
-
-            gui_logger.debug(">>> Starting \"connect_to_selected_server\" thread.")
-
-            thread = Thread(target=connect_to_selected_server, args=[self.interface, selected_server, self.messagedialog_label, self.messagedialog_spinner])
-            thread.daemon = True
-            thread.start()
-
-        self.messagedialog_window.show()
+            value = model.get_value(iter, col);
+            if isinstance(value, str):
+                if data.lower() in value.lower():
+                    return True
+                else:
+                    continue
 
     def quick_connect_button_clicked(self, button):
         """Button/Event handler to connect to the fastest server
@@ -189,7 +156,10 @@ class Handler:
 
         gui_logger.debug(">>> Starting \"quick_connect\" thread.")
 
-        thread = Thread(target=quick_connect, args=[self.interface, self.messagedialog_label, self.messagedialog_spinner])
+        thread = Thread(target=quick_connect, args=[{
+                                            "interface":self.interface, 
+                                            "messagedialog_label": self.messagedialog_label, 
+                                            "messagedialog_spinner": self.messagedialog_spinner}])
         thread.daemon = True
         thread.start()
 
@@ -229,7 +199,10 @@ class Handler:
 
         gui_logger.debug(">>> Starting \"random_connect\" thread.")
 
-        thread = Thread(target=random_connect, args=[self.interface, self.messagedialog_label, self.messagedialog_spinner])
+        thread = Thread(target=random_connect, args=[{
+                                                    "interface":self.interface, 
+                                                    "messagedialog_label": self.messagedialog_label, 
+                                                    "messagedialog_spinner": self.messagedialog_spinner}])
         thread.daemon = True
         thread.start()
 
@@ -250,22 +223,6 @@ class Handler:
 
         self.messagedialog_window.show()
         
-    def refresh_server_list_button_clicked(self, button):
-        """Button/Event handler to refresh/repopulate server list
-        - At the moment, will also refresh the Dashboard information, this will be fixed in the future.
-        """
-        self.messagedialog_sub_label.hide()
-        self.messagedialog_label.set_markup("Refreshing server list...")
-        self.messagedialog_spinner.show()
-
-        gui_logger.debug(">>> Starting \"refresh_server_list\" thread.")
-
-        thread = Thread(target=refresh_server_list, args=[self.interface, self.messagedialog_window, self.messagedialog_spinner])
-        thread.daemon = True
-        thread.start()
-
-        self.messagedialog_window.show()
-
     def about_menu_button_clicked(self, button):
         """Button /Event handler to open About dialog
         """
@@ -324,7 +281,7 @@ class Handler:
         load_configurations(self.interface)
         
     # To avoid getting the ConfigurationsWindow destroyed and not being re-rendered again
-    def ConfigurationsWindow_delete_event(self, object, event):
+    def SettingsWindow_delete_event(self, object, event):
         """On Delete handler is used to hide the window so it renders next time the dialog is called
         
         -Returns:Boolean
@@ -372,113 +329,31 @@ class Handler:
         thread.start()
 
         self.messagedialog_window.show()
-    
-    # Disable custom DNS input if not selected custom DNS
-    def dns_preferens_combobox_changed(self, combobox):
-        """Button/Event handler that is triggered whenever combo box value is changed.
-        """
-        # DNS ComboBox
-        # 0 - Leak Protection Enabled
-        # 1 - Custom DNS
-        # 2 - None
-
-        dns_custom_input = self.interface.get_object("dns_custom_input")
-
-        if combobox.get_active() == 0 or combobox.get_active() == 2:
-            dns_custom_input.set_property('sensitive', False)
-        else:
-            dns_custom_input.set_property('sensitive', True)
-
-    # Update DNS Configurations
-    def update_dns_button_clicked(self, button):
-        """Button/Event handler to update DNS protection 
-        """
-        self.messagedialog_sub_label.hide()
-        self.messagedialog_label.set_markup("Updating DNS configurations...")
-        self.messagedialog_spinner.show()
-        
-        gui_logger.debug(">>> Starting \"update_dns\" thread.")
-
-        thread = Thread(target=update_dns, args=[self.interface, self.messagedialog_label, self.messagedialog_spinner])
-        thread.daemon = True
-        thread.start()
-
-        self.messagedialog_window.show()
-
-    # Update ProtonVPN Plan
-    def update_pvpn_plan_button_clicked(self, button):
-        """Button/Event handler to update ProtonVPN Plan  
-        """
-        self.messagedialog_sub_label.hide()
-        self.messagedialog_label.set_markup("Updating ProtonVPN Plan...")
-        self.messagedialog_spinner.show()
-
-        gui_logger.debug(">>> Starting \"update_pvpn_plan\" thread.")
-
-        thread = Thread(target=update_pvpn_plan, args=[self.interface, self.messagedialog_label, self.messagedialog_spinner])
-        thread.daemon = True
-        thread.start()
-
-        self.messagedialog_window.show()
 
     # Update Default OpenVPN protocol
-    def update_def_protocol_button_clicked(self, button):
+    def update_protocol_combobox_changed(self, object):
         """Button/Event handler to update OpenVP Protocol  
         """
-        self.messagedialog_sub_label.hide()
-        self.messagedialog_label.set_markup("Updating default OpenVPN Protocol...")
-        self.messagedialog_spinner.show()
+        autoconnect_setting = get_config_value("USER", "default_protocol")
+        
+        tree_iter = object.get_active_iter()
 
-        gui_logger.debug(">>> Starting \"update_def_protocol\" thread.")
+        if tree_iter is not None:
+            model = object.get_model()
+            index, protocol = model[tree_iter][:2]
+            protocol = protocol.lower()
+            if protocol.lower() != autoconnect_setting.lower():
+                self.messagedialog_sub_label.hide()
+                self.messagedialog_label.set_markup("Updating default OpenVPN Protocol...")
+                self.messagedialog_spinner.show()
 
-        thread = Thread(target=update_def_protocol, args=[self.interface, self.messagedialog_label, self.messagedialog_spinner])
-        thread.daemon = True
-        thread.start()
+                gui_logger.debug(">>> Starting \"update_protocol_combobox_changed\" thread.")
 
-        self.messagedialog_window.show()
-    
-    # Autoconnect on boot
-    def autoconnect_button_clicked(self, button):
-        """Button/Event handler to update autoconnect
-        """
-        self.messagedialog_sub_label.hide()        
-        self.messagedialog_label.set_markup("Updating autoconnect settings...")
-        self.messagedialog_spinner.show()
+                thread = Thread(target=update_def_protocol, args=[self.interface, self.messagedialog_label, self.messagedialog_spinner, protocol])
+                thread.daemon = True
+                thread.start()
 
-        gui_logger.debug(">>> Starting \"autoconnect_button_clicked\" thread.")
-
-        thread = Thread(target=update_autoconnect, args=[self.interface, self.messagedialog_label, self.messagedialog_spinner])
-        thread.daemon = True
-        thread.start()
-
-        self.messagedialog_window.show()
-
-    # Kill Switch
-    def killswitch_combobox_changed(self, combobox):
-        """Event handler that reactes when the combobox value changes
-        - If killswitch is enabled, then it disables the split tunneling input and button
-        """
-        if combobox.get_active() == 0:
-            self.interface.get_object("split_tunneling_textview").set_property('sensitive', True)
-            self.interface.get_object("update_split_tunneling_button").set_property('sensitive', True)
-        else:
-            self.interface.get_object("split_tunneling_textview").set_property('sensitive', False)
-            self.interface.get_object("update_split_tunneling_button").set_property('sensitive', False)
-
-    def update_killswitch_button_clicked(self, button):
-        """Button/Event handler to update Killswitch  
-        """
-        self.messagedialog_sub_label.hide()
-        self.messagedialog_label.set_markup("Updating killswitch configurations...")
-        self.messagedialog_spinner.show()
-
-        gui_logger.debug(">>> Starting \"update_killswitch\" thread.")
-
-        thread = Thread(target=update_killswitch, args=[self.interface, self.messagedialog_label, self.messagedialog_spinner])
-        thread.daemon = True
-        thread.start()
-
-        self.messagedialog_window.show()
+                self.messagedialog_window.show()
 
     def update_split_tunneling_button_clicked(self, button):
         """Button/Event handler to update Split Tunneling 
@@ -495,21 +370,90 @@ class Handler:
 
         self.messagedialog_window.show()    
     
-    def update_tray_configurations_button_clicked(self, button):
-        """Button/Event handler to update Tray display configurations
-        """
-        self.messagedialog_sub_label.hide()
-        self.messagedialog_label.set_markup("Updating tray display configurations...")
-        self.messagedialog_spinner.show()
+    def tray_data_tx_combobox_changed(self, object):
+        display_data_tx = get_gui_config("tray_tab", "display_data_tx")
+        tree_iter = object.get_active_iter()
+        if tree_iter is not None:
+            model = object.get_model()
+            option, display = model[tree_iter][:2]
+            if option != int(display_data_tx):
+                self.messagedialog_sub_label.hide()        
+                self.messagedialog_label.set_markup("Updating tray settings...")
+                self.messagedialog_spinner.show()
+                gui_logger.debug(">>> Starting \"tray_data_tx_combobox_changed\" thread.")
+                thread = Thread(target=tray_configurations, args=[
+                                                                self.interface, 
+                                                                self.messagedialog_label, 
+                                                                self.messagedialog_spinner, 
+                                                                option,
+                                                                "tray_data_tx_combobox"])
+                thread.daemon = True
+                thread.start()
+                self.messagedialog_window.show()
 
-        gui_logger.debug(">>> Starting \"tray_configurations\" thread.")
+    def tray_servername_combobox_changed(self, object):
+        display_data_tx = get_gui_config("tray_tab", "display_server")
+        tree_iter = object.get_active_iter()
+        if tree_iter is not None:
+            model = object.get_model()
+            option, display = model[tree_iter][:2]
+            if option != int(display_data_tx):
+                self.messagedialog_sub_label.hide()        
+                self.messagedialog_label.set_markup("Updating tray settings...")
+                self.messagedialog_spinner.show()
+                gui_logger.debug(">>> Starting \"tray_servername_combobox_changed\" thread.")
+                thread = Thread(target=tray_configurations, args=[
+                                                                self.interface, 
+                                                                self.messagedialog_label, 
+                                                                self.messagedialog_spinner, 
+                                                                option,
+                                                                "tray_servername_combobox"])
+                thread.daemon = True
+                thread.start()
+                self.messagedialog_window.show() 
 
-        thread = Thread(target=tray_configurations, args=[self.interface, self.messagedialog_label, self.messagedialog_spinner])
-        thread.daemon = True
-        thread.start()
-
-        self.messagedialog_window.show()
-
+    def tray_time_connected_combobox_changed(self, object):
+        display_data_tx = get_gui_config("tray_tab", "display_time_conn")
+        tree_iter = object.get_active_iter()
+        if tree_iter is not None:
+            model = object.get_model()
+            option, display = model[tree_iter][:2]
+            if option != int(display_data_tx):
+                self.messagedialog_sub_label.hide()        
+                self.messagedialog_label.set_markup("Updating tray settings...")
+                self.messagedialog_spinner.show()
+                gui_logger.debug(">>> Starting \"tray_servername_combobox_changed\" thread.")
+                thread = Thread(target=tray_configurations, args=[
+                                                                self.interface, 
+                                                                self.messagedialog_label, 
+                                                                self.messagedialog_spinner, 
+                                                                option,
+                                                                "tray_time_connected_combobox"])
+                thread.daemon = True
+                thread.start()
+                self.messagedialog_window.show()
+                
+    def tray_serverload_combobox_changed(self, object):
+        display_data_tx = get_gui_config("tray_tab", "display_serverload")
+        tree_iter = object.get_active_iter()
+        if tree_iter is not None:
+            model = object.get_model()
+            option, display = model[tree_iter][:2]
+            if option != int(display_data_tx):
+                self.messagedialog_sub_label.hide()        
+                self.messagedialog_label.set_markup("Updating tray settings...")
+                self.messagedialog_spinner.show()
+                gui_logger.debug(">>> Starting \"tray_servername_combobox_changed\" thread.")
+                thread = Thread(target=tray_configurations, args=[
+                                                                self.interface, 
+                                                                self.messagedialog_label, 
+                                                                self.messagedialog_spinner, 
+                                                                option,
+                                                                "tray_serverload_combobox"])
+                thread.daemon = True
+                thread.start()
+                self.messagedialog_window.show()
+    
     def purge_configurations_button_clicked(self, button):
         """Button/Event handler to purge configurations
         """
@@ -525,6 +469,348 @@ class Handler:
 
         self.messagedialog_window.show()
 
+    def main_notebook_switch_page(self, notebook, selected_tab, actual_tab_index):
+        countries_tab = self.interface.get_object("countries_tab_label")
+        profiles_tab = self.interface.get_object("profiles_tab_label")
+        
+        countries_content_holder = self.interface.get_object("countries_content_holder")
+        profiles_content_holder = self.interface.get_object("profiles_content_holder")
+
+        countries_tab_style = countries_tab.get_style_context()
+        profiles_tab_style = profiles_tab.get_style_context()
+        
+        countries_content_holder_style = countries_content_holder.get_style_context()
+        profiles_content_holder_style = profiles_content_holder.get_style_context()
+
+        if self.main_initial_tab < actual_tab_index:
+            # Profiles selected
+            countries_tab_style.remove_class("active_tab")
+            countries_tab_style.add_class("inactive_tab")
+
+            profiles_tab_style.remove_class("inactive_tab")
+            profiles_tab_style.add_class("active_tab")
+        else:
+            # Countries selected
+            countries_tab_style.remove_class("inactive_tab")
+            countries_tab_style.add_class("active_tab")
+
+            profiles_tab_style.remove_class("active_tab")
+            profiles_tab_style.add_class("inactive_tab")
+
+    def settings_notebook_switch_page(self, notebook, selected_tab, actual_tab_index):
+        general_tab = self.interface.get_object("general_tab_label")
+        general_content_holder = self.interface.get_object("general_content_holder")
+        
+        sys_tray_tab = self.interface.get_object("sys_tray_tab_label")
+        sys_tray_content_holder = self.interface.get_object("sys_tray_content_holder")
+
+        connection_tab = self.interface.get_object("connection_tab_label")
+        connection_content_holder = self.interface.get_object("connection_content_holder")
+
+        account_tab = self.interface.get_object("account_tab_label")
+        account_content_holder = self.interface.get_object("account_content_holder")
+
+        general_tab_style = general_tab.get_style_context()
+        sys_tray_tab_style = sys_tray_tab.get_style_context()
+        connection_tab_style = connection_tab.get_style_context()
+        account_tab_style = account_tab.get_style_context()
+
+        if actual_tab_index == 0:
+            # General selected
+            general_tab_style.add_class("active_tab")
+            general_tab_style.remove_class("inactive_tab")
+            
+            sys_tray_tab_style.remove_class("active_tab")
+            sys_tray_tab_style.add_class("inactive_tab")
+
+            connection_tab_style.add_class("inactive_tab")
+            connection_tab_style.remove_class("active_tab")
+            
+            account_tab_style.add_class("inactive_tab")
+            account_tab_style.remove_class("active_tab")
+
+        elif actual_tab_index == 1:
+            # System tray selected
+            # General selected
+            general_tab_style.remove_class("active_tab")
+            general_tab_style.add_class("inactive_tab")
+            
+            sys_tray_tab_style.add_class("active_tab")
+            sys_tray_tab_style.remove_class("inactive_tab")
+
+            connection_tab_style.add_class("inactive_tab")
+            connection_tab_style.remove_class("active_tab")
+            
+            account_tab_style.add_class("inactive_tab")
+            account_tab_style.remove_class("active_tab")
+            
+        elif actual_tab_index == 2:
+            # Connection selected
+            general_tab_style.remove_class("active_tab")
+            general_tab_style.add_class("inactive_tab")
+
+            sys_tray_tab_style.remove_class("active_tab")
+            sys_tray_tab_style.add_class("inactive_tab")
+
+            connection_tab_style.remove_class("inactive_tab")
+            connection_tab_style.add_class("active_tab")
+            
+            account_tab_style.add_class("inactive_tab")
+            account_tab_style.remove_class("active_tab")
+
+        elif actual_tab_index == 3:
+            # Account selected
+            general_tab_style.remove_class("active_tab")
+            general_tab_style.add_class("inactive_tab")
+
+            sys_tray_tab_style.remove_class("active_tab")
+            sys_tray_tab_style.add_class("inactive_tab")
+
+            connection_tab_style.add_class("inactive_tab")
+            connection_tab_style.remove_class("active_tab")
+            
+            account_tab_style.remove_class("inactive_tab")
+            account_tab_style.add_class("active_tab")
+
+    def main_conn_disc_button_label(self, button):
+        """Button/Event handler to connect to the fastest server
+        """
+        self.messagedialog_sub_label.hide()
+
+        gui_logger.debug(">>> Starting \"main_conn_disc_button_label\" thread.")
+        
+        server_list = self.interface.get_object("TreeViewServerList").get_selection() 
+        (model, pathlist) = server_list.get_selected_rows()
+
+        user_selected_server = False
+
+        for path in pathlist :
+            tree_iter = model.get_iter(path)
+            # the second param of get_value() specifies the column number, starting at 0
+            user_selected_server = model.get_value(tree_iter, 1)
+
+        server_list.unselect_all()
+
+        target = custom_quick_connect 
+        message = "Connecting to the fastest server..."
+        
+        if get_gui_config("conn_tab","quick_connect") != "dis":
+            message = "Connecting to custom quick connect..."
+
+        if is_connected() and not user_selected_server:
+            target = disconnect
+            message = "Disconnecting..."
+
+        if user_selected_server:
+            target = connect_to_selected_server
+            message = "Connecting to <b>{}</b>".format(user_selected_server) 
+
+        self.messagedialog_label.set_markup(message)
+        self.messagedialog_spinner.show()
+
+        thread = Thread(target=target, args=[{
+                                            "interface":self.interface, 
+                                            "user_selected_server": user_selected_server, 
+                                            "messagedialog_label": self.messagedialog_label, 
+                                            "messagedialog_spinner": self.messagedialog_spinner}])
+        thread.daemon = True
+        thread.start()
+
+        self.messagedialog_window.show()
+
+    def TreeViewServerList_cursor_changed(self, treeview):
+        self.messagedialog_sub_label.hide()
+
+        # Get the selected server
+        (model, pathlist) = treeview.get_selection().get_selected_rows()
+
+        for path in pathlist :
+            tree_iter = model.get_iter(path)
+            # the second param of get_value() specifies the column number, starting at 0
+            user_selected_server = model.get_value(tree_iter, 1)
+
+        try:
+            self.conn_disc_button_label.set_markup("Connecto to {}".format(user_selected_server))
+        except UnboundLocalError:
+            self.conn_disc_button_label.set_markup("Quick Connect")
+
+    def update_dns_leak_switch_changed(self, object, state):
+        dns_protection = get_config_value("USER", "dns_leak_protection")
+        # dns_custom = get_config_value("USER", "custom_dns")
+        if dns_protection == "0":
+            update_to = "1"
+        elif dns_protection != "0":
+            update_to = "0"
+
+        if (state and dns_protection == "0") or (not state and dns_protection != "0"):
+            self.messagedialog_sub_label.hide()        
+            self.messagedialog_label.set_markup("Updating DNS leak settings...")
+            self.messagedialog_spinner.show()
+            # set_config_value("USER", "dns_leak_protection", "0")
+            thread = Thread(target=update_dns, args=[
+                                                    self.interface, 
+                                                    self.messagedialog_label, 
+                                                    self.messagedialog_spinner, 
+                                                    update_to])
+            thread.daemon = True
+            thread.start()
+
+            self.messagedialog_window.show()
+
+    def update_killswitch_switch_changed(self, object, state):
+        killswitch_protection = get_config_value("USER", "killswitch")
+        if killswitch_protection == "0":
+            update_to = "1"
+        else:
+            update_to = "0"
+
+        if (state and killswitch_protection == "0") or (not state and killswitch_protection != "0"):
+            self.messagedialog_sub_label.hide()        
+            self.messagedialog_label.set_markup("Updating Killswitch settings...")
+            self.messagedialog_spinner.show()
+            # set_config_value("USER", "dns_leak_protection", "0")
+            thread = Thread(target=update_killswitch, args=[
+                                                    self.interface, 
+                                                    self.messagedialog_label, 
+                                                    self.messagedialog_spinner, 
+                                                    update_to])
+            thread.daemon = True
+            thread.start()
+
+            self.messagedialog_window.show()
+
+    def update_autoconnect_combobox_changed(self, object):
+        autoconnect_setting = get_gui_config("conn_tab", "autoconnect")
+        
+        tree_iter = object.get_active_iter()
+
+        if tree_iter is not None:
+            model = object.get_model()
+            country_command, country_display = model[tree_iter][:2]
+
+            if country_command != autoconnect_setting:
+                self.messagedialog_sub_label.hide()        
+                self.messagedialog_label.set_markup("Updating autoconnect settings...")
+                self.messagedialog_spinner.show()
+
+                gui_logger.debug(">>> Starting \"update_autoconnect_combobox_changed\" thread.")
+
+                thread = Thread(target=update_connect_preference, args=[
+                                                                self.interface, 
+                                                                self.messagedialog_label, 
+                                                                self.messagedialog_spinner, 
+                                                                country_command,
+                                                                country_display])
+                thread.daemon = True
+                thread.start()
+
+                self.messagedialog_window.show()
+
+    def update_quick_connect_combobox_changed(self, object):
+        autoconnect_setting = get_gui_config("conn_tab", "quick_connect")
+        
+        tree_iter = object.get_active_iter()
+
+        if tree_iter is not None:
+            model = object.get_model()
+            country_command, country_display = model[tree_iter][:2]
+
+            if country_command != autoconnect_setting:
+                self.messagedialog_sub_label.hide()        
+                self.messagedialog_label.set_markup("Updating quick connect settings...")
+                self.messagedialog_spinner.show()
+
+                gui_logger.debug(">>> Starting \"update_quick_connect_combobox_changed\" thread.")
+
+                thread = Thread(target=update_connect_preference, args=[
+                                                                self.interface, 
+                                                                self.messagedialog_label, 
+                                                                self.messagedialog_spinner, 
+                                                                country_command,
+                                                                country_display,
+                                                                True])
+                thread.daemon = True
+                thread.start()
+
+                self.messagedialog_window.show()
+
+    def split_tunneling_switch_changed(self, object, state):
+        split_tunnel_grid = self.interface.get_object("split_tunneling_grid") 
+        split_tunnel = get_config_value("USER", "split_tunnel")
+        
+        if split_tunnel == "0":
+            update_to = "1"
+        else:
+            update_to = "0"
+
+        if state:
+            split_tunnel_grid.show()
+        else:
+
+            split_tunnel_grid.hide()
+
+        if (state and split_tunnel == "0") or (not state and split_tunnel != "0"):
+            self.messagedialog_sub_label.hide()        
+            self.messagedialog_label.set_markup("Updating split tunneling settings...")
+            self.messagedialog_spinner.show()
+            thread = Thread(target=update_split_tunneling_status, args=[
+                                                    self.messagedialog_label, 
+                                                    self.messagedialog_spinner,
+                                                    update_to])
+            thread.daemon = True
+            thread.start()
+
+            self.messagedialog_window.show()
+
+    def update_tier_combobox_changed(self, object):
+        tier = int(get_config_value("USER", "tier"))
+        
+        tree_iter = object.get_active_iter()
+
+        if tree_iter is not None:
+            model = object.get_model()
+            selected_tier, tier_display = model[tree_iter][:2]
+
+            if selected_tier != tier:
+                self.messagedialog_sub_label.hide()        
+                self.messagedialog_label.set_markup("Updating ProtoVPN plan...")
+                self.messagedialog_spinner.show()
+
+                gui_logger.debug(">>> Starting \"update_tier_combobox_changed\" thread.")
+
+                thread = Thread(target=update_pvpn_plan, args=[
+                                                                self.interface, 
+                                                                self.messagedialog_label, 
+                                                                self.messagedialog_spinner, 
+                                                                int(selected_tier+1),
+                                                                tier_display])
+                thread.daemon = True
+                thread.start()
+
+                self.messagedialog_window.show()
+
+    def secure_core_switch_changed(self, object, state):
+        display_secure_core = get_gui_config("connections", "display_secure_core")
+ 
+        if display_secure_core == "False":
+            update_to = "True"
+        else:
+            update_to = "False"
+        
+        if (state and display_secure_core == "False") or (not state and display_secure_core != "False"):
+            self.messagedialog_sub_label.hide()        
+            self.messagedialog_label.set_markup("Loading {} servers...".format("secure-core" if update_to == "True" else "non secure-core"))
+            self.messagedialog_spinner.show()
+            thread = Thread(target=reload_secure_core_servers, args=[
+                                                    self.interface,
+                                                    self.messagedialog_label, 
+                                                    self.messagedialog_spinner,
+                                                    update_to])
+            thread.daemon = True
+            thread.start()
+
+            self.messagedialog_window.show()
+            
 def initialize_gui():
     """Initializes the GUI 
     ---
@@ -549,8 +835,19 @@ def initialize_gui():
         else:
             glade_path = glade_path + path + "/"
 
-            
+    
     interface.add_from_file(glade_path[:-1])
+
+    css = re.sub("main.glade", "main.css", glade_path) 
+
+    style_provider = Gtk.CssProvider()
+    style_provider.load_from_path(css[:-1])
+
+    Gtk.StyleContext.add_provider_for_screen(
+        Gdk.Screen.get_default(),
+        style_provider,
+        Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
+    )
 
     messagedialog_window = interface.get_object("MessageDialog")
     messagedialog_label = interface.get_object("message_dialog_label")
@@ -582,13 +879,17 @@ def initialize_gui():
         interface.connect_signals(Handler(interface))
 
         check_root()
+
+        if not os.path.isdir(GUI_CONFIG_DIR):
+            os.mkdir(GUI_CONFIG_DIR)
+            gui_logger.debug("Config Directory created")
+            change_file_owner(GUI_CONFIG_DIR)
+
         gui_logger.debug("\n______________________________________\n\n\tINITIALIZING NEW GUI WINDOW\n______________________________________\n")
-        
         try:
-            change_file_owner(os.path.join(CONFIG_DIR, "protonvpn-gui.log"))
-        except NameError:
-            gui_logger.debug("[!] Could not CONFIG_DIR.")
-            sys.exit(1)
+            change_file_owner(os.path.join(GUI_CONFIG_DIR, "protonvpn-gui.log"))
+        except:
+            pass
 
         if len(get_gui_processes()) > 1:
             gui_logger.debug("[!] Two processes were found. Displaying MessageDialog to inform user.")
@@ -609,13 +910,13 @@ def initialize_gui():
 
             messagedialog_label.set_markup(response['message'])
             messagedialog_spinner.hide()
+            
 
-        if not os.path.isfile(CONFIG_FILE):
+        if not os.path.isfile(CONFIG_FILE):   
             gui_logger.debug(">>> Loading LoginWindow")
             window = interface.get_object("LoginWindow")
             dashboard = interface.get_object("DashboardWindow")
             dashboard.connect("destroy", Gtk.main_quit)
-            window.show()
         else:
             window = interface.get_object("DashboardWindow")
             gui_logger.debug(">>> Loading DashboardWindow")
@@ -640,9 +941,6 @@ def initialize_gui():
             thread = Thread(target=load_content_on_start, args=[objects])
             thread.daemon = True
             thread.start()
-            
-        # indicator(Gtk)
         window.show()
-
     Gtk.main()
     
