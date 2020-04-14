@@ -505,35 +505,18 @@ def load_configurations(interface):
     """
     # pref_dialog = interface.get_object("ConfigurationsWindow")
     pref_dialog = interface.get_object("SettingsWindow")
+
+    load_connection_settings(interface)
+
     # username = get_config_value("USER", "username")
-    # dns_leak_protection = get_config_value("USER", "dns_leak_protection")
     # custom_dns = get_config_value("USER", "custom_dns")
     # tier = int(get_config_value("USER", "tier")) + 1
     # default_protocol = get_config_value("USER", "default_protocol")
-    # killswitch = get_config_value("USER", "killswitch")
 
     # # Populate username
     # username_field = interface.get_object("update_username_input")
     # username_field.set_text(username)
-
-    # # Set DNS combobox
-    # dns_combobox = interface.get_object("dns_preferens_combobox")
-    # dns_custom_input = interface.get_object("dns_custom_input")
-
-    # # DNS ComboBox
-    # # 0 - Leak Protection Enabled
-    # # 1 - Custom DNS
-    # # 2 - None
-
-    # if dns_leak_protection == '1':
-    #     dns_combobox.set_active(0)
-    # elif dns_leak_protection != '1' and custom_dns.lower != "none":
-    #     dns_combobox.set_active(1)
-    #     dns_custom_input.set_property('sensitive', True)
-    # else:
-    #     dns_combobox.set_active(2)
     
-    # dns_custom_input.set_text(custom_dns)
 
     # # Set ProtonVPN Plan
     # protonvpn_plans = {
@@ -550,22 +533,7 @@ def load_configurations(interface):
 
     # # Set OpenVPN Protocol        
     # interface.get_object("protocol_tcp_update_checkbox").set_active(True) if default_protocol == "tcp" else interface.get_object("protocol_udp_update_checkbox").set_active(True)
-
-    # # Set Autoconnect on boot combobox 
-    # populate_autoconnect_list(interface)
-    # autoconnect_combobox = interface.get_object("autoconnect_combobox")
-
-    # try:
-    #     autoconnect_setting = get_config_value("USER", "autoconnect")
-    # except KeyError:
-    #     autoconnect_setting = 0
-
-    # autoconnect_combobox.set_active(int(autoconnect_setting))
-
-    # # Set Kill Switch combobox
-    # killswitch_combobox = interface.get_object("killswitch_combobox")
-
-    # killswitch_combobox.set_active(int(killswitch))
+    
 
     # # Populate Split Tunelling
     # split_tunneling = interface.get_object("split_tunneling_textview")
@@ -601,6 +569,42 @@ def load_configurations(interface):
     #     combobox.set_active(setter)
 
     pref_dialog.show()
+
+def load_connection_settings(interface):
+    # User values
+    dns_leak_protection = get_config_value("USER", "dns_leak_protection")
+    killswitch = get_config_value("USER", "killswitch")
+
+    # Object
+    dns_leak_switch = interface.get_object("dns_leak_switch")
+    killswitch_switch = interface.get_object("killswitch_switch")
+
+    # Set Autoconnect on boot combobox 
+    server_list = populate_autoconnect_list(interface, return_list=True)
+    autoconnect_combobox = interface.get_object("update_autoconnect_combobox")
+
+    try:
+        autoconnect_setting = get_config_value("USER", "autoconnect")
+    except KeyError:
+        autoconnect_setting = 0
+
+    index = list(server_list.keys()).index(autoconnect_setting)
+    
+    autoconnect_combobox.set_active(index)
+
+    # Set DNS Protection
+    if dns_leak_protection == '1' or (dns_leak_protection != '1' and custom_dns.lower != "none"):
+        dns_leak_switch.set_state(True)
+    else:
+        dns_leak_switch.set_state(False)
+
+    # Set Kill Switch
+    if killswitch != '0':
+        killswitch_switch.set_state(True)
+    else:
+        killswitch_switch.set_state(False)
+
+
 
 def populate_server_list(populate_servers_dict):
     """Function that updates server list.
@@ -765,7 +769,8 @@ def populate_autoconnect_list(interface, return_list=False):
         "tor": "Tor (Plus/Visionary)"
     }
     autoconnect_alternatives = ["dis", "fast", "rand", "p2p", "sc", "tor"]
-    return_values = []
+    # return_values = collections.OrderedDict()
+    return_values = collections.OrderedDict()
 
     for server in servers:
         country = get_country_name(server["ExitCountry"])
@@ -778,17 +783,17 @@ def populate_autoconnect_list(interface, return_list=False):
 
     for alt in autoconnect_alternatives:
         if alt in other_choice_dict:
-            if return_list:
-                return_values.append(other_choice_dict[alt])
-            else:
-                autoconnect_liststore.append([alt, other_choice_dict[alt]])
+            # if return_list:
+            return_values[alt] = other_choice_dict[alt]
+            # else:
+            autoconnect_liststore.append([alt, other_choice_dict[alt], alt])
         else:
             for k,v in country_codes.items():
                 if alt.lower() == v.lower():
-                    if return_list:
-                        return_values.append(v)
-                    else:
-                        autoconnect_liststore.append([k, v])
+                    # if return_list:
+                    return_values[k] = v
+                    # else:
+                    autoconnect_liststore.append([k, v, k])
     
     if return_list:
         return return_values

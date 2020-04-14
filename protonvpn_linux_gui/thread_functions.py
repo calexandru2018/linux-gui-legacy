@@ -459,13 +459,10 @@ def update_def_protocol(interface, messagedialog_label, messagedialog_spinner):
 
     gui_logger.debug(">>> Ended tasks in \"set_default_protocol\" thread.")   
 
-def update_autoconnect(interface, messagedialog_label, messagedialog_spinner):
+def update_autoconnect_preference(interface, messagedialog_label, messagedialog_spinner, user_choice, display_choice):
     """Function that updates autoconnect. 
     """
-    autoconnect_combobox = interface.get_object("autoconnect_combobox")
-    active_choice = autoconnect_combobox.get_active()
-    selected_country = False 
-    display_text = "disabled"
+    active_choice = user_choice
 
     gui_logger.debug(">>> Running \"update_autoconnect\".")
 
@@ -474,36 +471,23 @@ def update_autoconnect(interface, messagedialog_label, messagedialog_spinner):
     # autoconnect_alternatives = ["dis", "fast", "rand", "p2p", "sc", "tor"]
     manage_autoconnect(mode="disable")
 
-    if active_choice == 1:
+    if active_choice == "dis":
+        pass
+    elif active_choice == "fast":
         manage_autoconnect(mode="enable", command="connect -f")
-        display_text = "fastest"
-    elif active_choice == 2:
+    elif active_choice == "rand":
         manage_autoconnect(mode="enable", command="connect -r")
-        display_text = "random"
-    elif active_choice == 3:
+    elif active_choice == "p2p":
         manage_autoconnect(mode="enable", command="connect --p2p")
-        display_text = "peer2peer"
-    elif active_choice == 4:
+    elif active_choice == "sc":
         manage_autoconnect(mode="enable", command="connect --sc")
-        display_text = "secure-core"
-    elif active_choice == 5:
+    elif active_choice == "tor":
         manage_autoconnect(mode="enable", command="connect --tor")
-        display_text = "tor"
-    elif active_choice > 5:
+    else:
         # Connect to a specific country
-        country_list = populate_autoconnect_list(interface, return_list=True)
-        selected_country = country_list[active_choice]
-        for k, v in country_codes.items():
-            if v == selected_country:
-                selected_country = k
-                display_text = v
-                break
-        if not selected_country:
-            print("[!] Unable to find country code")
-            return False
-        manage_autoconnect(mode="enable", command="connect --cc " + selected_country.upper())
+        manage_autoconnect(mode="enable", command="connect --cc " + active_choice.upper())
 
-    messagedialog_label.set_markup("Autoconnect setting updated to connect to <b>{}</b>!".format(display_text))
+    messagedialog_label.set_markup("Autoconnect setting updated to connect to <b>{}</b>!".format(display_choice))
     messagedialog_spinner.hide()
 
     gui_logger.debug(">>> Ended tasks in \"update_autoconnect\" thread.") 
