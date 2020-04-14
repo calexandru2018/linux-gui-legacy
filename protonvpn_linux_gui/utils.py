@@ -531,33 +531,25 @@ def load_configurations(interface):
     # pref_dialog = interface.get_object("ConfigurationsWindow")
     pref_dialog = interface.get_object("SettingsWindow")
 
+    load_general_settings(interface)
     load_tray_settings(interface)
     load_connection_settings(interface)
     load_advanced_settings(interface)
-    # username = get_config_value("USER", "username")
-    # custom_dns = get_config_value("USER", "custom_dns")
-    # tier = int(get_config_value("USER", "tier")) + 1
-    # default_protocol = get_config_value("USER", "default_protocol")
-
-    # # Populate username
-    # username_field = interface.get_object("update_username_input")
-    # username_field.set_text(username)
-    
-
-    # # Set ProtonVPN Plan
-    # protonvpn_plans = {
-    #     1: interface.get_object("member_free_update_checkbox"),
-    #     2: interface.get_object("member_basic_update_checkbox"),
-    #     3: interface.get_object("member_plus_update_checkbox"),
-    #     4: interface.get_object("member_visionary_update_checkbox")
-    # }
-
-    # for tier_val, object in protonvpn_plans.items():
-    #     if tier_val == tier:
-    #         object.set_active(True)
-    #         break
-
+   
     pref_dialog.show()
+
+def load_general_settings(interface):
+    username_field = interface.get_object("update_username_input")
+    # pvpn_plan_combobox = interface.get_object("pvpn_tier_combobox")
+
+    username = get_config_value("USER", "username")
+    tier = int(get_config_value("USER", "tier")) + 1
+
+    # Populate username
+    username_field.set_text(username)   
+
+    # pvpn_plan_combobox.set_active(tier)
+
 
 def load_tray_settings(interface):
     # Load tray configurations
