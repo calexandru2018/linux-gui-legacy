@@ -223,22 +223,22 @@ If you would like to launch the GUI without having to type in your sudo password
 
 # GUI Layout
 <p align="center">
-  <img src="https://i.imgur.com/VnOMaeg.png" alt="Logo"></img>
+  <img src="https://i.imgur.com/7G9jGbn.png" alt="Dashboard"></img>
 </p>
 
 <p align="center">
-  <img src="https://i.imgur.com/BbwBiu6.png" alt="Logo"></img>
+  <img src="https://i.imgur.com/tdV0mYz.png" alt="General Settings"></img>
 </p>
 
 <p align="center">
-  <img src="https://i.imgur.com/103IBOc.png" alt="Logo"></img>
+  <img src="https://i.imgur.com/LMuCWQS.png" alt="Connection Settings"></img>
 </p>
 
 <p align="center">
-  <img src="https://i.imgur.com/zq93OdU.png" alt="Logo"></img>
+  <img src="https://i.imgur.com/d4gQGJ2.png" alt="Advanced Settings"></img>
 </p> 
 
  <p align="center">
-  <img src="https://i.imgur.com/bhK8qqB.png" alt="Logo"></img>
+  <img src="https://i.imgur.com/XcRU3z7.png" alt="About"></img>
 </p> 
  
