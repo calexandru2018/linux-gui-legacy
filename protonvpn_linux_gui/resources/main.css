@@ -160,3 +160,13 @@ headerbar.default-decoration {
     margin-right: -20px;
     /* padding-left: 60px; */
 }
+
+.split_tunnling_list{
+    background-color: white;
+    padding: 10px 10px;
+}
+.split_tunnling_list text{
+    background-color: white;
+    color: black;
+    border-radius: 5px;
+}
