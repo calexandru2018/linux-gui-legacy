@@ -47,7 +47,8 @@ from .thread_functions import(
     purge_configurations,
     kill_duplicate_gui_process,
     load_content_on_start,
-    update_autoconnect,
+    # update_autoconnect_status,
+    update_autoconnect_preference,
     tray_configurations
 )
 
@@ -369,23 +370,24 @@ class Handler:
         self.messagedialog_window.show()
 
     # Update Default OpenVPN protocol
-    def update_def_protocol_button_clicked(self, button):
+    def update_protocol_combobox(self, button):
         """Button/Event handler to update OpenVP Protocol  
         """
-        self.messagedialog_sub_label.hide()
-        self.messagedialog_label.set_markup("Updating default OpenVPN Protocol...")
-        self.messagedialog_spinner.show()
+        print("Hello")
+        # self.messagedialog_sub_label.hide()
+        # self.messagedialog_label.set_markup("Updating default OpenVPN Protocol...")
+        # self.messagedialog_spinner.show()
 
-        gui_logger.debug(">>> Starting \"update_def_protocol\" thread.")
+        # gui_logger.debug(">>> Starting \"update_def_protocol\" thread.")
 
-        thread = Thread(target=update_def_protocol, args=[self.interface, self.messagedialog_label, self.messagedialog_spinner])
-        thread.daemon = True
-        thread.start()
+        # thread = Thread(target=update_def_protocol, args=[self.interface, self.messagedialog_label, self.messagedialog_spinner])
+        # thread.daemon = True
+        # thread.start()
 
-        self.messagedialog_window.show()
+        # self.messagedialog_window.show()
     
     # Autoconnect on boot
-    def autoconnect_button_clicked(self, button):
+    def protocol_combobox_changed(self, button):
         """Button/Event handler to update autoconnect
         """
         self.messagedialog_sub_label.hide()        
@@ -504,6 +506,9 @@ class Handler:
         general_tab = self.interface.get_object("general_tab_label")
         general_content_holder = self.interface.get_object("general_content_holder")
         
+        sys_tray_tab = self.interface.get_object("sys_tray_tab_label")
+        sys_tray_content_holder = self.interface.get_object("sys_tray_content_holder")
+
         connection_tab = self.interface.get_object("connection_tab_label")
         connection_content_holder = self.interface.get_object("connection_content_holder")
 
@@ -511,6 +516,7 @@ class Handler:
         account_content_holder = self.interface.get_object("account_content_holder")
 
         general_tab_style = general_tab.get_style_context()
+        sys_tray_tab_style = sys_tray_tab.get_style_context()
         connection_tab_style = connection_tab.get_style_context()
         account_tab_style = account_tab.get_style_context()
 
@@ -518,6 +524,9 @@ class Handler:
             # General selected
             general_tab_style.add_class("active_tab")
             general_tab_style.remove_class("inactive_tab")
+            
+            sys_tray_tab_style.remove_class("active_tab")
+            sys_tray_tab_style.add_class("inactive_tab")
 
             connection_tab_style.add_class("inactive_tab")
             connection_tab_style.remove_class("active_tab")
@@ -526,9 +535,27 @@ class Handler:
             account_tab_style.remove_class("active_tab")
 
         elif actual_tab_index == 1:
+            # System tray selected
+            # General selected
+            general_tab_style.remove_class("active_tab")
+            general_tab_style.add_class("inactive_tab")
+            
+            sys_tray_tab_style.add_class("active_tab")
+            sys_tray_tab_style.remove_class("inactive_tab")
+
+            connection_tab_style.add_class("inactive_tab")
+            connection_tab_style.remove_class("active_tab")
+            
+            account_tab_style.add_class("inactive_tab")
+            account_tab_style.remove_class("active_tab")
+            
+        elif actual_tab_index == 2:
             # Connection selected
             general_tab_style.remove_class("active_tab")
             general_tab_style.add_class("inactive_tab")
+
+            sys_tray_tab_style.remove_class("active_tab")
+            sys_tray_tab_style.add_class("inactive_tab")
 
             connection_tab_style.remove_class("inactive_tab")
             connection_tab_style.add_class("active_tab")
@@ -536,10 +563,13 @@ class Handler:
             account_tab_style.add_class("inactive_tab")
             account_tab_style.remove_class("active_tab")
 
-        else:
+        elif actual_tab_index == 3:
             # Account selected
             general_tab_style.remove_class("active_tab")
             general_tab_style.add_class("inactive_tab")
+
+            sys_tray_tab_style.remove_class("active_tab")
+            sys_tray_tab_style.add_class("inactive_tab")
 
             connection_tab_style.add_class("inactive_tab")
             connection_tab_style.remove_class("active_tab")
@@ -605,6 +635,44 @@ class Handler:
             self.conn_disc_button_label.set_markup("Connecto to {}".format(user_selected_server))
         except UnboundLocalError:
             self.conn_disc_button_label.set_markup("Quick Connect")
+
+    def dns_leak_switch_clicked(self, object, state):
+        if not state:
+            print("Disable DNS leak protection")
+        else: 
+            print("Enable DNS")
+
+    def autoconnect_combobox_changed(self, object):
+        autoconnect_setting = False
+        try:
+            autoconnect_setting = get_config_value("USER", "autoconnect")
+        except KeyError:
+            pass
+        
+        if autoconnect_setting:
+            tree_iter = object.get_active_iter()
+
+            if tree_iter is not None:
+                model = object.get_model()
+                country_command, country_display = model[tree_iter][:2]
+
+                if country_command != autoconnect_setting:
+                    self.messagedialog_sub_label.hide()        
+                    self.messagedialog_label.set_markup("Updating autoconnect settings...")
+                    self.messagedialog_spinner.show()
+
+                    gui_logger.debug(">>> Starting \"autoconnect_button_clicked\" thread.")
+
+                    thread = Thread(target=update_autoconnect_preference, args=[
+                                                                    self.interface, 
+                                                                    self.messagedialog_label, 
+                                                                    self.messagedialog_spinner, 
+                                                                    country_command,
+                                                                    country_display])
+                    thread.daemon = True
+                    thread.start()
+
+                    self.messagedialog_window.show()
 
 def initialize_gui():
     """Initializes the GUI 
@@ -709,19 +777,18 @@ def initialize_gui():
             dashboard = interface.get_object("DashboardWindow")
             dashboard.connect("destroy", Gtk.main_quit)
         else:
-            window = interface.get_object("DashboardWindow")
-            # window = interface.get_object("SettingsWindow")
+            # window = interface.get_object("DashboardWindow")
             gui_logger.debug(">>> Loading DashboardWindow")
-            window.connect("destroy", Gtk.main_quit)
+            # window.connect("destroy", Gtk.main_quit)
             
             messagedialog_window = interface.get_object("MessageDialog")
             messagedialog_label = interface.get_object("message_dialog_label")
             interface.get_object("message_dialog_sub_label").hide()
             messagedialog_spinner = interface.get_object("message_dialog_spinner")
 
-            messagedialog_label.set_markup("Loading...")
-            messagedialog_spinner.show()
-            messagedialog_window.show()
+            # messagedialog_label.set_markup("Loading...")
+            # messagedialog_spinner.show()
+            # messagedialog_window.show()
 
             objects = {
                 "interface": interface,
@@ -730,11 +797,11 @@ def initialize_gui():
                 "messagedialog_spinner": messagedialog_spinner,
             }
 
-            thread = Thread(target=load_content_on_start, args=[objects])
-            thread.daemon = True
-            thread.start()
-            
-        window.show()
+            # thread = Thread(target=load_content_on_start, args=[objects])
+            # thread.daemon = True
+            # thread.start()
+        load_configurations(interface)
+        # window.show()
 
     Gtk.main()
     
