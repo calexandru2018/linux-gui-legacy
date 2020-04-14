@@ -557,28 +557,6 @@ def load_configurations(interface):
     #         object.set_active(True)
     #         break
 
-    # # Populate Split Tunelling
-    # split_tunneling = interface.get_object("split_tunneling_textview")
-
-    # # Check if killswtich is != 0, if it is then disable split tunneling Function
-    # if killswitch != '0':
-    #     split_tunneling.set_property('sensitive', False)
-    #     interface.get_object("update_split_tunneling_button").set_property('sensitive', False)
-        
-    # split_tunneling_buffer = split_tunneling.get_buffer()
-    # content = ""
-    # try:
-    #     with open(SPLIT_TUNNEL_FILE) as f:
-    #         lines = f.readlines()
-
-    #         for line in lines:
-    #             content = content + line
-
-    #         split_tunneling_buffer.set_text(content)
-
-    # except FileNotFoundError:
-    #     split_tunneling_buffer.set_text(content)
-
     pref_dialog.show()
 
 def load_tray_settings(interface):
@@ -627,10 +605,18 @@ def load_advanced_settings(interface):
     dns_leak_protection = get_config_value("USER", "dns_leak_protection")
     custom_dns = get_config_value("USER", "custom_dns")
     killswitch = get_config_value("USER", "killswitch")
+    split_tunnel = 0
+
+    try:
+        split_tunnel = get_config_value("USER", "split_tunnel")
+    except KeyError:
+        pass
 
     # Object
     dns_leak_switch = interface.get_object("update_dns_leak_switch")
     killswitch_switch = interface.get_object("update_killswitch_switch")
+    split_tunneling_switch = interface.get_object("split_tunneling_switch")
+    split_tunneling_list = interface.get_object("split_tunneling_textview")
 
     # Set DNS Protection
     if dns_leak_protection == '1':
@@ -644,6 +630,34 @@ def load_advanced_settings(interface):
         killswitch_switch.set_state(True)
     else:
         killswitch_switch.set_state(False)
+
+    # Populate Split Tunelling
+    # Check if killswtich is != 0, if it is then disable split tunneling Function
+    if killswitch != '0':
+        killswitch_switch.set_state(True)
+    else:
+        killswitch_switch.set_state(False)
+
+    if split_tunnel != '0':
+        split_tunneling_switch.set_state(True)
+        if killswitch != '0':
+            split_tunneling_list.set_property('sensitive', False)
+            interface.get_object("update_split_tunneling_button").set_property('sensitive', False)
+            
+        split_tunneling_buffer = split_tunneling_list.get_buffer()
+        content = ""
+        try:
+            with open(SPLIT_TUNNEL_FILE) as f:
+                lines = f.readlines()
+
+                for line in lines:
+                    content = content + line
+
+                split_tunneling_buffer.set_text(content)
+        except FileNotFoundError:
+            split_tunneling_buffer.set_text(content)
+    else:
+        split_tunneling_switch.set_state(False)  
 
 def populate_server_list(populate_servers_dict):
     """Function that updates server list.

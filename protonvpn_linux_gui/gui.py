@@ -50,9 +50,9 @@ from .thread_functions import(
     purge_configurations,
     kill_duplicate_gui_process,
     load_content_on_start,
-    # update_autoconnect_status,
     update_connect_preference,
-    tray_configurations
+    tray_configurations,
+    update_split_tunneling_status
 )
 
 # Import version
@@ -820,6 +820,7 @@ class Handler:
                 thread.start()
 
                 self.messagedialog_window.show()
+
     def split_tunneling_switch_changed(self, object, state):
         split_tunnel_grid = self.interface.get_object("split_tunneling_grid") 
         split_tunnel = get_config_value("USER", "split_tunnel")
@@ -836,28 +837,17 @@ class Handler:
             split_tunnel_grid.hide()
 
         if (state and split_tunnel == "0") or (not state and split_tunnel != "0"):
-            print("update")
-            # self.messagedialog_sub_label.hide()        
-            # self.messagedialog_label.set_markup("Updating split tunneling settings...")
-            # self.messagedialog_spinner.show()
-            # # set_config_value("USER", "dns_leak_protection", "0")
-            # thread = Thread(target=update_split_tunneling, args=[
-            #                                         self.interface, 
-            #                                         self.messagedialog_label, 
-            #                                         self.messagedialog_spinner, 
-            #                                         update_to])
-            # thread.daemon = True
-            # thread.start()
+            self.messagedialog_sub_label.hide()        
+            self.messagedialog_label.set_markup("Updating split tunneling settings...")
+            self.messagedialog_spinner.show()
+            thread = Thread(target=update_split_tunneling_status, args=[
+                                                    self.messagedialog_label, 
+                                                    self.messagedialog_spinner,
+                                                    update_to])
+            thread.daemon = True
+            thread.start()
 
-            # self.messagedialog_window.show()
-
-        # if state:
-        #     print("Show")
-        #     # split_tunnel_grid.set_property('visible', True)
-        #     split_tunnel_grid.show()
-        # else:
-        #     print("Hide")
-        #     split_tunnel_grid.hide()
+            self.messagedialog_window.show()
 
     def test(self, a,b):
         print("Test")

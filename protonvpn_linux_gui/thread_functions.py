@@ -502,10 +502,36 @@ def update_killswitch(interface, messagedialog_label, messagedialog_spinner, ks_
 
     gui_logger.debug(">>> Ended tasks in \"update_killswitch_switch_changed\" thread.")   
 
+def update_split_tunneling_status(messagedialog_label, messagedialog_spinner, update_to):
+
+
+
+    if update_to == "1":
+        result = "Split tunneling has been <b>enabled</b>!\n"
+    else:
+        if os.path.isfile(SPLIT_TUNNEL_FILE):
+            os.remove(SPLIT_TUNNEL_FILE)
+        result = "Split tunneling has been <b>disabled</b>!\n"
+
+    if int(get_config_value("USER", "killswitch")):
+        set_config_value("USER", "killswitch", 0)
+
+        result = result + "Split Tunneling <b>can't</b> be used with Kill Switch, Kill Switch has been <b>disabled</b>!\n\n"
+        time.sleep(1)
+
+    set_config_value("USER", "split_tunnel", update_to)
+    
+    messagedialog_label.set_markup(result)
+    messagedialog_spinner.hide()
+
+    gui_logger.debug(">>> Result: \"{0}\"".format(result))
+
+    gui_logger.debug(">>> Ended tasks in \"set_split_tunnel\" thread.") 
+
 def update_split_tunneling(interface, messagedialog_label, messagedialog_spinner):
     """Function that updates split tunneling configurations.
     """
-    result = "Split tunneling configurations updated!\n"
+    result = "Split tunneling configurations <b>updated</b>!\n"
     split_tunneling_buffer = interface.get_object("split_tunneling_textview").get_buffer()
 
     # Get text takes a start_iter, end_iter and the buffer itself as last param
@@ -523,7 +549,7 @@ def update_split_tunneling(interface, messagedialog_label, messagedialog_spinner
     for ip in split_tunneling_content:
         if not is_valid_ip(ip):
             messagedialog_spinner.hide()
-            messagedialog_label.set_markup("<b>{0}</b> is not valid.!\nNone of the IP's were added, please try again with a different IP.".format(ip))
+            messagedialog_label.set_markup("<b>{0}</b> is not valid!\nNone of the IP's were added, please try again with a different IP.".format(ip))
             gui_logger.debug("[!] Invalid IP \"{0}\".".format(ip))
             return
 
