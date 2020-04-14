@@ -393,25 +393,14 @@ def update_dns(interface, messagedialog_label, messagedialog_spinner, dns_value)
 
     gui_logger.debug(">>> Ended tasks in \"dns_leak_switch_clicked\" thread.")
 
-def update_pvpn_plan(interface, messagedialog_label, messagedialog_spinner):
+def update_pvpn_plan(interface, messagedialog_label, messagedialog_spinner, tier, tier_display):
     """Function that updates ProtonVPN plan.
     """
-    protonvpn_plan = 0
+  
+    protonvpn_plan = tier
     visionary_compare = 0
-    protonvpn_plans = {1: "Free", 2: "Basic", 3: "Plus", 4: "Visionary"}
-    protonvpn_radios = {
-        1: interface.get_object("member_free_update_checkbox").get_active(),
-        2: interface.get_object("member_basic_update_checkbox").get_active(),
-        3: interface.get_object("member_plus_update_checkbox").get_active(),
-        4: interface.get_object("member_visionary_update_checkbox").get_active()
-    }
 
     gui_logger.debug(">>> Running \"set_protonvpn_tier\".")
-
-    for k,v in protonvpn_radios.items():
-        if v == True:
-            protonvpn_plan = int(k)
-            break
 
     visionary_compare = protonvpn_plan
     if protonvpn_plan == 4:
@@ -422,14 +411,14 @@ def update_pvpn_plan(interface, messagedialog_label, messagedialog_spinner):
 
     set_config_value("USER", "tier", str(protonvpn_plan))
 
-    messagedialog_label.set_markup("ProtonVPN Plan has been updated to <b>{}</b>!\nServers list will be refreshed.".format(protonvpn_plans[4 if visionary_compare == 4 else int(protonvpn_plan+1)]))
+    messagedialog_label.set_markup("ProtonVPN Plan has been updated to <b>{}</b>!\nServers list will be refreshed.".format(tier_display))
     messagedialog_spinner.hide()
 
     gui_logger.debug(">>> Result: \"{0}\"".format("ProtonVPN Plan has been updated!"))
 
     time.sleep(1.5)
 
-    # load_on_start({"interface":interface, "gui_enabled": True})     
+    load_on_start({"interface":interface, "gui_enabled": True})     
     populate_servers_dict = {
         "tree_object": interface.get_object("ServerTreeStore"),
         "servers": False

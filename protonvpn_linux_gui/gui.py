@@ -849,8 +849,33 @@ class Handler:
 
             self.messagedialog_window.show()
 
-    def pvpn_tier_combobox_changed(self, object):
-        print(1)
+    def update_tier_combobox_changed(self, object):
+        tier = int(get_config_value("USER", "tier"))
+        
+        tree_iter = object.get_active_iter()
+
+        if tree_iter is not None:
+            model = object.get_model()
+            selected_tier, tier_display = model[tree_iter][:2]
+
+            if selected_tier != tier:
+                self.messagedialog_sub_label.hide()        
+                self.messagedialog_label.set_markup("Updating ProtoVPN plan...")
+                self.messagedialog_spinner.show()
+
+                gui_logger.debug(">>> Starting \"update_tier_combobox_changed\" thread.")
+
+                thread = Thread(target=update_pvpn_plan, args=[
+                                                                self.interface, 
+                                                                self.messagedialog_label, 
+                                                                self.messagedialog_spinner, 
+                                                                int(selected_tier+1),
+                                                                tier_display])
+                thread.daemon = True
+                thread.start()
+
+                self.messagedialog_window.show()
+
 
 def initialize_gui():
     """Initializes the GUI 
@@ -959,31 +984,29 @@ def initialize_gui():
             dashboard = interface.get_object("DashboardWindow")
             dashboard.connect("destroy", Gtk.main_quit)
         else:
-            # window = interface.get_object("DashboardWindow")
+            window = interface.get_object("DashboardWindow")
             gui_logger.debug(">>> Loading DashboardWindow")
-            # window.connect("destroy", Gtk.main_quit)
+            window.connect("destroy", Gtk.main_quit)
             
             messagedialog_window = interface.get_object("MessageDialog")
             messagedialog_label = interface.get_object("message_dialog_label")
             interface.get_object("message_dialog_sub_label").hide()
             messagedialog_spinner = interface.get_object("message_dialog_spinner")
 
-            # messagedialog_label.set_markup("Loading...")
-            # messagedialog_spinner.show()
-            # messagedialog_window.show()
+            messagedialog_label.set_markup("Loading...")
+            messagedialog_spinner.show()
+            messagedialog_window.show()
 
-            # objects = {
-            #     "interface": interface,
-            #     "messagedialog_window": messagedialog_window,
-            #     "messagedialog_label": messagedialog_label,
-            #     "messagedialog_spinner": messagedialog_spinner,
-            # }
+            objects = {
+                "interface": interface,
+                "messagedialog_window": messagedialog_window,
+                "messagedialog_label": messagedialog_label,
+                "messagedialog_spinner": messagedialog_spinner,
+            }
 
-            # thread = Thread(target=load_content_on_start, args=[objects])
-            # thread.daemon = True
-            # thread.start()
-        load_configurations(interface)
-        # window.show()
-
+            thread = Thread(target=load_content_on_start, args=[objects])
+            thread.daemon = True
+            thread.start()
+        window.show()
     Gtk.main()
     

@@ -540,15 +540,15 @@ def load_configurations(interface):
 
 def load_general_settings(interface):
     username_field = interface.get_object("update_username_input")
-    # pvpn_plan_combobox = interface.get_object("pvpn_tier_combobox")
+    pvpn_plan_combobox = interface.get_object("update_tier_combobox")
 
     username = get_config_value("USER", "username")
-    tier = int(get_config_value("USER", "tier")) + 1
+    tier = int(get_config_value("USER", "tier"))
 
     # Populate username
     username_field.set_text(username)   
-
-    # pvpn_plan_combobox.set_active(tier)
+    # Set tier
+    pvpn_plan_combobox.set_active(tier)
 
 
 def load_tray_settings(interface):
