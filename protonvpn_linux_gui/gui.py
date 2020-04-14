@@ -329,54 +329,6 @@ class Handler:
         thread.start()
 
         self.messagedialog_window.show()
-    
-    # Disable custom DNS input if not selected custom DNS
-    def dns_preferens_combobox_changed(self, combobox):
-        """Button/Event handler that is triggered whenever combo box value is changed.
-        """
-        # DNS ComboBox
-        # 0 - Leak Protection Enabled
-        # 1 - Custom DNS
-        # 2 - None
-
-        dns_custom_input = self.interface.get_object("dns_custom_input")
-
-        if combobox.get_active() == 0 or combobox.get_active() == 2:
-            dns_custom_input.set_property('sensitive', False)
-        else:
-            dns_custom_input.set_property('sensitive', True)
-
-    # Update DNS Configurations
-    def update_dns_button_clicked(self, button):
-        """Button/Event handler to update DNS protection 
-        """
-        self.messagedialog_sub_label.hide()
-        self.messagedialog_label.set_markup("Updating DNS configurations...")
-        self.messagedialog_spinner.show()
-        
-        gui_logger.debug(">>> Starting \"update_dns\" thread.")
-
-        thread = Thread(target=update_dns, args=[self.interface, self.messagedialog_label, self.messagedialog_spinner])
-        thread.daemon = True
-        thread.start()
-
-        self.messagedialog_window.show()
-
-    # Update ProtonVPN Plan
-    def update_pvpn_plan_button_clicked(self, button):
-        """Button/Event handler to update ProtonVPN Plan  
-        """
-        self.messagedialog_sub_label.hide()
-        self.messagedialog_label.set_markup("Updating ProtonVPN Plan...")
-        self.messagedialog_spinner.show()
-
-        gui_logger.debug(">>> Starting \"update_pvpn_plan\" thread.")
-
-        thread = Thread(target=update_pvpn_plan, args=[self.interface, self.messagedialog_label, self.messagedialog_spinner])
-        thread.daemon = True
-        thread.start()
-
-        self.messagedialog_window.show()
 
     # Update Default OpenVPN protocol
     def update_protocol_combobox_changed(self, object):
@@ -403,33 +355,6 @@ class Handler:
 
                 self.messagedialog_window.show()
 
-    # Kill Switch
-    def killswitch_combobox_changed(self, combobox):
-        """Event handler that reactes when the combobox value changes
-        - If killswitch is enabled, then it disables the split tunneling input and button
-        """
-        if combobox.get_active() == 0:
-            self.interface.get_object("split_tunneling_textview").set_property('sensitive', True)
-            self.interface.get_object("update_split_tunneling_button").set_property('sensitive', True)
-        else:
-            self.interface.get_object("split_tunneling_textview").set_property('sensitive', False)
-            self.interface.get_object("update_split_tunneling_button").set_property('sensitive', False)
-
-    def update_killswitch_button_clicked(self, button):
-        """Button/Event handler to update Killswitch  
-        """
-        self.messagedialog_sub_label.hide()
-        self.messagedialog_label.set_markup("Updating killswitch configurations...")
-        self.messagedialog_spinner.show()
-
-        gui_logger.debug(">>> Starting \"update_killswitch\" thread.")
-
-        thread = Thread(target=update_killswitch, args=[self.interface, self.messagedialog_label, self.messagedialog_spinner])
-        thread.daemon = True
-        thread.start()
-
-        self.messagedialog_window.show()
-
     def update_split_tunneling_button_clicked(self, button):
         """Button/Event handler to update Split Tunneling 
         """
@@ -445,21 +370,6 @@ class Handler:
 
         self.messagedialog_window.show()    
     
-    # def update_tray_configurations_button_clicked(self, button):
-    #     """Button/Event handler to update Tray display configurations
-    #     """
-    #     self.messagedialog_sub_label.hide()
-    #     self.messagedialog_label.set_markup("Updating tray display configurations...")
-    #     self.messagedialog_spinner.show()
-
-    #     gui_logger.debug(">>> Starting \"tray_configurations\" thread.")
-
-    #     thread = Thread(target=tray_configurations, args=[self.interface, self.messagedialog_label, self.messagedialog_spinner])
-    #     thread.daemon = True
-    #     thread.start()
-
-    #     self.messagedialog_window.show()
-
     def tray_data_tx_combobox_changed(self, object):
         display_data_tx = get_gui_config("tray_tab", "display_data_tx")
         tree_iter = object.get_active_iter()
