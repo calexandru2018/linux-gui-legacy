@@ -101,6 +101,10 @@ headerbar.default-decoration {
     background-color: rgba(68, 73, 78, 1);
 }
 
+.server_scroll_window{
+    border: none;
+}
+
 .server_list_bakground_row_selected{
     background-color: black;
 }
@@ -109,6 +113,21 @@ headerbar.default-decoration {
     background-color: rgb(86, 179, 102);
 }
 
+.remove_borders{
+    border: none;
+}
+
+.remove_borders{
+    border: none;
+}
+
+.bottom_border{
+    border-bottom: 1px solid rgba(255,255,255, 0.3);
+}
+
+.padding{
+    padding: 0.5px 0px;
+}
 /*
 ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 ----------------------- Settings Window -----------------------

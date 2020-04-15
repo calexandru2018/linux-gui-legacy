@@ -968,6 +968,9 @@ Author: Alexandru Cheltuitor
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="has_frame">False</property>
+                            <style>
+                              <class name="remove_borders"/>
+                            </style>
                           </object>
                           <packing>
                             <property name="left_attach">1</property>
@@ -981,6 +984,9 @@ Author: Alexandru Cheltuitor
                             <property name="visibility">False</property>
                             <property name="has_frame">False</property>
                             <property name="invisible_char">•</property>
+                            <style>
+                              <class name="remove_borders"/>
+                            </style>
                           </object>
                           <packing>
                             <property name="left_attach">1</property>
@@ -2121,7 +2127,6 @@ Author: Alexandru Cheltuitor
                                 <property name="can_focus">False</property>
                                 <property name="vexpand">True</property>
                                 <property name="orientation">vertical</property>
-                                <property name="spacing">15</property>
                                 <child>
                                   <object class="GtkGrid">
                                     <property name="visible">True</property>
@@ -2160,6 +2165,8 @@ Author: Alexandru Cheltuitor
                                     <style>
                                       <class name="default_background"/>
                                       <class name="countries_content_style"/>
+                                      <class name="bottom_border"/>
+                                      <class name="remove_borders"/>
                                     </style>
                                   </object>
                                   <packing>
@@ -2179,6 +2186,7 @@ Author: Alexandru Cheltuitor
                                     <style>
                                       <class name="default_background"/>
                                       <class name="countries_content_style"/>
+                                      <class name="remove_borders"/>
                                     </style>
                                   </object>
                                   <packing>
@@ -2301,6 +2309,7 @@ Author: Alexandru Cheltuitor
                                     <style>
                                       <class name="countries_content_style"/>
                                       <class name="default_background"/>
+                                      <class name="remove_borders"/>
                                     </style>
                                   </object>
                                   <packing>
@@ -2334,6 +2343,7 @@ Author: Alexandru Cheltuitor
                                   <class name="default_main_tab_conf"/>
                                   <class name="left_tab"/>
                                   <class name="active_tab"/>
+                                  <class name="remove_borders"/>
                                 </style>
                               </object>
                               <packing>
@@ -2503,6 +2513,7 @@ Author: Alexandru Cheltuitor
                                   <class name="default_main_tab_conf"/>
                                   <class name="right_tab"/>
                                   <class name="inactive_tab"/>
+                                  <class name="remove_borders"/>
                                 </style>
                               </object>
                               <packing>
