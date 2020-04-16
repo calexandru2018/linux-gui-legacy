@@ -310,7 +310,6 @@ Author: Alexandru Cheltuitor
             <property name="column_homogeneous">True</property>
             <child>
               <object class="GtkLabel">
-                <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="halign">start</property>
                 <property name="label" translatable="yes">Start on Boot</property>
@@ -326,7 +325,6 @@ Author: Alexandru Cheltuitor
             <child>
               <object class="GtkSwitch">
                 <property name="width_request">50</property>
-                <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="halign">end</property>
               </object>
