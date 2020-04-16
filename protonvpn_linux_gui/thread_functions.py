@@ -141,6 +141,14 @@ def on_login(interface, username_field, password_field, messagedialog_label, use
         gui_logger.debug("Passfile created")
         os.chmod(PASSFILE, 0o600)
 
+    if not initialize_gui_config():
+        sys.exit(1)
+
+    set_config_value("USER", "initialized", 1)
+
+    load_on_start({"interface":interface, "gui_enabled": True, "messagedialog_label": messagedialog_label})
+
+def initialize_gui_config():
     gui_config = configparser.ConfigParser()
     gui_config["connections"] = {
         "display_secure_core": False
@@ -161,14 +169,15 @@ def on_login(interface, username_field, password_field, messagedialog_label, use
         "quick_connect": "dis",
     }
 
-    with open(GUI_CONFIG_FILE, "w") as f:
-        gui_config.write(f)
-    change_file_owner(GUI_CONFIG_FILE)
-    gui_logger.debug("pvpn-gui.cfg initialized")
-
-    set_config_value("USER", "initialized", 1)
-
-    load_on_start({"interface":interface, "gui_enabled": True, "messagedialog_label": messagedialog_label})
+    try:
+        with open(GUI_CONFIG_FILE, "w") as f:
+            gui_config.write(f)
+        change_file_owner(GUI_CONFIG_FILE)
+        gui_logger.debug("pvpn-gui.cfg initialized.")
+        return True
+    except:
+        gui_logger.debug("Unablt to initialize pvpn-gui.cfg.")
+        return False
 
 def reload_secure_core_servers(interface, messagedialog_label, messagedialog_spinner, update_to):
     """Function that reloads server list to either secure-core or non-secure-core.

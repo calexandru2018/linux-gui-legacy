@@ -53,11 +53,12 @@ from .thread_functions import(
     update_connect_preference,
     tray_configurations,
     update_split_tunneling_status,
-    reload_secure_core_servers
+    reload_secure_core_servers,
+    initialize_gui_config
 )
 
 # Import version
-from .constants import VERSION, HELP_TEXT, GUI_CONFIG_DIR
+from .constants import VERSION, HELP_TEXT, GUI_CONFIG_DIR, GUI_CONFIG_FILE
 
 # PyGObject import
 import gi
@@ -918,6 +919,9 @@ def initialize_gui():
             dashboard = interface.get_object("DashboardWindow")
             dashboard.connect("destroy", Gtk.main_quit)
         else:
+            if not os.path.isfile(GUI_CONFIG_FILE):
+                initialize_gui_config()
+
             window = interface.get_object("DashboardWindow")
             gui_logger.debug(">>> Loading DashboardWindow")
             window.connect("destroy", Gtk.main_quit)
@@ -941,6 +945,7 @@ def initialize_gui():
             thread = Thread(target=load_content_on_start, args=[objects])
             thread.daemon = True
             thread.start()
+
         window.show()
     Gtk.main()
     
