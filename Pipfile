@@ -6,7 +6,7 @@ verify_ssl = true
 [dev-packages]
 
 [packages]
-requests = "*"
+requests = "==2.23.0"
 pycairo = "*"
 pygobject = "*"
 protonvpn-cli = "==2.2.2"
