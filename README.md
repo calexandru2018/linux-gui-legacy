@@ -224,22 +224,29 @@ If you would like to launch the GUI without having to type in your sudo password
 
 # GUI Layout
 <p align="center">
-  <img src="https://i.imgur.com/7G9jGbn.png" alt="Dashboard"></img>
+  <img src="https://i.imgur.com/OlcYrwf.png" alt="Login"></img>
+</p>
+<p align="center">
+  <img src="https://i.imgur.com/VOpTlMR.png" alt="Dashboard"></img>
+</p>
+<p align="center">
+  <img src="https://i.imgur.com/BlVmFa9.png" alt="Profiles"></img>
 </p>
 
 <p align="center">
-  <img src="https://i.imgur.com/tdV0mYz.png" alt="General Settings"></img>
+  <img src="https://i.imgur.com/S353btA.png" alt="General Settings"></img>
 </p>
-
 <p align="center">
-  <img src="https://i.imgur.com/LMuCWQS.png" alt="Connection Settings"></img>
-</p>
-
+  <img src="https://i.imgur.com/BWE9LDf.png" alt="Tray Settings"></img>
+</p> 
 <p align="center">
-  <img src="https://i.imgur.com/d4gQGJ2.png" alt="Advanced Settings"></img>
+  <img src="https://i.imgur.com/md4ni6t.png" alt="Connection Settings"></img>
+</p>  
+<p align="center">
+  <img src="https://i.imgur.com/KYMxSoe.png" alt="Advanced Settings"></img>
 </p> 
 
- <p align="center">
-  <img src="https://i.imgur.com/XcRU3z7.png" alt="About"></img>
+<p align="center">
+  <img src="https://i.imgur.com/vXMSQ8z.png" alt="Diagnosis Tool"></img>
 </p> 
  
