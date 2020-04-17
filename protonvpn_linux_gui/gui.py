@@ -537,10 +537,11 @@ class Handler:
 
         server_list.unselect_all()
 
-        target = custom_quick_connect 
+        target = quick_connect 
         message = "Connecting to the fastest server..."
         
         if get_gui_config("conn_tab","quick_connect") != "dis":
+            target = custom_quick_connect 
             message = "Connecting to custom quick connect..."
 
         if is_connected() and not user_selected_server:

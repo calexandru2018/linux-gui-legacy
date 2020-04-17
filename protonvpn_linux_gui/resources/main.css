@@ -189,8 +189,6 @@ notebook.dashboard_notebook_style tab{
 .profile_style_btn:hover{
     color: @def_green_color;
     padding-left: 15px;
-    /* border: none; */
-    /* border-bottom: 1px solid rgba(255,255,255, 0.3); */
     box-shadow: none;
 }
 .server_scroll_window{
@@ -204,7 +202,10 @@ notebook.dashboard_notebook_style tab{
     text-shadow: none;
     outline: none;
     border-image-width: 0;
-    border: none;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    border-bottom: 1px solid rgba(255,255,255, 0.3);
 }
 .default_style_combobox button{
     -gtk-icon-effect: none;
@@ -217,6 +218,7 @@ notebook.dashboard_notebook_style tab{
     background-color: @def_bg_color;
     color: white;
     border-radius: 0;
+    border: none;
 }
 
 .default_style_combobox button box arrow{
@@ -247,17 +249,19 @@ notebook.dashboard_notebook_style tab{
 
 /* Entry default style */
 entry.default_style_entry{
+    border-image:none;
+    outline: none;
+    box-shadow: none;
     background-color: @def_bg_color;
     color: white;
     border-top: none;
     border-left: none;
     border-right: none;
-    border-bottom: 1px solid black;
     border-bottom: 1px solid rgba(255,255,255, 0.3);
 }
 entry.default_style_entry:focus{
+    border-image:none;
     outline: none;
-    /* border-color: inherit; */
     box-shadow: none;
 }
 /* Entry default style */

@@ -394,7 +394,6 @@ Author: Alexandru Cheltuitor
                 <property name="can_focus">True</property>
                 <property name="receives_default">False</property>
                 <property name="halign">center</property>
-                <property name="active">True</property>
                 <property name="draw_indicator">True</property>
                 <property name="group">member_free</property>
                 <style>
@@ -413,7 +412,6 @@ Author: Alexandru Cheltuitor
                 <property name="can_focus">True</property>
                 <property name="receives_default">False</property>
                 <property name="halign">center</property>
-                <property name="active">True</property>
                 <property name="draw_indicator">True</property>
                 <property name="group">member_free</property>
                 <style>
@@ -432,7 +430,6 @@ Author: Alexandru Cheltuitor
                 <property name="can_focus">True</property>
                 <property name="receives_default">False</property>
                 <property name="halign">baseline</property>
-                <property name="active">True</property>
                 <property name="draw_indicator">True</property>
                 <property name="group">member_free</property>
                 <style>
@@ -531,7 +528,6 @@ Author: Alexandru Cheltuitor
                 <property name="can_focus">True</property>
                 <property name="has_focus">True</property>
                 <property name="hexpand">True</property>
-                <property name="visibility">False</property>
                 <property name="has_frame">False</property>
                 <property name="invisible_char">*</property>
                 <style>
@@ -2392,6 +2388,7 @@ Author: Alexandru Cheltuitor
                               </object>
                               <packing>
                                 <property name="tab_expand">True</property>
+                                <property name="tab_fill">False</property>
                               </packing>
                             </child>
                             <child>
@@ -2615,6 +2612,7 @@ Author: Alexandru Cheltuitor
                               <packing>
                                 <property name="position">1</property>
                                 <property name="tab_expand">True</property>
+                                <property name="tab_fill">False</property>
                               </packing>
                             </child>
                             <style>
