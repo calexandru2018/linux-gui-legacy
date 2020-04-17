@@ -1,5 +1,6 @@
 import re
 import os
+import sys
 import time
 import shutil
 import subprocess
@@ -141,6 +142,14 @@ def on_login(interface, username_field, password_field, messagedialog_label, use
         gui_logger.debug("Passfile created")
         os.chmod(PASSFILE, 0o600)
 
+    if not initialize_gui_config():
+        sys.exit(1)
+
+    set_config_value("USER", "initialized", 1)
+
+    load_on_start({"interface":interface, "gui_enabled": True, "messagedialog_label": messagedialog_label})
+
+def initialize_gui_config():
     gui_config = configparser.ConfigParser()
     gui_config["connections"] = {
         "display_secure_core": False
@@ -161,14 +170,15 @@ def on_login(interface, username_field, password_field, messagedialog_label, use
         "quick_connect": "dis",
     }
 
-    with open(GUI_CONFIG_FILE, "w") as f:
-        gui_config.write(f)
-    change_file_owner(GUI_CONFIG_FILE)
-    gui_logger.debug("pvpn-gui.cfg initialized")
-
-    set_config_value("USER", "initialized", 1)
-
-    load_on_start({"interface":interface, "gui_enabled": True, "messagedialog_label": messagedialog_label})
+    try:
+        with open(GUI_CONFIG_FILE, "w") as f:
+            gui_config.write(f)
+        change_file_owner(GUI_CONFIG_FILE)
+        gui_logger.debug("pvpn-gui.cfg initialized.")
+        return True
+    except:
+        gui_logger.debug("Unablt to initialize pvpn-gui.cfg.")
+        return False
 
 def reload_secure_core_servers(interface, messagedialog_label, messagedialog_spinner, update_to):
     """Function that reloads server list to either secure-core or non-secure-core.
@@ -436,15 +446,12 @@ def update_user_pass(interface, messagedialog_label, messagedialog_spinner):
     gui_logger.debug(">>> Ended tasks in \"set_username_password\" thread.")
 
 
-def update_dns(interface, messagedialog_label, messagedialog_spinner, dns_value):
+def update_dns(dns_value):
     """Function that updates DNS settings.
     """
     
     set_config_value("USER", "dns_leak_protection", dns_value)
     # set_config_value("USER", "custom_dns", custom_dns)
-
-    messagedialog_label.set_markup("DNS Management updated to <b>{0}</b>!".format("enabled" if dns_value == "1" else "disabled"))
-    messagedialog_spinner.hide()
 
     gui_logger.debug(">>> Result: \"{0}\"".format("DNS Management updated."))
 
@@ -485,15 +492,12 @@ def update_pvpn_plan(interface, messagedialog_label, messagedialog_spinner, tier
 
     gui_logger.debug(">>> Ended tasks in \"set_protonvpn_tier\" thread.")   
 
-def update_def_protocol(interface, messagedialog_label, messagedialog_spinner, openvpn_protocol):
+def update_def_protocol(openvpn_protocol):
     """Function that updates default protocol.
     """
     gui_logger.debug(">>> Running \"set_default_protocol\".")
 
     set_config_value("USER", "default_protocol", openvpn_protocol)
-
-    messagedialog_label.set_markup("Protocol updated to <b>{}</b>!".format(openvpn_protocol.upper()))
-    messagedialog_spinner.hide()
 
     gui_logger.debug(">>> Ended tasks in \"set_default_protocol\" thread.")   
 
@@ -534,24 +538,19 @@ def update_connect_preference(interface, messagedialog_label, messagedialog_spin
 
     gui_logger.debug(">>> Ended tasks in \"update_autoconnect\" thread.") 
 
-def update_killswitch(interface, messagedialog_label, messagedialog_spinner, ks_value):
+def update_killswitch(update_to):
     """Function that updates killswitch configurations. 
     """
-    set_config_value("USER", "killswitch", ks_value)
+    set_config_value("USER", "killswitch", update_to)
 
     # Update killswitch label
-    result = "Kill Switch configuration updated to <b>{}</b>!".format("enabled" if ks_value == "1" else "disabled")
-    messagedialog_label.set_markup()
-    messagedialog_spinner.hide()
+    result = ">>> Kill Switch configuration updated to {}".format("enabled" if update_to == "1" else "disabled")
 
     gui_logger.debug(">>> Result: \"{0}\"".format(result))
 
     gui_logger.debug(">>> Ended tasks in \"update_killswitch_switch_changed\" thread.")   
 
-def update_split_tunneling_status(messagedialog_label, messagedialog_spinner, update_to):
-
-
-
+def update_split_tunneling_status(update_to):
     if update_to == "1":
         result = "Split tunneling has been <b>enabled</b>!\n"
     else:
@@ -566,9 +565,6 @@ def update_split_tunneling_status(messagedialog_label, messagedialog_spinner, up
         time.sleep(1)
 
     set_config_value("USER", "split_tunnel", update_to)
-    
-    messagedialog_label.set_markup(result)
-    messagedialog_spinner.hide()
 
     gui_logger.debug(">>> Result: \"{0}\"".format(result))
 
@@ -638,7 +634,7 @@ def update_split_tunneling(interface, messagedialog_label, messagedialog_spinner
 
     gui_logger.debug(">>> Ended tasks in \"set_split_tunnel\" thread.")   
 
-def tray_configurations(interface, messagedialog_label, messagedialog_spinner, setting_value, setting_display):
+def tray_configurations(setting_value, setting_display):
     """Function to update what the tray should display.
     """    
     gui_logger.debug(">>> Running \"tray_configurations\".")
@@ -655,8 +651,6 @@ def tray_configurations(interface, messagedialog_label, messagedialog_spinner, s
     set_gui_config("tray_tab", TRAY_CFG_DICT[setting_display], setting_value)
 
     result = "Tray {0} is <b>{1}</b>!".format(msg, "displayed" if setting_value == 1 else "hidden")
-    messagedialog_label.set_markup(result)
-    messagedialog_spinner.hide()
 
     gui_logger.debug(">>> Result: \"{0}\"".format(result))
 

@@ -117,7 +117,7 @@ Author: Alexandru Cheltuitor
                     <property name="receives_default">True</property>
                     <signal name="clicked" handler="check_for_updates_button_clicked" swapped="no"/>
                     <style>
-                      <class name="initialize_profile_btn"/>
+                      <class name="default_style_btn"/>
                     </style>
                   </object>
                   <packing>
@@ -134,7 +134,7 @@ Author: Alexandru Cheltuitor
                     <property name="receives_default">True</property>
                     <signal name="clicked" handler="help_button_clicked" swapped="no"/>
                     <style>
-                      <class name="initialize_profile_btn"/>
+                      <class name="default_style_btn"/>
                     </style>
                   </object>
                   <packing>
@@ -308,7 +308,6 @@ Author: Alexandru Cheltuitor
             <property name="column_homogeneous">True</property>
             <child>
               <object class="GtkLabel">
-                <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="halign">start</property>
                 <property name="label" translatable="yes">Start on Boot</property>
@@ -324,7 +323,6 @@ Author: Alexandru Cheltuitor
             <child>
               <object class="GtkSwitch">
                 <property name="width_request">50</property>
-                <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="halign">end</property>
               </object>
@@ -468,7 +466,7 @@ Author: Alexandru Cheltuitor
                 <property name="halign">start</property>
                 <property name="margin_top">10</property>
                 <property name="margin_bottom">10</property>
-                <property name="label" translatable="yes">Password</property>
+                <property name="label" translatable="yes">ProtonVPN (OpenVPN/IKEv2) Password</property>
                 <attributes>
                   <attribute name="weight" value="bold"/>
                   <attribute name="size" value="12000"/>
@@ -489,7 +487,7 @@ Author: Alexandru Cheltuitor
                 <property name="has_frame">False</property>
                 <property name="invisible_char">*</property>
                 <style>
-                  <class name="white_text"/>
+                  <class name="default_style_entry"/>
                 </style>
               </object>
               <packing>
@@ -497,9 +495,6 @@ Author: Alexandru Cheltuitor
                 <property name="top_attach">1</property>
               </packing>
             </child>
-            <style>
-              <class name="default_background"/>
-            </style>
           </object>
           <packing>
             <property name="left_attach">0</property>
@@ -517,7 +512,7 @@ Author: Alexandru Cheltuitor
                 <property name="halign">start</property>
                 <property name="margin_top">10</property>
                 <property name="margin_bottom">10</property>
-                <property name="label" translatable="yes">Username</property>
+                <property name="label" translatable="yes">ProtonVPN (OpenVPN/IKEv2) Username</property>
                 <property name="justify">fill</property>
                 <attributes>
                   <attribute name="weight" value="bold"/>
@@ -536,10 +531,11 @@ Author: Alexandru Cheltuitor
                 <property name="can_focus">True</property>
                 <property name="has_focus">True</property>
                 <property name="hexpand">True</property>
+                <property name="visibility">False</property>
                 <property name="has_frame">False</property>
-                <property name="max_width_chars">30</property>
+                <property name="invisible_char">*</property>
                 <style>
-                  <class name="white_text"/>
+                  <class name="default_style_entry"/>
                 </style>
               </object>
               <packing>
@@ -575,6 +571,8 @@ Author: Alexandru Cheltuitor
                   <object class="GtkLabel">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
+                    <property name="hexpand">True</property>
+                    <property name="vexpand">True</property>
                     <property name="label" translatable="yes">Login</property>
                     <attributes>
                       <attribute name="weight" value="medium"/>
@@ -588,7 +586,7 @@ Author: Alexandru Cheltuitor
                   </object>
                 </child>
                 <style>
-                  <class name="initialize_profile_btn"/>
+                  <class name="default_style_btn"/>
                 </style>
               </object>
               <packing>
@@ -667,7 +665,7 @@ Author: Alexandru Cheltuitor
                   </object>
                 </child>
                 <style>
-                  <class name="initialize_profile_btn"/>
+                  <class name="default_style_btn"/>
                 </style>
               </object>
               <packing>
@@ -829,6 +827,8 @@ Author: Alexandru Cheltuitor
     <property name="width_request">400</property>
     <property name="height_request">400</property>
     <property name="can_focus">False</property>
+    <property name="title" translatable="yes">ProtonVPN GUI - Settings</property>
+    <property name="icon">img/logo/protonvpn_logo.png</property>
     <signal name="delete-event" handler="SettingsWindow_delete_event" swapped="no"/>
     <child type="titlebar">
       <placeholder/>
@@ -869,13 +869,28 @@ Author: Alexandru Cheltuitor
                       <object class="GtkLabel">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
+                        <property name="halign">start</property>
                         <property name="label" translatable="yes">Settings</property>
                         <attributes>
                           <attribute name="weight" value="bold"/>
-                          <attribute name="size" value="30000"/>
+                          <attribute name="size" value="20000"/>
                         </attributes>
                         <style>
-                          <class name="settings_label"/>
+                          <class name="settings_main_label"/>
+                        </style>
+                      </object>
+                      <packing>
+                        <property name="left_attach">0</property>
+                        <property name="top_attach">1</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkImage">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="pixbuf">img/logo/protonvpn-logo-white.png</property>
+                        <style>
+                          <class name="settings_main_logo"/>
                         </style>
                       </object>
                       <packing>
@@ -884,7 +899,7 @@ Author: Alexandru Cheltuitor
                       </packing>
                     </child>
                     <style>
-                      <class name="settings_label_bg"/>
+                      <class name="settings_label_grid"/>
                     </style>
                   </object>
                   <packing>
@@ -919,7 +934,7 @@ Author: Alexandru Cheltuitor
                           </object>
                           <packing>
                             <property name="left_attach">0</property>
-                            <property name="top_attach">0</property>
+                            <property name="top_attach">1</property>
                           </packing>
                         </child>
                         <child>
@@ -935,7 +950,7 @@ Author: Alexandru Cheltuitor
                           </object>
                           <packing>
                             <property name="left_attach">0</property>
-                            <property name="top_attach">1</property>
+                            <property name="top_attach">2</property>
                           </packing>
                         </child>
                         <child>
@@ -944,7 +959,7 @@ Author: Alexandru Cheltuitor
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="receives_default">True</property>
-                            <property name="halign">center</property>
+                            <property name="halign">end</property>
                             <property name="valign">end</property>
                             <signal name="clicked" handler="update_user_pass_button_clicked" swapped="no"/>
                             <child>
@@ -955,7 +970,41 @@ Author: Alexandru Cheltuitor
                               </object>
                             </child>
                             <style>
-                              <class name="initialize_profile_btn"/>
+                              <class name="default_style_btn"/>
+                            </style>
+                          </object>
+                          <packing>
+                            <property name="left_attach">1</property>
+                            <property name="top_attach">3</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkEntry" id="update_username_input">
+                            <property name="visible">True</property>
+                            <property name="can_focus">True</property>
+                            <property name="margin_top">5</property>
+                            <property name="margin_bottom">5</property>
+                            <property name="has_frame">False</property>
+                            <style>
+                              <class name="default_style_entry"/>
+                            </style>
+                          </object>
+                          <packing>
+                            <property name="left_attach">1</property>
+                            <property name="top_attach">1</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkEntry" id="update_password_input">
+                            <property name="visible">True</property>
+                            <property name="can_focus">True</property>
+                            <property name="margin_top">5</property>
+                            <property name="margin_bottom">5</property>
+                            <property name="visibility">False</property>
+                            <property name="has_frame">False</property>
+                            <property name="invisible_char">•</property>
+                            <style>
+                              <class name="default_style_entry"/>
                             </style>
                           </object>
                           <packing>
@@ -964,32 +1013,7 @@ Author: Alexandru Cheltuitor
                           </packing>
                         </child>
                         <child>
-                          <object class="GtkEntry" id="update_username_input">
-                            <property name="visible">True</property>
-                            <property name="can_focus">True</property>
-                            <property name="has_frame">False</property>
-                          </object>
-                          <packing>
-                            <property name="left_attach">1</property>
-                            <property name="top_attach">0</property>
-                          </packing>
-                        </child>
-                        <child>
-                          <object class="GtkEntry" id="update_password_input">
-                            <property name="visible">True</property>
-                            <property name="can_focus">True</property>
-                            <property name="visibility">False</property>
-                            <property name="has_frame">False</property>
-                            <property name="invisible_char">•</property>
-                          </object>
-                          <packing>
-                            <property name="left_attach">1</property>
-                            <property name="top_attach">1</property>
-                          </packing>
-                        </child>
-                        <child>
                           <object class="GtkLabel">
-                            <property name="visible">True</property>
                             <property name="can_focus">False</property>
                             <property name="halign">start</property>
                             <property name="label" translatable="yes">Show notifications</property>
@@ -1005,10 +1029,14 @@ Author: Alexandru Cheltuitor
                         </child>
                         <child>
                           <object class="GtkSwitch" id="show_notifications_switch">
-                            <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="halign">end</property>
                             <property name="valign">center</property>
+                            <property name="margin_top">5</property>
+                            <property name="margin_bottom">5</property>
+                            <style>
+                              <class name="default_style_switch"/>
+                            </style>
                           </object>
                           <packing>
                             <property name="left_attach">1</property>
@@ -1017,10 +1045,14 @@ Author: Alexandru Cheltuitor
                         </child>
                         <child>
                           <object class="GtkSwitch" id="start_on_boot_switch">
-                            <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="halign">end</property>
                             <property name="valign">center</property>
+                            <property name="margin_top">5</property>
+                            <property name="margin_bottom">5</property>
+                            <style>
+                              <class name="default_style_switch"/>
+                            </style>
                           </object>
                           <packing>
                             <property name="left_attach">1</property>
@@ -1033,6 +1065,12 @@ Author: Alexandru Cheltuitor
                             <property name="can_focus">True</property>
                             <property name="halign">end</property>
                             <property name="valign">center</property>
+                            <property name="margin_top">5</property>
+                            <property name="margin_bottom">5</property>
+                            <property name="active">True</property>
+                            <style>
+                              <class name="default_style_switch"/>
+                            </style>
                           </object>
                           <packing>
                             <property name="left_attach">1</property>
@@ -1041,7 +1079,6 @@ Author: Alexandru Cheltuitor
                         </child>
                         <child>
                           <object class="GtkLabel">
-                            <property name="visible">True</property>
                             <property name="can_focus">False</property>
                             <property name="halign">start</property>
                             <property name="label" translatable="yes">Start on boot</property>
@@ -1084,7 +1121,7 @@ Author: Alexandru Cheltuitor
                           </object>
                           <packing>
                             <property name="left_attach">0</property>
-                            <property name="top_attach">4</property>
+                            <property name="top_attach">0</property>
                           </packing>
                         </child>
                         <child>
@@ -1093,6 +1130,7 @@ Author: Alexandru Cheltuitor
                             <property name="can_focus">False</property>
                             <property name="model">TierListStore</property>
                             <property name="active">0</property>
+                            <property name="id_column">0</property>
                             <signal name="changed" handler="update_tier_combobox_changed" swapped="no"/>
                             <child>
                               <object class="GtkCellRendererText"/>
@@ -1100,10 +1138,13 @@ Author: Alexandru Cheltuitor
                                 <attribute name="text">1</attribute>
                               </attributes>
                             </child>
+                            <style>
+                              <class name="default_style_combobox"/>
+                            </style>
                           </object>
                           <packing>
                             <property name="left_attach">1</property>
-                            <property name="top_attach">4</property>
+                            <property name="top_attach">0</property>
                           </packing>
                         </child>
                         <child>
@@ -1116,8 +1157,7 @@ Author: Alexandru Cheltuitor
                           <placeholder/>
                         </child>
                         <style>
-                          <class name="settings_notebook_grid"/>
-                          <class name="default_background"/>
+                          <class name="default_notebook_grid_content"/>
                         </style>
                       </object>
                       <packing>
@@ -1135,9 +1175,9 @@ Author: Alexandru Cheltuitor
                           <attribute name="size" value="12000"/>
                         </attributes>
                         <style>
-                          <class name="settings_left_tab"/>
                           <class name="default_settings_tab_conf"/>
                           <class name="active_tab"/>
+                          <class name="general_tab"/>
                         </style>
                       </object>
                       <packing>
@@ -1156,8 +1196,6 @@ Author: Alexandru Cheltuitor
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
                             <property name="halign">start</property>
-                            <property name="margin_top">10</property>
-                            <property name="margin_bottom">10</property>
                             <property name="label" translatable="yes">Data Transmitted</property>
                             <attributes>
                               <attribute name="weight" value="medium"/>
@@ -1174,8 +1212,6 @@ Author: Alexandru Cheltuitor
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
                             <property name="halign">start</property>
-                            <property name="margin_top">10</property>
-                            <property name="margin_bottom">10</property>
                             <property name="label" translatable="yes">Servername</property>
                             <attributes>
                               <attribute name="weight" value="medium"/>
@@ -1188,42 +1224,6 @@ Author: Alexandru Cheltuitor
                           </packing>
                         </child>
                         <child>
-                          <object class="GtkLabel">
-                            <property name="visible">True</property>
-                            <property name="can_focus">False</property>
-                            <property name="halign">start</property>
-                            <property name="margin_top">10</property>
-                            <property name="margin_bottom">10</property>
-                            <property name="label" translatable="yes">Time Connected</property>
-                            <attributes>
-                              <attribute name="weight" value="medium"/>
-                              <attribute name="size" value="12000"/>
-                            </attributes>
-                          </object>
-                          <packing>
-                            <property name="left_attach">0</property>
-                            <property name="top_attach">2</property>
-                          </packing>
-                        </child>
-                        <child>
-                          <object class="GtkLabel">
-                            <property name="visible">True</property>
-                            <property name="can_focus">False</property>
-                            <property name="halign">start</property>
-                            <property name="margin_top">10</property>
-                            <property name="margin_bottom">10</property>
-                            <property name="label" translatable="yes">Server Load</property>
-                            <attributes>
-                              <attribute name="weight" value="medium"/>
-                              <attribute name="size" value="12000"/>
-                            </attributes>
-                          </object>
-                          <packing>
-                            <property name="left_attach">0</property>
-                            <property name="top_attach">3</property>
-                          </packing>
-                        </child>
-                        <child>
                           <object class="GtkComboBox" id="tray_data_tx_combobox">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
@@ -1231,7 +1231,6 @@ Author: Alexandru Cheltuitor
                             <property name="active">0</property>
                             <property name="has_frame">False</property>
                             <property name="entry_text_column">1</property>
-                            <property name="id_column">0</property>
                             <signal name="changed" handler="tray_data_tx_combobox_changed" swapped="no"/>
                             <child>
                               <object class="GtkCellRendererText"/>
@@ -1239,6 +1238,9 @@ Author: Alexandru Cheltuitor
                                 <attribute name="text">1</attribute>
                               </attributes>
                             </child>
+                            <style>
+                              <class name="default_style_combobox"/>
+                            </style>
                           </object>
                           <packing>
                             <property name="left_attach">1</property>
@@ -1253,7 +1255,6 @@ Author: Alexandru Cheltuitor
                             <property name="active">0</property>
                             <property name="has_frame">False</property>
                             <property name="entry_text_column">1</property>
-                            <property name="id_column">0</property>
                             <signal name="changed" handler="tray_servername_combobox_changed" swapped="no"/>
                             <child>
                               <object class="GtkCellRendererText"/>
@@ -1261,10 +1262,29 @@ Author: Alexandru Cheltuitor
                                 <attribute name="text">1</attribute>
                               </attributes>
                             </child>
+                            <style>
+                              <class name="default_style_combobox"/>
+                            </style>
                           </object>
                           <packing>
                             <property name="left_attach">1</property>
                             <property name="top_attach">1</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkLabel">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="halign">start</property>
+                            <property name="label" translatable="yes">Time Connected</property>
+                            <attributes>
+                              <attribute name="weight" value="medium"/>
+                              <attribute name="size" value="12000"/>
+                            </attributes>
+                          </object>
+                          <packing>
+                            <property name="left_attach">0</property>
+                            <property name="top_attach">2</property>
                           </packing>
                         </child>
                         <child>
@@ -1273,9 +1293,6 @@ Author: Alexandru Cheltuitor
                             <property name="can_focus">False</property>
                             <property name="model">Tray_Configurations</property>
                             <property name="active">0</property>
-                            <property name="has_frame">False</property>
-                            <property name="entry_text_column">1</property>
-                            <property name="id_column">0</property>
                             <signal name="changed" handler="tray_time_connected_combobox_changed" swapped="no"/>
                             <child>
                               <object class="GtkCellRendererText"/>
@@ -1283,10 +1300,29 @@ Author: Alexandru Cheltuitor
                                 <attribute name="text">1</attribute>
                               </attributes>
                             </child>
+                            <style>
+                              <class name="default_style_combobox"/>
+                            </style>
                           </object>
                           <packing>
                             <property name="left_attach">1</property>
                             <property name="top_attach">2</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkLabel">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="halign">start</property>
+                            <property name="label" translatable="yes">Server Load</property>
+                            <attributes>
+                              <attribute name="weight" value="medium"/>
+                              <attribute name="size" value="12000"/>
+                            </attributes>
+                          </object>
+                          <packing>
+                            <property name="left_attach">0</property>
+                            <property name="top_attach">3</property>
                           </packing>
                         </child>
                         <child>
@@ -1295,9 +1331,6 @@ Author: Alexandru Cheltuitor
                             <property name="can_focus">False</property>
                             <property name="model">Tray_Configurations</property>
                             <property name="active">0</property>
-                            <property name="has_frame">False</property>
-                            <property name="entry_text_column">1</property>
-                            <property name="id_column">0</property>
                             <signal name="changed" handler="tray_serverload_combobox_changed" swapped="no"/>
                             <child>
                               <object class="GtkCellRendererText"/>
@@ -1305,6 +1338,10 @@ Author: Alexandru Cheltuitor
                                 <attribute name="text">1</attribute>
                               </attributes>
                             </child>
+                            <style>
+                              <class name="default_style_combobox"/>
+                              <class name="white_text"/>
+                            </style>
                           </object>
                           <packing>
                             <property name="left_attach">1</property>
@@ -1312,12 +1349,12 @@ Author: Alexandru Cheltuitor
                           </packing>
                         </child>
                         <style>
-                          <class name="default_background"/>
-                          <class name="settings_notebook_grid"/>
+                          <class name="default_notebook_grid_content"/>
                         </style>
                       </object>
                       <packing>
                         <property name="position">1</property>
+                        <property name="tab_expand">True</property>
                       </packing>
                     </child>
                     <child type="tab">
@@ -1332,11 +1369,11 @@ Author: Alexandru Cheltuitor
                         <style>
                           <class name="default_settings_tab_conf"/>
                           <class name="inactive_tab"/>
-                          <class name="settings_center_left_tab"/>
                         </style>
                       </object>
                       <packing>
                         <property name="position">1</property>
+                        <property name="tab_expand">True</property>
                         <property name="tab_fill">False</property>
                       </packing>
                     </child>
@@ -1393,6 +1430,9 @@ Author: Alexandru Cheltuitor
                                 <attribute name="text">1</attribute>
                               </attributes>
                             </child>
+                            <style>
+                              <class name="default_style_combobox"/>
+                            </style>
                           </object>
                           <packing>
                             <property name="left_attach">1</property>
@@ -1414,6 +1454,10 @@ Author: Alexandru Cheltuitor
                                 <attribute name="text">1</attribute>
                               </attributes>
                             </child>
+                            <style>
+                              <class name="default_style_combobox"/>
+                              <class name="white_text"/>
+                            </style>
                           </object>
                           <packing>
                             <property name="left_attach">1</property>
@@ -1449,6 +1493,9 @@ Author: Alexandru Cheltuitor
                                 <attribute name="text">1</attribute>
                               </attributes>
                             </child>
+                            <style>
+                              <class name="default_style_combobox"/>
+                            </style>
                           </object>
                           <packing>
                             <property name="left_attach">1</property>
@@ -1456,12 +1503,12 @@ Author: Alexandru Cheltuitor
                           </packing>
                         </child>
                         <style>
-                          <class name="settings_notebook_grid"/>
-                          <class name="default_background"/>
+                          <class name="default_notebook_grid_content"/>
                         </style>
                       </object>
                       <packing>
                         <property name="position">2</property>
+                        <property name="tab_expand">True</property>
                       </packing>
                     </child>
                     <child type="tab">
@@ -1477,7 +1524,6 @@ Author: Alexandru Cheltuitor
                         <style>
                           <class name="default_settings_tab_conf"/>
                           <class name="inactive_tab"/>
-                          <class name="settings_center_right_tab"/>
                         </style>
                       </object>
                       <packing>
@@ -1487,7 +1533,7 @@ Author: Alexandru Cheltuitor
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkGrid" id="account_content_holder">
+                      <object class="GtkGrid" id="advanced_content_holder">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="row_spacing">25</property>
@@ -1513,7 +1559,7 @@ Author: Alexandru Cheltuitor
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
                             <property name="halign">start</property>
-                            <property name="label" translatable="yes">DNS Leak Protection </property>
+                            <property name="label" translatable="yes">DNS Leak Protection</property>
                             <attributes>
                               <attribute name="weight" value="medium"/>
                               <attribute name="size" value="12000"/>
@@ -1541,29 +1587,39 @@ Author: Alexandru Cheltuitor
                           </packing>
                         </child>
                         <child>
+                          <object class="GtkSwitch" id="update_killswitch_switch">
+                            <property name="visible">True</property>
+                            <property name="can_focus">True</property>
+                            <property name="halign">end</property>
+                            <property name="valign">baseline</property>
+                            <property name="margin_top">4</property>
+                            <property name="margin_bottom">4</property>
+                            <signal name="state-set" handler="update_killswitch_switch_changed" swapped="no"/>
+                            <style>
+                              <class name="default_style_switch"/>
+                            </style>
+                          </object>
+                          <packing>
+                            <property name="left_attach">1</property>
+                            <property name="top_attach">0</property>
+                          </packing>
+                        </child>
+                        <child>
                           <object class="GtkSwitch" id="update_dns_leak_switch">
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="halign">end</property>
                             <property name="valign">center</property>
+                            <property name="margin_top">4</property>
+                            <property name="margin_bottom">4</property>
                             <signal name="state-set" handler="update_dns_leak_switch_changed" swapped="no"/>
+                            <style>
+                              <class name="default_style_switch"/>
+                            </style>
                           </object>
                           <packing>
                             <property name="left_attach">1</property>
                             <property name="top_attach">1</property>
-                          </packing>
-                        </child>
-                        <child>
-                          <object class="GtkSwitch" id="update_killswitch_switch">
-                            <property name="visible">True</property>
-                            <property name="can_focus">True</property>
-                            <property name="halign">end</property>
-                            <property name="valign">center</property>
-                            <signal name="state-set" handler="update_killswitch_switch_changed" swapped="no"/>
-                          </object>
-                          <packing>
-                            <property name="left_attach">1</property>
-                            <property name="top_attach">0</property>
                           </packing>
                         </child>
                         <child>
@@ -1572,7 +1628,12 @@ Author: Alexandru Cheltuitor
                             <property name="can_focus">True</property>
                             <property name="halign">end</property>
                             <property name="valign">center</property>
+                            <property name="margin_top">4</property>
+                            <property name="margin_bottom">4</property>
                             <signal name="state-set" handler="split_tunneling_switch_changed" swapped="no"/>
+                            <style>
+                              <class name="default_style_switch"/>
+                            </style>
                           </object>
                           <packing>
                             <property name="left_attach">1</property>
@@ -1585,21 +1646,6 @@ Author: Alexandru Cheltuitor
                             <property name="row_spacing">10</property>
                             <property name="column_homogeneous">True</property>
                             <child>
-                              <object class="GtkTextView" id="split_tunneling_textview">
-                                <property name="visible">True</property>
-                                <property name="can_focus">True</property>
-                                <property name="hexpand">True</property>
-                                <property name="vexpand">True</property>
-                                <style>
-                                  <class name="split_tunnling_list"/>
-                                </style>
-                              </object>
-                              <packing>
-                                <property name="left_attach">1</property>
-                                <property name="top_attach">3</property>
-                              </packing>
-                            </child>
-                            <child>
                               <object class="GtkLabel">
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
@@ -1611,17 +1657,31 @@ Author: Alexandru Cheltuitor
                               </object>
                               <packing>
                                 <property name="left_attach">1</property>
-                                <property name="top_attach">2</property>
+                                <property name="top_attach">0</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <object class="GtkTextView" id="split_tunneling_textview">
+                                <property name="height_request">200</property>
+                                <property name="visible">True</property>
+                                <property name="can_focus">True</property>
+                                <property name="wrap_mode">word</property>
+                                <property name="monospace">True</property>
+                                <style>
+                                  <class name="split_tunnling_list"/>
+                                </style>
+                              </object>
+                              <packing>
+                                <property name="left_attach">1</property>
+                                <property name="top_attach">1</property>
                               </packing>
                             </child>
                             <child>
                               <object class="GtkButton" id="update_split_tunneling_button">
-                                <property name="width_request">150</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">True</property>
                                 <property name="halign">end</property>
-                                <property name="valign">end</property>
                                 <signal name="clicked" handler="update_split_tunneling_button_clicked" swapped="no"/>
                                 <child>
                                   <object class="GtkLabel">
@@ -1631,25 +1691,13 @@ Author: Alexandru Cheltuitor
                                   </object>
                                 </child>
                                 <style>
-                                  <class name="initialize_profile_btn"/>
+                                  <class name="default_style_btn"/>
                                 </style>
                               </object>
                               <packing>
                                 <property name="left_attach">1</property>
-                                <property name="top_attach">4</property>
+                                <property name="top_attach">2</property>
                               </packing>
-                            </child>
-                            <child>
-                              <placeholder/>
-                            </child>
-                            <child>
-                              <placeholder/>
-                            </child>
-                            <child>
-                              <placeholder/>
-                            </child>
-                            <child>
-                              <placeholder/>
                             </child>
                             <child>
                               <placeholder/>
@@ -1668,8 +1716,7 @@ Author: Alexandru Cheltuitor
                           </packing>
                         </child>
                         <style>
-                          <class name="default_background"/>
-                          <class name="settings_notebook_grid"/>
+                          <class name="default_notebook_grid_content"/>
                         </style>
                       </object>
                       <packing>
@@ -1677,7 +1724,7 @@ Author: Alexandru Cheltuitor
                       </packing>
                     </child>
                     <child type="tab">
-                      <object class="GtkLabel" id="account_tab_label">
+                      <object class="GtkLabel" id="advanced_tab_label">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="hexpand">True</property>
@@ -1688,7 +1735,6 @@ Author: Alexandru Cheltuitor
                         </attributes>
                         <style>
                           <class name="default_settings_tab_conf"/>
-                          <class name="settings_right_tab"/>
                           <class name="inactive_tab"/>
                         </style>
                       </object>
@@ -1699,7 +1745,7 @@ Author: Alexandru Cheltuitor
                       </packing>
                     </child>
                     <style>
-                      <class name="default_background"/>
+                      <class name="settings_notebook_style"/>
                     </style>
                   </object>
                   <packing>
@@ -1716,6 +1762,9 @@ Author: Alexandru Cheltuitor
             </child>
           </object>
         </child>
+        <style>
+          <class name="remove_borders"/>
+        </style>
       </object>
     </child>
   </object>
@@ -1837,7 +1886,7 @@ Author: Alexandru Cheltuitor
                                 <property name="row_spacing">7</property>
                                 <property name="column_homogeneous">True</property>
                                 <child>
-                                  <object class="GtkButton">
+                                  <object class="GtkButton" id="delete_active_profile_button">
                                     <property name="label" translatable="yes">Delete Profile</property>
                                     <property name="visible">True</property>
                                     <property name="can_focus">True</property>
@@ -1846,9 +1895,9 @@ Author: Alexandru Cheltuitor
                                     <property name="valign">center</property>
                                     <property name="image">gtk-delete-profile</property>
                                     <property name="relief">none</property>
-                                    <property name="always_show_image">True</property>
+                                    <signal name="clicked" handler="delete_active_profile_button_clicked" swapped="no"/>
                                     <style>
-                                      <class name="white_text"/>
+                                      <class name="delete_active_profile_btn"/>
                                     </style>
                                   </object>
                                   <packing>
@@ -1894,7 +1943,7 @@ Author: Alexandru Cheltuitor
                                       </object>
                                     </child>
                                     <style>
-                                      <class name="initialize_profile_btn"/>
+                                      <class name="main_connect_btn"/>
                                     </style>
                                   </object>
                                   <packing>
@@ -2106,6 +2155,7 @@ Author: Alexandru Cheltuitor
                             <property name="width_request">450</property>
                             <property name="height_request">300</property>
                             <property name="visible">True</property>
+                            <property name="app_paintable">True</property>
                             <property name="can_focus">True</property>
                             <property name="has_focus">True</property>
                             <property name="is_focus">True</property>
@@ -2121,7 +2171,6 @@ Author: Alexandru Cheltuitor
                                 <property name="can_focus">False</property>
                                 <property name="vexpand">True</property>
                                 <property name="orientation">vertical</property>
-                                <property name="spacing">15</property>
                                 <child>
                                   <object class="GtkGrid">
                                     <property name="visible">True</property>
@@ -2151,6 +2200,9 @@ Author: Alexandru Cheltuitor
                                         <property name="valign">center</property>
                                         <property name="margin_right">15</property>
                                         <signal name="state-set" handler="secure_core_switch_changed" swapped="no"/>
+                                        <style>
+                                          <class name="default_style_switch"/>
+                                        </style>
                                       </object>
                                       <packing>
                                         <property name="left_attach">0</property>
@@ -2160,6 +2212,8 @@ Author: Alexandru Cheltuitor
                                     <style>
                                       <class name="default_background"/>
                                       <class name="countries_content_style"/>
+                                      <class name="bottom_border"/>
+                                      <class name="remove_borders"/>
                                     </style>
                                   </object>
                                   <packing>
@@ -2177,8 +2231,8 @@ Author: Alexandru Cheltuitor
                                     <property name="placeholder_text" translatable="yes">Search for country or server</property>
                                     <signal name="key-release-event" handler="server_filter_input_key_release" swapped="no"/>
                                     <style>
-                                      <class name="default_background"/>
                                       <class name="countries_content_style"/>
+                                      <class name="default_style_entry"/>
                                     </style>
                                   </object>
                                   <packing>
@@ -2301,6 +2355,7 @@ Author: Alexandru Cheltuitor
                                     <style>
                                       <class name="countries_content_style"/>
                                       <class name="default_background"/>
+                                      <class name="remove_borders"/>
                                     </style>
                                   </object>
                                   <packing>
@@ -2332,13 +2387,13 @@ Author: Alexandru Cheltuitor
                                 </attributes>
                                 <style>
                                   <class name="default_main_tab_conf"/>
-                                  <class name="left_tab"/>
+                                  <class name="dashboard_left_tab"/>
                                   <class name="active_tab"/>
+                                  <class name="remove_borders"/>
                                 </style>
                               </object>
                               <packing>
                                 <property name="tab_expand">True</property>
-                                <property name="tab_fill">False</property>
                               </packing>
                             </child>
                             <child>
@@ -2346,51 +2401,140 @@ Author: Alexandru Cheltuitor
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
                                 <property name="orientation">vertical</property>
-                                <property name="spacing">5</property>
+                                <property name="spacing">50</property>
                                 <child>
-                                  <object class="GtkButton">
+                                  <object class="GtkScrolledWindow">
                                     <property name="visible">True</property>
                                     <property name="can_focus">True</property>
-                                    <property name="receives_default">True</property>
-                                    <signal name="clicked" handler="quick_connect_button_clicked" swapped="no"/>
+                                    <property name="shadow_type">in</property>
+                                    <property name="max_content_height">300</property>
+                                    <property name="propagate_natural_height">True</property>
                                     <child>
-                                      <object class="GtkGrid">
+                                      <object class="GtkViewport">
                                         <property name="visible">True</property>
                                         <property name="can_focus">False</property>
                                         <child>
-                                          <object class="GtkLabel">
+                                          <object class="GtkBox">
                                             <property name="visible">True</property>
                                             <property name="can_focus">False</property>
-                                            <property name="margin_left">10</property>
-                                            <property name="label" translatable="yes">Fastest</property>
-                                            <attributes>
-                                              <attribute name="size" value="15000"/>
-                                            </attributes>
+                                            <property name="orientation">vertical</property>
+                                            <property name="homogeneous">True</property>
+                                            <child>
+                                              <object class="GtkButton">
+                                                <property name="visible">True</property>
+                                                <property name="can_focus">True</property>
+                                                <property name="focus_on_click">False</property>
+                                                <property name="receives_default">True</property>
+                                                <signal name="clicked" handler="quick_connect_button_clicked" swapped="no"/>
+                                                <child>
+                                                  <object class="GtkGrid">
+                                                    <property name="visible">True</property>
+                                                    <property name="can_focus">False</property>
+                                                    <child>
+                                                      <object class="GtkLabel">
+                                                        <property name="visible">True</property>
+                                                        <property name="can_focus">False</property>
+                                                        <property name="margin_left">10</property>
+                                                        <property name="label" translatable="yes">Fastest</property>
+                                                        <attributes>
+                                                          <attribute name="size" value="15000"/>
+                                                        </attributes>
+                                                      </object>
+                                                      <packing>
+                                                        <property name="left_attach">1</property>
+                                                        <property name="top_attach">0</property>
+                                                      </packing>
+                                                    </child>
+                                                    <child>
+                                                      <object class="GtkImage">
+                                                        <property name="visible">True</property>
+                                                        <property name="can_focus">False</property>
+                                                        <property name="pixbuf">img/utils/fastest.png</property>
+                                                      </object>
+                                                      <packing>
+                                                        <property name="left_attach">0</property>
+                                                        <property name="top_attach">0</property>
+                                                      </packing>
+                                                    </child>
+                                                  </object>
+                                                </child>
+                                                <style>
+                                                  <class name="white_text"/>
+                                                  <class name="profile_style_btn"/>
+                                                  <class name="remove_borders"/>
+                                                  <class name="bottom_border"/>
+                                                </style>
+                                              </object>
+                                              <packing>
+                                                <property name="expand">False</property>
+                                                <property name="fill">True</property>
+                                                <property name="position">0</property>
+                                              </packing>
+                                            </child>
+                                            <child>
+                                              <object class="GtkButton">
+                                                <property name="visible">True</property>
+                                                <property name="can_focus">True</property>
+                                                <property name="receives_default">True</property>
+                                                <signal name="clicked" handler="random_connect_button_clicked" swapped="no"/>
+                                                <child>
+                                                  <object class="GtkGrid">
+                                                    <property name="visible">True</property>
+                                                    <property name="can_focus">False</property>
+                                                    <child>
+                                                      <object class="GtkImage">
+                                                        <property name="visible">True</property>
+                                                        <property name="can_focus">False</property>
+                                                        <property name="pixbuf">img/utils/random.png</property>
+                                                      </object>
+                                                      <packing>
+                                                        <property name="left_attach">0</property>
+                                                        <property name="top_attach">0</property>
+                                                      </packing>
+                                                    </child>
+                                                    <child>
+                                                      <object class="GtkLabel">
+                                                        <property name="visible">True</property>
+                                                        <property name="can_focus">False</property>
+                                                        <property name="margin_left">10</property>
+                                                        <property name="label" translatable="yes">Random</property>
+                                                        <attributes>
+                                                          <attribute name="size" value="15000"/>
+                                                        </attributes>
+                                                      </object>
+                                                      <packing>
+                                                        <property name="left_attach">1</property>
+                                                        <property name="top_attach">0</property>
+                                                      </packing>
+                                                    </child>
+                                                  </object>
+                                                </child>
+                                                <style>
+                                                  <class name="profile_style_btn"/>
+                                                  <class name="white_text"/>
+                                                  <class name="remove_borders"/>
+                                                  <class name="bottom_border"/>
+                                                </style>
+                                              </object>
+                                              <packing>
+                                                <property name="expand">False</property>
+                                                <property name="fill">True</property>
+                                                <property name="position">1</property>
+                                              </packing>
+                                            </child>
+                                            <child>
+                                              <placeholder/>
+                                            </child>
                                           </object>
-                                          <packing>
-                                            <property name="left_attach">1</property>
-                                            <property name="top_attach">0</property>
-                                          </packing>
-                                        </child>
-                                        <child>
-                                          <object class="GtkImage">
-                                            <property name="visible">True</property>
-                                            <property name="can_focus">False</property>
-                                            <property name="pixbuf">img/utils/fastest.png</property>
-                                          </object>
-                                          <packing>
-                                            <property name="left_attach">0</property>
-                                            <property name="top_attach">0</property>
-                                          </packing>
                                         </child>
                                         <style>
-                                          <class name="profile_buttons"/>
+                                          <class name="default_background"/>
                                         </style>
                                       </object>
                                     </child>
                                     <style>
-                                      <class name="profile_buttons"/>
-                                      <class name="white_text"/>
+                                      <class name="default_background"/>
+                                      <class name="remove_borders"/>
                                     </style>
                                   </object>
                                   <packing>
@@ -2400,79 +2544,44 @@ Author: Alexandru Cheltuitor
                                   </packing>
                                 </child>
                                 <child>
-                                  <object class="GtkButton">
+                                  <object class="GtkBox">
                                     <property name="visible">True</property>
-                                    <property name="can_focus">True</property>
-                                    <property name="receives_default">True</property>
-                                    <signal name="clicked" handler="random_connect_button_clicked" swapped="no"/>
+                                    <property name="can_focus">False</property>
+                                    <property name="orientation">vertical</property>
                                     <child>
-                                      <object class="GtkGrid">
+                                      <object class="GtkButton" id="manage_profiles_button">
                                         <property name="visible">True</property>
-                                        <property name="can_focus">False</property>
-                                        <child>
-                                          <object class="GtkImage">
-                                            <property name="visible">True</property>
-                                            <property name="can_focus">False</property>
-                                            <property name="pixbuf">img/utils/random.png</property>
-                                          </object>
-                                          <packing>
-                                            <property name="left_attach">0</property>
-                                            <property name="top_attach">0</property>
-                                          </packing>
-                                        </child>
+                                        <property name="can_focus">True</property>
+                                        <property name="receives_default">True</property>
+                                        <property name="margin_left">50</property>
+                                        <property name="margin_right">50</property>
+                                        <signal name="clicked" handler="manage_profiles_button_clicked" swapped="no"/>
                                         <child>
                                           <object class="GtkLabel">
                                             <property name="visible">True</property>
                                             <property name="can_focus">False</property>
-                                            <property name="margin_left">10</property>
-                                            <property name="label" translatable="yes">Random</property>
+                                            <property name="label" translatable="yes">Manage Profiles</property>
                                             <attributes>
-                                              <attribute name="size" value="15000"/>
+                                              <attribute name="size" value="12000"/>
                                             </attributes>
                                           </object>
-                                          <packing>
-                                            <property name="left_attach">1</property>
-                                            <property name="top_attach">0</property>
-                                          </packing>
                                         </child>
                                         <style>
-                                          <class name="profile_buttons"/>
+                                          <class name="default_style_btn"/>
                                         </style>
                                       </object>
+                                      <packing>
+                                        <property name="expand">False</property>
+                                        <property name="fill">True</property>
+                                        <property name="position">0</property>
+                                      </packing>
                                     </child>
-                                    <style>
-                                      <class name="profile_buttons"/>
-                                    </style>
                                   </object>
                                   <packing>
                                     <property name="expand">False</property>
                                     <property name="fill">True</property>
                                     <property name="position">1</property>
                                   </packing>
-                                </child>
-                                <child>
-                                  <placeholder/>
-                                </child>
-                                <child>
-                                  <placeholder/>
-                                </child>
-                                <child>
-                                  <placeholder/>
-                                </child>
-                                <child>
-                                  <placeholder/>
-                                </child>
-                                <child>
-                                  <placeholder/>
-                                </child>
-                                <child>
-                                  <placeholder/>
-                                </child>
-                                <child>
-                                  <placeholder/>
-                                </child>
-                                <child>
-                                  <placeholder/>
                                 </child>
                                 <style>
                                   <class name="default_background"/>
@@ -2501,19 +2610,17 @@ Author: Alexandru Cheltuitor
                                 </attributes>
                                 <style>
                                   <class name="default_main_tab_conf"/>
-                                  <class name="right_tab"/>
+                                  <class name="dashboard_right_tab"/>
                                   <class name="inactive_tab"/>
                                 </style>
                               </object>
                               <packing>
                                 <property name="position">1</property>
                                 <property name="tab_expand">True</property>
-                                <property name="tab_fill">False</property>
                               </packing>
                             </child>
                             <style>
-                              <class name="overlay_background"/>
-                              <class name="banner_shadow"/>
+                              <class name="dashboard_notebook_style"/>
                             </style>
                           </object>
                           <packing>
@@ -2521,14 +2628,8 @@ Author: Alexandru Cheltuitor
                             <property name="top_attach">1</property>
                           </packing>
                         </child>
-                        <style>
-                          <class name="overlay_background"/>
-                        </style>
                       </object>
                     </child>
-                    <style>
-                      <class name="default_background"/>
-                    </style>
                   </object>
                   <packing>
                     <property name="left_attach">0</property>
@@ -2564,6 +2665,7 @@ Author: Alexandru Cheltuitor
                         <property name="always_show_image">True</property>
                         <style>
                           <class name="overlay_background"/>
+                          <class name="remove_borders"/>
                         </style>
                       </object>
                     </child>
@@ -2665,17 +2767,20 @@ Author: Alexandru Cheltuitor
                             <style>
                               <class name="default_background"/>
                               <class name="white_text"/>
+                              <class name="remove_borders"/>
                             </style>
                           </object>
                         </child>
                         <style>
                           <class name="overlay_background"/>
                           <class name="white_text"/>
+                          <class name="remove_borders"/>
                         </style>
                       </object>
                     </child>
                     <style>
                       <class name="overlay_background"/>
+                      <class name="remove_borders"/>
                     </style>
                   </object>
                   <packing>
@@ -2684,18 +2789,12 @@ Author: Alexandru Cheltuitor
                     <property name="width">4</property>
                   </packing>
                 </child>
-                <style>
-                  <class name="default_background"/>
-                </style>
               </object>
             </child>
-            <style>
-              <class name="default_background"/>
-            </style>
           </object>
         </child>
         <style>
-          <class name="default_background"/>
+          <class name="remove_borders"/>
         </style>
       </object>
     </child>
