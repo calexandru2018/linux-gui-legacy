@@ -459,13 +459,17 @@ def update_labels(interface, servers, is_connected, connected_server, disconnect
     country_server = country_cc
 
     if is_connected:
-        country_server = country_server + " >> " + connected_server
+        try:
+            country_server = country_server + " >> " + connected_server
+        except TypeError: 
+            country_server = country_server + " >> "
+
         protonvpn_sign_green.show()
 
     # Get and set server name
     connected_server = connected_server if connected_server and is_connected else ""
 
-    country_label.set_markup(country_server)
+    country_label.set_markup(country_server if country_server else "")
     ip_label.set_markup(ip)
 
     isp_label.set_markup(isp)
