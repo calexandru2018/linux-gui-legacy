@@ -69,8 +69,8 @@ Protonvpn-linux-gui works on top of <a href="https://github.com/ProtonVPN/proton
 
 #### Python dependencies
 - python >= 3.5
-- requests == 2.23.0
-- configparse == 4.0.2
+- requests >= 2.23.0
+- configparse >= 4.0.2
 - pip for python3 (pip3)
 - <a href="https://github.com/ProtonVPN/protonvpn-cli-ng"><b>protonvpn-cli-ng</b></a> == 2.2.2
 - setuptools for python3 (python3-setuptools)
