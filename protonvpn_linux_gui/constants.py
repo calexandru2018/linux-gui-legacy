@@ -6,6 +6,7 @@ except:
     USER = '/home'
 
 VERSION = "2.0.3"
+
 GITHUB_URL_RELEASE = "https://github.com/calexandru2018/protonvpn-linux-gui/releases/latest"
 
 # GUI configurations
