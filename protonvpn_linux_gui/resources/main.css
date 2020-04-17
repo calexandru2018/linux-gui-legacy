@@ -2,6 +2,10 @@
 @define-color overlay_color rgba(52, 58, 63, 1);
 @define-color def_green_color rgb(86, 179, 102);
 
+label selection{
+    background-color: @def_green_color;
+}
+
 .default_background{
     background-color: @def_bg_color;
     color: white;
@@ -25,60 +29,123 @@
     color: white;
 }
 
-.default_style_btn, .suggested-action{
+.default_style_switch{
+    background-color: @overlay_color;
+    border-color: @overlay_color;
+}
+
+.default_style_switch slider{
+	border: transparent;
+}
+
+.default_style_switch:checked{
+    background-color: @def_green_color;
+    border-color: @def_green_color;
+}
+
+.default_style_btn{
+    -gtk-icon-effect: none;
+    -gtk-icon-source: none;
+    outline: none;
+    box-shadow: none;
+    background-image: none;
+    text-shadow: none;
     background-color: @def_bg_color;
     color: white;
     padding: 10px 50px;
-    border-style: solid;
-    border-width: 2px;
+    border: 2px solid white;
     border-radius: 20px;
     transition: all .115s ease-in-out;
 }
 
 .main_connect_btn{
-    background-color: transparent;
+    -gtk-icon-effect: none;
+    -gtk-icon-source: none;
+    outline: none;
+    box-shadow: none;
+    background-image: none;
+    text-shadow: none;
     color: white;
+    background-color: transparent;
+    border: 2px solid white;
     padding: 10px 50px;
-    border-style: solid;
-    border-width: 2px;
     border-radius: 20px;
-    transition: all 5s ease-in-out;
+    transition: all .115s ease-in-out;
 }
 
-.default_style_btn:hover, .main_connect_button:hover, .suggested-action:hover {
-    border-color: transparent;
+.delete_active_profile_btn{
+    -gtk-icon-effect: none;
+    -gtk-icon-source: none;
+    outline: none;
+    box-shadow: none;
+    background-image: none;
+    text-shadow: none;
+    color: white;
+    background-color: transparent;
+    border: none;
+    border-radius: 5px;
+    transition: all .115s ease-in-out;
+}   
+
+.default_style_btn:hover, .main_connect_btn:hover, .delete_active_profile_btn:hover{
+    -gtk-icon-effect: none;
+    -gtk-icon-source: none;
+    outline: none;
+    box-shadow: none;
+    background-image: none;
+    text-shadow: none;
+
+    border-color: @def_green_color;
     background-color: @def_green_color;
 }
 
 /* Dashboard notebook style*/
+notebook.dashboard_notebook_style{
+	outline:none;
+}
+
+notebook.dashboard_notebook_style header{
+	outline:none;
+	padding: 0;
+    -gtk-icon-source: none;
+    background-color: @overlay_color;
+    border: none;
+}
+
+notebook.dashboard_notebook_style tabs{
+	outline:none;
+	padding: 0;
+    margin: 0;
+    border-bottom: 1px solid rgba(255,255,255, 0.3);
+    border: none;
+}
 notebook.dashboard_notebook_style tab{
-    background-color: rgba(55, 61, 66, 1);
-    outline: none;
+    outline:none;
     border-color: transparent;
     box-shadow: none;
+	padding: 0;
+    margin: 0;
     transition: all .115s ease-in-out;
-    margin-left: -15px;
-    margin-right: -15px;
+    border: none;
 }
 
 .default_main_tab_conf{
+    outline:none;
+    border: none;
+    box-shadow: none;
     padding: 20px 70px;
     color: white;
-    margin-top: -6px;
-    margin-bottom: -6px;
     transition: all .115s ease-in-out;
 }
 
 .dashboard_left_tab{
     border-top-right-radius: 80px;
-    margin-left: -20px;
-    margin-right: -25px;
+    margin-right: -10px;
 
 }
 .dashboard_right_tab{
     border-top-left-radius: 80px;
-    margin-left: -20px;
-    margin-right: -20px;
+    margin-left: -10px;
 }
 /* Dashboard notebook style*/
 
@@ -105,14 +172,21 @@ notebook.dashboard_notebook_style tab{
     padding: 20px;
 }
 
-.profile_buttons{
+.profile_style_btn{
+    -gtk-icon-effect: none;
+    -gtk-icon-source: none;
+    outline: none;
+    box-shadow: none;
+    background-image: none;
+    text-shadow: none;
+
     padding: 5px 5px;
     background-color: transparent;
     border: none;
     border-radius: 0;
     transition: all .115s ease-in;
 }
-.profile_buttons:hover{
+.profile_style_btn:hover{
     color: @def_green_color;
     padding-left: 15px;
     /* border: none; */
@@ -123,17 +197,43 @@ notebook.dashboard_notebook_style tab{
     border: none;
 }
 
-.server_list_bakground_row_selected{
-    background-color: black;
+.default_style_combobox{
+    -gtk-icon-effect: none;
+    -gtk-icon-source: none;
+    background-image: none;
+    text-shadow: none;
+    outline: none;
+    border-image-width: 0;
+    border: none;
 }
-
-.combobox_style{
+.default_style_combobox button{
+    -gtk-icon-effect: none;
+    -gtk-icon-source: none;
+    background-image: none;
+    text-shadow: none;
+    box-shadow: none;
+    outline: none;
+    border-image-width: 0;
     background-color: @def_bg_color;
     color: white;
-    caret-color: white;
+    border-radius: 0;
 }
 
-.server_list_bakground_row:hover, .menu_list_hover:hover, .combobox_style:hover{
+.default_style_combobox button box arrow{
+    color: white;
+}
+
+.default_style_combobox button:focus{
+    -gtk-icon-effect: none;
+    -gtk-icon-source: none;
+}
+
+.default_style_combobox window menu{
+    background-color: @def_bg_color;
+	color:white;
+}
+
+.server_list_bakground_row:hover, .menu_list_hover:hover, .default_style_combobox window menu menuitem:hover{
     background-color: @def_green_color;
 }
 
@@ -143,10 +243,6 @@ notebook.dashboard_notebook_style tab{
 
 .bottom_border{
     border-bottom: 1px solid rgba(255,255,255, 0.3);
-}
-
-.padding{
-    padding: 0.5px 0px;
 }
 
 /* Entry default style */
@@ -186,15 +282,28 @@ entry.default_style_entry:focus{
 }
 
 /* Settings notebook style*/
+notebook.settings_notebook_style{
+	outline:none;
+}
+
+notebook.settings_notebook_style header{
+	outline:none;
+	padding: 0;
+    -gtk-icon-source: none;
+    background-color: transparent;
+    border: none;
+}
+
+notebook.settings_notebook_style tabs{
+	outline:none;
+	padding: 0;
+	margin: 0;
+}
 notebook.settings_notebook_style tab{
-    /* background-color: @overlay_color; */
-    background-color: rgba(55, 61, 66, 1);
-    outline: none;
-    border-color: inherit;
-    box-shadow: none;
+	outline:none;
+	padding: 0;
+    margin: 0;
     transition: all .115s ease-in-out;
-    margin-left: -15px;
-    margin-right: -15px;
 }
 
 .default_notebook_grid_content{
@@ -206,9 +315,6 @@ notebook.settings_notebook_style tab{
 
 .default_settings_tab_conf{
     padding: 15px 40px;
-    /* background-color: transparent; */
-    margin-top: -6px;
-    margin-bottom: -6px;
     transition: all .115s ease-in-out;
 }
 
