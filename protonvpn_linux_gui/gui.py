@@ -727,7 +727,17 @@ class Handler:
             thread.start()
 
             self.messagedialog_window.show()
-            
+    
+    def manage_profiles_button_clicked(self, button):
+        self.messagedialog_sub_label.hide()        
+        self.messagedialog_label.set_markup("This feature is not yet implemented.")
+        self.messagedialog_window.show()    
+        
+    def delete_active_profile_button_clicked(self, button):
+        self.messagedialog_sub_label.hide()        
+        self.messagedialog_label.set_markup("This feature is not yet implemented.")
+        self.messagedialog_window.show()
+
 def initialize_gui():
     """Initializes the GUI 
     ---
