@@ -208,7 +208,7 @@ class Handler:
 
         gui_logger.debug(">>> Starting \"disconnect\" thread.")
 
-        thread = Thread(target=disconnect, args=[self.interface, self.messagedialog_label, self.messagedialog_spinner])
+        thread = Thread(target=disconnect, args=[{"interface":self.interface, "messagedialog_label":self.messagedialog_label, "messagedialog_spinner":self.messagedialog_spinner}])
         thread.daemon = True
         thread.start()
 
