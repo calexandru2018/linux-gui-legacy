@@ -609,12 +609,11 @@ def load_advanced_settings(interface):
     dns_leak_protection = get_config_value("USER", "dns_leak_protection")
     custom_dns = get_config_value("USER", "custom_dns")
     killswitch = get_config_value("USER", "killswitch")
-    split_tunnel = 0
 
     try:
         split_tunnel = get_config_value("USER", "split_tunnel")
     except KeyError:
-        pass
+        split_tunnel = '0'
 
     # Object
     dns_leak_switch = interface.get_object("update_dns_leak_switch")

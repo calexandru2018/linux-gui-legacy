@@ -662,7 +662,11 @@ class Handler:
 
     def split_tunneling_switch_changed(self, object, state):
         split_tunnel_grid = self.interface.get_object("split_tunneling_grid") 
-        split_tunnel = get_config_value("USER", "split_tunnel")
+        try:
+            split_tunnel = get_config_value("USER", "split_tunnel")
+        except KeyError:
+            gui_logger.debug("[!] Split tunneling has not been configured.")
+            split_tunnel = 0
         
         if split_tunnel == "0":
             update_to = "1"
@@ -672,7 +676,6 @@ class Handler:
         if state:
             split_tunnel_grid.show()
         else:
-
             split_tunnel_grid.hide()
 
         if (state and split_tunnel == "0") or (not state and split_tunnel != "0"):
