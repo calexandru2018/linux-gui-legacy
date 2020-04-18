@@ -2,6 +2,13 @@
 @define-color overlay_color rgba(52, 58, 63, 1);
 @define-color def_green_color rgb(86, 179, 102);
 
+.login_links link{
+    color: @def_green_color;
+}
+.login_links link:hover{
+    color: rgb(255,255,255);
+}
+
 label, entry{
     text-shadow: none;
 }
