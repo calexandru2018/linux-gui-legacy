@@ -44,8 +44,11 @@ Protonvpn-linux-gui works on top of <a href="https://github.com/ProtonVPN/proton
   - [Dependencies](#dependencies)
     - [Python dependencies](#python-dependencies)
     - [ProtonVPN GUI dependencies](#protonvpn-gui-dependencies)
+      - [Known Issues](#gui-known-issues)   
+        - [Wayland](#wayland)  
     - [ProtonVPN Tray dependencies](#protonvpn-tray-dependencies)
-      - [Known Issue](#known-issue)
+      - [Known Issues](#tray-known-issues)
+        - [dbus-launch](#dbus-launch)
   - [Installing protonvpn-linux-gui](#installing-protonvpn-linux-gui)
     - [Distribution based](#distribution-based)
     - [PIP based](#pip-based)
@@ -72,7 +75,7 @@ Protonvpn-linux-gui works on top of <a href="https://github.com/ProtonVPN/proton
 - requests >= 2.23.0
 - configparse >= 4.0.2
 - pip for python3 (pip3)
-- <a href="https://github.com/ProtonVPN/protonvpn-cli-ng"><b>protonvpn-cli-ng</b></a> == 2.2.2
+- <a href="https://github.com/ProtonVPN/protonvpn-cli-ng"><b>protonvpn-cli-ng</b></a> >= 2.2.2
 - setuptools for python3 (python3-setuptools)
 
 
@@ -84,6 +87,18 @@ Protonvpn-linux-gui works on top of <a href="https://github.com/ProtonVPN/proton
 |Ubuntu/Linux Mint/Debian and derivatives | `sudo apt install -y python3-gi python3-gi-cairo gir1.2-gtk-3.0`                                                |
 |OpenSUSE/SLES                            | `sudo zypper install python3-gobject python3-gobject-Gdk typelib-1_0-Gtk-3_0 libgtk-3-0`                        |
 |Arch Linux/Manjaro                       | `sudo pacman -S python-gobject gtk3`                                                                            |
+
+### GUI Known issues:
+
+#### Wayland
+While this works well on X11, there are certain restrictions on Wayland since it does not allow GUIs to be launched as root. The way the GUI works at the moment is that it accesses much of the content that the CLI protects with sudo, thus starting with sudo lowers the UX friction, though this is subject to change. More info [here](https://wiki.archlinux.org/index.php/Running_GUI_applications_as_root#Using_xhost) and [here](https://beamtic.com/sudo-and-guis).
+
+Workaround is provied:
+1. Install `xhost` or `x11-xserver-utils`
+2. Type in terminal `xhost si:localuser:root`
+3. Type in terminal `sudo protonvpn-gui`
+
+
 
 #### ProtonVPN Tray dependencies
 
@@ -97,7 +112,8 @@ Protonvpn-linux-gui works on top of <a href="https://github.com/ProtonVPN/proton
 **NOTE:**
 Gnome users will to install and additional extension for this to work: <a href="https://extensions.gnome.org/extension/615/appindicator-support/"> KStatusNotifierItem/AppIndicator Support</a>
 
-### Known issue:
+### Tray Known issues:
+#### dbus-launch
 There is a known issue when user attempts to start the systray/appindicator. This might throw an error that is simillar to this one: `(<app-name>:<pid>) LIBDBUSMENU-GLIB-WARNING **: Unable to get session bus: Failed to execute child process "dbus-launch" (No such file or directory)` if a user does not have a specific package installed. If you are unable to use the systray/appindicator and have a simillar error then a solution is provided below.
 
 **Solution:**
