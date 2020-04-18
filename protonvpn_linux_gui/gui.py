@@ -662,7 +662,11 @@ class Handler:
 
     def split_tunneling_switch_changed(self, object, state):
         split_tunnel_grid = self.interface.get_object("split_tunneling_grid") 
-        split_tunnel = get_config_value("USER", "split_tunnel")
+        try:
+            split_tunnel = get_config_value("USER", "split_tunnel")
+        except KeyError:
+            gui_logger.debug("[!] Split tunneling has not been configured.")
+            split_tunnel = 0
         
         if split_tunnel == "0":
             update_to = "1"
@@ -672,7 +676,6 @@ class Handler:
         if state:
             split_tunnel_grid.show()
         else:
-
             split_tunnel_grid.hide()
 
         if (state and split_tunnel == "0") or (not state and split_tunnel != "0"):
@@ -738,6 +741,10 @@ class Handler:
         self.messagedialog_sub_label.hide()        
         self.messagedialog_label.set_markup("This feature is not yet implemented.")
         self.messagedialog_window.show()
+
+    def need_help_link_activate(self, object, link):
+        popover = self.interface.get_object("login_window_popover")
+        popover.show()
 
 def initialize_gui():
     """Initializes the GUI 
@@ -843,6 +850,8 @@ def initialize_gui():
         if not os.path.isfile(CONFIG_FILE):   
             gui_logger.debug(">>> Loading LoginWindow")
             window = interface.get_object("LoginWindow")
+            version_label = interface.get_object("login_window_version_label")
+            version_label.set_markup("v.{}".format(VERSION))
             dashboard = interface.get_object("DashboardWindow")
             dashboard.connect("destroy", Gtk.main_quit)
         else:

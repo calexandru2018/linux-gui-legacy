@@ -1,5 +1,5 @@
 # Call with pip install -r requirements.txt
-requests==2.23.0
+requests>=2.23.0
 protonvpn-cli==2.2.2
-configparser==4.0.2
+configparser>=4.0.2
 

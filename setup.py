@@ -1,19 +1,23 @@
 """setup.py: setuptools control."""
-
-
 import re
+import os
 from setuptools import setup
 
 from protonvpn_linux_gui.constants import VERSION
 
+try:
+    with open(os.path.join(os.path.abspath(os.path.dirname(__file__)), 'README.md'), encoding='utf-8') as f:
+        long_descr = '\n' + f.read()
+except FileNotFoundError:
+    long_descr = """
+    The Unofficial Linux GUI for ProtonVPN.
 
-long_descr = """
-The Unofficial Linux GUI for ProtonVPN.
+    For further information and a usage guide, please view the project page:
 
-For further information and a usage guide, please view the project page:
+    https://github.com/calexandru2018/protonvpn-linux-gui
+    """
 
-https://github.com/calexandru2018/protonvpn-linux-gui
-"""
+
 
 setup(
     name="protonvpn-linux-gui-calexandru2018",
@@ -37,12 +41,13 @@ setup(
     description="Unofficial Linux GUI client for ProtonVPN",
     long_description=long_descr,
     author="calexandru2018",
+    EMAIL="acrandom@pm.me",
     license="GPLv3",
     url="https://github.com/calexandru2018/protonvpn-linux-gui",
     install_requires=[
-        "protonvpn-cli==2.2.2",
-        "requests==2.23.0",
-        "configparser==4.0.2"
+        "protonvpn-cli>=2.2.2",
+        "requests>=2.23.0",
+        "configparser>=4.0.2"
     ],
     python_requires=">=3.5",
     classifiers=[

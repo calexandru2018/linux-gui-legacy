@@ -244,8 +244,8 @@ Author: Alexandru Cheltuitor
         <property name="can_focus">False</property>
         <property name="halign">center</property>
         <property name="valign">center</property>
-        <property name="margin_left">50</property>
-        <property name="margin_right">50</property>
+        <property name="margin_left">10</property>
+        <property name="margin_right">10</property>
         <property name="margin_top">10</property>
         <property name="margin_bottom">10</property>
         <property name="hexpand">True</property>
@@ -262,8 +262,8 @@ Author: Alexandru Cheltuitor
               <object class="GtkImage">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="margin_top">30</property>
-                <property name="margin_bottom">40</property>
+                <property name="margin_top">40</property>
+                <property name="margin_bottom">50</property>
                 <property name="pixbuf">img/logo/protonvpn-logo-white.png</property>
               </object>
               <packing>
@@ -302,51 +302,8 @@ Author: Alexandru Cheltuitor
           <object class="GtkGrid">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-            <property name="margin_top">20</property>
-            <property name="margin_bottom">10</property>
-            <property name="row_homogeneous">True</property>
-            <property name="column_homogeneous">True</property>
-            <child>
-              <object class="GtkLabel">
-                <property name="can_focus">False</property>
-                <property name="halign">start</property>
-                <property name="label" translatable="yes">Start on Boot</property>
-                <attributes>
-                  <attribute name="weight" value="bold"/>
-                </attributes>
-              </object>
-              <packing>
-                <property name="left_attach">0</property>
-                <property name="top_attach">0</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkSwitch">
-                <property name="width_request">50</property>
-                <property name="can_focus">True</property>
-                <property name="halign">end</property>
-              </object>
-              <packing>
-                <property name="left_attach">3</property>
-                <property name="top_attach">0</property>
-              </packing>
-            </child>
-            <child>
-              <placeholder/>
-            </child>
-            <child>
-              <placeholder/>
-            </child>
-          </object>
-          <packing>
-            <property name="left_attach">0</property>
-            <property name="top_attach">4</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkGrid">
-            <property name="visible">True</property>
-            <property name="can_focus">False</property>
+            <property name="margin_left">40</property>
+            <property name="margin_right">40</property>
             <property name="margin_top">30</property>
             <property name="margin_bottom">20</property>
             <property name="row_homogeneous">True</property>
@@ -451,47 +408,42 @@ Author: Alexandru Cheltuitor
           </packing>
         </child>
         <child>
-          <object class="GtkGrid">
+          <object class="GtkEntry" id="username_field">
             <property name="visible">True</property>
-            <property name="can_focus">False</property>
-            <property name="margin_top">20</property>
-            <property name="margin_bottom">10</property>
-            <child>
-              <object class="GtkLabel">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="halign">start</property>
-                <property name="margin_top">10</property>
-                <property name="margin_bottom">10</property>
-                <property name="label" translatable="yes">ProtonVPN (OpenVPN/IKEv2) Password</property>
-                <attributes>
-                  <attribute name="weight" value="bold"/>
-                  <attribute name="size" value="12000"/>
-                </attributes>
-              </object>
-              <packing>
-                <property name="left_attach">0</property>
-                <property name="top_attach">0</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkEntry" id="password_field">
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="has_focus">True</property>
-                <property name="hexpand">True</property>
-                <property name="visibility">False</property>
-                <property name="has_frame">False</property>
-                <property name="invisible_char">*</property>
-                <style>
-                  <class name="default_style_entry"/>
-                </style>
-              </object>
-              <packing>
-                <property name="left_attach">0</property>
-                <property name="top_attach">1</property>
-              </packing>
-            </child>
+            <property name="can_focus">True</property>
+            <property name="has_focus">True</property>
+            <property name="margin_left">40</property>
+            <property name="margin_right">40</property>
+            <property name="margin_bottom">30</property>
+            <property name="hexpand">True</property>
+            <property name="has_frame">False</property>
+            <property name="invisible_char">*</property>
+            <property name="placeholder_text" translatable="yes">ProtonVPN (OpenVPN/IKEv2) Username</property>
+            <style>
+              <class name="default_style_entry"/>
+            </style>
+          </object>
+          <packing>
+            <property name="left_attach">0</property>
+            <property name="top_attach">1</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkEntry" id="password_field">
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="has_focus">True</property>
+            <property name="margin_left">40</property>
+            <property name="margin_right">40</property>
+            <property name="margin_bottom">20</property>
+            <property name="hexpand">True</property>
+            <property name="visibility">False</property>
+            <property name="has_frame">False</property>
+            <property name="invisible_char">*</property>
+            <property name="placeholder_text" translatable="yes">ProtonVPN (OpenVPN/IKEv2) Password</property>
+            <style>
+              <class name="default_style_entry"/>
+            </style>
           </object>
           <packing>
             <property name="left_attach">0</property>
@@ -502,65 +454,17 @@ Author: Alexandru Cheltuitor
           <object class="GtkGrid">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-            <child>
-              <object class="GtkLabel">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="halign">start</property>
-                <property name="margin_top">10</property>
-                <property name="margin_bottom">10</property>
-                <property name="label" translatable="yes">ProtonVPN (OpenVPN/IKEv2) Username</property>
-                <property name="justify">fill</property>
-                <attributes>
-                  <attribute name="weight" value="bold"/>
-                  <attribute name="size" value="12000"/>
-                </attributes>
-              </object>
-              <packing>
-                <property name="left_attach">0</property>
-                <property name="top_attach">0</property>
-                <property name="width">3</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkEntry" id="username_field">
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="has_focus">True</property>
-                <property name="hexpand">True</property>
-                <property name="has_frame">False</property>
-                <property name="invisible_char">*</property>
-                <style>
-                  <class name="default_style_entry"/>
-                </style>
-              </object>
-              <packing>
-                <property name="left_attach">0</property>
-                <property name="top_attach">1</property>
-                <property name="width">3</property>
-              </packing>
-            </child>
-          </object>
-          <packing>
-            <property name="left_attach">0</property>
-            <property name="top_attach">1</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkGrid">
-            <property name="visible">True</property>
-            <property name="can_focus">False</property>
             <property name="halign">center</property>
-            <property name="margin_top">50</property>
-            <property name="margin_bottom">30</property>
+            <property name="margin_left">40</property>
+            <property name="margin_right">40</property>
+            <property name="margin_top">40</property>
+            <property name="margin_bottom">40</property>
             <child>
               <object class="GtkButton" id="button">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
                 <property name="halign">center</property>
-                <property name="margin_top">10</property>
-                <property name="margin_bottom">10</property>
                 <property name="always_show_image">True</property>
                 <signal name="clicked" handler="on_login_button_clicked" swapped="no"/>
                 <child>
@@ -593,7 +497,67 @@ Author: Alexandru Cheltuitor
           </object>
           <packing>
             <property name="left_attach">0</property>
+            <property name="top_attach">4</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkGrid">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="margin_top">10</property>
+            <property name="margin_bottom">10</property>
+            <property name="column_homogeneous">True</property>
+            <child>
+              <object class="GtkLabel" id="need_help_link">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="label" translatable="yes">&lt;a href="#"&gt;Need Help?&lt;/a&gt;</property>
+                <property name="use_markup">True</property>
+                <signal name="activate-link" handler="need_help_link_activate" swapped="no"/>
+                <style>
+                  <class name="login_links"/>
+                </style>
+              </object>
+              <packing>
+                <property name="left_attach">1</property>
+                <property name="top_attach">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkLabel" id="create_account_link_label">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="label" translatable="yes">&lt;a href="https://account.protonvpn.com/signup"&gt;Create Account&lt;/a&gt;</property>
+                <property name="use_markup">True</property>
+                <property name="track_visited_links">False</property>
+                <style>
+                  <class name="login_links"/>
+                </style>
+              </object>
+              <packing>
+                <property name="left_attach">0</property>
+                <property name="top_attach">0</property>
+              </packing>
+            </child>
+          </object>
+          <packing>
+            <property name="left_attach">0</property>
             <property name="top_attach">5</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkLabel" id="login_window_version_label">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="halign">end</property>
+            <property name="label" translatable="yes">v.2.0.5</property>
+            <style>
+              <class name="login_version_label"/>
+            </style>
+          </object>
+          <packing>
+            <property name="left_attach">0</property>
+            <property name="top_attach">6</property>
           </packing>
         </child>
         <style>
@@ -603,6 +567,63 @@ Author: Alexandru Cheltuitor
     </child>
     <style>
       <class name="default_background"/>
+    </style>
+  </object>
+  <object class="GtkPopoverMenu" id="login_window_popover">
+    <property name="can_focus">False</property>
+    <property name="relative_to">need_help_link</property>
+    <child>
+      <object class="GtkBox">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="margin_left">10</property>
+        <property name="margin_right">10</property>
+        <property name="margin_top">10</property>
+        <property name="margin_bottom">10</property>
+        <property name="orientation">vertical</property>
+        <property name="spacing">15</property>
+        <child>
+          <object class="GtkLabel">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="halign">start</property>
+            <property name="label" translatable="yes">&lt;a href="https://account.protonvpn.com/reset-password"&gt;Reset Password&lt;/a&gt;</property>
+            <property name="use_markup">True</property>
+            <style>
+              <class name="login_links"/>
+            </style>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">0</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkLabel">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="halign">start</property>
+            <property name="label" translatable="yes">&lt;a href="https://account.protonvpn.com/forgot-username"&gt;Forgot Username&lt;/a&gt;</property>
+            <property name="use_markup">True</property>
+            <style>
+              <class name="login_links"/>
+            </style>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">2</property>
+          </packing>
+        </child>
+      </object>
+      <packing>
+        <property name="submenu">submenu1</property>
+        <property name="position">1</property>
+      </packing>
+    </child>
+    <style>
+      <class name="overlay_background"/>
     </style>
   </object>
   <object class="GtkDialog" id="MessageDialog">
@@ -2775,8 +2796,7 @@ Author: Alexandru Cheltuitor
                       </object>
                     </child>
                     <style>
-                      <class name="overlay_background"/>
-                      <class name="remove_borders"/>
+                      <class name="menu_bar"/>
                     </style>
                   </object>
                   <packing>
