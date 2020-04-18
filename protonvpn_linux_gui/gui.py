@@ -742,6 +742,10 @@ class Handler:
         self.messagedialog_label.set_markup("This feature is not yet implemented.")
         self.messagedialog_window.show()
 
+    def need_help_link_activate(self, object, link):
+        popover = self.interface.get_object("login_window_popover")
+        popover.show()
+
 def initialize_gui():
     """Initializes the GUI 
     ---
