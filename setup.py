@@ -1,14 +1,12 @@
 """setup.py: setuptools control."""
-
-
 import re
+import os
 from setuptools import setup
 
 from protonvpn_linux_gui.constants import VERSION
 
-
 try:
-    with io.open(os.path.join(here, 'README.md'), encoding='utf-8') as f:
+    with open(os.path.join(os.path.abspath(os.path.dirname(__file__)), 'README.md'), encoding='utf-8') as f:
         long_descr = '\n' + f.read()
 except FileNotFoundError:
     long_descr = """
