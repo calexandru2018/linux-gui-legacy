@@ -2,18 +2,37 @@
 @define-color overlay_color rgba(52, 58, 63, 1);
 @define-color def_green_color rgb(86, 179, 102);
 
+label, entry{
+    text-shadow: none;
+}
+
 label selection{
     background-color: @def_green_color;
 }
 
+
+
 .default_background{
     background-color: @def_bg_color;
-    color: white;
+    color: rgb(255,255,255);;
 }
 
 .overlay_background{
     background-color: @overlay_color;
-    color: white;
+    color: rgb(255,255,255);;
+}
+
+.menu_bar{
+    border: none;
+    box-shadow: none;
+    background-color: @overlay_color;
+    color: rgb(255,255,255);
+}
+
+.menu_bar menuitem window menu{
+    box-shadow: none;
+    border:none;
+    color: rgb(255,255,255);
 }
 
 .top_menu_hamburger{
@@ -26,7 +45,7 @@ label selection{
 }
 
 .white_text{
-    color: white;
+    color: rgb(255,255,255);;
 }
 
 .default_style_switch{
@@ -51,9 +70,9 @@ label selection{
     background-image: none;
     text-shadow: none;
     background-color: @def_bg_color;
-    color: white;
+    color: rgb(255,255,255);;
     padding: 10px 50px;
-    border: 2px solid white;
+    border: 2px solid rgb(255,255,255);;
     border-radius: 20px;
     transition: all .115s ease-in-out;
 }
@@ -65,9 +84,9 @@ label selection{
     box-shadow: none;
     background-image: none;
     text-shadow: none;
-    color: white;
+    color: rgb(255,255,255);;
     background-color: transparent;
-    border: 2px solid white;
+    border: 2px solid rgb(255,255,255);;
     padding: 10px 50px;
     border-radius: 20px;
     transition: all .115s ease-in-out;
@@ -80,7 +99,7 @@ label selection{
     box-shadow: none;
     background-image: none;
     text-shadow: none;
-    color: white;
+    color: rgb(255,255,255);;
     background-color: transparent;
     border: none;
     border-radius: 5px;
@@ -105,21 +124,27 @@ notebook.dashboard_notebook_style{
 }
 
 notebook.dashboard_notebook_style header{
+	-gtk-icon-source: none;
+    background-image: none;
 	outline:none;
 	padding: 0;
-    -gtk-icon-source: none;
     background-color: @overlay_color;
     border: none;
 }
 
 notebook.dashboard_notebook_style tabs{
+    -gtk-icon-source: none;
+    background-image: none;
 	outline:none;
 	padding: 0;
     margin: 0;
     border-bottom: 1px solid rgba(255,255,255, 0.3);
     border: none;
 }
-notebook.dashboard_notebook_style tab{
+
+notebook.dashboard_notebook_style tabs tab{
+	-gtk-icon-source: none;
+    background-image: none;
     outline:none;
     border-color: transparent;
     box-shadow: none;
@@ -134,7 +159,7 @@ notebook.dashboard_notebook_style tab{
     border: none;
     box-shadow: none;
     padding: 20px 70px;
-    color: white;
+    color: rgb(255,255,255);;
     transition: all .115s ease-in-out;
 }
 
@@ -150,7 +175,7 @@ notebook.dashboard_notebook_style tab{
 /* Dashboard notebook style*/
 
 .active_tab{
-    color: white;
+    color: rgb(255,255,255);;
     background-color: @def_bg_color;
 }
 
@@ -216,13 +241,17 @@ notebook.dashboard_notebook_style tab{
     outline: none;
     border-image-width: 0;
     background-color: @def_bg_color;
-    color: white;
+    color: rgb(255,255,255);;
     border-radius: 0;
     border: none;
 }
 
 .default_style_combobox button box arrow{
-    color: white;
+    color: rgb(255,255,255);;
+}
+
+.default_style_combobox button box cellview{
+    color: rgb(255,255,255);
 }
 
 .default_style_combobox button:focus{
@@ -232,7 +261,7 @@ notebook.dashboard_notebook_style tab{
 
 .default_style_combobox window menu{
     background-color: @def_bg_color;
-	color:white;
+	color:rgb(255,255,255);;
 }
 
 .server_list_bakground_row:hover, .menu_list_hover:hover, .default_style_combobox window menu menuitem:hover{
@@ -253,7 +282,7 @@ entry.default_style_entry{
     outline: none;
     box-shadow: none;
     background-color: @def_bg_color;
-    color: white;
+    color: rgb(255,255,255);;
     border-top: none;
     border-left: none;
     border-right: none;
@@ -291,9 +320,9 @@ notebook.settings_notebook_style{
 }
 
 notebook.settings_notebook_style header{
+    -gtk-icon-source: none;
 	outline:none;
 	padding: 0;
-    -gtk-icon-source: none;
     background-color: transparent;
     border: none;
 }
@@ -304,6 +333,9 @@ notebook.settings_notebook_style tabs{
 	margin: 0;
 }
 notebook.settings_notebook_style tab{
+    box-shadow: none;
+    border: transparent;
+    background-image: none;
 	outline:none;
 	padding: 0;
     margin: 0;
@@ -311,7 +343,7 @@ notebook.settings_notebook_style tab{
 }
 
 .default_notebook_grid_content{
-    color: white;
+    color: rgb(255,255,255);;
     background-color: @def_bg_color;
     padding: 30px 100px;
     padding-bottom: 200px;
@@ -324,12 +356,12 @@ notebook.settings_notebook_style tab{
 
 .split_tunnling_list{
     background-color: @overlay_color;
-    color: white;
+    color: rgb(255,255,255);;
     padding: 10px 10px;
     /* border-radius: 5px; */
 }
 .split_tunnling_list text{
     background-color: @overlay_color;
-    color: white;
+    color: rgb(255,255,255);;
     /* border-radius: 5px; */
 }

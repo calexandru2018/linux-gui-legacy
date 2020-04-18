@@ -2775,8 +2775,7 @@ Author: Alexandru Cheltuitor
                       </object>
                     </child>
                     <style>
-                      <class name="overlay_background"/>
-                      <class name="remove_borders"/>
+                      <class name="menu_bar"/>
                     </style>
                   </object>
                   <packing>
