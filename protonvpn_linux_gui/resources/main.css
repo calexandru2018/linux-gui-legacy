@@ -10,8 +10,6 @@ label selection{
     background-color: @def_green_color;
 }
 
-
-
 .default_background{
     background-color: @def_bg_color;
     color: rgb(255,255,255);;
@@ -30,6 +28,7 @@ label selection{
 }
 
 .menu_bar menuitem window menu{
+    border-radius: 0;
     box-shadow: none;
     border:none;
     color: rgb(255,255,255);
@@ -260,7 +259,14 @@ notebook.dashboard_notebook_style tabs tab{
 }
 
 .default_style_combobox window menu{
+    border: none;
+    box-shadow: none;
+    border-radius: 0;
     background-color: @def_bg_color;
+	color:rgb(255,255,255);;
+}
+
+.default_style_combobox window menu menuitem cellview{
 	color:rgb(255,255,255);;
 }
 
