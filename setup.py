@@ -43,7 +43,7 @@ setup(
     description="Unofficial Linux GUI client for ProtonVPN",
     long_description=long_descr,
     author="calexandru2018",
-    EMAIL="acrandom@pm.me"
+    EMAIL="acrandom@pm.me",
     license="GPLv3",
     url="https://github.com/calexandru2018/protonvpn-linux-gui",
     install_requires=[
