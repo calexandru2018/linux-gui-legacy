@@ -850,6 +850,8 @@ def initialize_gui():
         if not os.path.isfile(CONFIG_FILE):   
             gui_logger.debug(">>> Loading LoginWindow")
             window = interface.get_object("LoginWindow")
+            version_label = interface.get_object("login_window_version_label")
+            version_label.set_markup("v.{}".format(VERSION))
             dashboard = interface.get_object("DashboardWindow")
             dashboard.connect("destroy", Gtk.main_quit)
         else:

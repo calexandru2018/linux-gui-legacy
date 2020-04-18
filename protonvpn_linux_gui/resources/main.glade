@@ -551,6 +551,9 @@ Author: Alexandru Cheltuitor
             <property name="can_focus">False</property>
             <property name="halign">end</property>
             <property name="label" translatable="yes">v.2.0.5</property>
+            <style>
+              <class name="login_version_label"/>
+            </style>
           </object>
           <packing>
             <property name="left_attach">0</property>

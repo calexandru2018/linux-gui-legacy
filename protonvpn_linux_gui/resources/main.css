@@ -5,8 +5,13 @@
 .login_links link{
     color: @def_green_color;
 }
+
 .login_links link:hover{
     color: rgb(255,255,255);
+}
+
+.login_version_label{
+    color: rgb(127,127,127);
 }
 
 label, entry{
