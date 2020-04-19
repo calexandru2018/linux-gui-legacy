@@ -40,6 +40,7 @@ setup(
     version=VERSION,
     description="Unofficial Linux GUI client for ProtonVPN",
     long_description=long_descr,
+    long_description_content_type="text/markdown",
     author="calexandru2018",
     author_email="acrandom@pm.me",
     license="GPLv3",
