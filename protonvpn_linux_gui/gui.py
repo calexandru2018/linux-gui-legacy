@@ -161,8 +161,7 @@ class Handler:
 
     def last_connect_button_clicked(self, button):
         """Button/Event handler to reconnect to previously connected server
-        """   
-        self.messagedialog_sub_label.hide()
+        """ essagedialog_sub_label.hide()
         try:
             servername = get_config_value("metadata", "connected_server")
             protocol = get_config_value("metadata", "connected_proto")     
