@@ -165,7 +165,7 @@ class Handler:
         try:
             servername = get_config_value("metadata", "connected_server")
             protocol = get_config_value("metadata", "connected_proto")     
-        except:
+        except asdasd:
             self.messagedialog_label.set_markup("You have not previously connected to any server, please do that connect to a server first before attempting to reconnect.")
             self.messagedialog_spinner.hide()
             self.messagedialog_window.show()
