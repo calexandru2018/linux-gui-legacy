@@ -9,11 +9,8 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
-
     steps:
-    - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v1
-      with:
-       token: ${{ secrets.CODECOV_TOKEN }}
-      run: |
-        bash <(curl -s https://codecov.io/bash)
+      - uses: actions/checkout@test
+      - uses: codecov/codecov-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
