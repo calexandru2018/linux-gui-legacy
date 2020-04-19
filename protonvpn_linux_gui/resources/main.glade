@@ -404,7 +404,7 @@ Author: Alexandru Cheltuitor
           </object>
           <packing>
             <property name="left_attach">0</property>
-            <property name="top_attach">3</property>
+            <property name="top_attach">5</property>
           </packing>
         </child>
         <child>
@@ -425,7 +425,7 @@ Author: Alexandru Cheltuitor
           </object>
           <packing>
             <property name="left_attach">0</property>
-            <property name="top_attach">1</property>
+            <property name="top_attach">2</property>
           </packing>
         </child>
         <child>
@@ -447,7 +447,7 @@ Author: Alexandru Cheltuitor
           </object>
           <packing>
             <property name="left_attach">0</property>
-            <property name="top_attach">2</property>
+            <property name="top_attach">4</property>
           </packing>
         </child>
         <child>
@@ -497,7 +497,7 @@ Author: Alexandru Cheltuitor
           </object>
           <packing>
             <property name="left_attach">0</property>
-            <property name="top_attach">4</property>
+            <property name="top_attach">6</property>
           </packing>
         </child>
         <child>
@@ -542,7 +542,7 @@ Author: Alexandru Cheltuitor
           </object>
           <packing>
             <property name="left_attach">0</property>
-            <property name="top_attach">5</property>
+            <property name="top_attach">7</property>
           </packing>
         </child>
         <child>
@@ -557,7 +557,39 @@ Author: Alexandru Cheltuitor
           </object>
           <packing>
             <property name="left_attach">0</property>
-            <property name="top_attach">6</property>
+            <property name="top_attach">8</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkLabel" id="login_username_label">
+            <property name="can_focus">False</property>
+            <property name="halign">start</property>
+            <property name="margin_left">47</property>
+            <property name="margin_right">40</property>
+            <property name="label" translatable="yes">ProtonVPN (OpenVPN/IKEv2) Username</property>
+            <style>
+              <class name="login_labels"/>
+            </style>
+          </object>
+          <packing>
+            <property name="left_attach">0</property>
+            <property name="top_attach">1</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkLabel" id="login_password_label">
+            <property name="can_focus">False</property>
+            <property name="halign">start</property>
+            <property name="margin_left">47</property>
+            <property name="margin_right">40</property>
+            <property name="label" translatable="yes">ProtonVPN (OpenVPN/IKEv2) Password</property>
+            <style>
+              <class name="login_labels"/>
+            </style>
+          </object>
+          <packing>
+            <property name="left_attach">0</property>
+            <property name="top_attach">3</property>
           </packing>
         </child>
         <style>
@@ -1398,38 +1430,6 @@ Author: Alexandru Cheltuitor
                         <property name="row_spacing">25</property>
                         <property name="column_homogeneous">True</property>
                         <child>
-                          <object class="GtkLabel">
-                            <property name="visible">True</property>
-                            <property name="can_focus">False</property>
-                            <property name="halign">start</property>
-                            <property name="label" translatable="yes">Auto Connect</property>
-                            <attributes>
-                              <attribute name="weight" value="medium"/>
-                              <attribute name="size" value="12000"/>
-                            </attributes>
-                          </object>
-                          <packing>
-                            <property name="left_attach">0</property>
-                            <property name="top_attach">0</property>
-                          </packing>
-                        </child>
-                        <child>
-                          <object class="GtkLabel">
-                            <property name="visible">True</property>
-                            <property name="can_focus">False</property>
-                            <property name="halign">start</property>
-                            <property name="label" translatable="yes">Quick Connect</property>
-                            <attributes>
-                              <attribute name="weight" value="medium"/>
-                              <attribute name="size" value="12000"/>
-                            </attributes>
-                          </object>
-                          <packing>
-                            <property name="left_attach">0</property>
-                            <property name="top_attach">1</property>
-                          </packing>
-                        </child>
-                        <child>
                           <object class="GtkComboBox" id="update_autoconnect_combobox">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
@@ -1479,22 +1479,6 @@ Author: Alexandru Cheltuitor
                           </packing>
                         </child>
                         <child>
-                          <object class="GtkLabel">
-                            <property name="visible">True</property>
-                            <property name="can_focus">False</property>
-                            <property name="halign">start</property>
-                            <property name="label" translatable="yes">Default Protocol</property>
-                            <attributes>
-                              <attribute name="weight" value="medium"/>
-                              <attribute name="size" value="12000"/>
-                            </attributes>
-                          </object>
-                          <packing>
-                            <property name="left_attach">0</property>
-                            <property name="top_attach">2</property>
-                          </packing>
-                        </child>
-                        <child>
                           <object class="GtkComboBox" id="update_protocol_combobox">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
@@ -1514,6 +1498,202 @@ Author: Alexandru Cheltuitor
                           <packing>
                             <property name="left_attach">1</property>
                             <property name="top_attach">2</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkGrid">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <child>
+                              <object class="GtkLabel">
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="halign">start</property>
+                                <property name="margin_right">10</property>
+                                <property name="label" translatable="yes">Auto Connect</property>
+                                <attributes>
+                                  <attribute name="weight" value="medium"/>
+                                  <attribute name="size" value="12000"/>
+                                </attributes>
+                                <style>
+                                  <class name="labels_with_info_tooltip_grid"/>
+                                </style>
+                              </object>
+                              <packing>
+                                <property name="left_attach">0</property>
+                                <property name="top_attach">0</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <object class="GtkImage">
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="tooltip_text" translatable="yes">On login, you are automatically connected to the specific profile.</property>
+                                <property name="margin_top">3</property>
+                                <property name="pixbuf">img/utils/info-green.png</property>
+                              </object>
+                              <packing>
+                                <property name="left_attach">1</property>
+                                <property name="top_attach">0</property>
+                              </packing>
+                            </child>
+                            <style>
+                              <class name="labels_with_info_tooltip_grid"/>
+                            </style>
+                          </object>
+                          <packing>
+                            <property name="left_attach">0</property>
+                            <property name="top_attach">0</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkGrid">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <child>
+                              <object class="GtkLabel">
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="halign">start</property>
+                                <property name="margin_right">10</property>
+                                <property name="label" translatable="yes">Quick Connect</property>
+                                <attributes>
+                                  <attribute name="weight" value="medium"/>
+                                  <attribute name="size" value="12000"/>
+                                </attributes>
+                                <style>
+                                  <class name="labels_with_info_tooltip_grid"/>
+                                </style>
+                              </object>
+                              <packing>
+                                <property name="left_attach">0</property>
+                                <property name="top_attach">0</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <object class="GtkImage">
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="tooltip_text" translatable="yes">The Quick Connect button connects you to the selected profile.</property>
+                                <property name="margin_top">3</property>
+                                <property name="pixbuf">img/utils/info-green.png</property>
+                              </object>
+                              <packing>
+                                <property name="left_attach">1</property>
+                                <property name="top_attach">0</property>
+                              </packing>
+                            </child>
+                            <style>
+                              <class name="labels_with_info_tooltip_grid"/>
+                            </style>
+                          </object>
+                          <packing>
+                            <property name="left_attach">0</property>
+                            <property name="top_attach">1</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkGrid">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <child>
+                              <object class="GtkLabel">
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="halign">start</property>
+                                <property name="margin_right">10</property>
+                                <property name="label" translatable="yes">Default Protocol</property>
+                                <attributes>
+                                  <attribute name="weight" value="medium"/>
+                                  <attribute name="size" value="12000"/>
+                                </attributes>
+                                <style>
+                                  <class name="labels_with_info_tooltip_grid"/>
+                                </style>
+                              </object>
+                              <packing>
+                                <property name="left_attach">0</property>
+                                <property name="top_attach">0</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <object class="GtkImage">
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="tooltip_text" translatable="yes">The default OpenVPN protocol to be used.</property>
+                                <property name="margin_top">3</property>
+                                <property name="pixbuf">img/utils/info-green.png</property>
+                              </object>
+                              <packing>
+                                <property name="left_attach">1</property>
+                                <property name="top_attach">0</property>
+                              </packing>
+                            </child>
+                            <style>
+                              <class name="labels_with_info_tooltip_grid"/>
+                            </style>
+                          </object>
+                          <packing>
+                            <property name="left_attach">0</property>
+                            <property name="top_attach">2</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkSwitch" id="custom_dns_switch">
+                            <property name="visible">True</property>
+                            <property name="can_focus">True</property>
+                            <property name="halign">end</property>
+                            <property name="valign">center</property>
+                          </object>
+                          <packing>
+                            <property name="left_attach">1</property>
+                            <property name="top_attach">3</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkGrid">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <child>
+                              <object class="GtkLabel">
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="halign">start</property>
+                                <property name="margin_right">10</property>
+                                <property name="label" translatable="yes">Custom DNS servers</property>
+                                <attributes>
+                                  <attribute name="weight" value="medium"/>
+                                  <attribute name="size" value="12000"/>
+                                </attributes>
+                                <style>
+                                  <class name="labels_with_info_tooltip_grid"/>
+                                </style>
+                              </object>
+                              <packing>
+                                <property name="left_attach">0</property>
+                                <property name="top_attach">0</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <object class="GtkImage">
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="tooltip_text" translatable="yes">Enter a private DNS server (like AdGuard DNS) to process your DNS request. Using custom DNS servers will disable NetShield. DNS servers are responsible for directing you to the correct site, so only use servers you trust.</property>
+                                <property name="margin_top">3</property>
+                                <property name="pixbuf">img/utils/info-green.png</property>
+                              </object>
+                              <packing>
+                                <property name="left_attach">1</property>
+                                <property name="top_attach">0</property>
+                              </packing>
+                            </child>
+                            <style>
+                              <class name="labels_with_info_tooltip_grid"/>
+                            </style>
+                          </object>
+                          <packing>
+                            <property name="left_attach">0</property>
+                            <property name="top_attach">3</property>
                           </packing>
                         </child>
                         <style>
@@ -1553,61 +1733,11 @@ Author: Alexandru Cheltuitor
                         <property name="row_spacing">25</property>
                         <property name="column_homogeneous">True</property>
                         <child>
-                          <object class="GtkLabel">
-                            <property name="visible">True</property>
-                            <property name="can_focus">False</property>
-                            <property name="halign">start</property>
-                            <property name="label" translatable="yes">Kill Switch</property>
-                            <attributes>
-                              <attribute name="weight" value="medium"/>
-                              <attribute name="size" value="12000"/>
-                            </attributes>
-                          </object>
-                          <packing>
-                            <property name="left_attach">0</property>
-                            <property name="top_attach">0</property>
-                          </packing>
-                        </child>
-                        <child>
-                          <object class="GtkLabel">
-                            <property name="visible">True</property>
-                            <property name="can_focus">False</property>
-                            <property name="halign">start</property>
-                            <property name="label" translatable="yes">DNS Leak Protection</property>
-                            <attributes>
-                              <attribute name="weight" value="medium"/>
-                              <attribute name="size" value="12000"/>
-                            </attributes>
-                          </object>
-                          <packing>
-                            <property name="left_attach">0</property>
-                            <property name="top_attach">1</property>
-                          </packing>
-                        </child>
-                        <child>
-                          <object class="GtkLabel">
-                            <property name="visible">True</property>
-                            <property name="can_focus">False</property>
-                            <property name="halign">start</property>
-                            <property name="label" translatable="yes">Split Tunneling</property>
-                            <attributes>
-                              <attribute name="weight" value="medium"/>
-                              <attribute name="size" value="12000"/>
-                            </attributes>
-                          </object>
-                          <packing>
-                            <property name="left_attach">0</property>
-                            <property name="top_attach">2</property>
-                          </packing>
-                        </child>
-                        <child>
                           <object class="GtkSwitch" id="update_killswitch_switch">
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="halign">end</property>
-                            <property name="valign">baseline</property>
-                            <property name="margin_top">5</property>
-                            <property name="margin_bottom">5</property>
+                            <property name="valign">center</property>
                             <signal name="state-set" handler="update_killswitch_switch_changed" swapped="no"/>
                             <style>
                               <class name="default_style_switch"/>
@@ -1624,8 +1754,6 @@ Author: Alexandru Cheltuitor
                             <property name="can_focus">True</property>
                             <property name="halign">end</property>
                             <property name="valign">center</property>
-                            <property name="margin_top">6</property>
-                            <property name="margin_bottom">6</property>
                             <signal name="state-set" handler="update_dns_leak_switch_changed" swapped="no"/>
                             <style>
                               <class name="default_style_switch"/>
@@ -1642,8 +1770,6 @@ Author: Alexandru Cheltuitor
                             <property name="can_focus">True</property>
                             <property name="halign">end</property>
                             <property name="valign">center</property>
-                            <property name="margin_top">6</property>
-                            <property name="margin_bottom">6</property>
                             <signal name="state-set" handler="split_tunneling_switch_changed" swapped="no"/>
                             <style>
                               <class name="default_style_switch"/>
@@ -1729,6 +1855,147 @@ Author: Alexandru Cheltuitor
                             <property name="width">2</property>
                           </packing>
                         </child>
+                        <child>
+                          <object class="GtkGrid">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <child>
+                              <object class="GtkLabel">
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="halign">start</property>
+                                <property name="margin_right">10</property>
+                                <property name="label" translatable="yes">Kill Switch</property>
+                                <attributes>
+                                  <attribute name="weight" value="medium"/>
+                                  <attribute name="size" value="12000"/>
+                                </attributes>
+                                <style>
+                                  <class name="labels_with_info_tooltip_grid"/>
+                                </style>
+                              </object>
+                              <packing>
+                                <property name="left_attach">0</property>
+                                <property name="top_attach">0</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <object class="GtkImage">
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="tooltip_text" translatable="yes">Blocks all network traffic when the VPN tunnel is lost. Cannot be switched on together with Split Tunneling.</property>
+                                <property name="valign">center</property>
+                                <property name="margin_top">3</property>
+                                <property name="pixbuf">img/utils/info-green.png</property>
+                              </object>
+                              <packing>
+                                <property name="left_attach">1</property>
+                                <property name="top_attach">0</property>
+                              </packing>
+                            </child>
+                            <style>
+                              <class name="labels_with_info_tooltip_grid"/>
+                            </style>
+                          </object>
+                          <packing>
+                            <property name="left_attach">0</property>
+                            <property name="top_attach">0</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkGrid">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <child>
+                              <object class="GtkLabel">
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="halign">start</property>
+                                <property name="margin_right">10</property>
+                                <property name="label" translatable="yes">DNS Leak Protection</property>
+                                <attributes>
+                                  <attribute name="weight" value="medium"/>
+                                  <attribute name="size" value="12000"/>
+                                </attributes>
+                                <style>
+                                  <class name="labels_with_info_tooltip_grid"/>
+                                </style>
+                              </object>
+                              <packing>
+                                <property name="left_attach">0</property>
+                                <property name="top_attach">0</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <object class="GtkImage">
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="tooltip_text" translatable="yes">Prevent leaking details of DNS queries to third parties.</property>
+                                <property name="valign">center</property>
+                                <property name="margin_top">3</property>
+                                <property name="pixbuf">img/utils/info-green.png</property>
+                              </object>
+                              <packing>
+                                <property name="left_attach">1</property>
+                                <property name="top_attach">0</property>
+                              </packing>
+                            </child>
+                            <style>
+                              <class name="labels_with_info_tooltip_grid"/>
+                            </style>
+                          </object>
+                          <packing>
+                            <property name="left_attach">0</property>
+                            <property name="top_attach">1</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkGrid">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <child>
+                              <object class="GtkLabel">
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="halign">start</property>
+                                <property name="margin_right">10</property>
+                                <property name="label" translatable="yes">Split Tunneling</property>
+                                <attributes>
+                                  <attribute name="weight" value="medium"/>
+                                  <attribute name="size" value="12000"/>
+                                </attributes>
+                                <style>
+                                  <class name="labels_with_info_tooltip_grid"/>
+                                </style>
+                              </object>
+                              <packing>
+                                <property name="left_attach">0</property>
+                                <property name="top_attach">0</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <object class="GtkImage">
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="tooltip_text" translatable="yes">Exclude an application (not yet implemented) or an IP adress from VPN traffic or include only specific apps. Cannot be switched on together with Kill Switch.</property>
+                                <property name="valign">center</property>
+                                <property name="margin_top">3</property>
+                                <property name="pixbuf">img/utils/info-green.png</property>
+                              </object>
+                              <packing>
+                                <property name="left_attach">1</property>
+                                <property name="top_attach">0</property>
+                              </packing>
+                            </child>
+                            <style>
+                              <class name="labels_with_info_tooltip_grid"/>
+                            </style>
+                          </object>
+                          <packing>
+                            <property name="left_attach">0</property>
+                            <property name="top_attach">2</property>
+                          </packing>
+                        </child>
                         <style>
                           <class name="default_notebook_grid_content"/>
                         </style>
@@ -1791,7 +2058,7 @@ Author: Alexandru Cheltuitor
   <object class="GtkImage" id="gtk-justify-fill">
     <property name="visible">True</property>
     <property name="can_focus">False</property>
-    <property name="pixbuf">img/utils/hamburger-menu-icon (copy).png</property>
+    <property name="pixbuf">img/utils/hamburger-menu-icon.png</property>
     <property name="icon_size">3</property>
     <style>
       <class name="top_menu_hamburger"/>
@@ -2196,10 +2463,13 @@ Author: Alexandru Cheltuitor
                                         <property name="can_focus">False</property>
                                         <property name="halign">start</property>
                                         <property name="margin_left">10</property>
+                                        <property name="margin_right">10</property>
                                         <property name="margin_top">10</property>
                                         <property name="margin_bottom">10</property>
-                                        <property name="hexpand">True</property>
                                         <property name="label" translatable="yes">Secure Core</property>
+                                        <style>
+                                          <class name="disabled_label"/>
+                                        </style>
                                       </object>
                                       <packing>
                                         <property name="left_attach">1</property>
@@ -2213,7 +2483,7 @@ Author: Alexandru Cheltuitor
                                         <property name="can_focus">True</property>
                                         <property name="halign">start</property>
                                         <property name="valign">center</property>
-                                        <property name="margin_right">15</property>
+                                        <property name="margin_right">10</property>
                                         <signal name="state-set" handler="secure_core_switch_changed" swapped="no"/>
                                         <style>
                                           <class name="default_style_switch"/>
@@ -2221,6 +2491,22 @@ Author: Alexandru Cheltuitor
                                       </object>
                                       <packing>
                                         <property name="left_attach">0</property>
+                                        <property name="top_attach">0</property>
+                                      </packing>
+                                    </child>
+                                    <child>
+                                      <object class="GtkImage">
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">False</property>
+                                        <property name="tooltip_text" translatable="yes">Provides additonal protection against VPN server compromise by routing through ProtonVPNs secure network.</property>
+                                        <property name="halign">start</property>
+                                        <property name="valign">center</property>
+                                        <property name="margin_top">3</property>
+                                        <property name="hexpand">True</property>
+                                        <property name="pixbuf">img/utils/info-green.png</property>
+                                      </object>
+                                      <packing>
+                                        <property name="left_attach">2</property>
                                         <property name="top_attach">0</property>
                                       </packing>
                                     </child>
