@@ -508,7 +508,6 @@ def update_connect_preference(interface, messagedialog_label, messagedialog_spin
 
     gui_logger.debug(">>> Running \"update_connect_preference\".")
 
-
     # autoconnect_alternatives = ["dis", "fast", "rand", "p2p", "sc", "tor"]
     if not quick_connect:
         manage_autoconnect(mode="disable")

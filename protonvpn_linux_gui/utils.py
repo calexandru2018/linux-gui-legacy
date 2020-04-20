@@ -52,6 +52,15 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import GObject as gobject, Gtk, GdkPixbuf
 
+def tab_style_manager(tab_to_show: str, tab_dict):
+    for k, v in tab_dict.items():
+        if k == tab_to_show:
+            v.add_class("active_tab")
+            v.remove_class("inactive_tab")
+        else:
+            v.add_class("inactive_tab")
+            v.remove_class("active_tab")
+
 def get_gui_config(group, key):
     """Return specific value from GUI_CONFIG_FILE as string"""
     config = configparser.ConfigParser()
