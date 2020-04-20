@@ -401,22 +401,16 @@ def update_labels_status(update_labels_dict):
     else:
         servers = update_labels_dict["servers"]
 
-    protonvpn_conn_check = is_connected()
-    is_vpn_connected = True if protonvpn_conn_check else False
+    interface =  update_labels_dict["interface"]
+    disconnecting = update_labels_dict["disconnecting"]
+    conn_info = update_labels_dict["conn_info"]
+    is_vpn_connected = True if is_connected() else False
 
     try:
         connected_server = get_config_value("metadata", "connected_server")
     except:
         connected_server = False
-        
-    update_labels(update_labels_dict["interface"], servers, is_vpn_connected, connected_server, update_labels_dict["disconnecting"], conn_info=update_labels_dict["conn_info"])
 
-def update_labels(interface, servers, is_connected, connected_server, disconnecting, conn_info=False):
-    """Function that updates the labels.
-    """
-    gui_logger.debug(">>> Running \"right_grid_update_labels\".")
-
-    # Right grid
     time_connected_label =  interface.get_object("time_connected_label")
     protocol_label =        interface.get_object("protocol_label")
     conn_disc_button_label = interface.get_object("main_conn_disc_button_label")
@@ -432,13 +426,16 @@ def update_labels(interface, servers, is_connected, connected_server, disconnect
     CURRDIR = os.path.dirname(os.path.abspath(__file__))
     flags_base_path = CURRDIR+"/resources/img/flags/large/"
 
+    country_cc = False
+    load = False
+
     # Get and set server load label
     try:
         load = get_server_value(connected_server, "Load", servers)
-    except:
-        load = False
+    except KeyError:
+        gui_logger.debug("[!] Could not find server load information.")
         
-    load = "{0}% Load".format(load) if load and is_connected else ""
+    load = "{0}% Load".format(load) if load and is_vpn_connected else ""
     server_load_label.set_markup('<span>{0}</span>'.format(load))
 
     # Get and set IP labels. Get also country and ISP
@@ -452,12 +449,10 @@ def update_labels(interface, servers, is_connected, connected_server, disconnect
             country = "None"
     else:
         ip, isp, country = conn_info
-
-    country_cc = False
-
+        
     for k,v in country_codes.items():
         if k == country:
-            if is_connected:
+            if is_vpn_connected:
                 try:
                     flag_path = flags_base_path+"{}.jpg".format(k.lower()) 
                     background_large_flag.set_from_file(flag_path)
@@ -469,52 +464,40 @@ def update_labels(interface, servers, is_connected, connected_server, disconnect
     protonvpn_sign_green.hide()
     country_server = country_cc
 
-    if is_connected:
+    if is_vpn_connected:
         try:
             country_server = country_server + " >> " + connected_server
         except TypeError: 
             country_server = country_server + " >> "
 
         protonvpn_sign_green.show()
-
-    # Get and set server name
-    connected_server = connected_server if connected_server and is_connected else ""
-
-    country_label.set_markup(country_server if country_server else "")
     ip_label.set_markup(ip)
-
     isp_label.set_markup(isp)
 
-    # Get and set city label
-    try:
-        city = get_server_value(connected_server, "City", servers)
-    except:
-        city = False
-    city = city if city else ""
+    # Get and set server name
+    connected_server = connected_server if connected_server and is_vpn_connected else ""
+    country_label.set_markup(country_server if country_server else "")
 
     # Update sent and received data
-    gobject.timeout_add_seconds(1, update_sent_received_data, {"received_label": data_received_label, "sent_label": data_sent_label})
+    gobject.timeout_add_seconds(1, update_sent_received_data, {"is_vpn_connected": is_vpn_connected, "received_label": data_received_label, "sent_label": data_sent_label})
     
-    # Left grid
-    all_features = {0: "Normal", 1: "Secure-Core", 2: "Tor", 4: "P2P"}
-    protocol = "No VPN Connection"
-
     # Check and set VPN status label. Get also protocol status if vpn is connected
+    protocol = "No VPN Connection"
     conn_disc_button = "Quick Connect"
-    if is_connected and not disconnecting:
+    if is_vpn_connected and not disconnecting:
         try:
             connected_to_protocol = get_config_value("metadata", "connected_proto")
             protocol = '<span>OpenVPN >> {0}</span>'.format(connected_to_protocol.upper())
         except KeyError:
             pass
         conn_disc_button = "Disconnect"
-    
     conn_disc_button_label.set_markup(conn_disc_button)
+
     # Check and set DNS status label
     dns_enabled = get_config_value("USER", "dns_leak_protection")
 
     # Update time connected label
-    gobject.timeout_add_seconds(1, update_connection_time, {"is_connected":is_connected, "label":time_connected_label})
+    gobject.timeout_add_seconds(1, update_connection_time, {"is_vpn_connected":is_vpn_connected, "label":time_connected_label})
 
     # Check and set protocol label
     protocol_label.set_markup(protocol)
@@ -522,12 +505,12 @@ def update_labels(interface, servers, is_connected, connected_server, disconnect
 def update_sent_received_data(dict_labels):
     tx_amount, rx_amount = get_transferred_data()
 
-    rx_amount = rx_amount if is_connected else ""
+    rx_amount = rx_amount if dict_labels["is_vpn_connected"] else ""
     
     dict_labels["received_label"].set_markup('<span>{0}</span>'.format(rx_amount))
 
     # Get and set sent data
-    tx_amount = tx_amount if is_connected else ""
+    tx_amount = tx_amount if dict_labels["is_vpn_connected"] else ""
     dict_labels["sent_label"].set_markup('<span>{0}</span>'.format(tx_amount))
     
     return True
@@ -535,7 +518,7 @@ def update_sent_received_data(dict_labels):
 def update_connection_time(dict_data):
     connection_time = False
     
-    if dict_data["is_connected"]:
+    if dict_data["is_vpn_connected"]:
         try:
             connected_time = get_config_value("metadata", "connected_time")
             connection_time = time.time() - int(connected_time)

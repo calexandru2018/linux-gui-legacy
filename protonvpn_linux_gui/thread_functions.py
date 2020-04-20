@@ -575,17 +575,17 @@ def update_split_tunneling(interface, messagedialog_label, messagedialog_spinner
     result = "Split tunneling configurations <b>updated</b>!\n"
     split_tunneling_buffer = interface.get_object("split_tunneling_textview").get_buffer()
 
-    # Get text takes a start_iter, end_iter and the buffer itself as last param
-    split_tunneling_content = split_tunneling_buffer.get_text(split_tunneling_buffer.get_start_iter(), split_tunneling_buffer.get_end_iter(), split_tunneling_buffer)
-    
-    # Split IP/CIDR by either ";" and/or "\n"
-    split_tunneling_content = re.split('[;\n]', split_tunneling_content)
+    def clean_input(buffer):
+        # Get text takes a start_iter, end_iter and the buffer itself as last param
+        split_tunneling_content = buffer.get_text(buffer.get_start_iter(), buffer.get_end_iter(), buffer)
+        # Split IP/CIDR by either ";" and/or "\n"
+        split_tunneling_content = re.split('[;\n]', split_tunneling_content)
+        # Remove empty spaces
+        split_tunneling_content = [content.strip() for content in split_tunneling_content]
+        # Remove empty list elements
+        return list(filter(None, split_tunneling_content))
 
-    # Remove empty spaces
-    split_tunneling_content = [content.strip() for content in split_tunneling_content]
-
-    # Remove empty list elements
-    split_tunneling_content = list(filter(None, split_tunneling_content))
+    split_tunneling_content = clean_input(split_tunneling_buffer)
 
     for ip in split_tunneling_content:
         if not is_valid_ip(ip):
