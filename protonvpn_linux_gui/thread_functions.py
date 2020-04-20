@@ -482,7 +482,6 @@ def update_pvpn_plan(interface, messagedialog_label, messagedialog_spinner, tier
 
     time.sleep(1.5)
 
-    load_on_start({"interface":interface, "gui_enabled": True})     
     populate_servers_dict = {
         "tree_object": interface.get_object("ServerTreeStore"),
         "servers": False
