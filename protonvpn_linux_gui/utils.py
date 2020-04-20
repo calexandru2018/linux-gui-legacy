@@ -180,7 +180,7 @@ def message_dialog(interface, action, label_object, spinner_object, sub_label_ob
                 if is_killswitch_enabled:
                     reccomendation = reccomendation + "\nYou Have killswitch enabled, which might be blocking your connection.\nTry to flush and then reconfigure your IP tables."
                     reccomendation = reccomendation + "<b>Warning:</b> By doing this you are clearing all of your killswitch configurations. Do at your own risk." + restore_ip_tables_guide
-                elif is_custom_resolv_conf["logical"] is True:
+                elif is_custom_resolv_conf["logical"]:
                     reccomendation = reccomendation + "\nCustom DNS is still present in resolv.conf even though you are not connected to a server. This might be blocking your from establishing a non-encrypted connection.\n"
                     reccomendation = reccomendation + "Try to restart your network manager to restore default configurations:" + restart_netwman_guide
                 elif is_custom_resolv_conf["logical"] is None:
@@ -320,7 +320,7 @@ def prepare_initilizer(username_field, password_field, interface):
 
     # Get user plan
     for k,v in protonvpn_plans.items():
-        if v is True:
+        if v:
             protonvpn_plan = k
             break
     
@@ -339,7 +339,7 @@ def load_on_start(params_dict):
     gui_logger.debug(">>> Running \"load_on_start\". Params: {0}.".format(params_dict))
 
     conn = custom_get_ip_info()
-    if not conn == False and not conn == None:
+    if conn and not conn is None:
         try:
             params_dict["messagedialog_label"].set_markup("Populating dashboard...")
         except:
@@ -597,7 +597,7 @@ def load_connection_settings(interface):
     # Set values
     update_autoconnect_combobox.set_active(autoconnect_index)
     update_quick_connect_combobox.set_active(quick_connect_index)
-    update_protocol_combobox.set_active(0) if default_protocol == "tcp" else update_protocol_combobox.set_active(1) # nosec
+    update_protocol_combobox.set_active(0) if default_protocol == "tcp" else update_protocol_combobox.set_active(1)
 
 def load_advanced_settings(interface):
     # User values
@@ -918,8 +918,8 @@ def find_cli():
     except:
         gui_logger.debug("[!] Unable to run \"find protonvpn-cli-ng\" subprocess.")
         protonvpn_path = False
-
-    return protonvpn_path.stdout.decode()[:-1] if (protonvpn_path is True and protonvpn_path.returncode == 0) else False
+        
+    return protonvpn_path.stdout.decode()[:-1] if (protonvpn_path and protonvpn_path.returncode == 0) else False
         
 def generate_template(template):
     """Function that generates the service file for autoconnect.
