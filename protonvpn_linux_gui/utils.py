@@ -27,8 +27,7 @@ try:
     from protonvpn_cli.constants import SPLIT_TUNNEL_FILE, USER, CONFIG_FILE, PASSFILE
     from protonvpn_cli.utils import change_file_owner, make_ovpn_template, set_config_value
 except:
-    print("Unable to import from CLI, can not find CLI modules.")
-    pass
+    print("Can not find CLI modules.")
 
 from .constants import (
     PATH_AUTOCONNECT_SERVICE, 
@@ -96,8 +95,8 @@ def get_server_protocol_from_cli(raw_result, return_protocol=False):
             protocol = re.search("(UDP|TCP)", display_message[0])
             return (server_name[0].group(), protocol.group())
         return server_name[0].group()
-    else:
-        return False
+
+    return False
 
 def message_dialog(interface, action, label_object, spinner_object, sub_label_object=False):
     """Multipurpose message dialog function.
@@ -142,7 +141,7 @@ def message_dialog(interface, action, label_object, spinner_object, sub_label_ob
 
         # Check if custom DNS is enabled
             # If there is no VPN connection and also no internet, then it is a DNS issue.
-        is_dns_protection_enabled = False if get_config_value("USER", "dns_leak_protection") == "0" or (not get_config_value("USER", "custom_dns") == None and get_config_value("USER", "dns_leak_protection") == "0") else True
+        is_dns_protection_enabled = False if get_config_value("USER", "dns_leak_protection") == "0" or (not get_config_value("USER", "custom_dns") is None and get_config_value("USER", "dns_leak_protection") == "0") else True
 
         # Check if custom DNS is in use. 
             # It might that the user has disabled the custom DNS settings but the file still resides there
@@ -181,10 +180,10 @@ def message_dialog(interface, action, label_object, spinner_object, sub_label_ob
                 if is_killswitch_enabled:
                     reccomendation = reccomendation + "\nYou Have killswitch enabled, which might be blocking your connection.\nTry to flush and then reconfigure your IP tables."
                     reccomendation = reccomendation + "<b>Warning:</b> By doing this you are clearing all of your killswitch configurations. Do at your own risk." + restore_ip_tables_guide
-                elif is_custom_resolv_conf["logical"] == True:
+                elif is_custom_resolv_conf["logical"] is True:
                     reccomendation = reccomendation + "\nCustom DNS is still present in resolv.conf even though you are not connected to a server. This might be blocking your from establishing a non-encrypted connection.\n"
                     reccomendation = reccomendation + "Try to restart your network manager to restore default configurations:" + restart_netwman_guide
-                elif is_custom_resolv_conf["logical"] == None:
+                elif is_custom_resolv_conf["logical"] is None:
                     reccomendation = reccomendation + "\nNo running VPN process was found, though DNS configurations are lacking in resolv.conf.\n"
                     reccomendation = reccomendation + "This might be due to some error or corruption during DNS restoration or lack of internet connection.\n"
                     reccomendation = reccomendation + "Try to restart your network manager to restore default configurations, if it still does not work, then you probably experiencing some internet connection issues." + restart_netwman_guide
@@ -321,7 +320,7 @@ def prepare_initilizer(username_field, password_field, interface):
 
     # Get user plan
     for k,v in protonvpn_plans.items():
-        if v == True:
+        if v is True:
             protonvpn_plan = k
             break
     
@@ -598,7 +597,7 @@ def load_connection_settings(interface):
     # Set values
     update_autoconnect_combobox.set_active(autoconnect_index)
     update_quick_connect_combobox.set_active(quick_connect_index)
-    update_protocol_combobox.set_active(0) if default_protocol == "tcp" else update_protocol_combobox.set_active(1)
+    update_protocol_combobox.set_active(0) if default_protocol == "tcp" else update_protocol_combobox.set_active(1) # nosec
 
 def load_advanced_settings(interface):
     # User values
