@@ -24,7 +24,8 @@ try:
         get_servers,
         get_server_value
     )
-except Exception:
+except: # nosec
+    print("Unable to find ProtonVPN CLI modules.")
     sys.exit(1)
 
 from .utils import get_gui_config, set_gui_config
@@ -158,7 +159,7 @@ class ProtonVPNIndicator:
         # force_pull servers
         try:
             pull_server_data(force=True)
-        except Exception:
+        except: # nosec
             gui_logger.debug("[!] Could not pull from servers, possible due to unstable connection.{}".format(Exception))
             return True
 

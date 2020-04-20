@@ -12,7 +12,7 @@ try:
 
     # ProtonVPN helper funcitons
     from protonvpn_cli.utils import check_root, get_config_value, change_file_owner, is_connected, set_config_value #noqa
-except:
+except: # nosec
     print("Can not find CLI modules.")
 
 # Import GUI logger

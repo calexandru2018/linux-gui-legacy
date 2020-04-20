@@ -13,7 +13,7 @@ try:
     from protonvpn_cli.utils import get_config_value, is_valid_ip, set_config_value, change_file_owner, pull_server_data, make_ovpn_template #noqa
     from protonvpn_cli import cli, connection #noqa
     from protonvpn_cli.country_codes import country_codes #noqa
-except Exception:
+except: # nosec
     print("Can not find CLI modules.")
 
 # Custom helper functions
@@ -176,7 +176,7 @@ def initialize_gui_config():
         change_file_owner(GUI_CONFIG_FILE)
         gui_logger.debug("pvpn-gui.cfg initialized.")
         return True
-    except Exception:
+    except: # nosec
         gui_logger.debug("Unablt to initialize pvpn-gui.cfg. {}".format(Exception))
         return False
 
