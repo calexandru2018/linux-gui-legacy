@@ -24,7 +24,7 @@ try:
         get_servers,
         get_server_value
     )
-except:
+except Exception:
     sys.exit(1)
 
 from .utils import get_gui_config, set_gui_config
@@ -158,8 +158,8 @@ class ProtonVPNIndicator:
         # force_pull servers
         try:
             pull_server_data(force=True)
-        except:
-            gui_logger.debug("[!] Could not pull from servers, possible due to unstable connection.")
+        except Exception:
+            gui_logger.debug("[!] Could not pull from servers, possible due to unstable connection.{}".format(Exception))
             return True
 
         # get_servers
@@ -168,7 +168,7 @@ class ProtonVPNIndicator:
         # get server load
         try:
             load = get_server_value(connected_server, "Load", servers)
-        except:
+        except KeyError:
             gui_logger.debug("[!] Unable to get server load.")
             return True
 
@@ -179,7 +179,7 @@ class ProtonVPNIndicator:
     def quick_connect(self, _):
         """Makes a quick connection by making a cli call to protonvpn-cli-ng"""
         gui_logger.debug("TRAY >>> Starting quick connect.")
-        proces = subprocess.Popen(["sudo", "protonvpn", "connect", "--fastest"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        proces = subprocess.Popen(["sudo", "protonvpn", "connect", "--fastest"], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
         resp = proces.communicate()
         self.update_serverload(None)
         gui_logger.debug("TRAY >>> Successfully started quick connect: {}".format(resp))
@@ -187,13 +187,13 @@ class ProtonVPNIndicator:
     def show_gui(self, _):
         """Displays the GUI."""
         gui_logger.debug("TRAY >>> Starting to display GUI.")
-        subprocess.Popen(["sudo", "protonvpn-gui"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        subprocess.Popen(["sudo", "protonvpn-gui"], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
         gui_logger.debug("TRAY >>> GUI display called, GUI should be visible.")
 
     def disconnect(self, _):
         """Disconnects from a current vpn connection."""
         gui_logger.debug("TRAY >>> Starting disconnect.")
-        subprocess.Popen(["sudo", "protonvpn", "disconnect"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        subprocess.Popen(["sudo", "protonvpn", "disconnect"], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
         gui_logger.debug("TRAY >>> Successfully disconnected user.")
 
     def get_tray_settings(self):
@@ -213,25 +213,21 @@ class ProtonVPNIndicator:
             resp_dict["display_serverload"] = int(get_gui_config("tray_tab", TRAY_CFG_SERVERLOAD))
         except KeyError:
             gui_logger.debug("[!] Could not find display_serverload in config file: ".format(KeyError))
-            pass
         
         try: 
             resp_dict["display_server"] = int(get_gui_config("tray_tab", TRAY_CFG_SERVENAME))
         except KeyError:
             gui_logger.debug("[!] Could not find display_server in config file: ".format(KeyError))
-            pass
 
         try: 
             resp_dict["display_data_tx"] = int(get_gui_config("tray_tab", TRAY_CFG_DATA_TX))
         except KeyError:
-            gui_logger.debug("[!] Could not find display_data_tx in config file: ".format(KeyError))
-            pass 
+            gui_logger.debug("[!] Could not find display_data_tx in config file: ".format(KeyError)) 
         
         try: 
             resp_dict["display_time_conn"] = int(get_gui_config("tray_tab", TRAY_CFG_TIME_CONN))
         except KeyError:
             gui_logger.debug("[!] Could not find display_time_conn in config file: ".format(KeyError))
-            pass
 
         return resp_dict
 
