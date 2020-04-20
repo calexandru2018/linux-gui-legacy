@@ -346,9 +346,11 @@ def load_on_start(params_dict):
         
         display_secure_core = get_gui_config("connections", "display_secure_core")
         secure_core_switch = params_dict["interface"].get_object("secure_core_switch")
+        secure_core_label_style = params_dict["interface"].get_object("secure_core_label").get_style_context() 
 
         if display_secure_core == "True":
             secure_core_switch.set_state(True)
+            secure_core_label_style.remove_class("disabled_label")
         else:
             secure_core_switch.set_state(False)
 

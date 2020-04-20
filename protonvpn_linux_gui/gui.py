@@ -82,7 +82,7 @@ class Handler:
 
         # Dashboard related
         self.conn_disc_button_label = self.interface.get_object("main_conn_disc_button_label")
-        self.secure_core_label = self.interface.get_object("secure_core_label")
+        self.secure_core_label_style = self.interface.get_object("secure_core_label").get_style_context()
         self.dashboard_tab_dict = {
             "countries_tab_style": self.interface.get_object("countries_tab_label").get_style_context(),
             "profiles_tab_style": self.interface.get_object("profiles_tab_label").get_style_context()
@@ -624,8 +624,10 @@ class Handler:
  
         if display_secure_core == "False":
             update_to = "True"
+            self.secure_core_label_style.remove_class("disabled_label")
         else:
             update_to = "False"
+            self.secure_core_label_style.add_class("disabled_label")
         
         if (state and display_secure_core == "False") or (not state and display_secure_core != "False"):
             self.messagedialog_sub_label.hide()        
