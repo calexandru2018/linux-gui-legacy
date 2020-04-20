@@ -484,7 +484,7 @@ class Handler:
                 thread.daemon = True
                 thread.start()
 
-    def tray_time_connected_combobox_changed(self, object):
+    def tray_time_connected_combobox_changed(self, object: object):
         display_data_tx = get_gui_config("tray_tab", "display_time_conn")
         tree_iter = object.get_active_iter()
         if tree_iter is not None:
@@ -794,14 +794,13 @@ def initialize_gui():
 
         if not os.path.isdir(GUI_CONFIG_DIR):
             os.mkdir(GUI_CONFIG_DIR)
-            gui_logger.debug("Config Directory created")
+            gui_logger.debug(">>> Config Directory created")
             change_file_owner(GUI_CONFIG_DIR)
 
         gui_logger.debug("\n______________________________________\n\n\tINITIALIZING NEW GUI WINDOW\n______________________________________\n")
-        try:
-            change_file_owner(os.path.join(GUI_CONFIG_DIR, "protonvpn-gui.log"))
-        except:
-            pass
+
+        change_file_owner(os.path.join(GUI_CONFIG_DIR, "protonvpn-gui.log"))
+
 
         if len(get_gui_processes()) > 1:
             gui_logger.debug("[!] Two processes were found. Displaying MessageDialog to inform user.")
