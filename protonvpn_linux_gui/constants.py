@@ -1,9 +1,10 @@
 import os
 try:
     from protonvpn_cli.constants import VERSION as cli_version, USER
-except:
+except Exception:
     cli_version = "Not installed"
     USER = '/home'
+    print(Exception)
 
 VERSION = "2.0.5"
 
