@@ -343,7 +343,7 @@ def load_on_start(params_dict):
         try:
             params_dict["messagedialog_label"].set_markup("Populating dashboard...")
         except:
-            pass # nosec
+            pass
         
         display_secure_core = get_gui_config("connections", "display_secure_core")
         secure_core_switch = params_dict["interface"].get_object("secure_core_switch")
@@ -918,7 +918,7 @@ def find_cli():
     except:
         gui_logger.debug("[!] Unable to run \"find protonvpn-cli-ng\" subprocess.")
         protonvpn_path = False
-        
+
     return protonvpn_path.stdout.decode()[:-1] if (protonvpn_path and protonvpn_path.returncode == 0) else False
         
 def generate_template(template):
