@@ -963,7 +963,7 @@ Author: Alexandru Cheltuitor
                     <property name="can_focus">True</property>
                     <property name="show_border">False</property>
                     <property name="enable_popup">True</property>
-                    <signal name="switch-page" handler="settings_notebook_switch_page" swapped="no"/>
+                    <signal name="switch-page" handler="settings_notebook_page_changed" swapped="no"/>
                     <child>
                       <object class="GtkGrid" id="general_content_holder">
                         <property name="visible">True</property>
@@ -1031,8 +1031,6 @@ Author: Alexandru Cheltuitor
                           <object class="GtkEntry" id="update_username_input">
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
-                            <property name="margin_top">5</property>
-                            <property name="margin_bottom">5</property>
                             <property name="has_frame">False</property>
                             <style>
                               <class name="default_style_entry"/>
@@ -1047,8 +1045,6 @@ Author: Alexandru Cheltuitor
                           <object class="GtkEntry" id="update_password_input">
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
-                            <property name="margin_top">5</property>
-                            <property name="margin_bottom">5</property>
                             <property name="visibility">False</property>
                             <property name="has_frame">False</property>
                             <property name="invisible_char">•</property>
@@ -1223,7 +1219,6 @@ Author: Alexandru Cheltuitor
                         <style>
                           <class name="default_settings_tab_conf"/>
                           <class name="active_tab"/>
-                          <class name="general_tab"/>
                         </style>
                       </object>
                       <packing>
@@ -1640,10 +1635,13 @@ Author: Alexandru Cheltuitor
                         </child>
                         <child>
                           <object class="GtkSwitch" id="custom_dns_switch">
-                            <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="halign">end</property>
                             <property name="valign">center</property>
+                            <signal name="state-set" handler="custom_dns_switch_changed" swapped="no"/>
+                            <style>
+                              <class name="default_style_switch"/>
+                            </style>
                           </object>
                           <packing>
                             <property name="left_attach">1</property>
@@ -1652,7 +1650,6 @@ Author: Alexandru Cheltuitor
                         </child>
                         <child>
                           <object class="GtkGrid">
-                            <property name="visible">True</property>
                             <property name="can_focus">False</property>
                             <child>
                               <object class="GtkLabel">
@@ -1694,6 +1691,59 @@ Author: Alexandru Cheltuitor
                           <packing>
                             <property name="left_attach">0</property>
                             <property name="top_attach">3</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkGrid" id="custom_dns_grid">
+                            <property name="can_focus">False</property>
+                            <property name="row_spacing">10</property>
+                            <property name="column_homogeneous">True</property>
+                            <child>
+                              <object class="GtkEntry">
+                                <property name="visible">True</property>
+                                <property name="can_focus">True</property>
+                                <property name="placeholder_text" translatable="yes">Separate by ;</property>
+                                <style>
+                                  <class name="default_style_entry"/>
+                                </style>
+                              </object>
+                              <packing>
+                                <property name="left_attach">0</property>
+                                <property name="top_attach">0</property>
+                                <property name="width">2</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <object class="GtkButton" id="update_custom_dns_button">
+                                <property name="visible">True</property>
+                                <property name="can_focus">True</property>
+                                <property name="receives_default">True</property>
+                                <property name="halign">end</property>
+                                <signal name="clicked" handler="update_custom_dns_button_clicked" swapped="no"/>
+                                <child>
+                                  <object class="GtkLabel">
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">False</property>
+                                    <property name="label" translatable="yes">Update</property>
+                                  </object>
+                                </child>
+                                <style>
+                                  <class name="default_style_btn"/>
+                                </style>
+                              </object>
+                              <packing>
+                                <property name="left_attach">1</property>
+                                <property name="top_attach">1</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <placeholder/>
+                            </child>
+                          </object>
+                          <packing>
+                            <property name="left_attach">0</property>
+                            <property name="top_attach">4</property>
+                            <property name="width">2</property>
                           </packing>
                         </child>
                         <style>
@@ -2444,7 +2494,7 @@ Author: Alexandru Cheltuitor
                             <property name="vexpand">True</property>
                             <property name="show_border">False</property>
                             <property name="enable_popup">True</property>
-                            <signal name="switch-page" handler="main_notebook_switch_page" swapped="no"/>
+                            <signal name="switch-page" handler="dashboard_notebook_page_changed" swapped="no"/>
                             <child>
                               <object class="GtkBox" id="countries_content_holder">
                                 <property name="width_request">460</property>
@@ -2458,7 +2508,7 @@ Author: Alexandru Cheltuitor
                                     <property name="visible">True</property>
                                     <property name="can_focus">False</property>
                                     <child>
-                                      <object class="GtkLabel">
+                                      <object class="GtkLabel" id="secure_core_label">
                                         <property name="visible">True</property>
                                         <property name="can_focus">False</property>
                                         <property name="halign">start</property>
@@ -2727,7 +2777,7 @@ Author: Alexandru Cheltuitor
                                                 <property name="can_focus">True</property>
                                                 <property name="focus_on_click">False</property>
                                                 <property name="receives_default">True</property>
-                                                <signal name="clicked" handler="quick_connect_button_clicked" swapped="no"/>
+                                                <signal name="clicked" handler="profile_quick_connect_button_clicked" swapped="no"/>
                                                 <child>
                                                   <object class="GtkGrid">
                                                     <property name="visible">True</property>
@@ -2778,7 +2828,7 @@ Author: Alexandru Cheltuitor
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">True</property>
                                                 <property name="receives_default">True</property>
-                                                <signal name="clicked" handler="random_connect_button_clicked" swapped="no"/>
+                                                <signal name="clicked" handler="profile_random_connect_button_clicked" swapped="no"/>
                                                 <child>
                                                   <object class="GtkGrid">
                                                     <property name="visible">True</property>
