@@ -291,15 +291,17 @@ def check_for_updates():
 
     if latest_release == VERSION:
         return "You have the latest version!"
-    elif VERSION < latest_release:
+
+    if VERSION < latest_release:
         return_string = "There is a newer release, you should upgrade to <b>v{0}</b>.\n\n".format(latest_release)
         if pip3_installed:
             return_string = return_string + "You can upgrade with the following command:\n\n<b>sudo pip3 install protonvpn-linux-gui-calexandru2018 --upgrade</b>\n\n"
         else:
             return_string = return_string + "You can upgrade by <b>first removing this version</b>, and then cloning the new one with the following commands:\n\n<b>git clone https://github.com/calexandru2018/protonvpn-linux-gui</b>\n\n<b>cd protonvpn-linux-gui</b>\n\n<b>sudo python3 setup.py install</b>"
+        
         return return_string
-    else:
-        return "Developer Mode."
+   
+    return "Developer Mode."
 
 def prepare_initilizer(username_field, password_field, interface):
     """Funciton that collects and prepares user input from login window.
@@ -356,8 +358,8 @@ def load_on_start(params_dict):
 
         update_labels_server_list(params_dict["interface"], conn_info=conn)
         return True
-    else:
-        return False
+ 
+    return False
 
 def update_labels_server_list(interface, server_tree_list_object=False, conn_info=False):
     """Function that updates dashboard labels and server list.
@@ -858,7 +860,6 @@ def manage_autoconnect(mode, command=False):
     """Function that manages autoconnect functionality. It takes a mode (enabled/disabled) and a command that is to be passed to the CLI.
     """
     if mode == 'enable':
-
         if not enable_autoconnect(command):
             print("[!] Unable to enable autoconnect")
             gui_logger.debug("[!] Unable to enable autoconnect.")
@@ -868,7 +869,7 @@ def manage_autoconnect(mode, command=False):
         gui_logger.debug(">>> Autoconnect on boot enabled")
         return True
 
-    elif mode == 'disable':
+    if mode == 'disable':
 
         if not disable_autoconnect():
             print("[!] Could not disable autoconnect")
@@ -901,10 +902,11 @@ def disable_autoconnect():
     """
     if not stop_and_disable_daemon():
         return False
-    elif not remove_template():
+
+    if not remove_template():
         return False
-    else:
-        return True
+
+    return True
 
 def find_cli():
     """Function that searches for the CLI. Returns CLIs path if it is found, otherwise it returns False.
@@ -918,7 +920,7 @@ def find_cli():
         gui_logger.debug("[!] Unable to run \"find protonvpn-cli-ng\" subprocess.")
         protonvpn_path = False
 
-    return protonvpn_path.stdout.decode()[:-1] if (not protonvpn_path == False and protonvpn_path.returncode == 0) else False
+    return protonvpn_path.stdout.decode()[:-1] if (protonvpn_path is True and protonvpn_path.returncode == 0) else False
         
 def generate_template(template):
     """Function that generates the service file for autoconnect.
@@ -976,7 +978,7 @@ def stop_and_disable_daemon():
     """
     if not daemon_exists():
         return True
-        
+
     try:
         resp_stop = subprocess.run(['sudo', 'systemctl', 'stop' , SERVICE_NAME], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
 
