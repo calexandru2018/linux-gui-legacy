@@ -80,6 +80,10 @@ class Handler:
         self.messagedialog_spinner = self.interface.get_object("message_dialog_spinner")
         self.messagedialog_sub_label.hide()
 
+        # Login related
+        self.login_username_label = self.interface.get_object("login_username_label")
+        self.login_password_label = self.interface.get_object("login_password_label")
+
         # Dashboard related
         self.conn_disc_button_label = self.interface.get_object("main_conn_disc_button_label")
         self.secure_core_label_style = self.interface.get_object("secure_core_label").get_style_context()
@@ -677,6 +681,22 @@ class Handler:
         thread.start()
 
         self.messagedialog_window.show()
+   
+    def login_username_entry_key_release(self, object, event):
+        if len(object.get_text().strip()) > 0:
+            # self.login_username_label.show()
+            self.login_username_label.set_markup("ProtonVPN (OpenVPN/IKEv2) Username")
+        else:
+            self.login_username_label.set_markup("")
+            # self.login_username_label.hide()
+        
+    def login_password_entry_key_release(self, object, event):
+        if len(object.get_text().strip()) > 0:
+            # self.login_password_label.show()
+            self.login_password_label.set_markup("ProtonVPN (OpenVPN/IKEv2) Password")
+        else:
+            # self.login_password_label.hide()
+            self.login_password_label.set_markup("")
 
 def initialize_gui():
     """Initializes the GUI 

@@ -411,7 +411,6 @@ Author: Alexandru Cheltuitor
           <object class="GtkEntry" id="username_field">
             <property name="visible">True</property>
             <property name="can_focus">True</property>
-            <property name="has_focus">True</property>
             <property name="margin_left">40</property>
             <property name="margin_right">40</property>
             <property name="margin_bottom">30</property>
@@ -419,6 +418,7 @@ Author: Alexandru Cheltuitor
             <property name="has_frame">False</property>
             <property name="invisible_char">*</property>
             <property name="placeholder_text" translatable="yes">ProtonVPN (OpenVPN/IKEv2) Username</property>
+            <signal name="key-release-event" handler="login_username_entry_key_release" swapped="no"/>
             <style>
               <class name="default_style_entry"/>
             </style>
@@ -432,7 +432,6 @@ Author: Alexandru Cheltuitor
           <object class="GtkEntry" id="password_field">
             <property name="visible">True</property>
             <property name="can_focus">True</property>
-            <property name="has_focus">True</property>
             <property name="margin_left">40</property>
             <property name="margin_right">40</property>
             <property name="margin_bottom">20</property>
@@ -441,6 +440,7 @@ Author: Alexandru Cheltuitor
             <property name="has_frame">False</property>
             <property name="invisible_char">*</property>
             <property name="placeholder_text" translatable="yes">ProtonVPN (OpenVPN/IKEv2) Password</property>
+            <signal name="key-release-event" handler="login_password_entry_key_release" swapped="no"/>
             <style>
               <class name="default_style_entry"/>
             </style>
@@ -562,11 +562,11 @@ Author: Alexandru Cheltuitor
         </child>
         <child>
           <object class="GtkLabel" id="login_username_label">
+            <property name="visible">True</property>
             <property name="can_focus">False</property>
             <property name="halign">start</property>
             <property name="margin_left">47</property>
             <property name="margin_right">40</property>
-            <property name="label" translatable="yes">ProtonVPN (OpenVPN/IKEv2) Username</property>
             <style>
               <class name="login_labels"/>
             </style>
@@ -578,11 +578,11 @@ Author: Alexandru Cheltuitor
         </child>
         <child>
           <object class="GtkLabel" id="login_password_label">
+            <property name="visible">True</property>
             <property name="can_focus">False</property>
             <property name="halign">start</property>
             <property name="margin_left">47</property>
             <property name="margin_right">40</property>
-            <property name="label" translatable="yes">ProtonVPN (OpenVPN/IKEv2) Password</property>
             <style>
               <class name="login_labels"/>
             </style>
@@ -605,7 +605,7 @@ Author: Alexandru Cheltuitor
     <property name="can_focus">False</property>
     <property name="relative_to">need_help_link</property>
     <child>
-      <object class="GtkBox">
+      <object class="GtkBox" id="main">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
         <property name="margin_left">10</property>
@@ -619,8 +619,9 @@ Author: Alexandru Cheltuitor
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <property name="halign">start</property>
-            <property name="label" translatable="yes">&lt;a href="https://account.protonvpn.com/reset-password"&gt;Reset Password&lt;/a&gt;</property>
+            <property name="label" translatable="yes">Reset Password: &lt;a href="#"&gt;https://account.protonvpn.com/reset-password&lt;/a&gt;</property>
             <property name="use_markup">True</property>
+            <property name="selectable">True</property>
             <style>
               <class name="login_links"/>
             </style>
@@ -636,8 +637,9 @@ Author: Alexandru Cheltuitor
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <property name="halign">start</property>
-            <property name="label" translatable="yes">&lt;a href="https://account.protonvpn.com/forgot-username"&gt;Forgot Username&lt;/a&gt;</property>
+            <property name="label" translatable="yes">Forgot Username: &lt;a href="#"&gt;https://account.protonvpn.com/forgot-username&lt;/a&gt;</property>
             <property name="use_markup">True</property>
+            <property name="selectable">True</property>
             <style>
               <class name="login_links"/>
             </style>
