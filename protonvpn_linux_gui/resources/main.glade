@@ -1886,7 +1886,7 @@ Author: Alexandru Cheltuitor
                                     <property name="can_focus">False</property>
                                     <property name="halign">start</property>
                                     <property name="margin_right">10</property>
-                                    <property name="label" translatable="yes">IP:</property>
+                                    <property name="label" translatable="yes">IP</property>
                                     <attributes>
                                       <attribute name="size" value="12000"/>
                                     </attributes>
