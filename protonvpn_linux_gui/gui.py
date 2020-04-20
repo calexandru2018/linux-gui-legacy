@@ -604,9 +604,7 @@ class Handler:
         if (state and killswitch_protection == 0) or (not state and killswitch_protection != 0):
             if update_to == 1 and split_tunnel >= 0:
                 self.split_tunneling_switch.set_property('sensitive', False)
-                print("Blocked split tunell")
             else:
-                print("Unblocked split tunell")
                 self.split_tunneling_switch.set_property('sensitive', True)
                 
             thread = Thread(target=update_killswitch, args=[update_to])
@@ -636,9 +634,7 @@ class Handler:
         if (state and split_tunnel == 0) or (not state and split_tunnel != 0):
             if update_to == 1 and killswitch_protection >= 0:
                 self.update_killswitch_switch.set_property('sensitive', False)
-                print("Blocked killswitch")
             else:
-                print("Unblocked killswitch")
                 self.update_killswitch_switch.set_property('sensitive', True)
 
             thread = Thread(target=update_split_tunneling_status, args=[update_to])
