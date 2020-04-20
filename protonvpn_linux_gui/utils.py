@@ -270,7 +270,7 @@ def check_for_updates():
     pip3_installed = False
 
     try:
-        is_pip3_installed = subprocess.run(["pip3", "show", "protonvpn-linux-gui-calexandru2018"],stdout=subprocess.PIPE)
+        is_pip3_installed = subprocess.run(["pip3", "show", "protonvpn-linux-gui-calexandru2018"],stdout=subprocess.PIPE) # nosec
         if is_pip3_installed.returncode == 0:
             is_pip3_installed = is_pip3_installed.stdout.decode().split("\n")
             for el in is_pip3_installed:
@@ -342,7 +342,7 @@ def load_on_start(params_dict):
         try:
             params_dict["messagedialog_label"].set_markup("Populating dashboard...")
         except:
-            pass
+            pass # nosec
         
         display_secure_core = get_gui_config("connections", "display_secure_core")
         secure_core_switch = params_dict["interface"].get_object("secure_core_switch")
@@ -457,7 +457,7 @@ def update_labels_status(update_labels_dict):
                     flag_path = flags_base_path+"{}.jpg".format(k.lower()) 
                     background_large_flag.set_from_file(flag_path)
                 except:
-                    pass
+                    gui_logger.debug("[!] Could not find appropriate flag to display in the Dashboard.")
                 
             country_cc = v
 
@@ -913,7 +913,7 @@ def find_cli():
     custom_cli_err = ''
 
     try:
-        protonvpn_path = subprocess.run(['sudo', 'which', 'protonvpn'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        protonvpn_path = subprocess.run(['sudo', 'which', 'protonvpn'], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
     except:
         gui_logger.debug("[!] Unable to run \"find protonvpn-cli-ng\" subprocess.")
         protonvpn_path = False
@@ -926,7 +926,7 @@ def generate_template(template):
     generate_service_command = "cat > {0} <<EOF {1}\nEOF".format(PATH_AUTOCONNECT_SERVICE, template)
     gui_logger.debug(">>> Template:\n{}".format(generate_service_command))
     try:
-        resp = subprocess.run(["sudo", "bash", "-c", generate_service_command], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        resp = subprocess.run(["sudo", "bash", "-c", generate_service_command], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
 
         if resp.returncode == 1:
             gui_logger.debug("[!] Unable to generate template.\n{}".format(resp))
@@ -941,7 +941,7 @@ def remove_template():
     """Function that removes the service file from /etc/systemd/system/.
     """
     try:
-        resp = subprocess.run(["sudo", "rm", PATH_AUTOCONNECT_SERVICE], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        resp = subprocess.run(["sudo", "rm", PATH_AUTOCONNECT_SERVICE], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
 
         # If return code 1: File does not exist in path
         # This is fired when a user wants to remove template a that does not exist
@@ -960,7 +960,7 @@ def enable_daemon():
     reload_daemon()
 
     try:
-        resp = subprocess.run(['sudo', 'systemctl', 'enable' , SERVICE_NAME], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        resp = subprocess.run(['sudo', 'systemctl', 'enable' , SERVICE_NAME], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
 
         if resp.returncode == 1:
             gui_logger.debug("[!] Unable to enable deamon.\n{}".format(resp))
@@ -976,34 +976,34 @@ def stop_and_disable_daemon():
     """
     if not daemon_exists():
         return True
-    else:
-        try:
-            resp_stop = subprocess.run(['sudo', 'systemctl', 'stop' , SERVICE_NAME], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        
+    try:
+        resp_stop = subprocess.run(['sudo', 'systemctl', 'stop' , SERVICE_NAME], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
 
-            if resp_stop.returncode == 1:
-                gui_logger.debug("[!] Unable to stop deamon.\n{}".format(resp_stop))
-                return False
-        except:
-            gui_logger.debug("[!] Could not run \"stop daemon\" subprocess.")
+        if resp_stop.returncode == 1:
+            gui_logger.debug("[!] Unable to stop deamon.\n{}".format(resp_stop))
             return False
+    except:
+        gui_logger.debug("[!] Could not run \"stop daemon\" subprocess.")
+        return False
 
-        try:
-            resp_disable = subprocess.run(['sudo', 'systemctl', 'disable' ,SERVICE_NAME], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    try:
+        resp_disable = subprocess.run(['sudo', 'systemctl', 'disable' ,SERVICE_NAME], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
 
-            if resp_disable.returncode == 1:
-                gui_logger.debug("[!] Unable not disable daemon.\n{}".format(resp_disable))
-                return False
-        except:
-            gui_logger.debug("[!] Could not run \"disable daemon\" subprocess.")
+        if resp_disable.returncode == 1:
+            gui_logger.debug("[!] Unable not disable daemon.\n{}".format(resp_disable))
             return False
+    except:
+        gui_logger.debug("[!] Could not run \"disable daemon\" subprocess.")
+        return False
 
-        return True
+    return True
 
 def reload_daemon():
     """Function that reloads the autoconnect daemon service.
     """
     try:
-        resp = subprocess.run(['sudo', 'systemctl', 'daemon-reload'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        resp = subprocess.run(['sudo', 'systemctl', 'daemon-reload'], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
         if resp.returncode == 1:
             gui_logger.debug("[!] Unable to reload daemon.\n{}".format(resp))
             return False
@@ -1017,12 +1017,13 @@ def daemon_exists():
     """
     # Return code 3: service exists
     # Return code 4: service could not be found
-    resp_stop = subprocess.run(['systemctl', 'status' , SERVICE_NAME], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    resp_stop = subprocess.run(['systemctl', 'status' , SERVICE_NAME], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
+    return_val = True
 
     if resp_stop.returncode == 4:
-        return False
-    else:
-        return True
+        return_val = False
+
+    return return_val
 
 def custom_get_ip_info():
     """Custom get_ip_info that also returns the country.
@@ -1044,7 +1045,7 @@ def get_gui_processes():
     """
     gui_logger.debug(">>> Running \"get_gui_processes\".")
 
-    processes = subprocess.run(["pgrep", "protonvpn-gui"],stdout=subprocess.PIPE)
+    processes = subprocess.run(["pgrep", "protonvpn-gui"],stdout=subprocess.PIPE) # nosec
     
     processes = list(filter(None, processes.stdout.decode().split("\n"))) 
 
