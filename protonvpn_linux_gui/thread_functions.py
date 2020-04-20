@@ -228,7 +228,7 @@ def connect_to_selected_server(*args):
     display_message = result.stdout.decode()
 
     if server_protocol:
-        display_message = "You are connect to <b>{}</b> via <b>{}</b>!".format(server_protocol, protocol.upper())
+        display_message = "You are connected to <b>{}</b> via <b>{}</b>!".format(server_protocol, protocol.upper())
 
     args[0]["messagedialog_label"].set_markup(display_message)
     args[0]["messagedialog_spinner"].hide()
@@ -286,7 +286,7 @@ def custom_quick_connect(*args):
     display_message = result.stdout.decode()
 
     if server_protocol:
-        display_message = "You are connect to <b>{}</b> via <b>{}</b>!".format(server_protocol, protocol.upper())
+        display_message = "You are connected to <b>{}</b> via <b>{}</b>!".format(server_protocol, protocol.upper())
 
     args[0]["messagedialog_label"].set_markup(display_message)
     args[0]["messagedialog_spinner"].hide()
@@ -318,7 +318,7 @@ def quick_connect(*args):
     display_message = result.stdout.decode()
 
     if server_protocol:
-        display_message = "You are connect to <b>{}</b> via <b>{}</b>!".format(server_protocol, protocol.upper())
+        display_message = "You are connected to <b>{}</b> via <b>{}</b>!".format(server_protocol, protocol.upper())
 
     args[0]["messagedialog_label"].set_markup(display_message)
     args[0]["messagedialog_spinner"].hide()
@@ -348,7 +348,7 @@ def last_connect(interface, messagedialog_label, messagedialog_spinner):
     display_message = result.stdout.decode()
 
     if server_protocol:
-        display_message = "You are connect to <b>{}</b> via <b>{}</b>!".format(server_protocol[0], server_protocol[1].upper())
+        display_message = "You are connected to <b>{}</b> via <b>{}</b>!".format(server_protocol[0], server_protocol[1].upper())
 
     messagedialog_label.set_markup(display_message)
     messagedialog_spinner.hide()
@@ -380,7 +380,7 @@ def random_connect(interface, messagedialog_label, messagedialog_spinner):
     display_message = result.stdout.decode()
 
     if server_protocol:
-        display_message = "You are connect to <b>{}</b> via <b>{}</b>!".format(server_protocol[0], server_protocol[1].upper())
+        display_message = "You are connected to <b>{}</b> via <b>{}</b>!".format(server_protocol[0], server_protocol[1].upper())
 
     messagedialog_label.set_markup(display_message)
     messagedialog_spinner.hide()
