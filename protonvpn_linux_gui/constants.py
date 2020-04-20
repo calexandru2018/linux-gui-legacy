@@ -6,7 +6,7 @@ except Exception:
     USER = '/home'
     print(Exception)
 
-VERSION = "2.0.5"
+VERSION = "2.0.6"
 
 GITHUB_URL_RELEASE = "https://github.com/calexandru2018/protonvpn-linux-gui/releases/latest"
 
