@@ -152,7 +152,7 @@ class ProtonVPNIndicator:
 
         try:
             connected_server = get_config_value("metadata", "connected_server")
-        except KeyError:
+        except (KeyError, IndexError):
             gui_logger.debug("[!] Could not find specified key: ".format(KeyError))
             return True
 
@@ -292,7 +292,7 @@ class ProtonVPNIndicator:
             connected_time = get_config_value("metadata", "connected_time")
             connection_time = time.time() - int(connected_time)
             connection_time = str(datetime.timedelta(seconds=connection_time)).split(".")[0]
-        except KeyError:
+        except (KeyError, IndexError):
             connection_time = False
     
         connection_time = connection_time if connection_time else ""

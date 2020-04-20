@@ -167,7 +167,7 @@ def message_dialog(interface, action, label_object, spinner_object, sub_label_ob
                         is_custom_resolv_conf["display"] = "Custom"
         try:
             is_splitunn_enabled = True if get_config_value("USER", "split_tunnel") == "1" else False
-        except KeyError:
+        except (KeyError, IndexError):
             is_splitunn_enabled = False
         
         # Reccomendations based on known issues
@@ -406,7 +406,7 @@ def update_labels_status(update_labels_dict):
 
     try:
         connected_server = get_config_value("metadata", "connected_server")
-    except:
+    except (KeyError, IndexError):
         connected_server = False
 
     time_connected_label =  interface.get_object("time_connected_label")
@@ -430,7 +430,7 @@ def update_labels_status(update_labels_dict):
     # Get and set server load label
     try:
         load = get_server_value(connected_server, "Load", servers)
-    except KeyError:
+    except (KeyError, IndexError):
         gui_logger.debug("[!] Could not find server load information.")
         
     load = "{0}% Load".format(load) if load and is_vpn_connected else ""
@@ -486,7 +486,7 @@ def update_labels_status(update_labels_dict):
         try:
             connected_to_protocol = get_config_value("metadata", "connected_proto")
             protocol = '<span>OpenVPN >> {0}</span>'.format(connected_to_protocol.upper())
-        except KeyError:
+        except (KeyError, IndexError):
             pass
         conn_disc_button = "Disconnect"
     conn_disc_button_label.set_markup(conn_disc_button)
@@ -521,7 +521,7 @@ def update_connection_time(dict_data):
             connected_time = get_config_value("metadata", "connected_time")
             connection_time = time.time() - int(connected_time)
             connection_time = str(datetime.timedelta(seconds=connection_time)).split(".")[0]
-        except KeyError:
+        except (KeyError, IndexError):
             connection_time = False
     
     connection_time = connection_time if connection_time else ""
@@ -579,11 +579,11 @@ def load_connection_settings(interface):
     #Get values
     try:
         autoconnect_setting = get_gui_config("conn_tab", "autoconnect")
-    except KeyError:
+    except (KeyError, IndexError):
         autoconnect_setting = 0
     try:
         quick_connect_setting = get_gui_config("conn_tab", "quick_connect")
-    except KeyError:
+    except (KeyError, IndexError):
         quick_connect = 0 
     default_protocol = get_config_value("USER", "default_protocol")
 
@@ -604,7 +604,7 @@ def load_advanced_settings(interface):
 
     try:
         split_tunnel = get_config_value("USER", "split_tunnel")
-    except KeyError:
+    except (KeyError, IndexError):
         split_tunnel = '0'
 
     # Object

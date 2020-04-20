@@ -788,12 +788,10 @@ def initialize_gui():
         if not os.path.isdir(GUI_CONFIG_DIR):
             os.mkdir(GUI_CONFIG_DIR)
             gui_logger.debug(">>> Config Directory created")
-            change_file_owner(GUI_CONFIG_DIR)
 
+        change_file_owner(GUI_CONFIG_DIR)
         gui_logger.debug("\n______________________________________\n\n\tINITIALIZING NEW GUI WINDOW\n______________________________________\n")
-
         change_file_owner(os.path.join(GUI_CONFIG_DIR, "protonvpn-gui.log"))
-
 
         if len(get_gui_processes()) > 1:
             gui_logger.debug("[!] Two processes were found. Displaying MessageDialog to inform user.")
