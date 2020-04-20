@@ -13,8 +13,8 @@ try:
     from protonvpn_cli.utils import get_config_value, is_valid_ip, set_config_value, change_file_owner, pull_server_data, make_ovpn_template #noqa
     from protonvpn_cli import cli, connection #noqa
     from protonvpn_cli.country_codes import country_codes #noqa
-except:
-    pass
+except Exception:
+    print("Can not find CLI modules.")
 
 # Custom helper functions
 from .utils import (
@@ -176,8 +176,8 @@ def initialize_gui_config():
         change_file_owner(GUI_CONFIG_FILE)
         gui_logger.debug("pvpn-gui.cfg initialized.")
         return True
-    except:
-        gui_logger.debug("Unablt to initialize pvpn-gui.cfg.")
+    except Exception:
+        gui_logger.debug("Unablt to initialize pvpn-gui.cfg. {}".format(Exception))
         return False
 
 def reload_secure_core_servers(interface, messagedialog_label, messagedialog_spinner, update_to):
@@ -213,14 +213,14 @@ def connect_to_selected_server(*args):
         
     # Check if it should connect to country or server
     if "#" in args[0]["user_selected_server"]:
-        result = subprocess.run(["protonvpn", "connect", args[0]["user_selected_server"], "-p", protocol], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        result = subprocess.run(["protonvpn", "connect", args[0]["user_selected_server"], "-p", protocol], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
         gui_logger.debug(">>> Log during connection to specific server: {}".format(result))
     else:
         for k, v in country_codes.items():
             if v == args[0]["user_selected_server"]:
                 selected_country = k
                 break
-        result = subprocess.run(["protonvpn", "connect", "--cc", selected_country, "-p", protocol], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        result = subprocess.run(["protonvpn", "connect", "--cc", selected_country, "-p", protocol], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
         gui_logger.debug(">>> Log during connection to country: {}".format(result))
 
     server_protocol = get_server_protocol_from_cli(result)
@@ -305,7 +305,7 @@ def quick_connect(*args):
 
     gui_logger.debug(">>> Running \"fastest\".")
 
-    result = subprocess.run(["protonvpn", "connect", "--fastest", "-p", protocol], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    result = subprocess.run(["protonvpn", "connect", "--fastest", "-p", protocol], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
 
     update_labels_dict = {
         "interface": args[0]["interface"],
@@ -334,7 +334,7 @@ def last_connect(interface, messagedialog_label, messagedialog_spinner):
     """        
     gui_logger.debug(">>> Running \"reconnect\".")
 
-    result = subprocess.run(["protonvpn", "reconnect"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    result = subprocess.run(["protonvpn", "reconnect"], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
 
     update_labels_dict = {
         "interface": interface,
@@ -373,7 +373,7 @@ def random_connect(interface, messagedialog_label, messagedialog_spinner):
         "conn_info": False
     }
 
-    result = subprocess.run(["protonvpn", "connect", "--random", "-p", protocol], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    result = subprocess.run(["protonvpn", "connect", "--random", "-p", protocol], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
     
     server_protocol = get_server_protocol_from_cli(result, return_protocol=True)
 
@@ -403,7 +403,7 @@ def disconnect(*args):
 
     gui_logger.debug(">>> Running \"disconnect\".")
 
-    result = subprocess.run(["protonvpn", "disconnect"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    result = subprocess.run(["protonvpn", "disconnect"], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
     
     args[0]["messagedialog_label"].set_markup(result.stdout.decode())
     args[0]["messagedialog_spinner"].hide()
@@ -692,10 +692,10 @@ def kill_duplicate_gui_process():
 
         while len(get_gui_processes()) > 1:
             if time.time() - timer_start <= 10:
-                subprocess.run(["kill", process_to_kill])
+                subprocess.run(["kill", process_to_kill]) # nosec
                 time.sleep(0.2)
             else:
-                subprocess.run(["kill", "-9", process_to_kill])
+                subprocess.run(["kill", "-9", process_to_kill]) # nosec
                 gui_logger.debug("[!] Unable to pkill process \"{0}\". Will attempt a SIGKILL.".format(process[0]))
                 break
 
