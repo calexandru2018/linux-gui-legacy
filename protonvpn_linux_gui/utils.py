@@ -27,8 +27,7 @@ try:
     from protonvpn_cli.constants import SPLIT_TUNNEL_FILE, USER, CONFIG_FILE, PASSFILE
     from protonvpn_cli.utils import change_file_owner, make_ovpn_template, set_config_value
 except:
-    print("Unable to import from CLI, can not find CLI modules.")
-    pass
+    print("Can not find CLI modules.")
 
 from .constants import (
     PATH_AUTOCONNECT_SERVICE, 
@@ -96,8 +95,8 @@ def get_server_protocol_from_cli(raw_result, return_protocol=False):
             protocol = re.search("(UDP|TCP)", display_message[0])
             return (server_name[0].group(), protocol.group())
         return server_name[0].group()
-    else:
-        return False
+
+    return False
 
 def message_dialog(interface, action, label_object, spinner_object, sub_label_object=False):
     """Multipurpose message dialog function.
@@ -142,7 +141,7 @@ def message_dialog(interface, action, label_object, spinner_object, sub_label_ob
 
         # Check if custom DNS is enabled
             # If there is no VPN connection and also no internet, then it is a DNS issue.
-        is_dns_protection_enabled = False if get_config_value("USER", "dns_leak_protection") == "0" or (not get_config_value("USER", "custom_dns") == None and get_config_value("USER", "dns_leak_protection") == "0") else True
+        is_dns_protection_enabled = False if get_config_value("USER", "dns_leak_protection") == "0" or (not get_config_value("USER", "custom_dns") is None and get_config_value("USER", "dns_leak_protection") == "0") else True
 
         # Check if custom DNS is in use. 
             # It might that the user has disabled the custom DNS settings but the file still resides there
@@ -181,10 +180,10 @@ def message_dialog(interface, action, label_object, spinner_object, sub_label_ob
                 if is_killswitch_enabled:
                     reccomendation = reccomendation + "\nYou Have killswitch enabled, which might be blocking your connection.\nTry to flush and then reconfigure your IP tables."
                     reccomendation = reccomendation + "<b>Warning:</b> By doing this you are clearing all of your killswitch configurations. Do at your own risk." + restore_ip_tables_guide
-                elif is_custom_resolv_conf["logical"] == True:
+                elif is_custom_resolv_conf["logical"]:
                     reccomendation = reccomendation + "\nCustom DNS is still present in resolv.conf even though you are not connected to a server. This might be blocking your from establishing a non-encrypted connection.\n"
                     reccomendation = reccomendation + "Try to restart your network manager to restore default configurations:" + restart_netwman_guide
-                elif is_custom_resolv_conf["logical"] == None:
+                elif is_custom_resolv_conf["logical"] is None:
                     reccomendation = reccomendation + "\nNo running VPN process was found, though DNS configurations are lacking in resolv.conf.\n"
                     reccomendation = reccomendation + "This might be due to some error or corruption during DNS restoration or lack of internet connection.\n"
                     reccomendation = reccomendation + "Try to restart your network manager to restore default configurations, if it still does not work, then you probably experiencing some internet connection issues." + restart_netwman_guide
@@ -270,7 +269,7 @@ def check_for_updates():
     pip3_installed = False
 
     try:
-        is_pip3_installed = subprocess.run(["pip3", "show", "protonvpn-linux-gui-calexandru2018"],stdout=subprocess.PIPE)
+        is_pip3_installed = subprocess.run(["pip3", "show", "protonvpn-linux-gui-calexandru2018"],stdout=subprocess.PIPE) # nosec
         if is_pip3_installed.returncode == 0:
             is_pip3_installed = is_pip3_installed.stdout.decode().split("\n")
             for el in is_pip3_installed:
@@ -291,15 +290,17 @@ def check_for_updates():
 
     if latest_release == VERSION:
         return "You have the latest version!"
-    elif VERSION < latest_release:
+
+    if VERSION < latest_release:
         return_string = "There is a newer release, you should upgrade to <b>v{0}</b>.\n\n".format(latest_release)
         if pip3_installed:
             return_string = return_string + "You can upgrade with the following command:\n\n<b>sudo pip3 install protonvpn-linux-gui-calexandru2018 --upgrade</b>\n\n"
         else:
             return_string = return_string + "You can upgrade by <b>first removing this version</b>, and then cloning the new one with the following commands:\n\n<b>git clone https://github.com/calexandru2018/protonvpn-linux-gui</b>\n\n<b>cd protonvpn-linux-gui</b>\n\n<b>sudo python3 setup.py install</b>"
+        
         return return_string
-    else:
-        return "Developer Mode."
+   
+    return "Developer Mode."
 
 def prepare_initilizer(username_field, password_field, interface):
     """Funciton that collects and prepares user input from login window.
@@ -319,7 +320,7 @@ def prepare_initilizer(username_field, password_field, interface):
 
     # Get user plan
     for k,v in protonvpn_plans.items():
-        if v == True:
+        if v:
             protonvpn_plan = k
             break
     
@@ -338,11 +339,8 @@ def load_on_start(params_dict):
     gui_logger.debug(">>> Running \"load_on_start\". Params: {0}.".format(params_dict))
 
     conn = custom_get_ip_info()
-    if not conn == False and not conn == None:
-        try:
-            params_dict["messagedialog_label"].set_markup("Populating dashboard...")
-        except:
-            pass
+    if conn and not conn is None:
+        params_dict["messagedialog_label"].set_markup("Populating dashboard...")
         
         display_secure_core = get_gui_config("connections", "display_secure_core")
         secure_core_switch = params_dict["interface"].get_object("secure_core_switch")
@@ -356,8 +354,8 @@ def load_on_start(params_dict):
 
         update_labels_server_list(params_dict["interface"], conn_info=conn)
         return True
-    else:
-        return False
+ 
+    return False
 
 def update_labels_server_list(interface, server_tree_list_object=False, conn_info=False):
     """Function that updates dashboard labels and server list.
@@ -401,22 +399,16 @@ def update_labels_status(update_labels_dict):
     else:
         servers = update_labels_dict["servers"]
 
-    protonvpn_conn_check = is_connected()
-    is_vpn_connected = True if protonvpn_conn_check else False
+    interface =  update_labels_dict["interface"]
+    disconnecting = update_labels_dict["disconnecting"]
+    conn_info = update_labels_dict["conn_info"]
+    is_vpn_connected = True if is_connected() else False
 
     try:
         connected_server = get_config_value("metadata", "connected_server")
     except:
         connected_server = False
-        
-    update_labels(update_labels_dict["interface"], servers, is_vpn_connected, connected_server, update_labels_dict["disconnecting"], conn_info=update_labels_dict["conn_info"])
 
-def update_labels(interface, servers, is_connected, connected_server, disconnecting, conn_info=False):
-    """Function that updates the labels.
-    """
-    gui_logger.debug(">>> Running \"right_grid_update_labels\".")
-
-    # Right grid
     time_connected_label =  interface.get_object("time_connected_label")
     protocol_label =        interface.get_object("protocol_label")
     conn_disc_button_label = interface.get_object("main_conn_disc_button_label")
@@ -432,13 +424,16 @@ def update_labels(interface, servers, is_connected, connected_server, disconnect
     CURRDIR = os.path.dirname(os.path.abspath(__file__))
     flags_base_path = CURRDIR+"/resources/img/flags/large/"
 
+    country_cc = False
+    load = False
+
     # Get and set server load label
     try:
         load = get_server_value(connected_server, "Load", servers)
-    except:
-        load = False
+    except KeyError:
+        gui_logger.debug("[!] Could not find server load information.")
         
-    load = "{0}% Load".format(load) if load and is_connected else ""
+    load = "{0}% Load".format(load) if load and is_vpn_connected else ""
     server_load_label.set_markup('<span>{0}</span>'.format(load))
 
     # Get and set IP labels. Get also country and ISP
@@ -452,69 +447,55 @@ def update_labels(interface, servers, is_connected, connected_server, disconnect
             country = "None"
     else:
         ip, isp, country = conn_info
-
-    country_cc = False
-
+        
     for k,v in country_codes.items():
         if k == country:
-            if is_connected:
+            if is_vpn_connected:
                 try:
                     flag_path = flags_base_path+"{}.jpg".format(k.lower()) 
                     background_large_flag.set_from_file(flag_path)
                 except:
-                    pass
+                    gui_logger.debug("[!] Could not find appropriate flag to display in the Dashboard.")
                 
             country_cc = v
 
     protonvpn_sign_green.hide()
     country_server = country_cc
 
-    if is_connected:
+    if is_vpn_connected:
         try:
             country_server = country_server + " >> " + connected_server
         except TypeError: 
             country_server = country_server + " >> "
 
         protonvpn_sign_green.show()
-
-    # Get and set server name
-    connected_server = connected_server if connected_server and is_connected else ""
-
-    country_label.set_markup(country_server if country_server else "")
     ip_label.set_markup(ip)
-
     isp_label.set_markup(isp)
 
-    # Get and set city label
-    try:
-        city = get_server_value(connected_server, "City", servers)
-    except:
-        city = False
-    city = city if city else ""
+    # Get and set server name
+    connected_server = connected_server if connected_server and is_vpn_connected else ""
+    country_label.set_markup(country_server if country_server else "")
 
     # Update sent and received data
-    gobject.timeout_add_seconds(1, update_sent_received_data, {"received_label": data_received_label, "sent_label": data_sent_label})
+    gobject.timeout_add_seconds(1, update_sent_received_data, {"is_vpn_connected": is_vpn_connected, "received_label": data_received_label, "sent_label": data_sent_label})
     
-    # Left grid
-    all_features = {0: "Normal", 1: "Secure-Core", 2: "Tor", 4: "P2P"}
-    protocol = "No VPN Connection"
-
     # Check and set VPN status label. Get also protocol status if vpn is connected
+    protocol = "No VPN Connection"
     conn_disc_button = "Quick Connect"
-    if is_connected and not disconnecting:
+    if is_vpn_connected and not disconnecting:
         try:
             connected_to_protocol = get_config_value("metadata", "connected_proto")
             protocol = '<span>OpenVPN >> {0}</span>'.format(connected_to_protocol.upper())
         except KeyError:
             pass
         conn_disc_button = "Disconnect"
-    
     conn_disc_button_label.set_markup(conn_disc_button)
+
     # Check and set DNS status label
     dns_enabled = get_config_value("USER", "dns_leak_protection")
 
     # Update time connected label
-    gobject.timeout_add_seconds(1, update_connection_time, {"is_connected":is_connected, "label":time_connected_label})
+    gobject.timeout_add_seconds(1, update_connection_time, {"is_vpn_connected":is_vpn_connected, "label":time_connected_label})
 
     # Check and set protocol label
     protocol_label.set_markup(protocol)
@@ -522,12 +503,12 @@ def update_labels(interface, servers, is_connected, connected_server, disconnect
 def update_sent_received_data(dict_labels):
     tx_amount, rx_amount = get_transferred_data()
 
-    rx_amount = rx_amount if is_connected else ""
+    rx_amount = rx_amount if dict_labels["is_vpn_connected"] else ""
     
     dict_labels["received_label"].set_markup('<span>{0}</span>'.format(rx_amount))
 
     # Get and set sent data
-    tx_amount = tx_amount if is_connected else ""
+    tx_amount = tx_amount if dict_labels["is_vpn_connected"] else ""
     dict_labels["sent_label"].set_markup('<span>{0}</span>'.format(tx_amount))
     
     return True
@@ -535,7 +516,7 @@ def update_sent_received_data(dict_labels):
 def update_connection_time(dict_data):
     connection_time = False
     
-    if dict_data["is_connected"]:
+    if dict_data["is_vpn_connected"]:
         try:
             connected_time = get_config_value("metadata", "connected_time")
             connection_time = time.time() - int(connected_time)
@@ -875,7 +856,6 @@ def manage_autoconnect(mode, command=False):
     """Function that manages autoconnect functionality. It takes a mode (enabled/disabled) and a command that is to be passed to the CLI.
     """
     if mode == 'enable':
-
         if not enable_autoconnect(command):
             print("[!] Unable to enable autoconnect")
             gui_logger.debug("[!] Unable to enable autoconnect.")
@@ -885,7 +865,7 @@ def manage_autoconnect(mode, command=False):
         gui_logger.debug(">>> Autoconnect on boot enabled")
         return True
 
-    elif mode == 'disable':
+    if mode == 'disable':
 
         if not disable_autoconnect():
             print("[!] Could not disable autoconnect")
@@ -918,10 +898,11 @@ def disable_autoconnect():
     """
     if not stop_and_disable_daemon():
         return False
-    elif not remove_template():
+
+    if not remove_template():
         return False
-    else:
-        return True
+
+    return True
 
 def find_cli():
     """Function that searches for the CLI. Returns CLIs path if it is found, otherwise it returns False.
@@ -930,12 +911,12 @@ def find_cli():
     custom_cli_err = ''
 
     try:
-        protonvpn_path = subprocess.run(['sudo', 'which', 'protonvpn'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        protonvpn_path = subprocess.run(['sudo', 'which', 'protonvpn'], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
     except:
         gui_logger.debug("[!] Unable to run \"find protonvpn-cli-ng\" subprocess.")
         protonvpn_path = False
 
-    return protonvpn_path.stdout.decode()[:-1] if (not protonvpn_path == False and protonvpn_path.returncode == 0) else False
+    return protonvpn_path.stdout.decode()[:-1] if (protonvpn_path and protonvpn_path.returncode == 0) else False
         
 def generate_template(template):
     """Function that generates the service file for autoconnect.
@@ -943,7 +924,7 @@ def generate_template(template):
     generate_service_command = "cat > {0} <<EOF {1}\nEOF".format(PATH_AUTOCONNECT_SERVICE, template)
     gui_logger.debug(">>> Template:\n{}".format(generate_service_command))
     try:
-        resp = subprocess.run(["sudo", "bash", "-c", generate_service_command], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        resp = subprocess.run(["sudo", "bash", "-c", generate_service_command], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
 
         if resp.returncode == 1:
             gui_logger.debug("[!] Unable to generate template.\n{}".format(resp))
@@ -958,7 +939,7 @@ def remove_template():
     """Function that removes the service file from /etc/systemd/system/.
     """
     try:
-        resp = subprocess.run(["sudo", "rm", PATH_AUTOCONNECT_SERVICE], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        resp = subprocess.run(["sudo", "rm", PATH_AUTOCONNECT_SERVICE], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
 
         # If return code 1: File does not exist in path
         # This is fired when a user wants to remove template a that does not exist
@@ -977,7 +958,7 @@ def enable_daemon():
     reload_daemon()
 
     try:
-        resp = subprocess.run(['sudo', 'systemctl', 'enable' , SERVICE_NAME], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        resp = subprocess.run(['sudo', 'systemctl', 'enable' , SERVICE_NAME], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
 
         if resp.returncode == 1:
             gui_logger.debug("[!] Unable to enable deamon.\n{}".format(resp))
@@ -993,34 +974,34 @@ def stop_and_disable_daemon():
     """
     if not daemon_exists():
         return True
-    else:
-        try:
-            resp_stop = subprocess.run(['sudo', 'systemctl', 'stop' , SERVICE_NAME], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
-            if resp_stop.returncode == 1:
-                gui_logger.debug("[!] Unable to stop deamon.\n{}".format(resp_stop))
-                return False
-        except:
-            gui_logger.debug("[!] Could not run \"stop daemon\" subprocess.")
+    try:
+        resp_stop = subprocess.run(['sudo', 'systemctl', 'stop' , SERVICE_NAME], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
+
+        if resp_stop.returncode == 1:
+            gui_logger.debug("[!] Unable to stop deamon.\n{}".format(resp_stop))
             return False
+    except:
+        gui_logger.debug("[!] Could not run \"stop daemon\" subprocess.")
+        return False
 
-        try:
-            resp_disable = subprocess.run(['sudo', 'systemctl', 'disable' ,SERVICE_NAME], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    try:
+        resp_disable = subprocess.run(['sudo', 'systemctl', 'disable' ,SERVICE_NAME], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
 
-            if resp_disable.returncode == 1:
-                gui_logger.debug("[!] Unable not disable daemon.\n{}".format(resp_disable))
-                return False
-        except:
-            gui_logger.debug("[!] Could not run \"disable daemon\" subprocess.")
+        if resp_disable.returncode == 1:
+            gui_logger.debug("[!] Unable not disable daemon.\n{}".format(resp_disable))
             return False
+    except:
+        gui_logger.debug("[!] Could not run \"disable daemon\" subprocess.")
+        return False
 
-        return True
+    return True
 
 def reload_daemon():
     """Function that reloads the autoconnect daemon service.
     """
     try:
-        resp = subprocess.run(['sudo', 'systemctl', 'daemon-reload'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        resp = subprocess.run(['sudo', 'systemctl', 'daemon-reload'], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
         if resp.returncode == 1:
             gui_logger.debug("[!] Unable to reload daemon.\n{}".format(resp))
             return False
@@ -1034,12 +1015,13 @@ def daemon_exists():
     """
     # Return code 3: service exists
     # Return code 4: service could not be found
-    resp_stop = subprocess.run(['systemctl', 'status' , SERVICE_NAME], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    resp_stop = subprocess.run(['systemctl', 'status' , SERVICE_NAME], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
+    return_val = True
 
     if resp_stop.returncode == 4:
-        return False
-    else:
-        return True
+        return_val = False
+
+    return return_val
 
 def custom_get_ip_info():
     """Custom get_ip_info that also returns the country.
@@ -1061,7 +1043,7 @@ def get_gui_processes():
     """
     gui_logger.debug(">>> Running \"get_gui_processes\".")
 
-    processes = subprocess.run(["pgrep", "protonvpn-gui"],stdout=subprocess.PIPE)
+    processes = subprocess.run(["pgrep", "protonvpn-gui"],stdout=subprocess.PIPE) # nosec
     
     processes = list(filter(None, processes.stdout.decode().split("\n"))) 
 

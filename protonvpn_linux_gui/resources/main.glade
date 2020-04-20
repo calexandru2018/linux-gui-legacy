@@ -1838,37 +1838,6 @@ Author: Alexandru Cheltuitor
                             <property name="row_spacing">10</property>
                             <property name="column_homogeneous">True</property>
                             <child>
-                              <object class="GtkLabel">
-                                <property name="visible">True</property>
-                                <property name="can_focus">False</property>
-                                <property name="halign">start</property>
-                                <property name="label" translatable="yes">IP:</property>
-                                <attributes>
-                                  <attribute name="size" value="12000"/>
-                                </attributes>
-                              </object>
-                              <packing>
-                                <property name="left_attach">1</property>
-                                <property name="top_attach">0</property>
-                              </packing>
-                            </child>
-                            <child>
-                              <object class="GtkTextView" id="split_tunneling_textview">
-                                <property name="height_request">200</property>
-                                <property name="visible">True</property>
-                                <property name="can_focus">True</property>
-                                <property name="wrap_mode">word</property>
-                                <property name="monospace">True</property>
-                                <style>
-                                  <class name="split_tunnling_list"/>
-                                </style>
-                              </object>
-                              <packing>
-                                <property name="left_attach">1</property>
-                                <property name="top_attach">1</property>
-                              </packing>
-                            </child>
-                            <child>
                               <object class="GtkButton" id="update_split_tunneling_button">
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
@@ -1889,6 +1858,63 @@ Author: Alexandru Cheltuitor
                               <packing>
                                 <property name="left_attach">1</property>
                                 <property name="top_attach">2</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <object class="GtkTextView" id="split_tunneling_textview">
+                                <property name="height_request">200</property>
+                                <property name="visible">True</property>
+                                <property name="can_focus">True</property>
+                                <property name="wrap_mode">word</property>
+                                <property name="monospace">True</property>
+                                <style>
+                                  <class name="split_tunnling_list"/>
+                                </style>
+                              </object>
+                              <packing>
+                                <property name="left_attach">1</property>
+                                <property name="top_attach">1</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <object class="GtkGrid">
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <child>
+                                  <object class="GtkLabel">
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">False</property>
+                                    <property name="halign">start</property>
+                                    <property name="margin_right">10</property>
+                                    <property name="label" translatable="yes">IP:</property>
+                                    <attributes>
+                                      <attribute name="size" value="12000"/>
+                                    </attributes>
+                                  </object>
+                                  <packing>
+                                    <property name="left_attach">0</property>
+                                    <property name="top_attach">0</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <object class="GtkImage">
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">False</property>
+                                    <property name="tooltip_markup" translatable="yes">IPs should be either separated by a new line or semi-colon (;). 
+Ex:
+192.168.0.1; 192.168.0.1
+192.168.0.1</property>
+                                    <property name="pixbuf">img/utils/info-green.png</property>
+                                  </object>
+                                  <packing>
+                                    <property name="left_attach">1</property>
+                                    <property name="top_attach">0</property>
+                                  </packing>
+                                </child>
+                              </object>
+                              <packing>
+                                <property name="left_attach">1</property>
+                                <property name="top_attach">0</property>
                               </packing>
                             </child>
                             <child>
