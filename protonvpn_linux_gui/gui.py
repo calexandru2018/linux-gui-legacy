@@ -93,6 +93,8 @@ class Handler:
         }
 
         # Settings related
+        self.update_killswitch_switch = self.interface.get_object("update_killswitch_switch")
+        self.split_tunneling_switch = self.interface.get_object("split_tunneling_switch")
         self.settings_tab_dict = {
             "general_tab_style": self.interface.get_object("general_tab_label").get_style_context(), 
             "sys_tray_tab_style": self.interface.get_object("sys_tray_tab_label").get_style_context(),
@@ -589,36 +591,59 @@ class Handler:
             thread.start()
 
     def update_killswitch_switch_changed(self, object, state):
-        killswitch_protection = get_config_value("USER", "killswitch")
-        if killswitch_protection == "0":
-            update_to = "1"
-        else:
-            update_to = "0"
+        killswitch_protection = int(get_config_value("USER", "killswitch"))
 
-        if (state and killswitch_protection == "0") or (not state and killswitch_protection != "0"):
+        try:
+            split_tunnel = int(get_config_value("USER", "split_tunnel"))
+        except KeyError:
+            gui_logger.debug("[!] Split tunneling has not been configured.")
+            split_tunnel = 0
+
+        if killswitch_protection == 0:
+            update_to = 1
+        else:
+            update_to = 0
+        
+        if (state and killswitch_protection == 0) or (not state and killswitch_protection != 0):
+            if update_to == 1 and split_tunnel >= 0:
+                self.split_tunneling_switch.set_property('sensitive', False)
+                print("Blocked split tunell")
+            else:
+                print("Unblocked split tunell")
+                self.split_tunneling_switch.set_property('sensitive', True)
+                
             thread = Thread(target=update_killswitch, args=[update_to])
             thread.daemon = True
             thread.start()
 
     def split_tunneling_switch_changed(self, object, state):
         split_tunnel_grid = self.interface.get_object("split_tunneling_grid") 
+        killswitch_protection = int(get_config_value("USER", "killswitch"))
+
         try:
-            split_tunnel = get_config_value("USER", "split_tunnel")
+            split_tunnel = int(get_config_value("USER", "split_tunnel"))
         except KeyError:
             gui_logger.debug("[!] Split tunneling has not been configured.")
             split_tunnel = 0
         
-        if split_tunnel == "0":
-            update_to = "1"
+        if split_tunnel == 0:
+            update_to = 1
         else:
-            update_to = "0"
+            update_to = 0
 
         if state:
             split_tunnel_grid.show()
         else:
             split_tunnel_grid.hide()
 
-        if (state and split_tunnel == "0") or (not state and split_tunnel != "0"):
+        if (state and split_tunnel == 0) or (not state and split_tunnel != 0):
+            if update_to == 1 and killswitch_protection >= 0:
+                self.update_killswitch_switch.set_property('sensitive', False)
+                print("Blocked killswitch")
+            else:
+                print("Unblocked killswitch")
+                self.update_killswitch_switch.set_property('sensitive', True)
+
             thread = Thread(target=update_split_tunneling_status, args=[update_to])
             thread.daemon = True
             thread.start()

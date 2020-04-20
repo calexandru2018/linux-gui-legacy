@@ -639,21 +639,17 @@ def load_advanced_settings(interface):
     else:
         dns_leak_switch.set_state(False)
 
-    # Set Kill Switch
-    if killswitch != '0':
-        killswitch_switch.set_state(True)
-    else:
-        killswitch_switch.set_state(False)
-
     # Populate Split Tunelling
     # Check if killswtich is != 0, if it is then disable split tunneling Function
     if killswitch != '0':
         killswitch_switch.set_state(True)
+        split_tunneling_switch.set_property('sensitive', False)
     else:
         killswitch_switch.set_state(False)
 
     if split_tunnel != '0':
         split_tunneling_switch.set_state(True)
+        killswitch_switch.set_property('sensitive', False)
         if killswitch != '0':
             split_tunneling_list.set_property('sensitive', False)
             interface.get_object("update_split_tunneling_button").set_property('sensitive', False)
