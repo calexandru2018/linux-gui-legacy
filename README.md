@@ -15,9 +15,7 @@
     </a>
 </p>
 <p align="center">
-  <a href="https://liberapay.com/calexandru2018/donate">
-      <img src="http://img.shields.io/liberapay/goal/calexandru2018.svg?logo=liberapay">
-  </a>
+  <a href="https://liberapay.com/calexandru2018/donate"><img alt="Donate using Liberapay" src="https://liberapay.com/assets/widgets/donate.svg"></a>
 </p>
 <p align="center">
   <img alt="PyPI - Python Version" src="https://img.shields.io/pypi/pyversions/protonvpn-linux-gui-calexandru2018?color=Yellow&label=python&logo=Python&logoColor=Yellow">
@@ -27,7 +25,7 @@
         <img alt="GitHub Workflow Status (Master)" src="https://img.shields.io/github/workflow/status/calexandru2018/protonvpn-linux-gui/Master branch Flake8/master?label=Master%20branch%20Flake8&logo=Github">
     </a>
     <a href="https://github.com/calexandru2018/protonvpn-linux-gui/blob/master/LICENSE">
-        <img src="https://img.shields.io/github/license/calexandru2018/protonvpn-linux-gui">
+        <img src="https://img.shields.io/pypi/l/protonvpn-linux-gui-calexandru2018?style=flat" alt="License"></img>
     </a>
     <a href="https://actions-badge.atrox.dev/calexandru2018/protonvpn-linux-gui/goto?ref=testing">
         <img alt="GitHub Workflow Status (Testing)" src="https://img.shields.io/github/workflow/status/calexandru2018/protonvpn-linux-gui/Testing branch Flake8/testing?label=Testing%20branch%20Flake8&logo=Github">
