@@ -650,46 +650,31 @@ def load_advanced_settings(interface):
 def populate_server_list(populate_servers_dict):
     """Function that updates server list.
     """
-    only_secure_core = True if get_gui_config("connections", "display_secure_core") == "True" else False
-
     pull_server_data(force=True)
 
-    features = {0: "Normal", 1: "Secure-Core", 2: "Tor", 4: "P2P"}
-    server_tiers = {0: "Free", 1: "Basic", 2: "Plus/Visionary"}
-    
+    only_secure_core = True if get_gui_config("connections", "display_secure_core") == "True" else False
     if not populate_servers_dict["servers"]:
         servers = get_servers()
     else:
         servers = populate_servers_dict["servers"]
 
-    # Country with respective servers, ex: PT#02
-    countries = {}
-    
     if servers:
-        for server in servers:
-            country = get_country_name(server["ExitCountry"])
-            if country not in countries.keys():
-                countries[country] = []
-            countries[country].append(server["Name"])
-
-        country_servers = {} 
-
-        # Order server list by country alphabetically
-        countries = collections.OrderedDict(sorted(countries.items()))
-
-        for country in countries:
-            country_servers[country] = sorted(countries[country], key=lambda s: get_server_value(s, "Load", servers))
         populate_servers_dict["tree_object"].clear()
 
+        country_servers = get_country_servers(servers)
         empty_pix, p2p_pix, tor_pix, plus_pix = create_features_img()
+        images_dict = {
+            "empty_pix": empty_pix,
+            "p2p_pix": p2p_pix,
+            "tor_pix": tor_pix,
+            "plus_pix": plus_pix,
+        }
 
         for country in country_servers:
-            flag_path = get_flag_path(country)
-
             # Get average load and highest feature
-            avrg_load, country_feature = get_country_avrg_features(country, country_servers, servers, features)
+            avrg_load, country_feature = get_country_avrg_features(country, country_servers, servers, only_secure_core)
 
-            flag = GdkPixbuf.Pixbuf.new_from_file_at_size(flag_path, 15,15)
+            flag = GdkPixbuf.Pixbuf.new_from_file_at_size(get_flag_path(country), 15,15)
             
             # Check plus servers
             if country_feature == "normal" or country_feature == "p2p":
@@ -711,33 +696,42 @@ def populate_server_list(populate_servers_dict):
                 country_row = populate_servers_dict["tree_object"].append(None, [flag, country, plus_feature, feature, avrg_load])
 
             for servername in country_servers[country]:
-                secure_core = False
-                load = str(get_server_value(servername, "Load", servers)).rjust(3, " ")
-                load = load + "%"               
-
-                tier = server_tiers[get_server_value(servername, "Tier", servers)]
-                
-                if not "Plus/Visionary".lower() == tier.lower():
-                    plus_feature = empty_pix
-                else:
-                    plus_feature = plus_pix
-
-                server_feature = features[get_server_value(servername, 'Features', servers)].lower()
-                
-                if server_feature == "Normal".lower():
-                    feature = empty_pix
-                elif server_feature == "P2P".lower():
-                    feature = p2p_pix
-                elif server_feature == "Tor".lower():
-                    feature = tor_pix
-                else:
-                    # Should be secure core
-                    secure_core = True
+                servername, plus_feature, feature, load, secure_core  = set_individual_server(servername, images_dict, servers, feature)
 
                 if secure_core and only_secure_core:
                     populate_servers_dict["tree_object"].append(country_row, [empty_pix, servername, plus_feature, feature, load])
                 elif not secure_core and not only_secure_core:
                     populate_servers_dict["tree_object"].append(country_row, [empty_pix, servername, plus_feature, feature, load])
+
+def set_individual_server(servername, images_dict, servers, feature):
+    server_tiers = {0: "Free", 1: "Basic", 2: "Plus/Visionary"}
+    features = {0: "Normal", 1: "Secure-Core", 2: "Tor", 4: "P2P"}
+
+    secure_core = False
+
+    load = str(get_server_value(servername, "Load", servers)).rjust(3, " ")
+    load = load + "%"               
+
+    tier = server_tiers[get_server_value(servername, "Tier", servers)]
+    
+    if not "Plus/Visionary".lower() == tier.lower():
+        plus_feature = images_dict["empty_pix"]
+    else:
+        plus_feature = images_dict["plus_pix"]
+
+    server_feature = features[get_server_value(servername, 'Features', servers)].lower()
+    
+    if server_feature == "Normal".lower():
+        feature = images_dict["empty_pix"]
+    elif server_feature == "P2P".lower():
+        feature = images_dict["p2p_pix"]
+    elif server_feature == "Tor".lower():
+        feature = images_dict["tor_pix"]
+    else:
+        # Should be secure core
+        secure_core = True
+
+    return (servername, plus_feature, feature, load, secure_core)
 
 def get_flag_path(country):
     for k,v in country_codes.items():
@@ -748,6 +742,23 @@ def get_flag_path(country):
             flag_path = SMALL_FLAGS_BASE_PATH+"Unknown.png"
 
     return flag_path
+
+def get_country_servers(servers):
+    countries = {}
+    for server in servers:
+        country = get_country_name(server["ExitCountry"])
+        if country not in countries.keys():
+            countries[country] = []
+        countries[country].append(server["Name"])
+
+    country_servers = {} 
+    # Order server list by country alphabetically
+    countries = collections.OrderedDict(sorted(countries.items()))
+
+    for country in countries:
+        country_servers[country] = sorted(countries[country], key=lambda s: get_server_value(s, "Load", servers))
+
+    return country_servers
 
 def create_features_img():
     # Create empty image
@@ -765,9 +776,10 @@ def create_features_img():
 
     return (empty_pix, p2p_pix, tor_pix, plus_pix)    
 
-def get_country_avrg_features(country, country_servers, servers, features):
+def get_country_avrg_features(country, country_servers, servers, only_secure_core):
     """Function that returns average load and features of a specific country.
     """
+    features = {0: "Normal", 1: "Secure-Core", 2: "Tor", 4: "P2P"}
     # Variables for average per country
     count = 0
     load_sum = 0
@@ -797,6 +809,7 @@ def get_country_avrg_features(country, country_servers, servers, features):
     for feature in country_feature_list:
         for k,v in order_dict.items():
             if feature.lower() == k.lower():
+                # if top_choice < v and (not only_secure_core and not v > 2):
                 if top_choice < v:
                     top_choice = v
 
@@ -808,6 +821,8 @@ def get_country_avrg_features(country, country_servers, servers, features):
         top_choice = "tor"
     else:
         top_choice = "secure-core"
+
+    # print(country,top_choice)
 
     return  (str(int(round(load_sum/count)))+"%", top_choice)    
 
