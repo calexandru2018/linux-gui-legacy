@@ -662,13 +662,7 @@ def populate_server_list(populate_servers_dict):
         populate_servers_dict["tree_object"].clear()
 
         country_servers = get_country_servers(servers)
-        empty_pix, p2p_pix, tor_pix, plus_pix = create_features_img()
-        images_dict = {
-            "empty_pix": empty_pix,
-            "p2p_pix": p2p_pix,
-            "tor_pix": tor_pix,
-            "plus_pix": plus_pix,
-        }
+        images_dict = create_features_img()
 
         for country in country_servers:
             # Get average load and highest feature
@@ -678,17 +672,17 @@ def populate_server_list(populate_servers_dict):
             
             # Check plus servers
             if country_feature == "normal" or country_feature == "p2p":
-                plus_feature = empty_pix
+                plus_feature = images_dict["empty_pix"]
             else:
-                plus_feature = plus_pix
+                plus_feature = images_dict["plus_pix"]
 
             # Check correct feature
             if country_feature == "normal" or country_feature == "secure-core":
-                feature = empty_pix
+                feature = images_dict["empty_pix"]
             elif country_feature == "p2p":
-                feature = p2p_pix
+                feature = images_dict["p2p_pix"]
             elif country_feature == "tor":
-                feature = tor_pix
+                feature = images_dict["tor_pix"]
 
             if country_feature == "secure-core" and only_secure_core:
                 country_row = populate_servers_dict["tree_object"].append(None, [flag, country, plus_feature, feature, avrg_load])
@@ -699,9 +693,9 @@ def populate_server_list(populate_servers_dict):
                 servername, plus_feature, feature, load, secure_core  = set_individual_server(servername, images_dict, servers, feature)
 
                 if secure_core and only_secure_core:
-                    populate_servers_dict["tree_object"].append(country_row, [empty_pix, servername, plus_feature, feature, load])
+                    populate_servers_dict["tree_object"].append(country_row, [images_dict["empty_pix"], servername, plus_feature, feature, load])
                 elif not secure_core and not only_secure_core:
-                    populate_servers_dict["tree_object"].append(country_row, [empty_pix, servername, plus_feature, feature, load])
+                    populate_servers_dict["tree_object"].append(country_row, [images_dict["empty_pix"], servername, plus_feature, feature, load])
 
 def set_individual_server(servername, images_dict, servers, feature):
     server_tiers = {0: "Free", 1: "Basic", 2: "Plus/Visionary"}
@@ -774,7 +768,13 @@ def create_features_img():
     plus_server_path = FEATURES_BASE_PATH+"plus-server.png"
     plus_pix = GdkPixbuf.Pixbuf.new_from_file_at_size(plus_server_path, 15,15)
 
-    return (empty_pix, p2p_pix, tor_pix, plus_pix)    
+    images_dict = {
+        "empty_pix": empty_pix,
+        "p2p_pix": p2p_pix,
+        "tor_pix": tor_pix,
+        "plus_pix": plus_pix,
+    }
+    return images_dict    
 
 def get_country_avrg_features(country, country_servers, servers, only_secure_core):
     """Function that returns average load and features of a specific country.
@@ -925,12 +925,8 @@ def disable_autoconnect():
 def find_cli():
     """Function that searches for the CLI. Returns CLIs path if it is found, otherwise it returns False.
     """
-    cli_ng_err = ''
-    custom_cli_err = ''
-
-    try:
-        protonvpn_path = subprocess.run(['sudo', 'which', 'protonvpn'], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
-    except:
+    protonvpn_path = subprocess.run(['sudo', 'which', 'protonvpn'], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
+    if protonvpn_path.returncode == 1:
         gui_logger.debug("[!] Unable to run \"find protonvpn-cli-ng\" subprocess.")
         protonvpn_path = False
 
@@ -941,50 +937,36 @@ def generate_template(template):
     """
     generate_service_command = "cat > {0} <<EOF {1}\nEOF".format(PATH_AUTOCONNECT_SERVICE, template)
     gui_logger.debug(">>> Template:\n{}".format(generate_service_command))
-    try:
-        resp = subprocess.run(["sudo", "bash", "-c", generate_service_command], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
 
-        if resp.returncode == 1:
-            gui_logger.debug("[!] Unable to generate template.\n{}".format(resp))
-            return False
-
-        return True
-    except:
-        gui_logger.debug("[!] Could not run \"generate template\" subprocess.")
+    resp = subprocess.run(["sudo", "bash", "-c", generate_service_command], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nose
+    if resp.returncode == 1:
+        gui_logger.debug("[!] Unable to generate template.\n{}".format(resp))
         return False
+
+    return True
 
 def remove_template():
     """Function that removes the service file from /etc/systemd/system/.
     """
-    try:
-        resp = subprocess.run(["sudo", "rm", PATH_AUTOCONNECT_SERVICE], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
+    resp = subprocess.run(["sudo", "rm", PATH_AUTOCONNECT_SERVICE], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
+    # If return code 1: File does not exist in path
+    # This is fired when a user wants to remove template a that does not exist
+    if resp.returncode == 1:
+        gui_logger.debug("[!] Could not remove .serivce file.\n{}".format(resp))
 
-        # If return code 1: File does not exist in path
-        # This is fired when a user wants to remove template a that does not exist
-        if resp.returncode == 1:
-            gui_logger.debug("[!] Could not remove .serivce file.\n{}".format(resp))
-
-        reload_daemon()
-        return True
-    except:
-        gui_logger.debug("[!] Could not run \"remove template\" subprocess.")
-        return False  
+    reload_daemon()
+    return True
 
 def enable_daemon():
     """Function that enables the autoconnect daemon service.
     """
     reload_daemon()
 
-    try:
-        resp = subprocess.run(['sudo', 'systemctl', 'enable' , SERVICE_NAME], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
-
-        if resp.returncode == 1:
-            gui_logger.debug("[!] Unable to enable deamon.\n{}".format(resp))
-            return False
-    except:
-        gui_logger.debug("[!] Could not run \"enable daemon\" subprocess.")
+    resp = subprocess.run(['sudo', 'systemctl', 'enable' , SERVICE_NAME], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
+    if resp.returncode == 1:
+        gui_logger.debug("[!] Unable to enable deamon.\n{}".format(resp))
         return False
-    
+
     return True
     
 def stop_and_disable_daemon():
@@ -993,24 +975,14 @@ def stop_and_disable_daemon():
     if not daemon_exists():
         return True
 
-    try:
-        resp_stop = subprocess.run(['sudo', 'systemctl', 'stop' , SERVICE_NAME], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
-
-        if resp_stop.returncode == 1:
-            gui_logger.debug("[!] Unable to stop deamon.\n{}".format(resp_stop))
-            return False
-    except:
-        gui_logger.debug("[!] Could not run \"stop daemon\" subprocess.")
+    resp_stop = subprocess.run(['sudo', 'systemctl', 'stop' , SERVICE_NAME], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
+    if resp_stop.returncode == 1:
+        gui_logger.debug("[!] Unable to stop deamon.\n{}".format(resp_stop))
         return False
 
-    try:
-        resp_disable = subprocess.run(['sudo', 'systemctl', 'disable' ,SERVICE_NAME], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
-
-        if resp_disable.returncode == 1:
-            gui_logger.debug("[!] Unable not disable daemon.\n{}".format(resp_disable))
-            return False
-    except:
-        gui_logger.debug("[!] Could not run \"disable daemon\" subprocess.")
+    resp_disable = subprocess.run(['sudo', 'systemctl', 'disable' ,SERVICE_NAME], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
+    if resp_disable.returncode == 1:
+        gui_logger.debug("[!] Unable not disable daemon.\n{}".format(resp_disable))
         return False
 
     return True
@@ -1018,15 +990,13 @@ def stop_and_disable_daemon():
 def reload_daemon():
     """Function that reloads the autoconnect daemon service.
     """
-    try:
-        resp = subprocess.run(['sudo', 'systemctl', 'daemon-reload'], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
-        if resp.returncode == 1:
-            gui_logger.debug("[!] Unable to reload daemon.\n{}".format(resp))
-            return False
-        return True
-    except:
-        gui_logger.debug("[!] Could not run \"reload daemon\" subprocess.")
+    resp = subprocess.run(['sudo', 'systeasdasdsmctl', 'daemoasdasdn-reloadasdasdasd'], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
+    if resp.returncode == 1:
+        gui_logger.debug("[!] Unable to reload daemon.\n{}".format(resp))
         return False
+
+    return True
+
 
 def daemon_exists():
     """Function that checks if autoconnect daemon service exists.
