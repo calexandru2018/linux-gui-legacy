@@ -7,13 +7,9 @@ import subprocess
 import concurrent.futures
 import configparser
 
-try:
-    # Import ProtonVPN methods, utils and constants
-    from protonvpn_cli.constants import USER, CONFIG_FILE, CONFIG_DIR, PASSFILE, SPLIT_TUNNEL_FILE #noqa
-    from protonvpn_cli.utils import get_config_value, is_valid_ip, set_config_value, change_file_owner, pull_server_data, make_ovpn_template #noqa
-    from protonvpn_cli.country_codes import country_codes #noqa
-except: # nosec
-    print("Can not find CLI modules.")
+from protonvpn_cli.constants import USER, CONFIG_FILE, CONFIG_DIR, PASSFILE, SPLIT_TUNNEL_FILE #noqa
+from protonvpn_cli.utils import get_config_value, is_valid_ip, set_config_value, change_file_owner, pull_server_data, make_ovpn_template #noqa
+from protonvpn_cli.country_codes import country_codes #noqa
 
 # Custom helper functions
 from .utils import (
@@ -47,8 +43,6 @@ from .constants import (
 
 # PyGObject import
 import gi
-
-# Gtk3 import
 gi.require_version('Gtk', '3.0')
 from gi.repository import GObject as gobject
 

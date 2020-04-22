@@ -6,14 +6,8 @@ import pathlib
 from threading import Thread
 import time
 
-try:
-    # ProtonVPN base CLI package import
-    from protonvpn_cli.constants import (CONFIG_FILE) #noqa
-
-    # ProtonVPN helper funcitons
-    from protonvpn_cli.utils import check_root, get_config_value, change_file_owner, is_connected, set_config_value #noqa
-except: # nosec
-    print("Can not find CLI modules.")
+from protonvpn_cli.constants import (CONFIG_FILE) #noqa
+from protonvpn_cli.utils import check_root, get_config_value, change_file_owner, is_connected, set_config_value #noqa
 
 # Import GUI logger
 from .gui_logger import gui_logger

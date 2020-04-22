@@ -10,23 +10,20 @@ import configparser
 import concurrent.futures
 from threading import Thread
 
-try:
-    from protonvpn_cli.utils import (
-        pull_server_data,
-        get_servers,
-        get_country_name,
-        get_server_value,
-        set_config_value,
-        get_config_value,
-        is_connected,
-        get_transferred_data,
-        change_file_owner,
-        make_ovpn_template
-    )
-    from protonvpn_cli.country_codes import country_codes
-    from protonvpn_cli.constants import SPLIT_TUNNEL_FILE, USER, CONFIG_FILE, PASSFILE
-except:
-    print("Can not find CLI modules.")
+from protonvpn_cli.utils import (
+    pull_server_data,
+    get_servers,
+    get_country_name,
+    get_server_value,
+    set_config_value,
+    get_config_value,
+    is_connected,
+    get_transferred_data,
+    change_file_owner,
+    make_ovpn_template
+)
+from protonvpn_cli.country_codes import country_codes
+from protonvpn_cli.constants import SPLIT_TUNNEL_FILE, USER, CONFIG_FILE, PASSFILE
 
 from .constants import (
     PATH_AUTOCONNECT_SERVICE, 
@@ -45,8 +42,6 @@ from .gui_logger import gui_logger
 
 # PyGObject import
 import gi
-
-# Gtk3 import
 gi.require_version('Gtk', '3.0')
 from gi.repository import GObject as gobject, Gtk, GdkPixbuf
 
