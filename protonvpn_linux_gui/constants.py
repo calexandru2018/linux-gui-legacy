@@ -1,25 +1,23 @@
 import os
-try:
-    from protonvpn_cli.constants import VERSION as cli_version, USER
-except Exception:
-    cli_version = "Not installed"
-    USER = '/home'
-    print(Exception)
+from protonvpn_cli.constants import VERSION as cli_version, USER
 
 VERSION = "2.0.6"
-
 GITHUB_URL_RELEASE = "https://github.com/calexandru2018/protonvpn-linux-gui/releases/latest"
 
 # GUI configurations
 GUI_CONFIG_DIR = os.path.join(os.path.expanduser("~{0}".format(USER)), ".pvpn-gui")
 GUI_CONFIG_FILE = os.path.join(GUI_CONFIG_DIR, "pvpn-gui.cfg")
 
+CURRDIR = os.path.dirname(os.path.abspath(__file__))
+LARGE_FLAGS_BASE_PATH = os.path.join(CURRDIR, "resources/img/flags/large/")
+SMALL_FLAGS_BASE_PATH = os.path.join(CURRDIR, "resources/img/flags/small/")
+FEATURES_BASE_PATH = os.path.join(CURRDIR, "resources/img/utils/")
+
 # Tray configuration naming
 TRAY_CFG_SERVERLOAD = "display_serverload"
 TRAY_CFG_SERVENAME = "display_server"
 TRAY_CFG_DATA_TX = "display_data_tx"
 TRAY_CFG_TIME_CONN = "display_time_conn"
-
 TRAY_CFG_DICT = {
     "tray_data_tx_combobox": TRAY_CFG_DATA_TX,
     "tray_servername_combobox": TRAY_CFG_SERVENAME,

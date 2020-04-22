@@ -1,38 +1,27 @@
 import os
-import sys
 import time
 import datetime
 import subprocess
 
-# Import GTK3 and AppIndicator3
-import gi
-
-gi.require_version('Gtk', '3.0')
-gi.require_version('AppIndicator3', '0.1')
-
-from gi.repository import Gtk, GObject
-from gi.repository import AppIndicator3 as appindicator
-
-# Import protonvpn-cli-ng util functions
-try:
-    from protonvpn_cli.utils import (
-        get_country_name,
-        get_config_value,
-        is_connected,
-        get_transferred_data,
-        pull_server_data,
-        get_servers,
-        get_server_value
-    )
-except: # nosec
-    print("Unable to find ProtonVPN CLI modules.")
-    sys.exit(1)
+from protonvpn_cli.utils import (
+    get_country_name,
+    get_config_value,
+    is_connected,
+    get_transferred_data,
+    pull_server_data,
+    get_servers,
+    get_server_value
+)
 
 from .utils import get_gui_config, set_gui_config
-
 from .constants import TRAY_CFG_SERVERLOAD, TRAY_CFG_SERVENAME, TRAY_CFG_DATA_TX, TRAY_CFG_TIME_CONN
-
 from .gui_logger import gui_logger
+
+import gi
+gi.require_version('Gtk', '3.0')
+gi.require_version('AppIndicator3', '0.1')
+from gi.repository import Gtk, GObject
+from gi.repository import AppIndicator3 as appindicator
 
 CURRDIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -152,15 +141,15 @@ class ProtonVPNIndicator:
 
         try:
             connected_server = get_config_value("metadata", "connected_server")
-        except KeyError:
-            gui_logger.debug("[!] Could not find specified key: ".format(KeyError))
+        except (KeyError, IndexError):
+            gui_logger.debug("[!] Could not find specified key.")
             return True
 
         # force_pull servers
         try:
             pull_server_data(force=True)
-        except: # nosec
-            gui_logger.debug("[!] Could not pull from servers, possible due to unstable connection.{}".format(Exception))
+        except KeyError:
+            gui_logger.debug("[!] Could not pull from servers, possible due to unstable connection.")
             return True
 
         # get_servers
@@ -169,7 +158,7 @@ class ProtonVPNIndicator:
         # get server load
         try:
             load = get_server_value(connected_server, "Load", servers)
-        except KeyError:
+        except (KeyError, IndexError):
             gui_logger.debug("[!] Unable to get server load.")
             return True
 
@@ -212,23 +201,23 @@ class ProtonVPNIndicator:
 
         try: 
             resp_dict["display_serverload"] = int(get_gui_config("tray_tab", TRAY_CFG_SERVERLOAD))
-        except KeyError:
-            gui_logger.debug("[!] Could not find display_serverload in config file: ".format(KeyError))
+        except (KeyError, IndexError):
+            gui_logger.debug("[!] Could not find display_serverload in config file.")
         
         try: 
             resp_dict["display_server"] = int(get_gui_config("tray_tab", TRAY_CFG_SERVENAME))
-        except KeyError:
-            gui_logger.debug("[!] Could not find display_server in config file: ".format(KeyError))
+        except (KeyError, IndexError):
+            gui_logger.debug("[!] Could not find display_server in config file.")
 
         try: 
             resp_dict["display_data_tx"] = int(get_gui_config("tray_tab", TRAY_CFG_DATA_TX))
-        except KeyError:
-            gui_logger.debug("[!] Could not find display_data_tx in config file: ".format(KeyError)) 
+        except (KeyError, IndexError):
+            gui_logger.debug("[!] Could not find display_data_tx in config file.")
         
         try: 
             resp_dict["display_time_conn"] = int(get_gui_config("tray_tab", TRAY_CFG_TIME_CONN))
-        except KeyError:
-            gui_logger.debug("[!] Could not find display_time_conn in config file: ".format(KeyError))
+        except (KeyError, IndexError):
+            gui_logger.debug("[!] Could not find display_time_conn in config file.")
 
         return resp_dict
 
@@ -292,7 +281,7 @@ class ProtonVPNIndicator:
             connected_time = get_config_value("metadata", "connected_time")
             connection_time = time.time() - int(connected_time)
             connection_time = str(datetime.timedelta(seconds=connection_time)).split(".")[0]
-        except KeyError:
+        except (KeyError, IndexError):
             connection_time = False
     
         connection_time = connection_time if connection_time else ""

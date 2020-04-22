@@ -30,7 +30,10 @@
 </p>
 <p align="center">
     <a href="https://actions-badge.atrox.dev/calexandru2018/protonvpn-linux-gui/goto?ref=master">
-      <img alt="GitHub Workflow Status (Master)" src="https://img.shields.io/github/workflow/status/calexandru2018/protonvpn-linux-gui/Master branch Flake8/master?label=Master%20branch%20Flake8&logo=Github">
+        <img alt="GitHub Workflow Status (Master)" src="https://img.shields.io/github/workflow/status/calexandru2018/protonvpn-linux-gui/Master branch Flake8/master?label=Master%20branch%20Flake8&logo=Github">
+    </a>
+    <a href="https://github.com/calexandru2018/protonvpn-linux-gui/blob/master/LICENSE">
+        <img src="https://img.shields.io/pypi/l/protonvpn-linux-gui-calexandru2018?style=flat" alt="License"></img>
     </a>
     <a href="https://actions-badge.atrox.dev/calexandru2018/protonvpn-linux-gui/goto?ref=testing">
       <img alt="GitHub Workflow Status (Testing)" src="https://img.shields.io/github/workflow/status/calexandru2018/protonvpn-linux-gui/Testing branch Flake8/testing?label=Testing%20branch%20Flake8&logo=Github">

@@ -6,14 +6,8 @@ import pathlib
 from threading import Thread
 import time
 
-try:
-    # ProtonVPN base CLI package import
-    from protonvpn_cli.constants import (CONFIG_FILE) #noqa
-
-    # ProtonVPN helper funcitons
-    from protonvpn_cli.utils import check_root, get_config_value, change_file_owner, is_connected, set_config_value #noqa
-except: # nosec
-    print("Can not find CLI modules.")
+from protonvpn_cli.constants import (CONFIG_FILE) #noqa
+from protonvpn_cli.utils import check_root, get_config_value, change_file_owner, is_connected, set_config_value #noqa
 
 # Import GUI logger
 from .gui_logger import gui_logger
@@ -149,13 +143,13 @@ class Handler:
         # Updates the ListStore model
         n_filter.refilter()
 
-    def column_filter(self, model, iter, data=None):
+    def column_filter(self, model, iterator, data=None):
         """Filter by columns and returns the corresponding rows
         """
         treeview = self.interface.get_object("TreeViewServerList")
         
         for col in range(0, treeview.get_n_columns()):
-            value = model.get_value(iter, col)
+            value = model.get_value(iterator, col)
             if isinstance(value, str):
                 if data.lower() in value.lower():
                     return True
@@ -788,12 +782,10 @@ def initialize_gui():
         if not os.path.isdir(GUI_CONFIG_DIR):
             os.mkdir(GUI_CONFIG_DIR)
             gui_logger.debug(">>> Config Directory created")
-            change_file_owner(GUI_CONFIG_DIR)
 
+        change_file_owner(GUI_CONFIG_DIR)
         gui_logger.debug("\n______________________________________\n\n\tINITIALIZING NEW GUI WINDOW\n______________________________________\n")
-
         change_file_owner(os.path.join(GUI_CONFIG_DIR, "protonvpn-gui.log"))
-
 
         if len(get_gui_processes()) > 1:
             gui_logger.debug("[!] Two processes were found. Displaying MessageDialog to inform user.")

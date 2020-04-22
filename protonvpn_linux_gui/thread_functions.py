@@ -7,14 +7,9 @@ import subprocess
 import concurrent.futures
 import configparser
 
-try:
-    # Import ProtonVPN methods, utils and constants
-    from protonvpn_cli.constants import USER, CONFIG_FILE, CONFIG_DIR, PASSFILE, SPLIT_TUNNEL_FILE #noqa
-    from protonvpn_cli.utils import get_config_value, is_valid_ip, set_config_value, change_file_owner, pull_server_data, make_ovpn_template #noqa
-    from protonvpn_cli import cli, connection #noqa
-    from protonvpn_cli.country_codes import country_codes #noqa
-except: # nosec
-    print("Can not find CLI modules.")
+from protonvpn_cli.constants import USER, CONFIG_FILE, CONFIG_DIR, PASSFILE, SPLIT_TUNNEL_FILE #noqa
+from protonvpn_cli.utils import get_config_value, is_valid_ip, set_config_value, change_file_owner, pull_server_data, make_ovpn_template #noqa
+from protonvpn_cli.country_codes import country_codes #noqa
 
 # Custom helper functions
 from .utils import (
@@ -48,8 +43,6 @@ from .constants import (
 
 # PyGObject import
 import gi
-
-# Gtk3 import
 gi.require_version('Gtk', '3.0')
 from gi.repository import GObject as gobject
 
@@ -170,15 +163,16 @@ def initialize_gui_config():
         "quick_connect": "dis",
     }
 
-    try:
-        with open(GUI_CONFIG_FILE, "w") as f:
-            gui_config.write(f)
-        change_file_owner(GUI_CONFIG_FILE)
+    with open(GUI_CONFIG_FILE, "w") as f:
+        gui_config.write(f)
         gui_logger.debug("pvpn-gui.cfg initialized.")
-        return True
-    except: # nosec
+    change_file_owner(GUI_CONFIG_FILE)
+
+    if not os.path.isfile(GUI_CONFIG_FILE):
         gui_logger.debug("Unablt to initialize pvpn-gui.cfg. {}".format(Exception))
         return False
+    
+    return True
 
 def reload_secure_core_servers(interface, messagedialog_label, messagedialog_spinner, update_to):
     """Function that reloads server list to either secure-core or non-secure-core.
@@ -660,7 +654,7 @@ def purge_configurations(interface, messagedialog_label, messagedialog_spinner):
     # To-do: Confirm prior to allowing user to do this
     gui_logger.debug(">>> Running \"set_split_tunnel\".")
 
-    connection.disconnect(passed=True)
+    #connection.disconnect(passed=True)
 
     if os.path.isdir(CONFIG_DIR):
         shutil.rmtree(CONFIG_DIR)

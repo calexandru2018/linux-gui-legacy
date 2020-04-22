@@ -1,5 +1,4 @@
 import re
-import os
 import sys
 import time
 import requests
@@ -10,24 +9,20 @@ import configparser
 import concurrent.futures
 from threading import Thread
 
-try:
-    from protonvpn_cli.utils import (
-        pull_server_data,
-        get_servers,
-        get_country_name,
-        get_server_value,
-        get_config_value,
-        is_connected,
-        get_transferred_data,
-        call_api
-    )
-
-    from protonvpn_cli.country_codes import country_codes
-
-    from protonvpn_cli.constants import SPLIT_TUNNEL_FILE, USER, CONFIG_FILE, PASSFILE
-    from protonvpn_cli.utils import change_file_owner, make_ovpn_template, set_config_value
-except:
-    print("Can not find CLI modules.")
+from protonvpn_cli.utils import (
+    pull_server_data,
+    get_servers,
+    get_country_name,
+    get_server_value,
+    set_config_value,
+    get_config_value,
+    is_connected,
+    get_transferred_data,
+    change_file_owner,
+    make_ovpn_template
+)
+from protonvpn_cli.country_codes import country_codes
+from protonvpn_cli.constants import SPLIT_TUNNEL_FILE, USER, CONFIG_FILE, PASSFILE
 
 from .constants import (
     PATH_AUTOCONNECT_SERVICE, 
@@ -39,15 +34,16 @@ from .constants import (
     TRAY_CFG_DATA_TX, 
     TRAY_CFG_TIME_CONN, 
     TRAY_CFG_DICT,
-    GUI_CONFIG_FILE
+    GUI_CONFIG_FILE,
+    LARGE_FLAGS_BASE_PATH,
+    SMALL_FLAGS_BASE_PATH,
+    FEATURES_BASE_PATH
 )
 
 from .gui_logger import gui_logger
 
 # PyGObject import
 import gi
-
-# Gtk3 import
 gi.require_version('Gtk', '3.0')
 from gi.repository import GObject as gobject, Gtk, GdkPixbuf
 
@@ -167,7 +163,7 @@ def message_dialog(interface, action, label_object, spinner_object, sub_label_ob
                         is_custom_resolv_conf["display"] = "Custom"
         try:
             is_splitunn_enabled = True if get_config_value("USER", "split_tunnel") == "1" else False
-        except KeyError:
+        except (KeyError, IndexError):
             is_splitunn_enabled = False
         
         # Reccomendations based on known issues
@@ -222,10 +218,7 @@ def check_internet_conn(request_bool=False):
     """
     gui_logger.debug(">>> Running \"check_internet_conn\".")
 
-    try:    
-        return custom_call_api(request_bool=request_bool)
-    except:
-        return False
+    return custom_call_api(request_bool=request_bool)
 
 def custom_call_api(endpoint=False, request_bool=False):
     """Function that is a custom call_api with a timeout of 6 seconds. This is mostly used to check for API access and also for internet access.
@@ -268,24 +261,22 @@ def check_for_updates():
     latest_release = ''
     pip3_installed = False
 
-    try:
-        is_pip3_installed = subprocess.run(["pip3", "show", "protonvpn-linux-gui-calexandru2018"],stdout=subprocess.PIPE) # nosec
-        if is_pip3_installed.returncode == 0:
-            is_pip3_installed = is_pip3_installed.stdout.decode().split("\n")
-            for el in is_pip3_installed:
-                if "Location:" in el:
-                    el = el.split(" ")[1].split("/")
-                    if not ".egg" in el[-1]:
-                        pip3_installed = True
-                        # print(".egg" in el[-1])
-                        break           
-    except:
-        pip3_installed = False
+    is_pip3_installed = subprocess.run(["pip3", "show", "protonvpn-linux-gui-calexandru2018"],stdout=subprocess.PIPE) # nosec
+    if is_pip3_installed.returncode == 0:
+        is_pip3_installed = is_pip3_installed.stdout.decode().split("\n")
+        for el in is_pip3_installed:
+            if "Location:" in el:
+                el = el.split(" ")[1].split("/")
+                if not ".egg" in el[-1]:
+                    pip3_installed = True
+                    # print(".egg" in el[-1])
+                    break           
 
     try:
         check_version = requests.get(GITHUB_URL_RELEASE, timeout=2)
         latest_release =  check_version.url.split("/")[-1][1:]
-    except:
+    except (requests.exceptions.ConnectionError,
+            requests.exceptions.ConnectTimeout):
         return "Failed to check for updates."
 
     if latest_release == VERSION:
@@ -403,11 +394,8 @@ def update_labels_status(update_labels_dict):
     disconnecting = update_labels_dict["disconnecting"]
     conn_info = update_labels_dict["conn_info"]
     is_vpn_connected = True if is_connected() else False
-
-    try:
-        connected_server = get_config_value("metadata", "connected_server")
-    except:
-        connected_server = False
+    country_cc = False
+    load = False
 
     time_connected_label =  interface.get_object("time_connected_label")
     protocol_label =        interface.get_object("protocol_label")
@@ -421,16 +409,15 @@ def update_labels_status(update_labels_dict):
     background_large_flag = interface.get_object("background_large_flag")
     protonvpn_sign_green =  interface.get_object("protonvpn_sign_green")
 
-    CURRDIR = os.path.dirname(os.path.abspath(__file__))
-    flags_base_path = CURRDIR+"/resources/img/flags/large/"
-
-    country_cc = False
-    load = False
+    try:
+        connected_server = get_config_value("metadata", "connected_server")
+    except (KeyError, IndexError):
+        connected_server = False
 
     # Get and set server load label
     try:
         load = get_server_value(connected_server, "Load", servers)
-    except KeyError:
+    except (KeyError, IndexError):
         gui_logger.debug("[!] Could not find server load information.")
         
     load = "{0}% Load".format(load) if load and is_vpn_connected else ""
@@ -451,12 +438,8 @@ def update_labels_status(update_labels_dict):
     for k,v in country_codes.items():
         if k == country:
             if is_vpn_connected:
-                try:
-                    flag_path = flags_base_path+"{}.jpg".format(k.lower()) 
-                    background_large_flag.set_from_file(flag_path)
-                except:
-                    gui_logger.debug("[!] Could not find appropriate flag to display in the Dashboard.")
-                
+                flag_path = LARGE_FLAGS_BASE_PATH+"{}.jpg".format(k.lower())
+                background_large_flag.set_from_file(flag_path)
             country_cc = v
 
     protonvpn_sign_green.hide()
@@ -486,7 +469,7 @@ def update_labels_status(update_labels_dict):
         try:
             connected_to_protocol = get_config_value("metadata", "connected_proto")
             protocol = '<span>OpenVPN >> {0}</span>'.format(connected_to_protocol.upper())
-        except KeyError:
+        except (KeyError, IndexError):
             pass
         conn_disc_button = "Disconnect"
     conn_disc_button_label.set_markup(conn_disc_button)
@@ -521,7 +504,7 @@ def update_connection_time(dict_data):
             connected_time = get_config_value("metadata", "connected_time")
             connection_time = time.time() - int(connected_time)
             connection_time = str(datetime.timedelta(seconds=connection_time)).split(".")[0]
-        except KeyError:
+        except (KeyError, IndexError):
             connection_time = False
     
     connection_time = connection_time if connection_time else ""
@@ -579,11 +562,11 @@ def load_connection_settings(interface):
     #Get values
     try:
         autoconnect_setting = get_gui_config("conn_tab", "autoconnect")
-    except KeyError:
+    except (KeyError, IndexError):
         autoconnect_setting = 0
     try:
         quick_connect_setting = get_gui_config("conn_tab", "quick_connect")
-    except KeyError:
+    except (KeyError, IndexError):
         quick_connect = 0 
     default_protocol = get_config_value("USER", "default_protocol")
 
@@ -594,7 +577,11 @@ def load_connection_settings(interface):
     # Set values
     update_autoconnect_combobox.set_active(autoconnect_index)
     update_quick_connect_combobox.set_active(quick_connect_index)
-    update_protocol_combobox.set_active(0) if default_protocol == "tcp" else update_protocol_combobox.set_active(1)
+
+    if default_protocol == "tcp":
+        update_protocol_combobox.set_active(0)
+    else:
+        update_protocol_combobox.set_active(1)
 
 def load_advanced_settings(interface):
     # User values
@@ -604,7 +591,7 @@ def load_advanced_settings(interface):
 
     try:
         split_tunnel = get_config_value("USER", "split_tunnel")
-    except KeyError:
+    except (KeyError, IndexError):
         split_tunnel = '0'
 
     # Object
@@ -653,80 +640,39 @@ def load_advanced_settings(interface):
 def populate_server_list(populate_servers_dict):
     """Function that updates server list.
     """
-    only_secure_core = True if get_gui_config("connections", "display_secure_core") == "True" else False
-
     pull_server_data(force=True)
 
-    features = {0: "Normal", 1: "Secure-Core", 2: "Tor", 4: "P2P"}
-    server_tiers = {0: "Free", 1: "Basic", 2: "Plus/Visionary"}
-    
+    only_secure_core = True if get_gui_config("connections", "display_secure_core") == "True" else False
     if not populate_servers_dict["servers"]:
         servers = get_servers()
     else:
         servers = populate_servers_dict["servers"]
 
-    # Country with respective servers, ex: PT#02
-    countries = {}
-    
     if servers:
-        for server in servers:
-            country = get_country_name(server["ExitCountry"])
-            if country not in countries.keys():
-                countries[country] = []
-            countries[country].append(server["Name"])
-
-        country_servers = {} 
-
-        # Order server list by country alphabetically
-        countries = collections.OrderedDict(sorted(countries.items()))
-
-        for country in countries:
-            country_servers[country] = sorted(countries[country], key=lambda s: get_server_value(s, "Load", servers))
         populate_servers_dict["tree_object"].clear()
 
-        CURRDIR = os.path.dirname(os.path.abspath(__file__))
-        flags_base_path = CURRDIR+"/resources/img/flags/small/"
-        features_base_path = CURRDIR+"/resources/img/utils/"
-
-        # Create empty image
-        empty_path = features_base_path+"normal.png"
-        empty_pix = empty = GdkPixbuf.Pixbuf.new_from_file_at_size(empty_path, 15,15)
-        # Create P2P image
-        p2p_path = features_base_path+"p2p-arrows.png"
-        p2p_pix = empty = GdkPixbuf.Pixbuf.new_from_file_at_size(p2p_path, 15,15)
-        # Create TOR image
-        tor_path = features_base_path+"tor-onion.png"
-        tor_pix = empty = GdkPixbuf.Pixbuf.new_from_file_at_size(tor_path, 15,15)
-        # Create Plus image
-        plus_server_path = features_base_path+"plus-server.png"
-        plus_pix = GdkPixbuf.Pixbuf.new_from_file_at_size(plus_server_path, 15,15)
+        country_servers = get_country_servers(servers)
+        images_dict = create_features_img()
 
         for country in country_servers:
-            for k,v in country_codes.items():
-                if country == v:
-                    flag_path = flags_base_path+"{}.png".format(v)
-                    break
-                else:
-                    flag_path = flags_base_path+"Unknown.png"
-
             # Get average load and highest feature
-            avrg_load, country_feature = get_country_avrg_features(country, country_servers, servers, features)
+            avrg_load, country_feature = get_country_avrg_features(country, country_servers, servers, only_secure_core)
 
-            flag = GdkPixbuf.Pixbuf.new_from_file_at_size(flag_path, 15,15)
+            flag = GdkPixbuf.Pixbuf.new_from_file_at_size(get_flag_path(country), 15,15)
             
             # Check plus servers
             if country_feature == "normal" or country_feature == "p2p":
-                plus_feature = empty_pix
+                plus_feature = images_dict["empty_pix"]
             else:
-                plus_feature = plus_pix
+                plus_feature = images_dict["plus_pix"]
 
             # Check correct feature
             if country_feature == "normal" or country_feature == "secure-core":
-                feature = empty_pix
+                feature = images_dict["empty_pix"]
             elif country_feature == "p2p":
-                feature = p2p_pix
+                feature = images_dict["p2p_pix"]
             elif country_feature == "tor":
-                feature = tor_pix
+                feature = images_dict["tor_pix"]
 
             if country_feature == "secure-core" and only_secure_core:
                 country_row = populate_servers_dict["tree_object"].append(None, [flag, country, plus_feature, feature, avrg_load])
@@ -734,37 +680,96 @@ def populate_server_list(populate_servers_dict):
                 country_row = populate_servers_dict["tree_object"].append(None, [flag, country, plus_feature, feature, avrg_load])
 
             for servername in country_servers[country]:
-                secure_core = False
-                load = str(get_server_value(servername, "Load", servers)).rjust(3, " ")
-                load = load + "%"               
-
-                tier = server_tiers[get_server_value(servername, "Tier", servers)]
-                
-                if not "Plus/Visionary".lower() == tier.lower():
-                    plus_feature = empty_pix
-                else:
-                    plus_feature = plus_pix
-
-                server_feature = features[get_server_value(servername, 'Features', servers)].lower()
-                
-                if server_feature == "Normal".lower():
-                    feature = empty_pix
-                elif server_feature == "P2P".lower():
-                    feature = p2p_pix
-                elif server_feature == "Tor".lower():
-                    feature = tor_pix
-                else:
-                    # Should be secure core
-                    secure_core = True
+                servername, plus_feature, feature, load, secure_core  = set_individual_server(servername, images_dict, servers, feature)
 
                 if secure_core and only_secure_core:
-                    populate_servers_dict["tree_object"].append(country_row, [empty_pix, servername, plus_feature, feature, load])
+                    populate_servers_dict["tree_object"].append(country_row, [images_dict["empty_pix"], servername, plus_feature, feature, load])
                 elif not secure_core and not only_secure_core:
-                    populate_servers_dict["tree_object"].append(country_row, [empty_pix, servername, plus_feature, feature, load])
+                    populate_servers_dict["tree_object"].append(country_row, [images_dict["empty_pix"], servername, plus_feature, feature, load])
 
-def get_country_avrg_features(country, country_servers, servers, features):
+def set_individual_server(servername, images_dict, servers, feature):
+    server_tiers = {0: "Free", 1: "Basic", 2: "Plus/Visionary"}
+    features = {0: "Normal", 1: "Secure-Core", 2: "Tor", 4: "P2P"}
+
+    secure_core = False
+
+    load = str(get_server_value(servername, "Load", servers)).rjust(3, " ")
+    load = load + "%"               
+
+    tier = server_tiers[get_server_value(servername, "Tier", servers)]
+    
+    if not "Plus/Visionary".lower() == tier.lower():
+        plus_feature = images_dict["empty_pix"]
+    else:
+        plus_feature = images_dict["plus_pix"]
+
+    server_feature = features[get_server_value(servername, 'Features', servers)].lower()
+    
+    if server_feature == "Normal".lower():
+        feature = images_dict["empty_pix"]
+    elif server_feature == "P2P".lower():
+        feature = images_dict["p2p_pix"]
+    elif server_feature == "Tor".lower():
+        feature = images_dict["tor_pix"]
+    else:
+        # Should be secure core
+        secure_core = True
+
+    return (servername, plus_feature, feature, load, secure_core)
+
+def get_flag_path(country):
+    for k,v in country_codes.items():
+        if country == v:
+            flag_path = SMALL_FLAGS_BASE_PATH+"{}.png".format(v)
+            break
+        else:
+            flag_path = SMALL_FLAGS_BASE_PATH+"Unknown.png"
+
+    return flag_path
+
+def get_country_servers(servers):
+    countries = {}
+    for server in servers:
+        country = get_country_name(server["ExitCountry"])
+        if country not in countries.keys():
+            countries[country] = []
+        countries[country].append(server["Name"])
+
+    country_servers = {} 
+    # Order server list by country alphabetically
+    countries = collections.OrderedDict(sorted(countries.items()))
+
+    for country in countries:
+        country_servers[country] = sorted(countries[country], key=lambda s: get_server_value(s, "Load", servers))
+
+    return country_servers
+
+def create_features_img():
+    # Create empty image
+    empty_path = FEATURES_BASE_PATH+"normal.png"
+    empty_pix = GdkPixbuf.Pixbuf.new_from_file_at_size(empty_path, 15,15)
+    # Create P2P image
+    p2p_path = FEATURES_BASE_PATH+"p2p-arrows.png"
+    p2p_pix = GdkPixbuf.Pixbuf.new_from_file_at_size(p2p_path, 15,15)
+    # Create TOR image
+    tor_path = FEATURES_BASE_PATH+"tor-onion.png"
+    tor_pix = GdkPixbuf.Pixbuf.new_from_file_at_size(tor_path, 15,15)
+    # Create Plus image
+    plus_server_path = FEATURES_BASE_PATH+"plus-server.png"
+    plus_pix = GdkPixbuf.Pixbuf.new_from_file_at_size(plus_server_path, 15,15)
+
+    images_dict = {
+        "empty_pix": empty_pix,
+        "p2p_pix": p2p_pix,
+        "tor_pix": tor_pix,
+        "plus_pix": plus_pix,
+    }
+    return images_dict
+
+def get_country_avrg_features(country, country_servers, servers, only_secure_core):
     """Function that returns average load and features of a specific country.
     """
+    features = {0: "Normal", 1: "Secure-Core", 2: "Tor", 4: "P2P"}
     # Variables for average per country
     count = 0
     load_sum = 0
@@ -794,6 +799,7 @@ def get_country_avrg_features(country, country_servers, servers, features):
     for feature in country_feature_list:
         for k,v in order_dict.items():
             if feature.lower() == k.lower():
+                # if top_choice < v and (not only_secure_core and not v > 2):
                 if top_choice < v:
                     top_choice = v
 
@@ -805,6 +811,8 @@ def get_country_avrg_features(country, country_servers, servers, features):
         top_choice = "tor"
     else:
         top_choice = "secure-core"
+
+    # print(country,top_choice)
 
     return  (str(int(round(load_sum/count)))+"%", top_choice)    
 
@@ -907,12 +915,8 @@ def disable_autoconnect():
 def find_cli():
     """Function that searches for the CLI. Returns CLIs path if it is found, otherwise it returns False.
     """
-    cli_ng_err = ''
-    custom_cli_err = ''
-
-    try:
-        protonvpn_path = subprocess.run(['sudo', 'which', 'protonvpn'], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
-    except:
+    protonvpn_path = subprocess.run(['sudo', 'which', 'protonvpn'], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
+    if protonvpn_path.returncode == 1:
         gui_logger.debug("[!] Unable to run \"find protonvpn-cli-ng\" subprocess.")
         protonvpn_path = False
 
@@ -923,50 +927,36 @@ def generate_template(template):
     """
     generate_service_command = "cat > {0} <<EOF {1}\nEOF".format(PATH_AUTOCONNECT_SERVICE, template)
     gui_logger.debug(">>> Template:\n{}".format(generate_service_command))
-    try:
-        resp = subprocess.run(["sudo", "bash", "-c", generate_service_command], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
 
-        if resp.returncode == 1:
-            gui_logger.debug("[!] Unable to generate template.\n{}".format(resp))
-            return False
-
-        return True
-    except:
-        gui_logger.debug("[!] Could not run \"generate template\" subprocess.")
+    resp = subprocess.run(["sudo", "bash", "-c", generate_service_command], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
+    if resp.returncode == 1:
+        gui_logger.debug("[!] Unable to generate template.\n{}".format(resp))
         return False
+
+    return True
 
 def remove_template():
     """Function that removes the service file from /etc/systemd/system/.
     """
-    try:
-        resp = subprocess.run(["sudo", "rm", PATH_AUTOCONNECT_SERVICE], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
+    resp = subprocess.run(["sudo", "rm", PATH_AUTOCONNECT_SERVICE], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
+    # If return code 1: File does not exist in path
+    # This is fired when a user wants to remove template a that does not exist
+    if resp.returncode == 1:
+        gui_logger.debug("[!] Could not remove .serivce file.\n{}".format(resp))
 
-        # If return code 1: File does not exist in path
-        # This is fired when a user wants to remove template a that does not exist
-        if resp.returncode == 1:
-            gui_logger.debug("[!] Could not remove .serivce file.\n{}".format(resp))
-
-        reload_daemon()
-        return True
-    except:
-        gui_logger.debug("[!] Could not run \"remove template\" subprocess.")
-        return False  
+    reload_daemon()
+    return True
 
 def enable_daemon():
     """Function that enables the autoconnect daemon service.
     """
     reload_daemon()
 
-    try:
-        resp = subprocess.run(['sudo', 'systemctl', 'enable' , SERVICE_NAME], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
-
-        if resp.returncode == 1:
-            gui_logger.debug("[!] Unable to enable deamon.\n{}".format(resp))
-            return False
-    except:
-        gui_logger.debug("[!] Could not run \"enable daemon\" subprocess.")
+    resp = subprocess.run(['sudo', 'systemctl', 'enable' , SERVICE_NAME], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
+    if resp.returncode == 1:
+        gui_logger.debug("[!] Unable to enable deamon.\n{}".format(resp))
         return False
-    
+
     return True
     
 def stop_and_disable_daemon():
@@ -975,24 +965,14 @@ def stop_and_disable_daemon():
     if not daemon_exists():
         return True
 
-    try:
-        resp_stop = subprocess.run(['sudo', 'systemctl', 'stop' , SERVICE_NAME], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
-
-        if resp_stop.returncode == 1:
-            gui_logger.debug("[!] Unable to stop deamon.\n{}".format(resp_stop))
-            return False
-    except:
-        gui_logger.debug("[!] Could not run \"stop daemon\" subprocess.")
+    resp_stop = subprocess.run(['sudo', 'systemctl', 'stop' , SERVICE_NAME], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
+    if resp_stop.returncode == 1:
+        gui_logger.debug("[!] Unable to stop deamon.\n{}".format(resp_stop))
         return False
 
-    try:
-        resp_disable = subprocess.run(['sudo', 'systemctl', 'disable' ,SERVICE_NAME], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
-
-        if resp_disable.returncode == 1:
-            gui_logger.debug("[!] Unable not disable daemon.\n{}".format(resp_disable))
-            return False
-    except:
-        gui_logger.debug("[!] Could not run \"disable daemon\" subprocess.")
+    resp_disable = subprocess.run(['sudo', 'systemctl', 'disable' ,SERVICE_NAME], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
+    if resp_disable.returncode == 1:
+        gui_logger.debug("[!] Unable not disable daemon.\n{}".format(resp_disable))
         return False
 
     return True
@@ -1000,15 +980,13 @@ def stop_and_disable_daemon():
 def reload_daemon():
     """Function that reloads the autoconnect daemon service.
     """
-    try:
-        resp = subprocess.run(['sudo', 'systemctl', 'daemon-reload'], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
-        if resp.returncode == 1:
-            gui_logger.debug("[!] Unable to reload daemon.\n{}".format(resp))
-            return False
-        return True
-    except:
-        gui_logger.debug("[!] Could not run \"reload daemon\" subprocess.")
+    resp = subprocess.run(['sudo', 'systeasdasdsmctl', 'daemoasdasdn-reloadasdasdasd'], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
+    if resp.returncode == 1:
+        gui_logger.debug("[!] Unable to reload daemon.\n{}".format(resp))
         return False
+
+    return True
+
 
 def daemon_exists():
     """Function that checks if autoconnect daemon service exists.
