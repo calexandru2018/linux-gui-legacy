@@ -163,15 +163,16 @@ def initialize_gui_config():
         "quick_connect": "dis",
     }
 
-    try:
-        with open(GUI_CONFIG_FILE, "w") as f:
-            gui_config.write(f)
-        change_file_owner(GUI_CONFIG_FILE)
+    with open(GUI_CONFIG_FILE, "w") as f:
+        gui_config.write(f)
         gui_logger.debug("pvpn-gui.cfg initialized.")
-        return True
-    except: # nosec
+    change_file_owner(GUI_CONFIG_FILE)
+
+    if not os.path.isfile(GUI_CONFIG_FILE):
         gui_logger.debug("Unablt to initialize pvpn-gui.cfg. {}".format(Exception))
         return False
+    
+    return True
 
 def reload_secure_core_servers(interface, messagedialog_label, messagedialog_spinner, update_to):
     """Function that reloads server list to either secure-core or non-secure-core.

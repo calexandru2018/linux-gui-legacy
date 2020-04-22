@@ -143,13 +143,13 @@ class Handler:
         # Updates the ListStore model
         n_filter.refilter()
 
-    def column_filter(self, model, iter, data=None):
+    def column_filter(self, model, iterator, data=None):
         """Filter by columns and returns the corresponding rows
         """
         treeview = self.interface.get_object("TreeViewServerList")
         
         for col in range(0, treeview.get_n_columns()):
-            value = model.get_value(iter, col)
+            value = model.get_value(iterator, col)
             if isinstance(value, str):
                 if data.lower() in value.lower():
                     return True

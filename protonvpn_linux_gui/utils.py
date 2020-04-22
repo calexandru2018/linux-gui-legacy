@@ -35,7 +35,10 @@ from .constants import (
     TRAY_CFG_DATA_TX, 
     TRAY_CFG_TIME_CONN, 
     TRAY_CFG_DICT,
-    GUI_CONFIG_FILE
+    GUI_CONFIG_FILE,
+    LARGE_FLAGS_BASE_PATH,
+    SMALL_FLAGS_BASE_PATH,
+    FEATURES_BASE_PATH
 )
 
 from .gui_logger import gui_logger
@@ -397,11 +400,8 @@ def update_labels_status(update_labels_dict):
     disconnecting = update_labels_dict["disconnecting"]
     conn_info = update_labels_dict["conn_info"]
     is_vpn_connected = True if is_connected() else False
-
-    try:
-        connected_server = get_config_value("metadata", "connected_server")
-    except (KeyError, IndexError):
-        connected_server = False
+    country_cc = False
+    load = False
 
     time_connected_label =  interface.get_object("time_connected_label")
     protocol_label =        interface.get_object("protocol_label")
@@ -415,11 +415,10 @@ def update_labels_status(update_labels_dict):
     background_large_flag = interface.get_object("background_large_flag")
     protonvpn_sign_green =  interface.get_object("protonvpn_sign_green")
 
-    CURRDIR = os.path.dirname(os.path.abspath(__file__))
-    flags_base_path = CURRDIR+"/resources/img/flags/large/"
-
-    country_cc = False
-    load = False
+    try:
+        connected_server = get_config_value("metadata", "connected_server")
+    except (KeyError, IndexError):
+        connected_server = False
 
     # Get and set server load label
     try:
@@ -446,7 +445,7 @@ def update_labels_status(update_labels_dict):
         if k == country:
             if is_vpn_connected:
                 try:
-                    flag_path = flags_base_path+"{}.jpg".format(k.lower()) 
+                    flag_path = LARGE_FLAGS_BASE_PATH+"{}.jpg".format(k.lower()) 
                     background_large_flag.set_from_file(flag_path)
                 except:
                     gui_logger.debug("[!] Could not find appropriate flag to display in the Dashboard.")
@@ -588,7 +587,11 @@ def load_connection_settings(interface):
     # Set values
     update_autoconnect_combobox.set_active(autoconnect_index)
     update_quick_connect_combobox.set_active(quick_connect_index)
-    update_protocol_combobox.set_active(0) if default_protocol == "tcp" else update_protocol_combobox.set_active(1)
+
+    if default_protocol == "tcp":
+        update_protocol_combobox.set_active(0)
+    else:
+        update_protocol_combobox.set_active(1)
 
 def load_advanced_settings(interface):
     # User values
@@ -678,30 +681,10 @@ def populate_server_list(populate_servers_dict):
             country_servers[country] = sorted(countries[country], key=lambda s: get_server_value(s, "Load", servers))
         populate_servers_dict["tree_object"].clear()
 
-        CURRDIR = os.path.dirname(os.path.abspath(__file__))
-        flags_base_path = CURRDIR+"/resources/img/flags/small/"
-        features_base_path = CURRDIR+"/resources/img/utils/"
-
-        # Create empty image
-        empty_path = features_base_path+"normal.png"
-        empty_pix = empty = GdkPixbuf.Pixbuf.new_from_file_at_size(empty_path, 15,15)
-        # Create P2P image
-        p2p_path = features_base_path+"p2p-arrows.png"
-        p2p_pix = empty = GdkPixbuf.Pixbuf.new_from_file_at_size(p2p_path, 15,15)
-        # Create TOR image
-        tor_path = features_base_path+"tor-onion.png"
-        tor_pix = empty = GdkPixbuf.Pixbuf.new_from_file_at_size(tor_path, 15,15)
-        # Create Plus image
-        plus_server_path = features_base_path+"plus-server.png"
-        plus_pix = GdkPixbuf.Pixbuf.new_from_file_at_size(plus_server_path, 15,15)
+        empty_pix, p2p_pix, tor_pix, plus_pix = create_features_img()
 
         for country in country_servers:
-            for k,v in country_codes.items():
-                if country == v:
-                    flag_path = flags_base_path+"{}.png".format(v)
-                    break
-                else:
-                    flag_path = flags_base_path+"Unknown.png"
+            flag_path = get_flag_path(country)
 
             # Get average load and highest feature
             avrg_load, country_feature = get_country_avrg_features(country, country_servers, servers, features)
@@ -755,6 +738,32 @@ def populate_server_list(populate_servers_dict):
                     populate_servers_dict["tree_object"].append(country_row, [empty_pix, servername, plus_feature, feature, load])
                 elif not secure_core and not only_secure_core:
                     populate_servers_dict["tree_object"].append(country_row, [empty_pix, servername, plus_feature, feature, load])
+
+def get_flag_path(country):
+    for k,v in country_codes.items():
+        if country == v:
+            flag_path = SMALL_FLAGS_BASE_PATH+"{}.png".format(v)
+            break
+        else:
+            flag_path = SMALL_FLAGS_BASE_PATH+"Unknown.png"
+
+    return flag_path
+
+def create_features_img():
+    # Create empty image
+    empty_path = FEATURES_BASE_PATH+"normal.png"
+    empty_pix = GdkPixbuf.Pixbuf.new_from_file_at_size(empty_path, 15,15)
+    # Create P2P image
+    p2p_path = FEATURES_BASE_PATH+"p2p-arrows.png"
+    p2p_pix = GdkPixbuf.Pixbuf.new_from_file_at_size(p2p_path, 15,15)
+    # Create TOR image
+    tor_path = FEATURES_BASE_PATH+"tor-onion.png"
+    tor_pix = GdkPixbuf.Pixbuf.new_from_file_at_size(tor_path, 15,15)
+    # Create Plus image
+    plus_server_path = FEATURES_BASE_PATH+"plus-server.png"
+    plus_pix = GdkPixbuf.Pixbuf.new_from_file_at_size(plus_server_path, 15,15)
+
+    return (empty_pix, p2p_pix, tor_pix, plus_pix)    
 
 def get_country_avrg_features(country, country_servers, servers, features):
     """Function that returns average load and features of a specific country.

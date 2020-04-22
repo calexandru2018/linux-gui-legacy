@@ -143,14 +143,14 @@ class ProtonVPNIndicator:
         try:
             connected_server = get_config_value("metadata", "connected_server")
         except (KeyError, IndexError):
-            gui_logger.debug("[!] Could not find specified key: ".format(KeyError))
+            gui_logger.debug("[!] Could not find specified key.")
             return True
 
         # force_pull servers
         try:
             pull_server_data(force=True)
-        except: # nosec
-            gui_logger.debug("[!] Could not pull from servers, possible due to unstable connection.{}".format(Exception))
+        except KeyError: 
+            gui_logger.debug("[!] Could not pull from servers, possible due to unstable connection.")
             return True
 
         # get_servers
@@ -159,7 +159,7 @@ class ProtonVPNIndicator:
         # get server load
         try:
             load = get_server_value(connected_server, "Load", servers)
-        except KeyError:
+        except (KeyError, IndexError):
             gui_logger.debug("[!] Unable to get server load.")
             return True
 
@@ -202,23 +202,23 @@ class ProtonVPNIndicator:
 
         try: 
             resp_dict["display_serverload"] = int(get_gui_config("tray_tab", TRAY_CFG_SERVERLOAD))
-        except KeyError:
-            gui_logger.debug("[!] Could not find display_serverload in config file: ".format(KeyError))
+        except (KeyError, IndexError):
+            gui_logger.debug("[!] Could not find display_serverload in config file.")
         
         try: 
             resp_dict["display_server"] = int(get_gui_config("tray_tab", TRAY_CFG_SERVENAME))
-        except KeyError:
-            gui_logger.debug("[!] Could not find display_server in config file: ".format(KeyError))
+        except (KeyError, IndexError):
+            gui_logger.debug("[!] Could not find display_server in config file.")
 
         try: 
             resp_dict["display_data_tx"] = int(get_gui_config("tray_tab", TRAY_CFG_DATA_TX))
-        except KeyError:
-            gui_logger.debug("[!] Could not find display_data_tx in config file: ".format(KeyError)) 
+        except (KeyError, IndexError):
+            gui_logger.debug("[!] Could not find display_data_tx in config file.") 
         
         try: 
             resp_dict["display_time_conn"] = int(get_gui_config("tray_tab", TRAY_CFG_TIME_CONN))
-        except KeyError:
-            gui_logger.debug("[!] Could not find display_time_conn in config file: ".format(KeyError))
+        except (KeyError, IndexError):
+            gui_logger.debug("[!] Could not find display_time_conn in config file.")
 
         return resp_dict
 
