@@ -1,5 +1,4 @@
 import re
-import os
 import sys
 import time
 import requests
@@ -439,7 +438,7 @@ def update_labels_status(update_labels_dict):
     for k,v in country_codes.items():
         if k == country:
             if is_vpn_connected:
-                flag_path = LARGE_FLAGS_BASE_PATH+"{}.jpg".format(k.lower()) 
+                flag_path = LARGE_FLAGS_BASE_PATH+"{}.jpg".format(k.lower())
                 background_large_flag.set_from_file(flag_path)
             country_cc = v
 
@@ -765,7 +764,7 @@ def create_features_img():
         "tor_pix": tor_pix,
         "plus_pix": plus_pix,
     }
-    return images_dict    
+    return images_dict
 
 def get_country_avrg_features(country, country_servers, servers, only_secure_core):
     """Function that returns average load and features of a specific country.

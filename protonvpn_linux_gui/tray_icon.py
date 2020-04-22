@@ -1,5 +1,4 @@
 import os
-import sys
 import time
 import datetime
 import subprocess
@@ -149,7 +148,7 @@ class ProtonVPNIndicator:
         # force_pull servers
         try:
             pull_server_data(force=True)
-        except KeyError: 
+        except KeyError:
             gui_logger.debug("[!] Could not pull from servers, possible due to unstable connection.")
             return True
 
@@ -213,7 +212,7 @@ class ProtonVPNIndicator:
         try: 
             resp_dict["display_data_tx"] = int(get_gui_config("tray_tab", TRAY_CFG_DATA_TX))
         except (KeyError, IndexError):
-            gui_logger.debug("[!] Could not find display_data_tx in config file.") 
+            gui_logger.debug("[!] Could not find display_data_tx in config file.")
         
         try: 
             resp_dict["display_time_conn"] = int(get_gui_config("tray_tab", TRAY_CFG_TIME_CONN))
