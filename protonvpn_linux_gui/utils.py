@@ -219,10 +219,7 @@ def check_internet_conn(request_bool=False):
     """
     gui_logger.debug(">>> Running \"check_internet_conn\".")
 
-    try:    
-        return custom_call_api(request_bool=request_bool)
-    except:
-        return False
+    return custom_call_api(request_bool=request_bool)
 
 def custom_call_api(endpoint=False, request_bool=False):
     """Function that is a custom call_api with a timeout of 6 seconds. This is mostly used to check for API access and also for internet access.
@@ -265,24 +262,22 @@ def check_for_updates():
     latest_release = ''
     pip3_installed = False
 
-    try:
-        is_pip3_installed = subprocess.run(["pip3", "show", "protonvpn-linux-gui-calexandru2018"],stdout=subprocess.PIPE) # nosec
-        if is_pip3_installed.returncode == 0:
-            is_pip3_installed = is_pip3_installed.stdout.decode().split("\n")
-            for el in is_pip3_installed:
-                if "Location:" in el:
-                    el = el.split(" ")[1].split("/")
-                    if not ".egg" in el[-1]:
-                        pip3_installed = True
-                        # print(".egg" in el[-1])
-                        break           
-    except:
-        pip3_installed = False
+    is_pip3_installed = subprocess.run(["pip3", "show", "protonvpn-linux-gui-calexandru2018"],stdout=subprocess.PIPE) # nosec
+    if is_pip3_installed.returncode == 0:
+        is_pip3_installed = is_pip3_installed.stdout.decode().split("\n")
+        for el in is_pip3_installed:
+            if "Location:" in el:
+                el = el.split(" ")[1].split("/")
+                if not ".egg" in el[-1]:
+                    pip3_installed = True
+                    # print(".egg" in el[-1])
+                    break           
 
     try:
         check_version = requests.get(GITHUB_URL_RELEASE, timeout=2)
         latest_release =  check_version.url.split("/")[-1][1:]
-    except:
+    except (requests.exceptions.ConnectionError,
+            requests.exceptions.ConnectTimeout):
         return "Failed to check for updates."
 
     if latest_release == VERSION:
@@ -444,12 +439,8 @@ def update_labels_status(update_labels_dict):
     for k,v in country_codes.items():
         if k == country:
             if is_vpn_connected:
-                try:
-                    flag_path = LARGE_FLAGS_BASE_PATH+"{}.jpg".format(k.lower()) 
-                    background_large_flag.set_from_file(flag_path)
-                except:
-                    gui_logger.debug("[!] Could not find appropriate flag to display in the Dashboard.")
-                
+                flag_path = LARGE_FLAGS_BASE_PATH+"{}.jpg".format(k.lower()) 
+                background_large_flag.set_from_file(flag_path)
             country_cc = v
 
     protonvpn_sign_green.hide()
@@ -938,7 +929,7 @@ def generate_template(template):
     generate_service_command = "cat > {0} <<EOF {1}\nEOF".format(PATH_AUTOCONNECT_SERVICE, template)
     gui_logger.debug(">>> Template:\n{}".format(generate_service_command))
 
-    resp = subprocess.run(["sudo", "bash", "-c", generate_service_command], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nose
+    resp = subprocess.run(["sudo", "bash", "-c", generate_service_command], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
     if resp.returncode == 1:
         gui_logger.debug("[!] Unable to generate template.\n{}".format(resp))
         return False
