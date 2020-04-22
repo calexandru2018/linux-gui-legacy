@@ -16,16 +16,15 @@ try:
         get_servers,
         get_country_name,
         get_server_value,
+        set_config_value,
         get_config_value,
         is_connected,
         get_transferred_data,
-        call_api
+        change_file_owner,
+        make_ovpn_template
     )
-
     from protonvpn_cli.country_codes import country_codes
-
     from protonvpn_cli.constants import SPLIT_TUNNEL_FILE, USER, CONFIG_FILE, PASSFILE
-    from protonvpn_cli.utils import change_file_owner, make_ovpn_template, set_config_value
 except:
     print("Can not find CLI modules.")
 
