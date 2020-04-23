@@ -1,7 +1,8 @@
 import os
 from protonvpn_cli.constants import VERSION as cli_version, USER
 
-VERSION = "2.0.6"
+VERSION = "2.0.7"
+
 GITHUB_URL_RELEASE = "https://github.com/calexandru2018/protonvpn-linux-gui/releases/latest"
 
 # GUI configurations
