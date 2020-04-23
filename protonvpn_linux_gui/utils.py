@@ -240,8 +240,9 @@ def custom_call_api(endpoint=False, request_bool=False):
     try:
         response = requests.get(url, headers=headers, timeout=6)
     except (requests.exceptions.ConnectionError,
-            requests.exceptions.ConnectTimeout):
-        gui_logger.debug("Error connecting to ProtonVPN API")
+            requests.exceptions.ConnectTimeout,
+            requests.exceptions.ReadTimeout):
+        gui_logger.debug("Error connecting to ProtonVPN API. Connection either timed out or were unable to connect.")
         return False
 
     try:
