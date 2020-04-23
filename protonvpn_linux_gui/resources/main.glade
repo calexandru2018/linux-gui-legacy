@@ -2246,22 +2246,108 @@ Ex:
                                 <property name="row_spacing">7</property>
                                 <property name="column_homogeneous">True</property>
                                 <child>
-                                  <object class="GtkButton" id="delete_active_profile_button">
-                                    <property name="label" translatable="yes">Delete Profile</property>
+                                  <object class="GtkGrid">
                                     <property name="visible">True</property>
-                                    <property name="can_focus">True</property>
-                                    <property name="receives_default">True</property>
-                                    <property name="halign">start</property>
-                                    <property name="valign">center</property>
-                                    <property name="image">gtk-delete-profile</property>
-                                    <property name="relief">none</property>
-                                    <signal name="clicked" handler="delete_active_profile_button_clicked" swapped="no"/>
-                                    <style>
-                                      <class name="delete_active_profile_btn"/>
-                                    </style>
+                                    <property name="can_focus">False</property>
+                                    <property name="vexpand">True</property>
+                                    <child>
+                                      <object class="GtkImage" id="protonvpn_sign_green">
+                                        <property name="can_focus">False</property>
+                                        <property name="pixbuf">img/logo/protonvpn_sign_green.png</property>
+                                      </object>
+                                      <packing>
+                                        <property name="left_attach">0</property>
+                                        <property name="top_attach">0</property>
+                                      </packing>
+                                    </child>
+                                    <child>
+                                      <object class="GtkLabel" id="country_label">
+                                        <property name="width_request">-1</property>
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">False</property>
+                                        <property name="halign">start</property>
+                                        <property name="hexpand">True</property>
+                                        <attributes>
+                                          <attribute name="weight" value="medium"/>
+                                          <attribute name="size" value="12000"/>
+                                        </attributes>
+                                      </object>
+                                      <packing>
+                                        <property name="left_attach">1</property>
+                                        <property name="top_attach">0</property>
+                                      </packing>
+                                    </child>
                                   </object>
                                   <packing>
                                     <property name="left_attach">0</property>
+                                    <property name="top_attach">0</property>
+                                    <property name="width">2</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <object class="GtkGrid">
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">False</property>
+                                    <property name="halign">end</property>
+                                    <property name="column_spacing">5</property>
+                                    <child>
+                                      <object class="GtkImage">
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">False</property>
+                                        <property name="pixbuf">img/utils/bitrate-download-arrow.png</property>
+                                      </object>
+                                      <packing>
+                                        <property name="left_attach">0</property>
+                                        <property name="top_attach">0</property>
+                                      </packing>
+                                    </child>
+                                    <child>
+                                      <object class="GtkLabel" id="data_received_label">
+                                        <property name="width_request">-1</property>
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">False</property>
+                                        <property name="hexpand">True</property>
+                                        <property name="justify">fill</property>
+                                        <attributes>
+                                          <attribute name="weight" value="medium"/>
+                                        </attributes>
+                                      </object>
+                                      <packing>
+                                        <property name="left_attach">1</property>
+                                        <property name="top_attach">0</property>
+                                      </packing>
+                                    </child>
+                                    <child>
+                                      <object class="GtkImage">
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">False</property>
+                                        <property name="pixbuf">img/utils/bitrate-upload-arrow.png</property>
+                                      </object>
+                                      <packing>
+                                        <property name="left_attach">2</property>
+                                        <property name="top_attach">0</property>
+                                      </packing>
+                                    </child>
+                                    <child>
+                                      <object class="GtkLabel" id="data_sent_label">
+                                        <property name="width_request">-1</property>
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">False</property>
+                                        <property name="halign">start</property>
+                                        <property name="hexpand">True</property>
+                                        <property name="justify">fill</property>
+                                        <attributes>
+                                          <attribute name="weight" value="medium"/>
+                                        </attributes>
+                                      </object>
+                                      <packing>
+                                        <property name="left_attach">3</property>
+                                        <property name="top_attach">0</property>
+                                      </packing>
+                                    </child>
+                                  </object>
+                                  <packing>
+                                    <property name="left_attach">1</property>
                                     <property name="top_attach">4</property>
                                   </packing>
                                 </child>
@@ -2279,7 +2365,24 @@ Ex:
                                   </object>
                                   <packing>
                                     <property name="left_attach">1</property>
-                                    <property name="top_attach">1</property>
+                                    <property name="top_attach">3</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <object class="GtkLabel" id="time_connected_label">
+                                    <property name="width_request">-1</property>
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">False</property>
+                                    <property name="halign">end</property>
+                                    <property name="hexpand">True</property>
+                                    <property name="justify">fill</property>
+                                    <attributes>
+                                      <attribute name="weight" value="medium"/>
+                                    </attributes>
+                                  </object>
+                                  <packing>
+                                    <property name="left_attach">1</property>
+                                    <property name="top_attach">2</property>
                                   </packing>
                                 </child>
                                 <child>
@@ -2308,29 +2411,12 @@ Ex:
                                   </object>
                                   <packing>
                                     <property name="left_attach">0</property>
-                                    <property name="top_attach">5</property>
+                                    <property name="top_attach">6</property>
                                     <property name="width">2</property>
                                   </packing>
                                 </child>
                                 <child>
-                                  <object class="GtkLabel" id="time_connected_label">
-                                    <property name="width_request">-1</property>
-                                    <property name="visible">True</property>
-                                    <property name="can_focus">False</property>
-                                    <property name="halign">end</property>
-                                    <property name="hexpand">True</property>
-                                    <property name="justify">fill</property>
-                                    <attributes>
-                                      <attribute name="weight" value="medium"/>
-                                    </attributes>
-                                  </object>
-                                  <packing>
-                                    <property name="left_attach">1</property>
-                                    <property name="top_attach">0</property>
-                                  </packing>
-                                </child>
-                                <child>
-                                  <object class="GtkLabel" id="ip_label">
+                                  <object class="GtkLabel" id="isp_label">
                                     <property name="width_request">-1</property>
                                     <property name="visible">True</property>
                                     <property name="can_focus">False</property>
@@ -2343,10 +2429,11 @@ Ex:
                                   <packing>
                                     <property name="left_attach">0</property>
                                     <property name="top_attach">1</property>
+                                    <property name="width">2</property>
                                   </packing>
                                 </child>
                                 <child>
-                                  <object class="GtkLabel" id="isp_label">
+                                  <object class="GtkLabel" id="ip_label">
                                     <property name="width_request">-1</property>
                                     <property name="visible">True</property>
                                     <property name="can_focus">False</property>
@@ -2378,122 +2465,27 @@ Ex:
                                   </packing>
                                 </child>
                                 <child>
-                                  <object class="GtkGrid">
+                                  <object class="GtkButton" id="delete_active_profile_button">
+                                    <property name="label" translatable="yes">Delete Profile</property>
                                     <property name="visible">True</property>
-                                    <property name="can_focus">False</property>
-                                    <property name="halign">end</property>
-                                    <property name="column_spacing">5</property>
-                                    <child>
-                                      <object class="GtkImage">
-                                        <property name="visible">True</property>
-                                        <property name="can_focus">False</property>
-                                        <property name="pixbuf">img/utils/bitrate-download-arrow.png</property>
-                                      </object>
-                                      <packing>
-                                        <property name="left_attach">1</property>
-                                        <property name="top_attach">0</property>
-                                      </packing>
-                                    </child>
-                                    <child>
-                                      <object class="GtkLabel" id="data_received_label">
-                                        <property name="width_request">-1</property>
-                                        <property name="visible">True</property>
-                                        <property name="can_focus">False</property>
-                                        <property name="hexpand">True</property>
-                                        <property name="justify">fill</property>
-                                        <attributes>
-                                          <attribute name="weight" value="medium"/>
-                                        </attributes>
-                                      </object>
-                                      <packing>
-                                        <property name="left_attach">0</property>
-                                        <property name="top_attach">0</property>
-                                      </packing>
-                                    </child>
-                                  </object>
-                                  <packing>
-                                    <property name="left_attach">1</property>
-                                    <property name="top_attach">3</property>
-                                  </packing>
-                                </child>
-                                <child>
-                                  <object class="GtkGrid">
-                                    <property name="visible">True</property>
-                                    <property name="can_focus">False</property>
-                                    <property name="halign">end</property>
-                                    <property name="column_spacing">5</property>
-                                    <child>
-                                      <object class="GtkImage">
-                                        <property name="visible">True</property>
-                                        <property name="can_focus">False</property>
-                                        <property name="pixbuf">img/utils/bitrate-upload-arrow.png</property>
-                                      </object>
-                                      <packing>
-                                        <property name="left_attach">1</property>
-                                        <property name="top_attach">0</property>
-                                      </packing>
-                                    </child>
-                                    <child>
-                                      <object class="GtkLabel" id="data_sent_label">
-                                        <property name="width_request">-1</property>
-                                        <property name="visible">True</property>
-                                        <property name="can_focus">False</property>
-                                        <property name="halign">start</property>
-                                        <property name="hexpand">True</property>
-                                        <property name="justify">fill</property>
-                                        <attributes>
-                                          <attribute name="weight" value="medium"/>
-                                        </attributes>
-                                      </object>
-                                      <packing>
-                                        <property name="left_attach">0</property>
-                                        <property name="top_attach">0</property>
-                                      </packing>
-                                    </child>
-                                  </object>
-                                  <packing>
-                                    <property name="left_attach">1</property>
-                                    <property name="top_attach">2</property>
-                                  </packing>
-                                </child>
-                                <child>
-                                  <object class="GtkGrid">
-                                    <property name="visible">True</property>
-                                    <property name="can_focus">False</property>
-                                    <property name="vexpand">True</property>
-                                    <child>
-                                      <object class="GtkImage" id="protonvpn_sign_green">
-                                        <property name="can_focus">False</property>
-                                        <property name="pixbuf">img/logo/protonvpn_sign_green.png</property>
-                                      </object>
-                                      <packing>
-                                        <property name="left_attach">0</property>
-                                        <property name="top_attach">0</property>
-                                      </packing>
-                                    </child>
-                                    <child>
-                                      <object class="GtkLabel" id="country_label">
-                                        <property name="width_request">-1</property>
-                                        <property name="visible">True</property>
-                                        <property name="can_focus">False</property>
-                                        <property name="halign">start</property>
-                                        <property name="hexpand">True</property>
-                                        <property name="wrap">True</property>
-                                        <attributes>
-                                          <attribute name="weight" value="medium"/>
-                                          <attribute name="size" value="12000"/>
-                                        </attributes>
-                                      </object>
-                                      <packing>
-                                        <property name="left_attach">1</property>
-                                        <property name="top_attach">0</property>
-                                      </packing>
-                                    </child>
+                                    <property name="can_focus">True</property>
+                                    <property name="receives_default">True</property>
+                                    <property name="halign">start</property>
+                                    <property name="valign">center</property>
+                                    <property name="image">gtk-delete-profile</property>
+                                    <property name="relief">none</property>
+                                    <signal name="clicked" handler="delete_active_profile_button_clicked" swapped="no"/>
+                                    <style>
+                                      <class name="delete_active_profile_btn"/>
+                                    </style>
                                   </object>
                                   <packing>
                                     <property name="left_attach">0</property>
-                                    <property name="top_attach">0</property>
+                                    <property name="top_attach">4</property>
                                   </packing>
+                                </child>
+                                <child>
+                                  <placeholder/>
                                 </child>
                                 <child>
                                   <placeholder/>
