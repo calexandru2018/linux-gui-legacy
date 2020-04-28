@@ -2,7 +2,7 @@ class DialogHandler:
     def __init__(self, interface): 
 
         # Should also be passed
-        # self.interface = interface
+        self.interface = interface
         # self.messagedialog_window = self.interface.get_object("MessageDialog")
         # self.messagedialog_label = self.interface.get_object("message_dialog_label")
         # self.messagedialog_sub_label = self.interface.get_object("message_dialog_sub_label")

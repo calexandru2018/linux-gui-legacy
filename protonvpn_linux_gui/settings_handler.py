@@ -23,28 +23,27 @@ from .thread_functions import (
 )
 from .utils import get_gui_config
 
-class DashboardHandler: 
+class SettingsHandler: 
     def __init__(self, interface): 
 
         # Should also be passed
         self.interface = interface
-        self.messagedialog_window = self.interface.get_object("MessageDialog")
-        self.messagedialog_label = self.interface.get_object("message_dialog_label")
-        self.messagedialog_sub_label = self.interface.get_object("message_dialog_sub_label")
-        self.messagedialog_spinner = self.interface.get_object("message_dialog_spinner")
-        self.messagedialog_sub_label.hide()
+        # self.messagedialog_window = self.interface.get_object("MessageDialog")
+        # self.messagedialog_label = self.interface.get_object("message_dialog_label")
+        # self.messagedialog_sub_label = self.interface.get_object("message_dialog_sub_label")
+        # self.messagedialog_spinner = self.interface.get_object("message_dialog_spinner")
+        # self.messagedialog_sub_label.hide()
 
         # Settings related
-        self.update_killswitch_switch = self.interface.get_object("update_killswitch_switch")
-        self.split_tunneling_switch = self.interface.get_object("split_tunneling_switch")
-        self.settings_tab_dict = {
-            "general_tab_style": self.interface.get_object("general_tab_label").get_style_context(), 
-            "sys_tray_tab_style": self.interface.get_object("sys_tray_tab_label").get_style_context(),
-            "connection_tab_style": self.interface.get_object("connection_tab_label").get_style_context(),
-            "advanced_tab_style": self.interface.get_object("advanced_tab_label").get_style_context()
-        }
+        # self.update_killswitch_switch = self.interface.get_object("update_killswitch_switch")
+        # self.split_tunneling_switch = self.interface.get_object("split_tunneling_switch")
+        # self.settings_tab_dict = {
+        #     "general_tab_style": self.interface.get_object("general_tab_label").get_style_context(), 
+        #     "sys_tray_tab_style": self.interface.get_object("sys_tray_tab_label").get_style_context(),
+        #     "connection_tab_style": self.interface.get_object("connection_tab_label").get_style_context(),
+        #     "advanced_tab_style": self.interface.get_object("advanced_tab_label").get_style_context()
+        # }
 
-    
     # Update Default OpenVPN protocol
     def update_protocol_combobox_changed(self, combobox):
         """Button/Event handler to update OpenVP Protocol  

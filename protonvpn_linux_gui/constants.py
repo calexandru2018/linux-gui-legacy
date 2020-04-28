@@ -9,7 +9,15 @@ GITHUB_URL_RELEASE = "https://github.com/calexandru2018/protonvpn-linux-gui/rele
 GUI_CONFIG_DIR = os.path.join(os.path.expanduser("~{0}".format(USER)), ".pvpn-gui")
 GUI_CONFIG_FILE = os.path.join(GUI_CONFIG_DIR, "pvpn-gui.cfg")
 
+
 CURRDIR = os.path.dirname(os.path.abspath(__file__))
+
+UI_LOGIN = os.path.join(CURRDIR, "resources/login_window.glade")
+UI_DASHBOARD = os.path.join(CURRDIR, "resources/dashboard_window.glade")
+UI_SETTINGS = os.path.join(CURRDIR, "resources/settings_window.glade")
+UI_DIALOG = os.path.join(CURRDIR, "resources/message_dialog.glade")
+UI_STYLES = os.path.join(CURRDIR, "resources/main.css")
+
 LARGE_FLAGS_BASE_PATH = os.path.join(CURRDIR, "resources/img/flags/large/")
 SMALL_FLAGS_BASE_PATH = os.path.join(CURRDIR, "resources/img/flags/small/")
 FEATURES_BASE_PATH = os.path.join(CURRDIR, "resources/img/utils/")
@@ -43,6 +51,18 @@ Environment=SUDO_USER=user
 
 [Install]
 WantedBy=multi-user.target
+"""
+CLI_ABSENCE_INFO = """
+<b>Could not find protonvpn-cli-ng installed on your system!</b>\t
+Original protonvpn-cli-ng is needed for the GUI to work.
+
+<b>Install via pip:</b>
+sudo pip3 install protonvpn-cli
+
+<b>Install via Github:</b>
+git clone https://github.com/protonvpn/protonvpn-cli-ng
+cd protonvpn-cli-ng
+sudo python3 setup.py install
 """
 HELP_TEXT = """
 <b>How is this GUI related to protonvpn-cli-ng ?</b>

@@ -25,25 +25,26 @@ from .utils import (
     tab_style_manager,
     message_dialog
 )
+from .constants import HELP_TEXT
 
 class DashboardHandler:
     def __init__(self, interface):
         self.interface = interface
         
         # Should also be passed
-        self.messagedialog_window = self.interface.get_object("MessageDialog")
-        self.messagedialog_label = self.interface.get_object("message_dialog_label")
-        self.messagedialog_sub_label = self.interface.get_object("message_dialog_sub_label")
-        self.messagedialog_spinner = self.interface.get_object("message_dialog_spinner")
-        self.messagedialog_sub_label.hide()
+        # self.messagedialog_window = self.interface.get_object("MessageDialog")
+        # self.messagedialog_label = self.interface.get_object("message_dialog_label")
+        # self.messagedialog_sub_label = self.interface.get_object("message_dialog_sub_label")
+        # self.messagedialog_spinner = self.interface.get_object("message_dialog_spinner")
+        # self.messagedialog_sub_label.hide()
 
-        # Dashboard related
-        self.conn_disc_button_label = self.interface.get_object("main_conn_disc_button_label")
-        self.secure_core_label_style = self.interface.get_object("secure_core_label").get_style_context()
-        self.dashboard_tab_dict = {
-            "countries_tab_style": self.interface.get_object("countries_tab_label").get_style_context(),
-            "profiles_tab_style": self.interface.get_object("profiles_tab_label").get_style_context()
-        }
+        # # Dashboard related
+        # self.conn_disc_button_label = self.interface.get_object("main_conn_disc_button_label")
+        # self.secure_core_label_style = self.interface.get_object("secure_core_label").get_style_context()
+        # self.dashboard_tab_dict = {
+        #     "countries_tab_style": self.interface.get_object("countries_tab_label").get_style_context(),
+        #     "profiles_tab_style": self.interface.get_object("profiles_tab_label").get_style_context()
+        # }
 
     def configuration_menu_button_clicked(self, button):
         """Button/Event handler to open Configurations window
@@ -86,6 +87,7 @@ class DashboardHandler:
     def profile_quick_connect_button_clicked(self, button):
         """Button/Event handler to connect to the fastest server
         """
+        
         self.messagedialog_sub_label.hide()
         self.messagedialog_label.set_markup("Connecting to the fastest server...")
         self.messagedialog_spinner.show()
