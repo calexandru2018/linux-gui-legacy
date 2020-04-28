@@ -14,8 +14,7 @@ from gi.repository import  Gtk, Gdk
 
 # Local imports
 from .login_handler import LoginHandler
-from .dashboard_handler import DashboardHandler
-from .settings_handler import SettingsHandler
+from .dashboard_handler import display_dashboard
 from .dialog_handler import DialogHandler
 from .gui_logger import gui_logger
 from .constants import (
@@ -44,7 +43,7 @@ from .utils import (
     find_cli,
 )
 
-def initialize_gui():
+def init():
     """Initializes the GUI
     """
     check_root()
@@ -104,34 +103,7 @@ def initialize_gui():
             version_label.set_markup("v.{}".format(VERSION))
         else:
             gui_logger.debug(">>> Loading DashboardWindow")
-
-            interface.connect_signals(DashboardHandler(interface))
-            interface.connect_signals(SettingsHandler(interface))
-
-            interface.add_from_file(UI_DASHBOARD)
-            interface.add_from_file(UI_SETTINGS)
-
-            window = interface.get_object("DashboardWindow")
-
-            messagedialog_label.set_markup("Loading...")
-            messagedialog_spinner.show()
-            messagedialog_window.show()
-
-            objects = {
-                    "interface": interface,
-                    "messagedialog_window": messagedialog_window,
-                    "messagedialog_label": messagedialog_label,
-                    "messagedialog_spinner": messagedialog_spinner,
-                }
-
-            thread = Thread(target=load_content_on_start, args=[objects])
-            thread.daemon = True
-            thread.start()
-            
-        # load_configurations(interface)
-
-        window.connect("destroy", Gtk.main_quit)
-        window.show()
+            display_dashboard(interface, Gtk, messagedialog_window,messagedialog_label,messagedialog_spinner)
 
     Gtk.main()
 
