@@ -1,5 +1,6 @@
 from threading import Thread
 
+# Remote imports
 from protonvpn_cli.constants import (VERSION) #noqa
 from protonvpn_cli.utils import(
     get_config_value, 
@@ -8,7 +9,10 @@ from protonvpn_cli.utils import(
     set_config_value #noqa
 )    
 
+# Local imports
+from .settings_handler import SettingsHandler
 from .gui_logger import gui_logger
+from .constants import HELP_TEXT, UI_DASHBOARD, UI_SETTINGS
 from .thread_functions import (
     quick_connect,
     last_connect,
@@ -17,6 +21,7 @@ from .thread_functions import (
     custom_quick_connect,
     connect_to_selected_server,
     reload_secure_core_servers,
+    load_content_on_start
 )
 from .utils import (
     load_configurations,
@@ -25,26 +30,55 @@ from .utils import (
     tab_style_manager,
     message_dialog
 )
-from .constants import HELP_TEXT
+
+def display_dashboard(interface, Gtk, messagedialog_window,messagedialog_label,messagedialog_spinner):
+    interface.connect_signals(SettingsHandler(interface))
+    interface.add_from_file(UI_DASHBOARD)
+    interface.add_from_file(UI_SETTINGS)
+
+    dashboard_window = interface.get_object("DashboardWindow")
+
+    interface.connect_signals(DashboardHandler(interface))
+
+    test = SettingsHandler(interface)
+    test.set_objects()
+
+    dashboard_window.connect("destroy", Gtk.main_quit)
+
+    messagedialog_label.set_markup("Loading...")
+    messagedialog_spinner.show()
+    messagedialog_window.show()
+
+    objects = {
+            "interface": interface,
+            "messagedialog_window": messagedialog_window,
+            "messagedialog_label": messagedialog_label,
+            "messagedialog_spinner": messagedialog_spinner,
+        }
+
+    thread = Thread(target=load_content_on_start, args=[objects])
+    thread.daemon = True
+    thread.start()
+
+    dashboard_window.show()
 
 class DashboardHandler:
     def __init__(self, interface):
         self.interface = interface
-        
         # Should also be passed
-        # self.messagedialog_window = self.interface.get_object("MessageDialog")
-        # self.messagedialog_label = self.interface.get_object("message_dialog_label")
-        # self.messagedialog_sub_label = self.interface.get_object("message_dialog_sub_label")
-        # self.messagedialog_spinner = self.interface.get_object("message_dialog_spinner")
-        # self.messagedialog_sub_label.hide()
+        self.messagedialog_window = self.interface.get_object("MessageDialog")
+        self.messagedialog_label = self.interface.get_object("message_dialog_label")
+        self.messagedialog_sub_label = self.interface.get_object("message_dialog_sub_label")
+        self.messagedialog_spinner = self.interface.get_object("message_dialog_spinner")
+        self.messagedialog_sub_label.hide()
 
-        # # Dashboard related
-        # self.conn_disc_button_label = self.interface.get_object("main_conn_disc_button_label")
-        # self.secure_core_label_style = self.interface.get_object("secure_core_label").get_style_context()
-        # self.dashboard_tab_dict = {
-        #     "countries_tab_style": self.interface.get_object("countries_tab_label").get_style_context(),
-        #     "profiles_tab_style": self.interface.get_object("profiles_tab_label").get_style_context()
-        # }
+        # Dashboard related
+        self.conn_disc_button_label = self.interface.get_object("main_conn_disc_button_label")
+        self.secure_core_label_style = self.interface.get_object("secure_core_label").get_style_context()
+        self.dashboard_tab_dict = {
+            "countries_tab_style": self.interface.get_object("countries_tab_label").get_style_context(),
+            "profiles_tab_style": self.interface.get_object("profiles_tab_label").get_style_context()
+        }
 
     def configuration_menu_button_clicked(self, button):
         """Button/Event handler to open Configurations window
@@ -188,18 +222,6 @@ class DashboardHandler:
             tab_style_manager("profiles_tab_style", self.dashboard_tab_dict)
         else:
             tab_style_manager("countries_tab_style", self.dashboard_tab_dict)
-
-    def settings_notebook_page_changed(self, notebook, selected_tab, actual_tab_index):
-        """Updates Settings Window tab style
-        """
-        if actual_tab_index == 0:
-            tab_style_manager("general_tab_style", self.settings_tab_dict)
-        elif actual_tab_index == 1:
-            tab_style_manager("sys_tray_tab_style", self.settings_tab_dict)
-        elif actual_tab_index == 2:
-            tab_style_manager("connection_tab_style", self.settings_tab_dict)
-        elif actual_tab_index == 3:
-            tab_style_manager("advanced_tab_style", self.settings_tab_dict)
 
     def TreeViewServerList_cursor_changed(self, treeview):
         """Updates Quick Connect label in the Dashabord, based on what server or contry a user clicked.

@@ -21,7 +21,7 @@ from .thread_functions import (
     tray_configurations,
     purge_configurations
 )
-from .utils import get_gui_config
+from .utils import get_gui_config, tab_style_manager
 
 class SettingsHandler: 
     def __init__(self, interface): 
@@ -35,14 +35,35 @@ class SettingsHandler:
         # self.messagedialog_sub_label.hide()
 
         # Settings related
-        # self.update_killswitch_switch = self.interface.get_object("update_killswitch_switch")
-        # self.split_tunneling_switch = self.interface.get_object("split_tunneling_switch")
-        # self.settings_tab_dict = {
-        #     "general_tab_style": self.interface.get_object("general_tab_label").get_style_context(), 
-        #     "sys_tray_tab_style": self.interface.get_object("sys_tray_tab_label").get_style_context(),
-        #     "connection_tab_style": self.interface.get_object("connection_tab_label").get_style_context(),
-        #     "advanced_tab_style": self.interface.get_object("advanced_tab_label").get_style_context()
-        # }
+        self.update_killswitch_switch = ""
+        self.split_tunneling_switch = ""
+        self.settings_tab_dict = {
+            "general_tab_style": "1", 
+            "sys_tray_tab_style": "2",
+            "connection_tab_style": "3",
+            "advanced_tab_style": "4"
+        }
+
+    def set_objects(self):
+        self.update_killswitch_switch = self.interface.get_object("update_killswitch_switch")
+        self.split_tunneling_switch = self.interface.get_object("split_tunneling_switch")
+        self.settings_tab_dict["general_tab_style"] = self.interface.get_object("general_tab_label").get_style_context()
+        self.settings_tab_dict["sys_tray_tab_style"] = self.interface.get_object("sys_tray_tab_label").get_style_context()
+        self.settings_tab_dict["connection_tab_style"] = self.interface.get_object("connection_tab_label").get_style_context()
+        self.settings_tab_dict["advanced_tab_style"] = self.interface.get_object("advanced_tab_label").get_style_context()
+
+
+    def settings_notebook_page_changed(self, notebook, selected_tab, actual_tab_index):
+        """Updates Settings Window tab style
+        """
+        if actual_tab_index == 0:
+            tab_style_manager("general_tab_style", self.settings_tab_dict)
+        elif actual_tab_index == 1:
+            tab_style_manager("sys_tray_tab_style", self.settings_tab_dict)
+        elif actual_tab_index == 2:
+            tab_style_manager("connection_tab_style", self.settings_tab_dict)
+        elif actual_tab_index == 3:
+            tab_style_manager("advanced_tab_style", self.settings_tab_dict)
 
     # Update Default OpenVPN protocol
     def update_protocol_combobox_changed(self, combobox):
