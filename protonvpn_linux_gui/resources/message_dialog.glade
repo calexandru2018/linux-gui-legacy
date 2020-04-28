@@ -63,6 +63,9 @@ Author: Alexandru Cheltuitor
             <property name="label" translatable="yes">ProtonVPN Linux GUI</property>
           </object>
         </child>
+        <style>
+          <class name="overlay_background"/>
+        </style>
       </object>
     </child>
     <child internal-child="vbox">

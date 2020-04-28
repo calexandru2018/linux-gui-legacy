@@ -56,6 +56,9 @@ Author: Alexandru Cheltuitor
             <property name="pixbuf">img/logo/protonvpn_sign_green.png</property>
           </object>
         </child>
+        <style>
+          <class name="overlay_background"/>
+        </style>
       </object>
     </child>
     <child>
