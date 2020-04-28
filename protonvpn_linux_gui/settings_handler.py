@@ -297,3 +297,14 @@ class DashboardHandler:
         thread.start()
 
         self.messagedialog_window.show()
+
+    # To avoid getting the ConfigurationsWindow destroyed and not being re-rendered again
+    def SettingsWindow_delete_event(self, window, event):
+        """On Delete handler is used to hide the window so it renders next time the dialog is called
+        
+        -Returns:Boolean
+        - It needs to return True, otherwise the content will not re-render after closing the dialog
+        """
+        if window.get_property("visible") is True:
+            window.hide()
+            return True

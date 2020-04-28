@@ -298,3 +298,37 @@ class DashboardHandler:
         self.messagedialog_sub_label.hide()        
         self.messagedialog_label.set_markup("This feature is not yet implemented.")
         self.messagedialog_window.show()
+
+    def check_for_updates_button_clicked(self, button):
+        """Button/Event handler to check for update.
+        """
+        self.messagedialog_sub_label.hide()
+        self.messagedialog_label.set_markup("Checking...")
+        self.messagedialog_spinner.show()
+
+        gui_logger.debug(">>> Starting \"message_dialog\" thread. [CHECK_FOR_UPDATES]")
+
+        thread = Thread(target=message_dialog, args=[self.interface, "check_for_update", self.messagedialog_label, self.messagedialog_spinner])
+        thread.daemon = True
+        thread.start()
+
+        self.messagedialog_window.show()
+
+    def help_button_clicked(self, button):
+        """Button/Event handler to show help information.
+        """
+        self.messagedialog_sub_label.hide()
+        self.messagedialog_label.set_markup(HELP_TEXT)
+
+        self.messagedialog_window.show()
+
+    # To avoid getting the AboutDialog destroyed and not being re-rendered again
+    def AboutDialog_delete_event(self, window, event):
+        """On Delete handler is used to hide the dialog and so that it successfully renders next time it is called
+        
+        -Returns:Boolean
+        - It needs to return True, otherwise the content will not re-render after closing the window
+        """
+        if window.get_property("visible") is True:
+            window.hide()
+            return True    

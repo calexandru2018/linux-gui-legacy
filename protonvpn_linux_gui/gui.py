@@ -14,50 +14,24 @@ from .gui_logger import gui_logger
 
 # Custom helper functions
 from .utils import (
-    populate_server_list,
-    prepare_initilizer,
     load_configurations,
     message_dialog,
     check_for_updates,
     get_gui_processes,
     find_cli,
-    get_gui_config,
-    set_gui_config,
-    tab_style_manager
 )
 
 # Import functions that are called with threads
 from .thread_functions import(
-    quick_connect,
-    custom_quick_connect,
-    disconnect,
-    random_connect,
-    last_connect,
-    connect_to_selected_server,
-    on_login,
-    update_user_pass,
-    update_dns,
-    update_pvpn_plan,
-    update_def_protocol,
-    update_killswitch,
-    update_split_tunneling,
-    purge_configurations,
     kill_duplicate_gui_process,
     load_content_on_start,
-    update_connect_preference,
-    tray_configurations,
-    update_split_tunneling_status,
-    reload_secure_core_servers,
     initialize_gui_config
 )
 
 # Import version
 from .constants import VERSION, HELP_TEXT, GUI_CONFIG_DIR, GUI_CONFIG_FILE
 
-# PyGObject import
 import gi
-
-# Gtk3 import
 gi.require_version('Gtk', '3.0')
 from gi.repository import  Gtk, Gdk
 
@@ -65,87 +39,17 @@ class Handler:
     """Handler that has all callback functions.
     """
     def __init__(self, interface): 
+        print("Hello")
         # General
-        self.interface = interface
-        self.messagedialog_window = self.interface.get_object("MessageDialog")
-        self.messagedialog_label = self.interface.get_object("message_dialog_label")
-        self.messagedialog_sub_label = self.interface.get_object("message_dialog_sub_label")
-        self.messagedialog_spinner = self.interface.get_object("message_dialog_spinner")
-        self.messagedialog_sub_label.hide()
-
-    # Login BUTTON HANDLER
-    def check_for_updates_button_clicked(self, button):
-        """Button/Event handler to check for update.
-        """
-        self.messagedialog_sub_label.hide()
-        self.messagedialog_label.set_markup("Checking...")
-        self.messagedialog_spinner.show()
-
-        gui_logger.debug(">>> Starting \"message_dialog\" thread. [CHECK_FOR_UPDATES]")
-
-        thread = Thread(target=message_dialog, args=[self.interface, "check_for_update", self.messagedialog_label, self.messagedialog_spinner])
-        thread.daemon = True
-        thread.start()
-
-        self.messagedialog_window.show()
-
-    def help_button_clicked(self, button):
-        """Button/Event handler to show help information.
-        """
-        self.messagedialog_sub_label.hide()
-        self.messagedialog_label.set_markup(HELP_TEXT)
-
-        self.messagedialog_window.show()
-
-    def close_message_dialog(self, button):
-        """Button/Event handler to close message dialog.
-        """
-        self.interface.get_object("MessageDialog").hide()
-        
-    # To avoid getting the ConfigurationsWindow destroyed and not being re-rendered again
-    def SettingsWindow_delete_event(self, window, event):
-        """On Delete handler is used to hide the window so it renders next time the dialog is called
-        
-        -Returns:Boolean
-        - It needs to return True, otherwise the content will not re-render after closing the dialog
-        """
-        if window.get_property("visible") is True:
-            window.hide()
-            return True
-
-    # To avoid getting the AboutDialog destroyed and not being re-rendered again
-    def AboutDialog_delete_event(self, window, event):
-        """On Delete handler is used to hide the dialog and so that it successfully renders next time it is called
-        
-        -Returns:Boolean
-        - It needs to return True, otherwise the content will not re-render after closing the window
-        """
-        if window.get_property("visible") is True:
-            window.hide()
-            return True    
-
-    # To avoid getting the MessageDialog destroyed and not being re-rendered again
-    def MessageDialog_delete_event(self, window, event):
-        """On Delete handler is used to hide the dialog and so that it successfully renders next time it is called
-        
-        -Returns:Boolean
-        - It needs to return True, otherwise the content will not re-render after closing the window
-        """
-        if window.get_property("visible") is True:
-            window.hide()
-            return True
+        # self.interface = interface
+        # self.messagedialog_window = self.interface.get_object("MessageDialog")
+        # self.messagedialog_label = self.interface.get_object("message_dialog_label")
+        # self.messagedialog_sub_label = self.interface.get_object("message_dialog_sub_label")
+        # self.messagedialog_spinner = self.interface.get_object("message_dialog_spinner")
+        # self.messagedialog_sub_label.hide()
 
 def initialize_gui():
-    """Initializes the GUI 
-    ---
-    If user has not initialized a profile, the GUI will ask for the following data:
-    - Username
-    - Password
-    - Plan
-    - Protocol
-
-    sudo protonvpn-gui
-    - Will start the GUI without invoking cli()
+    """Initializes the GUI
     """
 
     interface = Gtk.Builder()
