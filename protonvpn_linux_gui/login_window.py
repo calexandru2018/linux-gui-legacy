@@ -3,7 +3,7 @@ from threading import Thread
 from .thread_functions import on_login
 from .utils import gui_logger
 
-class LoginHandler:
+class LoginWindow:
     def __init__(self, interface):
         self.interface = interface
         

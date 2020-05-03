@@ -23,7 +23,7 @@ from .thread_functions import (
 )
 from .utils import get_gui_config, tab_style_manager
 
-class SettingsHandler: 
+class SettingsWindow: 
     def __init__(self, interface): 
 
         # Should also be passed
