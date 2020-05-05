@@ -13,8 +13,8 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import  Gtk, Gdk
 
 # Local imports
-from .login_handler import LoginHandler
-from .dashboard_handler import display_dashboard
+from .login_window import LoginWindow
+from .dashboard_window import DashboardWindow
 from .dialog_handler import DialogHandler
 from .gui_logger import gui_logger
 from .constants import (
@@ -77,6 +77,8 @@ def init():
     messagedialog_window = interface.get_object("MessageDialog")
     messagedialog_label = interface.get_object("message_dialog_label")
     messagedialog_spinner = interface.get_object("message_dialog_spinner")
+    messagedialog_sub_label = interface.get_object("message_dialog_sub_label")
+    messagedialog_sub_label.hide()
 
     if not find_cli():
         messagedialog_spinner.hide()
@@ -94,7 +96,7 @@ def init():
         if not os.path.isfile(CONFIG_FILE): 
             gui_logger.debug(">>> Loading LoginWindow")
 
-            interface.connect_signals(LoginHandler(interface))
+            interface.connect_signals(LoginWindow(interface))
 
             interface.add_from_file(UI_LOGIN)
 
@@ -103,7 +105,8 @@ def init():
             version_label.set_markup("v.{}".format(VERSION))
         else:
             gui_logger.debug(">>> Loading DashboardWindow")
-            display_dashboard(interface, Gtk, messagedialog_window,messagedialog_label,messagedialog_spinner)
+            dashboard = DashboardWindow(interface, Gtk, messagedialog_window, messagedialog_label, messagedialog_sub_label, messagedialog_spinner)
+            dashboard.display_window()
 
     Gtk.main()
 
