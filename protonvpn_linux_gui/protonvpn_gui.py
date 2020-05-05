@@ -33,9 +33,10 @@ from .constants import (
 )
 from .thread_functions import(
     kill_duplicate_gui_process,
-    load_content_on_start,
     initialize_gui_config
 )
+from .services.dashboad_service import load_content_on_start
+
 from .utils import (
     load_configurations,
     message_dialog,
