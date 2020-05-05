@@ -94,17 +94,18 @@ def get_server_protocol_from_cli(raw_result, return_protocol=False):
 
     return False
 
-def message_dialog(interface, action, label_object, spinner_object, sub_label_object=False):
+def message_dialog(**kwargs):
     """Multipurpose message dialog function.
     """
-    if action == "check_for_update":
+    dialog_window = kwargs.get("dialog_window")
+
+    if kwargs.get("command") == "check_for_update":
         with concurrent.futures.ThreadPoolExecutor() as executor:
             future = executor.submit(check_for_updates)
             return_value = future.result()
             
-            label_object.set_markup("<span>{0}</span>".format(return_value))
-            spinner_object.hide()
-    elif action == "diagnose":
+            dialog_window.update_dialog(label="<span>{0}</span>".format(return_value))
+    elif  kwargs.get("command") ==  "diagnose":
         reccomendation = '' 
 
         end_openvpn_process_guide = """\n

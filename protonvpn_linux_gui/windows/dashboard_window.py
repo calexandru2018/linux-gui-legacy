@@ -13,7 +13,7 @@ from protonvpn_cli.utils import(
 from protonvpn_linux_gui.windows.settings_window import SettingsWindow
 from protonvpn_linux_gui.gui_logger import gui_logger
 from protonvpn_linux_gui.constants import HELP_TEXT, UI_DASHBOARD, UI_SETTINGS
-from protonvpn_linux_gui.thread_functions import (
+from protonvpn_linux_gui.services.dashboad_service import (
     quick_connect,
     last_connect,
     random_connect,
@@ -64,16 +64,9 @@ class DashboardWindow:
 
         self.dialog_window.display_dialog(label="Loading...", spinner=True)
 
-        # self.messagedialog_label.set_markup("Loading...")
-        # self.messagedialog_spinner.show()
-        # self.messagedialog_window.show()
-
         objects = {
             "interface": self.interface,
             "dialog_window": self.dialog_window
-            # "messagedialog_window": self.messagedialog_window,
-            # "messagedialog_label": self.messagedialog_label,
-            # "messagedialog_spinner": self.messagedialog_spinner,
         }
 
         thread = Thread(target=load_content_on_start, args=[objects])
@@ -87,11 +80,6 @@ class DashboardWindow:
         self.interface = interface
         self.settings_window = settings_window
         self.dialog_window = dialog_window
-        # self.messagedialog_window = messagedialog_window
-        # self.messagedialog_label = messagedialog_label
-        # self.messagedialog_spinner = messagedialog_spinner
-        # self.messagedialog_sub_label = messagedialog_sub_label
-        # self.messagedialog_sub_label.hide()
         self.conn_disc_button_label = self.interface.get_object("main_conn_disc_button_label")
         self.secure_core_label_style = self.interface.get_object("secure_core_label").get_style_context()
         self.dashboard_tab_dict = {
@@ -102,76 +90,54 @@ class DashboardWindow:
     def profile_quick_connect_button_clicked(self, button):
         """Button/Event handler to connect to the fastest server
         """
-        
-        self.messagedialog_sub_label.hide()
-        self.messagedialog_label.set_markup("Connecting to the fastest server...")
-        self.messagedialog_spinner.show()
+        self.dialog_window.display_dialog(label="Connecting to the fastest server...", spinner=True)
 
         gui_logger.debug(">>> Starting \"quick_connect\" thread.")
 
-        thread = Thread(target=quick_connect, args=[{
-                                            "interface":self.interface, 
-                                            "messagedialog_label": self.messagedialog_label, 
-                                            "messagedialog_spinner": self.messagedialog_spinner}])
+        thread = Thread(target=quick_connect, kwargs=dict(interface=self.interface, dialog_window=self.dialog_window)) 
         thread.daemon = True
         thread.start()
-
-        self.messagedialog_window.show()
 
     def last_connect_button_clicked(self, button):
         """Button/Event handler to reconnect to previously connected server
         """   
-        self.messagedialog_sub_label.hide()
         try:
             servername = get_config_value("metadata", "connected_server")
             protocol = get_config_value("metadata", "connected_proto")     
         except KeyError:
-            self.messagedialog_label.set_markup("You have not previously connected to any server, please do that connect to a server first before attempting to reconnect.")
-            self.messagedialog_spinner.hide()
-            self.messagedialog_window.show()
+            self.dialog_window.display_dialog(label="You have not previously connected to any server, please do first connect to a server before attempting to reconnect.")
             gui_logger.debug("[!] Attempted to connect to previously connected server without having made any previous connections.")
             return
 
-        self.messagedialog_label.set_markup("Connecting to previously connected server <b>{0}</b> with <b>{1}</b>.".format(servername, protocol.upper()))
-        self.messagedialog_spinner.show()
+        self.dialog_window.display_dialog(label="Connecting to previously connected server <b>{0}</b> with <b>{1}</b>.".format(servername, protocol.upper()))
 
         gui_logger.debug(">>> Starting \"last_connect\" thread.")
 
-        thread = Thread(target=last_connect, args=[self.interface, self.messagedialog_label, self.messagedialog_spinner])
+        thread = Thread(target=last_connect, kwargs=dict(interface=self.interface, dialog_window=self.dialog_window))
         thread.daemon = True
         thread.start()
-
-        self.messagedialog_window.show()
 
     def profile_random_connect_button_clicked(self, button):
         """Button/Event handler to connect to a random server
         """
-        self.messagedialog_sub_label.hide()
-        self.messagedialog_label.set_markup("Connecting to a random server...")
-        self.messagedialog_spinner.show()
-
+        self.dialog_window.display_dialog(label="Connecting to a random server...", spinner=True)
+        
         gui_logger.debug(">>> Starting \"random_connect\" thread.")
 
-        thread = Thread(target=random_connect, args=[self.interface, self.messagedialog_label, self.messagedialog_spinner])
+        thread = Thread(target=random_connect, kwargs=dict(interface=self.interface, dialog_window=self.dialog_window))
         thread.daemon = True
         thread.start()
-
-        self.messagedialog_window.show()
 
     def disconnect_button_clicked(self, button):
         """Button/Event handler to disconnect any existing connections
         """
-        self.messagedialog_sub_label.hide()
-        self.messagedialog_label.set_markup("Disconnecting...")
-        self.messagedialog_spinner.show()
+        self.dialog_window.display_dialog(label="Disconnecting...", spinner=True)
 
         gui_logger.debug(">>> Starting \"disconnect\" thread.")
 
-        thread = Thread(target=disconnect, args=[{"interface":self.interface, "messagedialog_label":self.messagedialog_label, "messagedialog_spinner":self.messagedialog_spinner}])
+        thread = Thread(target=disconnect, kwargs=dict(interface=self.interface, dialog_window=self.dialog_window))
         thread.daemon = True
         thread.start()
-
-        self.messagedialog_window.show()
 
     def dashboard_notebook_page_changed(self, notebook, selected_tab, actual_tab_index):
         """Updates Dashboard Window tab style
@@ -184,8 +150,6 @@ class DashboardWindow:
     def TreeViewServerList_cursor_changed(self, treeview):
         """Updates Quick Connect label in the Dashabord, based on what server or contry a user clicked.
         """
-        self.messagedialog_sub_label.hide()
-
         # Get the selected server
         (model, pathlist) = treeview.get_selection().get_selected_rows()
 
@@ -203,8 +167,6 @@ class DashboardWindow:
         """Button/Event handler to connect to either pre-selected quick connect, selected server/country or just fastest connect in the absence
         of previous params.
         """
-        self.messagedialog_sub_label.hide()
-
         gui_logger.debug(">>> Starting \"main_conn_disc_button_label\" thread.")
         
         server_list = self.interface.get_object("TreeViewServerList").get_selection() 
@@ -234,18 +196,14 @@ class DashboardWindow:
             target = connect_to_selected_server
             message = "Connecting to <b>{}</b>".format(user_selected_server) 
 
-        self.messagedialog_label.set_markup(message)
-        self.messagedialog_spinner.show()
+        self.dialog_window.display_dialog(label=message, spinner=True)
 
-        thread = Thread(target=target, args=[{
-                                            "interface":self.interface, 
-                                            "user_selected_server": user_selected_server, 
-                                            "messagedialog_label": self.messagedialog_label, 
-                                            "messagedialog_spinner": self.messagedialog_spinner}])
+        thread = Thread(target=target, kwargs=dict(
+                                            interface=self.interface, 
+                                            dialog_window=self.dialog_window,
+                                            user_selected_server=user_selected_server))
         thread.daemon = True
         thread.start()
-
-        self.messagedialog_window.show()
 
     def secure_core_switch_changed(self, switch, state):
         display_secure_core = get_gui_config("connections", "display_secure_core")
@@ -258,28 +216,19 @@ class DashboardWindow:
             self.secure_core_label_style.add_class("disabled_label")
         
         if (state and display_secure_core == "False") or (not state and display_secure_core != "False"):
-            self.messagedialog_sub_label.hide()        
-            self.messagedialog_label.set_markup("Loading {} servers...".format("secure-core" if update_to == "True" else "non secure-core"))
-            self.messagedialog_spinner.show()
-            thread = Thread(target=reload_secure_core_servers, args=[
-                                                    self.interface,
-                                                    self.messagedialog_label, 
-                                                    self.messagedialog_spinner,
-                                                    update_to])
+            self.dialog_window.display_dialog(label="Loading {} servers...".format("secure-core" if update_to == "True" else "non secure-core"), spinner=True)
+            thread = Thread(target=reload_secure_core_servers, kwargs=dict(
+                                                    interface=self.interface, 
+                                                    dialog_window=self.dialog_window,
+                                                    update_to=update_to))
             thread.daemon = True
             thread.start()
-
-            self.messagedialog_window.show()
     
     def manage_profiles_button_clicked(self, button):
-        self.messagedialog_sub_label.hide()        
-        self.messagedialog_label.set_markup("This feature is not yet implemented.")
-        self.messagedialog_window.show()    
+        self.dialog_window.display_dialog(label="This feature is not yet implemented.")
         
     def delete_active_profile_button_clicked(self, button):
-        self.messagedialog_sub_label.hide()        
-        self.messagedialog_label.set_markup("This feature is not yet implemented.")
-        self.messagedialog_window.show()
+        self.dialog_window.display_dialog(label="This feature is not yet implemented.")
 
     def server_filter_input_key_release(self, entry, event):
         """Event handler, to filter servers after each key release
@@ -329,17 +278,13 @@ class DashboardWindow:
     def check_for_updates_button_clicked(self, button):
         """Button/Event handler to check for update.
         """
-        self.messagedialog_sub_label.hide()
-        self.messagedialog_label.set_markup("Checking...")
-        self.messagedialog_spinner.show()
+        self.dialog_window.display_dialog(label="Checking...", spinner=True)
 
         gui_logger.debug(">>> Starting \"message_dialog\" thread. [CHECK_FOR_UPDATES]")
 
-        thread = Thread(target=message_dialog, args=[self.interface, "check_for_update", self.messagedialog_label, self.messagedialog_spinner])
+        thread = Thread(target=message_dialog, kwargs=dict(interface=self.interface, dialog_window=self.dialog_window, command="check_for_update"))
         thread.daemon = True
         thread.start()
-
-        self.messagedialog_window.show()
 
     def diagnose_menu_button_clicked(self, button):
         """Button/Event handler top show diagnose window.
