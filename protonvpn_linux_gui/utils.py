@@ -1,13 +1,10 @@
 import re
-import sys
 import time
-import requests
 import datetime
+import requests
 import subprocess
 import collections
 import configparser
-import concurrent.futures
-from threading import Thread
 
 from protonvpn_cli.utils import (
     pull_server_data,
@@ -349,126 +346,6 @@ def update_connection_time(dict_data):
 
     return True
 
-def load_configurations(interface):
-    """Function that loads user configurations before showing the configurations window.
-    """
-    load_general_settings(interface)
-    load_tray_settings(interface)
-    load_connection_settings(interface)
-    load_advanced_settings(interface)
-
-def load_general_settings(interface):
-    username_field = interface.get_object("update_username_input")
-    pvpn_plan_combobox = interface.get_object("update_tier_combobox")
-
-    username = get_config_value("USER", "username")
-    tier = int(get_config_value("USER", "tier"))
-
-    # Populate username
-    username_field.set_text(username)   
-    # Set tier
-    pvpn_plan_combobox.set_active(tier)
-
-
-def load_tray_settings(interface):
-    # Load tray configurations
-    for k,v in TRAY_CFG_DICT.items(): 
-        setter = 0
-        try: 
-            setter = int(get_gui_config("tray_tab", v))
-        except KeyError:
-            gui_logger.debug("[!] Unable to find {} key.".format(v))
-
-        combobox = interface.get_object(k)
-        combobox.set_active(setter)
-
-def load_connection_settings(interface):
-    # Set Autoconnect on boot combobox 
-    server_list = populate_autoconnect_list(interface, return_list=True)
-
-    # Get objects
-    update_autoconnect_combobox = interface.get_object("update_autoconnect_combobox")
-    update_quick_connect_combobox = interface.get_object("update_quick_connect_combobox")
-    update_protocol_combobox = interface.get_object("update_protocol_combobox")
-
-    #Get values
-    try:
-        autoconnect_setting = get_gui_config("conn_tab", "autoconnect")
-    except (KeyError, IndexError):
-        autoconnect_setting = 0
-    try:
-        quick_connect_setting = get_gui_config("conn_tab", "quick_connect")
-    except (KeyError, IndexError):
-        quick_connect = 0 
-    default_protocol = get_config_value("USER", "default_protocol")
-
-    # Get indexes
-    autoconnect_index = list(server_list.keys()).index(autoconnect_setting)
-    quick_connect_index = list(server_list.keys()).index(quick_connect_setting)
-
-    # Set values
-    update_autoconnect_combobox.set_active(autoconnect_index)
-    update_quick_connect_combobox.set_active(quick_connect_index)
-
-    if default_protocol == "tcp":
-        update_protocol_combobox.set_active(0)
-    else:
-        update_protocol_combobox.set_active(1)
-
-def load_advanced_settings(interface):
-    # User values
-    dns_leak_protection = get_config_value("USER", "dns_leak_protection")
-    custom_dns = get_config_value("USER", "custom_dns")
-    killswitch = get_config_value("USER", "killswitch")
-
-    try:
-        split_tunnel = get_config_value("USER", "split_tunnel")
-    except (KeyError, IndexError):
-        split_tunnel = '0'
-
-    # Object
-    dns_leak_switch = interface.get_object("update_dns_leak_switch")
-    killswitch_switch = interface.get_object("update_killswitch_switch")
-    split_tunneling_switch = interface.get_object("split_tunneling_switch")
-    split_tunneling_list = interface.get_object("split_tunneling_textview")
-
-    # Set DNS Protection
-    if dns_leak_protection == '1':
-    # if dns_leak_protection == '1' or (dns_leak_protection != '1' and custom_dns.lower() != "none"):
-        dns_leak_switch.set_state(True)
-    else:
-        dns_leak_switch.set_state(False)
-
-    # Populate Split Tunelling
-    # Check if killswtich is != 0, if it is then disable split tunneling Function
-    if killswitch != '0':
-        killswitch_switch.set_state(True)
-        split_tunneling_switch.set_property('sensitive', False)
-    else:
-        killswitch_switch.set_state(False)
-
-    if split_tunnel != '0':
-        split_tunneling_switch.set_state(True)
-        killswitch_switch.set_property('sensitive', False)
-        if killswitch != '0':
-            split_tunneling_list.set_property('sensitive', False)
-            interface.get_object("update_split_tunneling_button").set_property('sensitive', False)
-            
-        split_tunneling_buffer = split_tunneling_list.get_buffer()
-        content = ""
-        try:
-            with open(SPLIT_TUNNEL_FILE) as f:
-                lines = f.readlines()
-
-                for line in lines:
-                    content = content + line
-
-                split_tunneling_buffer.set_text(content)
-        except FileNotFoundError:
-            split_tunneling_buffer.set_text(content)
-    else:
-        split_tunneling_switch.set_state(False)  
-
 def populate_server_list(populate_servers_dict):
     """Function that updates server list.
     """
@@ -692,58 +569,6 @@ def populate_autoconnect_list(interface, return_list=False):
     if return_list:
         return return_values
 
-def manage_autoconnect(mode, command=False):
-    """Function that manages autoconnect functionality. It takes a mode (enabled/disabled) and a command that is to be passed to the CLI.
-    """
-    if mode == 'enable':
-        if not enable_autoconnect(command):
-            print("[!] Unable to enable autoconnect")
-            gui_logger.debug("[!] Unable to enable autoconnect.")
-            return False
-
-        print("Autoconnect on boot enabled")
-        gui_logger.debug(">>> Autoconnect on boot enabled")
-        return True
-
-    if mode == 'disable':
-
-        if not disable_autoconnect():
-            print("[!] Could not disable autoconnect")
-            gui_logger.debug("[!] Could not disable autoconnect.")
-            return False
-
-        print("Autoconnect on boot disabled")
-        gui_logger.debug(">>> Autoconnect on boot disabled")
-        return True
-
-def enable_autoconnect(command):
-    """Function that enables autoconnect.
-    """
-    protonvpn_path = find_cli()
-    if not protonvpn_path:
-        return False
-
-    # Injects CLIs start and stop path and username
-    with_cli_path = TEMPLATE.replace("PATH", (protonvpn_path + " " + command))
-    template = with_cli_path.replace("STOP", protonvpn_path + " disconnect")
-    template = template.replace("=user", "="+USER)
-    
-    if not generate_template(template):
-        return False
-
-    return enable_daemon() 
-
-def disable_autoconnect():
-    """Function that disables autoconnect.
-    """
-    if not stop_and_disable_daemon():
-        return False
-
-    if not remove_template():
-        return False
-
-    return True
-
 def find_cli():
     """Function that searches for the CLI. Returns CLIs path if it is found, otherwise it returns False.
     """
@@ -753,85 +578,7 @@ def find_cli():
         protonvpn_path = False
 
     return protonvpn_path.stdout.decode()[:-1] if (protonvpn_path and protonvpn_path.returncode == 0) else False
-        
-def generate_template(template):
-    """Function that generates the service file for autoconnect.
-    """
-    generate_service_command = "cat > {0} <<EOF {1}\nEOF".format(PATH_AUTOCONNECT_SERVICE, template)
-    gui_logger.debug(">>> Template:\n{}".format(generate_service_command))
-
-    resp = subprocess.run(["sudo", "bash", "-c", generate_service_command], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
-    if resp.returncode == 1:
-        gui_logger.debug("[!] Unable to generate template.\n{}".format(resp))
-        return False
-
-    return True
-
-def remove_template():
-    """Function that removes the service file from /etc/systemd/system/.
-    """
-    resp = subprocess.run(["sudo", "rm", PATH_AUTOCONNECT_SERVICE], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
-    # If return code 1: File does not exist in path
-    # This is fired when a user wants to remove template a that does not exist
-    if resp.returncode == 1:
-        gui_logger.debug("[!] Could not remove .serivce file.\n{}".format(resp))
-
-    reload_daemon()
-    return True
-
-def enable_daemon():
-    """Function that enables the autoconnect daemon service.
-    """
-    reload_daemon()
-
-    resp = subprocess.run(['sudo', 'systemctl', 'enable' , SERVICE_NAME], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
-    if resp.returncode == 1:
-        gui_logger.debug("[!] Unable to enable deamon.\n{}".format(resp))
-        return False
-
-    return True
-    
-def stop_and_disable_daemon():
-    """Function that stops and disables the autoconnect daemon service.
-    """
-    if not daemon_exists():
-        return True
-
-    resp_stop = subprocess.run(['sudo', 'systemctl', 'stop' , SERVICE_NAME], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
-    if resp_stop.returncode == 1:
-        gui_logger.debug("[!] Unable to stop deamon.\n{}".format(resp_stop))
-        return False
-
-    resp_disable = subprocess.run(['sudo', 'systemctl', 'disable' ,SERVICE_NAME], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
-    if resp_disable.returncode == 1:
-        gui_logger.debug("[!] Unable not disable daemon.\n{}".format(resp_disable))
-        return False
-
-    return True
-
-def reload_daemon():
-    """Function that reloads the autoconnect daemon service.
-    """
-    resp = subprocess.run(['sudo', 'systeasdasdsmctl', 'daemoasdasdn-reloadasdasdasd'], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
-    if resp.returncode == 1:
-        gui_logger.debug("[!] Unable to reload daemon.\n{}".format(resp))
-        return False
-
-    return True
-
-
-def daemon_exists():
-    """Function that checks if autoconnect daemon service exists.
-    """
-    # Return code 3: service exists
-    # Return code 4: service could not be found
-    resp_stop = subprocess.run(['systemctl', 'status' , SERVICE_NAME], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
-    return_val = True
-
-    if resp_stop.returncode == 4:
-        return_val = False
-
-    return return_val
+       
 
 def custom_get_ip_info():
     """Custom get_ip_info that also returns the country.
