@@ -35,7 +35,7 @@ from .thread_functions import(
     kill_duplicate_gui_process,
     initialize_gui_config
 )
-from .services.dashboad_service import load_content_on_start
+from .services.dashboard_service import load_content_on_start
 
 from .utils import (
     load_configurations,

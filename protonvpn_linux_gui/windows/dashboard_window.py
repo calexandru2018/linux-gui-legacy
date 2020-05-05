@@ -13,7 +13,7 @@ from protonvpn_cli.utils import(
 from protonvpn_linux_gui.windows.settings_window import SettingsWindow
 from protonvpn_linux_gui.gui_logger import gui_logger
 from protonvpn_linux_gui.constants import HELP_TEXT, UI_DASHBOARD, UI_SETTINGS
-from protonvpn_linux_gui.services.dashboad_service import (
+from protonvpn_linux_gui.services.dashboard_service import (
     quick_connect,
     last_connect,
     random_connect,
