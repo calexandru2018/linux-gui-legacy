@@ -16,7 +16,7 @@ from gi.repository import  Gtk, Gdk
 from protonvpn_linux_gui.windows.login_window import LoginWindow
 from protonvpn_linux_gui.windows.dashboard_window import DashboardWindow
 from protonvpn_linux_gui.windows.settings_window import SettingsWindow
-from protonvpn_linux_gui.windows.dialog_handler import DialogHandler
+from protonvpn_linux_gui.windows.dialog_window import DialogWindow
 from .gui_logger import gui_logger
 from .constants import (
     VERSION, 
@@ -60,7 +60,7 @@ def init():
             gui_logger.debug("[!] Unable to end previous process: {}.".format(response['message']))
             sys.exit(1)
 
-    queue = Queue()
+    # queue = Queue()
     interface = Gtk.Builder()
 
     style_provider = Gtk.CssProvider()
@@ -72,22 +72,10 @@ def init():
         Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
     )
 
-    interface.add_from_file(UI_DIALOG)
-    interface.connect_signals(DialogHandler(interface))
-
-    messagedialog_window = interface.get_object("MessageDialog")
-    messagedialog_label = interface.get_object("message_dialog_label")
-    messagedialog_spinner = interface.get_object("message_dialog_spinner")
-    messagedialog_sub_label = interface.get_object("message_dialog_sub_label")
-    messagedialog_sub_label.hide()
-
+    dialog_window = DialogWindow(interface, Gtk)
+    
     if not find_cli():
-        messagedialog_spinner.hide()
-        message_dialog_close_button = interface.get_object("message_dialog_close_button")
-        message_dialog_close_button.hide()
-        messagedialog_label.set_markup(CLI_ABSENCE_INFO)
-        messagedialog_window.show()
-        messagedialog_window.connect("destroy", Gtk.main_quit)
+        dialog_window.display_dialog(label=CLI_ABSENCE_INFO, spinner=False, hide_close_button=True)
     else:
         gui_logger.debug("\n______________________________________\n\n\tINITIALIZING NEW GUI WINDOW\n______________________________________\n")
 
@@ -106,8 +94,8 @@ def init():
             version_label.set_markup("v.{}".format(VERSION))
         else:
             gui_logger.debug(">>> Loading DashboardWindow")
-            settings_window = SettingsWindow(interface, Gtk, messagedialog_window, messagedialog_label, messagedialog_sub_label, messagedialog_spinner)
-            dashboard = DashboardWindow(interface, Gtk, messagedialog_window, messagedialog_label, messagedialog_sub_label, messagedialog_spinner, settings_window)
+            settings_window = SettingsWindow(interface, Gtk, dialog_window)
+            dashboard = DashboardWindow(interface, Gtk, dialog_window, settings_window)
             dashboard.display_window()
 
     Gtk.main()

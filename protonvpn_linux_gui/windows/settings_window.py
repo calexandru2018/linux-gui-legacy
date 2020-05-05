@@ -25,9 +25,9 @@ from protonvpn_linux_gui.thread_functions import (
 from protonvpn_linux_gui.utils import get_gui_config, tab_style_manager, load_configurations
 
 class SettingsWindow: 
-    def __init__(self, interface, Gtk, messagedialog_window, messagedialog_label, messagedialog_sub_label, messagedialog_spinner): 
+    def __init__(self, interface, Gtk, dialog_window): 
         interface.add_from_file(UI_SETTINGS)
-        self.set_objects(interface, Gtk, messagedialog_window, messagedialog_label, messagedialog_sub_label, messagedialog_spinner)
+        self.set_objects(interface, Gtk, dialog_window)
 
         interface.connect_signals({
             "settings_notebook_page_changed": self.settings_notebook_page_changed,
@@ -55,13 +55,10 @@ class SettingsWindow:
         load_configurations(self.interface)
         settings_window.show()
 
-    def set_objects(self, interface, Gtk, messagedialog_window, messagedialog_label, messagedialog_sub_label, messagedialog_spinner):
+    def set_objects(self, interface, Gtk, dialog_window):
         self.interface = interface
-        self.messagedialog_window = messagedialog_window
-        self.messagedialog_label = messagedialog_label
-        self.messagedialog_spinner = messagedialog_spinner
-        self.messagedialog_sub_label = messagedialog_sub_label
-        
+        self.dialog_window = dialog_window
+
         self.update_killswitch_switch = self.interface.get_object("update_killswitch_switch")
         self.split_tunneling_switch = self.interface.get_object("split_tunneling_switch")
         

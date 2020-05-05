@@ -23,25 +23,47 @@ class DialogWindow:
 
     def display_dialog(self, **kwargs):
         print(kwargs)
-        if "messagedialog_label" in kwargs:
-            self.messagedialog_label.set_markup(kwargs.get("messagedialog_label")) 
+        if "label" in kwargs:
+            self.messagedialog_label.set_markup(kwargs.get("label")) 
 
-        if "messagedialog_sub_label" in kwargs and kwargs.get("messagedialog_sub_label"):
-            self.messagedialog_sub_label.set_markup(kwargs.get("messagedialog_sub_label"))
-            self.messagedialog_sub_label.show()
-        else:
-            self.messagedialog_sub_label.hide()
-
-        if "messagedialog_spinner" in kwargs and kwargs.get("messagedialog_spinner"):
+        if "spinner" in kwargs and kwargs.get("spinner"):
             self.messagedialog_spinner.show()
         else:
             self.messagedialog_spinner.hide()
 
-        if "message_dialog_close_button" in kwargs and kwargs.get("message_dialog_close_button"):
+        if "sub_label" in kwargs and kwargs.get("sub_label"):
+            self.messagedialog_sub_label.set_markup(kwargs.get("sub_label"))
+            self.messagedialog_sub_label.show()
+        else:
+            self.messagedialog_sub_label.hide()
+
+        if "hide_close_button" in kwargs and kwargs.get("hide_close_button"):
             self.message_dialog_close_button.hide()
             self.messagedialog_window.connect("destroy", self.gtk.main_quit)
         
         self.messagedialog_window.show()
+
+    def update_dialog(self, **kwargs):
+        print(kwargs)
+        if "label" in kwargs:
+            self.messagedialog_label.set_markup(kwargs.get("label")) 
+
+        if "spinner" in kwargs and kwargs.get("spinner"):
+            self.messagedialog_spinner.show()
+        else:
+            self.messagedialog_spinner.hide()
+
+        if "sub_label" in kwargs and kwargs.get("sub_label"):
+            self.messagedialog_sub_label.set_markup(kwargs.get("sub_label"))
+            self.messagedialog_sub_label.show()
+        else:
+            self.messagedialog_sub_label.hide()
+
+    def hide_spinner(self):
+        self.messagedialog_spinner.hide()
+
+    def hide_dialog(self):
+        self.messagedialog_window.hide()
 
     def close_message_dialog(self, button):
         """Button/Event handler to close message dialog.

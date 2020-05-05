@@ -57,18 +57,18 @@ def load_content_on_start(objects):
         
         params_dict = {
             "interface": objects["interface"],
-            "messagedialog_label": objects["messagedialog_label"]
+            "dialog_window": objects["dialog_window"]
         }
 
-        objects["messagedialog_spinner"].hide()
+        objects["dialog_window"].hide_spinner()
 
         future = executor.submit(load_on_start, params_dict)
         return_value = future.result()
         
         if return_value:
-            objects["messagedialog_window"].hide()
+            objects["dialog_window"].hide_dialog()
         else:
-            objects["messagedialog_label"].set_markup("Could not load necessary resources, there might be connectivity issues.")
+            objects["dialog_window"].update_dialog(label="Could not load necessary resources, there might be connectivity issues.", spinner=False)
 
     gui_logger.debug(">>> Ended tasks in \"load_on_start\" thread.")    
 

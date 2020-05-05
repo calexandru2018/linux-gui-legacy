@@ -32,9 +32,9 @@ from protonvpn_linux_gui.utils import (
 )
 
 class DashboardWindow:
-    def __init__(self, interface, Gtk, messagedialog_window, messagedialog_label, messagedialog_sub_label, messagedialog_spinner, settings_window):
+    def __init__(self, interface, Gtk, dialog_window, settings_window):
         interface.add_from_file(UI_DASHBOARD)
-        self.set_objects(interface, Gtk, messagedialog_window, messagedialog_label, messagedialog_sub_label, messagedialog_spinner, settings_window)
+        self.set_objects(interface, Gtk, dialog_window, settings_window)
 
         interface.connect_signals({
             "profile_quick_connect_button_clicked": self.profile_quick_connect_button_clicked,
@@ -62,15 +62,18 @@ class DashboardWindow:
 
         dashboard_window.connect("destroy", self.gtk.main_quit)
 
-        self.messagedialog_label.set_markup("Loading...")
-        self.messagedialog_spinner.show()
-        self.messagedialog_window.show()
+        self.dialog_window.display_dialog(label="Loading...", spinner=True)
+
+        # self.messagedialog_label.set_markup("Loading...")
+        # self.messagedialog_spinner.show()
+        # self.messagedialog_window.show()
 
         objects = {
             "interface": self.interface,
-            "messagedialog_window": self.messagedialog_window,
-            "messagedialog_label": self.messagedialog_label,
-            "messagedialog_spinner": self.messagedialog_spinner,
+            "dialog_window": self.dialog_window
+            # "messagedialog_window": self.messagedialog_window,
+            # "messagedialog_label": self.messagedialog_label,
+            # "messagedialog_spinner": self.messagedialog_spinner,
         }
 
         thread = Thread(target=load_content_on_start, args=[objects])
@@ -79,14 +82,15 @@ class DashboardWindow:
 
         dashboard_window.show()
 
-    def set_objects(self, interface, Gtk, messagedialog_window, messagedialog_label, messagedialog_sub_label, messagedialog_spinner, settings_window):
+    def set_objects(self, interface, Gtk, dialog_window, settings_window):
         self.gtk = Gtk
         self.interface = interface
         self.settings_window = settings_window
-        self.messagedialog_window = messagedialog_window
-        self.messagedialog_label = messagedialog_label
-        self.messagedialog_spinner = messagedialog_spinner
-        self.messagedialog_sub_label = messagedialog_sub_label
+        self.dialog_window = dialog_window
+        # self.messagedialog_window = messagedialog_window
+        # self.messagedialog_label = messagedialog_label
+        # self.messagedialog_spinner = messagedialog_spinner
+        # self.messagedialog_sub_label = messagedialog_sub_label
         # self.messagedialog_sub_label.hide()
         self.conn_disc_button_label = self.interface.get_object("main_conn_disc_button_label")
         self.secure_core_label_style = self.interface.get_object("secure_core_label").get_style_context()

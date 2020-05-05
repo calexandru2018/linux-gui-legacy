@@ -332,7 +332,7 @@ def load_on_start(params_dict):
 
     conn = custom_get_ip_info()
     if conn and not conn is None:
-        params_dict["messagedialog_label"].set_markup("Populating dashboard...")
+        params_dict["dialog_window"].update_dialog(label="Populating dashboard...")
         
         display_secure_core = get_gui_config("connections", "display_secure_core")
         secure_core_switch = params_dict["interface"].get_object("secure_core_switch")
