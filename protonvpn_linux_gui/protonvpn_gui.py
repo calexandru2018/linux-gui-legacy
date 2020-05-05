@@ -13,10 +13,10 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import  Gtk, Gdk
 
 # Local imports
-from .login_window import LoginWindow
-from .dashboard_window import DashboardWindow
-from .settings_window import SettingsWindow
-from .dialog_handler import DialogHandler
+from protonvpn_linux_gui.windows.login_window import LoginWindow
+from protonvpn_linux_gui.windows.dashboard_window import DashboardWindow
+from protonvpn_linux_gui.windows.settings_window import SettingsWindow
+from protonvpn_linux_gui.windows.dialog_handler import DialogHandler
 from .gui_logger import gui_logger
 from .constants import (
     VERSION, 

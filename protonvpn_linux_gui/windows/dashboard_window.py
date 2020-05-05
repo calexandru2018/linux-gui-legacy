@@ -10,10 +10,10 @@ from protonvpn_cli.utils import(
 )    
 
 # Local imports
-from .settings_window import SettingsWindow
-from .gui_logger import gui_logger
-from .constants import HELP_TEXT, UI_DASHBOARD, UI_SETTINGS
-from .thread_functions import (
+from protonvpn_linux_gui.windows.settings_window import SettingsWindow
+from protonvpn_linux_gui.gui_logger import gui_logger
+from protonvpn_linux_gui.constants import HELP_TEXT, UI_DASHBOARD, UI_SETTINGS
+from protonvpn_linux_gui.thread_functions import (
     quick_connect,
     last_connect,
     random_connect,
@@ -23,7 +23,7 @@ from .thread_functions import (
     reload_secure_core_servers,
     load_content_on_start
 )
-from .utils import (
+from protonvpn_linux_gui.utils import (
     load_configurations,
     get_gui_config,
     set_gui_config,

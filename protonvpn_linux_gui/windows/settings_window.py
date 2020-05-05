@@ -8,9 +8,9 @@ from protonvpn_cli.utils import(
     set_config_value #noqa
 )    
 
-from .gui_logger import gui_logger
-from .constants import UI_SETTINGS
-from .thread_functions import (
+from protonvpn_linux_gui.gui_logger import gui_logger
+from protonvpn_linux_gui.constants import UI_SETTINGS
+from protonvpn_linux_gui.thread_functions import (
     update_def_protocol,
     update_connect_preference,
     update_dns,
@@ -22,7 +22,7 @@ from .thread_functions import (
     tray_configurations,
     purge_configurations
 )
-from .utils import get_gui_config, tab_style_manager, load_configurations
+from protonvpn_linux_gui.utils import get_gui_config, tab_style_manager, load_configurations
 
 class SettingsWindow: 
     def __init__(self, interface, Gtk, messagedialog_window, messagedialog_label, messagedialog_sub_label, messagedialog_spinner): 
