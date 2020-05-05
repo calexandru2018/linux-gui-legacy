@@ -22,7 +22,7 @@ class DialogWindow:
         self.gtk = Gtk
 
     def display_dialog(self, **kwargs):
-        print(kwargs)
+        # print(kwargs)
         if "label" in kwargs:
             self.messagedialog_label.set_markup(kwargs.get("label")) 
 

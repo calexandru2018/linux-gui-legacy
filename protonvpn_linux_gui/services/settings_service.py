@@ -24,7 +24,6 @@ from protonvpn_linux_gui.constants import (
 )
 from protonvpn_linux_gui.utils import (
     populate_server_list,
-    manage_autoconnect,
     set_gui_config,
     get_gui_config,
     populate_autoconnect_list,

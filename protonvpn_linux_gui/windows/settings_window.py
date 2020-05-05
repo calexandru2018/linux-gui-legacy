@@ -48,13 +48,13 @@ class SettingsWindow:
         })
 
     def display_window(self):
-        settings_window = self.interface.get_object("SettingsWindow")
         load_configurations(self.interface)
-        settings_window.show()
+        self.settings_window.show()
 
     def set_objects(self, interface, Gtk, dialog_window):
         self.interface = interface
         self.dialog_window = dialog_window
+        self.settings_window = self.interface.get_object("SettingsWindow")
 
         self.update_killswitch_switch = self.interface.get_object("update_killswitch_switch")
         self.split_tunneling_switch = self.interface.get_object("split_tunneling_switch")
