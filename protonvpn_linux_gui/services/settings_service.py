@@ -5,6 +5,7 @@ import shutil
 
 from protonvpn_cli.constants import CONFIG_DIR, PASSFILE, SPLIT_TUNNEL_FILE #noqa
 from protonvpn_cli.utils import get_config_value, is_valid_ip, set_config_value, change_file_owner #noqa
+from protonvpn_cli.connection import disconnect as pvpn_disconnect
 
 # Custom helper functions
 from protonvpn_linux_gui.utils import (
@@ -26,9 +27,12 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import GObject as gobject
 
-def update_user_pass(interface, messagedialog_label, messagedialog_spinner):
+def update_user_pass(**kwargs):
     """Function that updates username and password.
     """
+    interface = kwargs.get("interface")
+    dialog_window = kwargs.get("dialog_window")
+
     username_field = interface.get_object("update_username_input")
     password_field = interface.get_object("update_password_input")
 
@@ -36,8 +40,7 @@ def update_user_pass(interface, messagedialog_label, messagedialog_spinner):
     password_text = password_field.get_text().strip()
 
     if len(username_text) == 0 or len(password_text) == 0:
-        messagedialog_label.set_markup("Both fields need to be filled!")
-        messagedialog_spinner.hide()
+        dialog_window.update_dialog(label="Both fields need to be filled!")
         return
 
     gui_logger.debug(">>> Running \"set_username_password\".")
@@ -49,30 +52,24 @@ def update_user_pass(interface, messagedialog_label, messagedialog_spinner):
         gui_logger.debug("Passfile updated")
         os.chmod(PASSFILE, 0o600)
 
-        messagedialog_label.set_markup("Username and password updated!")
-        password_field.set_text("")
-        messagedialog_spinner.hide()
-        messagedialog_label.set_markup("Username and password updated.")
+        dialog_window.update_dialog(label="Username and password <b>updated</b>!")
 
     gui_logger.debug(">>> Ended tasks in \"set_username_password\" thread.")
-
 
 def update_dns(dns_value):
     """Function that updates DNS settings.
     """
-    
     set_config_value("USER", "dns_leak_protection", dns_value)
-    # set_config_value("USER", "custom_dns", custom_dns)
 
     gui_logger.debug(">>> Result: \"{0}\"".format("DNS Management updated."))
 
     gui_logger.debug(">>> Ended tasks in \"dns_leak_switch_clicked\" thread.")
 
-def update_pvpn_plan(interface, messagedialog_label, messagedialog_spinner, tier, tier_display):
+def update_pvpn_plan(**kwargs):
     """Function that updates ProtonVPN plan.
     """
-  
-    protonvpn_plan = tier
+    interface = kwargs.get("interface")
+    protonvpn_plan = kwargs.get("tier")
     visionary_compare = 0
 
     gui_logger.debug(">>> Running \"set_protonvpn_tier\".")
@@ -86,8 +83,8 @@ def update_pvpn_plan(interface, messagedialog_label, messagedialog_spinner, tier
 
     set_config_value("USER", "tier", str(protonvpn_plan))
 
-    messagedialog_label.set_markup("ProtonVPN Plan has been updated to <b>{}</b>!\nServers list will be refreshed.".format(tier_display))
-    messagedialog_spinner.hide()
+    dialog_window = kwargs.get("dialog_window")
+    dialog_window.update_dialog(label="ProtonVPN Plan has been updated to <b>{}</b>!\nServers list will be refreshed.".format(kwargs.get("tier_display")))
 
     gui_logger.debug(">>> Result: \"{0}\"".format("ProtonVPN Plan has been updated!"))
 
@@ -111,15 +108,18 @@ def update_def_protocol(openvpn_protocol):
 
     gui_logger.debug(">>> Ended tasks in \"set_default_protocol\" thread.")   
 
-def update_connect_preference(interface, messagedialog_label, messagedialog_spinner, user_choice, display_choice, quick_connect=False):
+def update_connect_preference(**kwargs):
     """Function that updates autoconnect. 
     """
-    active_choice = user_choice
+    print(kwargs)
+    interface = kwargs.get("interface")
+    active_choice = kwargs.get("user_choice")
+    dialog_window = kwargs.get("dialog_window")
 
     gui_logger.debug(">>> Running \"update_connect_preference\".")
 
     # autoconnect_alternatives = ["dis", "fast", "rand", "p2p", "sc", "tor"]
-    if not quick_connect:
+    if not "quick_connect" in kwargs:
         manage_autoconnect(mode="disable")
 
         if active_choice == "dis":
@@ -142,8 +142,7 @@ def update_connect_preference(interface, messagedialog_label, messagedialog_spin
     else:
         set_gui_config("conn_tab", "quick_connect", active_choice)
 
-    messagedialog_label.set_markup("{} setting updated to connect to <b>{}</b>!".format("Autoconnect" if not quick_connect else "Quick connect", display_choice))
-    messagedialog_spinner.hide()
+    dialog_window.update_dialog(label="{} setting updated to connect to <b>{}</b>!".format("Autoconnect" if not "quick_connect" in kwargs else "Quick connect", kwargs.get("country_display")))
 
     gui_logger.debug(">>> Ended tasks in \"update_autoconnect\" thread.") 
 
@@ -179,9 +178,11 @@ def update_split_tunneling_status(update_to):
 
     gui_logger.debug(">>> Ended tasks in \"set_split_tunnel\" thread.") 
 
-def update_split_tunneling(interface, messagedialog_label, messagedialog_spinner):
+def update_split_tunneling(**kwargs):
     """Function that updates split tunneling configurations.
     """
+    interface = kwargs.get("interface")
+    dialog_window = kwargs.get("dialog_window")
     result = "Split tunneling configurations <b>updated</b>!\n"
     split_tunneling_buffer = interface.get_object("split_tunneling_textview").get_buffer()
 
@@ -199,8 +200,7 @@ def update_split_tunneling(interface, messagedialog_label, messagedialog_spinner
 
     for ip in split_tunneling_content:
         if not is_valid_ip(ip):
-            messagedialog_spinner.hide()
-            messagedialog_label.set_markup("<b>{0}</b> is not valid!\nNone of the IP's were added, please try again with a different IP.".format(ip))
+            dialog_window.update_dialog(label="<b>{0}</b> is not valid!\nNone of the IP's were added, please try again with a different IP.".format(ip))
             gui_logger.debug("[!] Invalid IP \"{0}\".".format(ip))
             return
 
@@ -236,16 +236,17 @@ def update_split_tunneling(interface, messagedialog_label, messagedialog_spinner
         set_config_value("USER", "split_tunnel", 0)
         result = "No split tunneling file was found, split tunneling will be <b>disabled</b>!\n\n"
 
-    messagedialog_label.set_markup(result)
-    messagedialog_spinner.hide()
+    dialog_window.update_dialog(label=result)
 
     gui_logger.debug(">>> Result: \"{0}\"".format(result))
 
     gui_logger.debug(">>> Ended tasks in \"set_split_tunnel\" thread.")   
 
-def tray_configurations(setting_value, setting_display):
+def tray_configurations(**kwargs):
     """Function to update what the tray should display.
     """    
+    setting_value = kwargs.get("setting_value")
+    setting_display = kwargs.get("setting_display")
     gui_logger.debug(">>> Running \"tray_configurations\".")
     msg = ''
     if "serverload" in setting_display:
@@ -265,20 +266,18 @@ def tray_configurations(setting_value, setting_display):
 
     gui_logger.debug(">>> Ended tasks in \"tray_configurations\" thread.")   
     
-def purge_configurations(interface, messagedialog_label, messagedialog_spinner):
+def purge_configurations(dialog_window):
     """Function to purge all current configurations.
     """
     # To-do: Confirm prior to allowing user to do this
     gui_logger.debug(">>> Running \"set_split_tunnel\".")
 
-    #connection.disconnect(passed=True)
+    pvpn_disconnect(passed=True)
 
     if os.path.isdir(CONFIG_DIR):
         shutil.rmtree(CONFIG_DIR)
         gui_logger.debug(">>> Result: \"{0}\"".format("Configurations purged."))
 
-    messagedialog_label.set_markup("Configurations purged!")
-    messagedialog_spinner.hide()
-
+    dialog_window.update_dialog(label="Configurations purged!")
 
     gui_logger.debug(">>> Ended tasks in \"set_split_tunnel\" thread.")   
