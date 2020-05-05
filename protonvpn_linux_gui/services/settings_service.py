@@ -114,7 +114,6 @@ def update_def_protocol(openvpn_protocol):
 def update_connect_preference(**kwargs):
     """Function that updates autoconnect. 
     """
-    print(kwargs)
     interface = kwargs.get("interface")
     active_choice = kwargs.get("user_choice")
     dialog_window = kwargs.get("dialog_window")

@@ -44,7 +44,7 @@ class DialogWindow:
         self.messagedialog_window.show()
 
     def update_dialog(self, **kwargs):
-        print(kwargs)
+        # print(kwargs)
         if "label" in kwargs:
             self.messagedialog_label.set_markup(kwargs.get("label")) 
 
