@@ -1,8 +1,6 @@
 import os
 import sys
-import time
 from queue import Queue
-from threading import Thread
 
 # Remote imports
 from protonvpn_cli.constants import CONFIG_FILE #noqa

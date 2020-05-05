@@ -3,25 +3,22 @@ import sys
 import time
 import configparser
 
+# Remote imports
 from protonvpn_cli.constants import CONFIG_FILE, CONFIG_DIR, PASSFILE #noqa
 from protonvpn_cli.utils import set_config_value, change_file_owner, pull_server_data, make_ovpn_template #noqa
 
-# Custom helper functions
-from protonvpn_linux_gui.utils import (
-    prepare_initilizer,
-    load_on_start,
-)
-
-# Import GUI logger
+# Local imports
 from protonvpn_linux_gui.gui_logger import gui_logger
-
-# Import constants
 from protonvpn_linux_gui.constants import (
     TRAY_CFG_SERVERLOAD, 
     TRAY_CFG_SERVENAME, 
     TRAY_CFG_DATA_TX, 
     TRAY_CFG_TIME_CONN, 
     GUI_CONFIG_FILE
+)
+from protonvpn_linux_gui.utils import (
+    prepare_initilizer,
+    load_on_start,
 )
 
 def on_login(interface, username_field, password_field, messagedialog_label, user_window, login_window, messagedialog_window):

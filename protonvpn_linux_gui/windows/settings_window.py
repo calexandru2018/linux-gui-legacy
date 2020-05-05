@@ -1,13 +1,9 @@
 from threading import Thread
 
-from protonvpn_cli.constants import (VERSION) #noqa
-from protonvpn_cli.utils import(
-    get_config_value, 
-    change_file_owner, 
-    is_connected, 
-    set_config_value #noqa
-)    
+# Remote imports
+from protonvpn_cli.utils import get_config_value #noqa
 
+# Local imports
 from protonvpn_linux_gui.gui_logger import gui_logger
 from protonvpn_linux_gui.constants import UI_SETTINGS
 from protonvpn_linux_gui.services.settings_service import (
@@ -20,9 +16,10 @@ from protonvpn_linux_gui.services.settings_service import (
     update_split_tunneling_status,
     update_user_pass,
     tray_configurations,
-    purge_configurations
+    purge_configurations,
+    load_configurations
 )
-from protonvpn_linux_gui.utils import get_gui_config, tab_style_manager, load_configurations
+from protonvpn_linux_gui.utils import get_gui_config, tab_style_manager
 
 class SettingsWindow: 
     def __init__(self, interface, Gtk, dialog_window): 

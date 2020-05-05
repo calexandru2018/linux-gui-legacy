@@ -7,6 +7,11 @@ import concurrent.futures
 from protonvpn_cli.utils import get_config_value, is_connected #noqa
 from protonvpn_cli.country_codes import country_codes #noqa
 
+# PyGObject import
+import gi
+gi.require_version('Gtk', '3.0')
+from gi.repository import GObject as gobject
+
 # Local imports
 from protonvpn_linux_gui.gui_logger import gui_logger
 from protonvpn_linux_gui.constants import GITHUB_URL_RELEASE, VERSION
@@ -19,16 +24,7 @@ from protonvpn_linux_gui.utils import (
     set_gui_config,
     check_internet_conn
 )
-
-# Import GUI logger
-
-# PyGObject import
-import gi
-gi.require_version('Gtk', '3.0')
-from gi.repository import GObject as gobject
   
-
-# Load on start
 def load_content_on_start(objects):
     """Calls load_on_start, which returns False if there is no internet connection, otherwise populates dashboard labels and server list
     """

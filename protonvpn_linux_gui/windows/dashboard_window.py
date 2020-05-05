@@ -25,9 +25,7 @@ from protonvpn_linux_gui.services.dashboard_service import (
     diagnose
 )
 from protonvpn_linux_gui.utils import (
-    load_configurations,
     get_gui_config,
-    set_gui_config,
     tab_style_manager,
 )
 
