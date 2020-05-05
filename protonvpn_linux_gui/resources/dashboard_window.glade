@@ -41,6 +41,7 @@ Author: Alexandru Cheltuitor
     <property name="accept_focus">False</property>
     <property name="focus_on_map">False</property>
     <property name="gravity">center</property>
+    <property name="program_name">ProtonVPN Linux GUI</property>
     <property name="copyright" translatable="yes">Proton Technologies AG</property>
     <property name="comments" translatable="yes">Based on protonvpn-cli-ng</property>
     <property name="website">https://github.com/calexandru2018/protonvpn-linux-gui</property>
@@ -248,6 +249,7 @@ Author: Alexandru Cheltuitor
         <property name="visible">True</property>
         <property name="can_focus">False</property>
         <property name="title" translatable="yes">ProtonVPN GUI Linux - Dashboard</property>
+        <property name="has_subtitle">False</property>
         <property name="show_close_button">True</property>
         <child>
           <object class="GtkImage">

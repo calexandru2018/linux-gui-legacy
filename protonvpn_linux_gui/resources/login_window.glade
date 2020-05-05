@@ -47,7 +47,7 @@ Author: Alexandru Cheltuitor
         <property name="can_focus">False</property>
         <property name="title" translatable="yes">ProtonVPN Linux GUI</property>
         <property name="has_subtitle">False</property>
-        <property name="spacing">1</property>
+        <property name="spacing">6</property>
         <property name="show_close_button">True</property>
         <child>
           <object class="GtkImage">
