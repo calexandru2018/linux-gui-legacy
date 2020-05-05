@@ -268,10 +268,14 @@ def update_labels_status(update_labels_dict):
             country = "None"
     else:
         ip, isp, country = conn_info
-        
+    
+    country = country.lower()
+
     for k,v in country_codes.items():
-        if k == country:
+        if (k.lower() == country) or (k.lower() == "uk" and country == "gb"):
             if is_vpn_connected:
+                if k.lower() == "uk" and country == "gb":
+                    k = "gb"
                 flag_path = LARGE_FLAGS_BASE_PATH+"{}.jpg".format(k.lower())
                 background_large_flag.set_from_file(flag_path)
             country_cc = v
