@@ -32,9 +32,9 @@ from .utils import (
 )
 
 class DashboardWindow:
-    def __init__(self, interface, Gtk, messagedialog_window, messagedialog_label, messagedialog_sub_label, messagedialog_spinner):
+    def __init__(self, interface, Gtk, messagedialog_window, messagedialog_label, messagedialog_sub_label, messagedialog_spinner, settings_window):
         interface.add_from_file(UI_DASHBOARD)
-        self.set_dashboard_objects(interface, Gtk, messagedialog_window, messagedialog_label, messagedialog_sub_label, messagedialog_spinner)
+        self.set_objects(interface, Gtk, messagedialog_window, messagedialog_label, messagedialog_sub_label, messagedialog_spinner, settings_window)
 
         interface.connect_signals({
             "profile_quick_connect_button_clicked": self.profile_quick_connect_button_clicked,
@@ -79,14 +79,15 @@ class DashboardWindow:
 
         dashboard_window.show()
 
-    def set_dashboard_objects(self, interface, Gtk, messagedialog_window, messagedialog_label, messagedialog_sub_label, messagedialog_spinner):
+    def set_objects(self, interface, Gtk, messagedialog_window, messagedialog_label, messagedialog_sub_label, messagedialog_spinner, settings_window):
+        self.gtk = Gtk
         self.interface = interface
+        self.settings_window = settings_window
         self.messagedialog_window = messagedialog_window
         self.messagedialog_label = messagedialog_label
         self.messagedialog_spinner = messagedialog_spinner
         self.messagedialog_sub_label = messagedialog_sub_label
-        self.gtk = Gtk
-        self.messagedialog_sub_label.hide()
+        # self.messagedialog_sub_label.hide()
         self.conn_disc_button_label = self.interface.get_object("main_conn_disc_button_label")
         self.secure_core_label_style = self.interface.get_object("secure_core_label").get_style_context()
         self.dashboard_tab_dict = {
@@ -312,7 +313,7 @@ class DashboardWindow:
         """Button/Event handler to open Configurations window
         """
         gui_logger.debug(">>> Starting \"load_configurations\".")
-        load_configurations(self.interface)
+        self.settings_window.display_window()
 
     def about_menu_button_clicked(self, button):
         """Button /Event handler to open About dialog

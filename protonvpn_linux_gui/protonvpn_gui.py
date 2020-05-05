@@ -15,6 +15,7 @@ from gi.repository import  Gtk, Gdk
 # Local imports
 from .login_window import LoginWindow
 from .dashboard_window import DashboardWindow
+from .settings_window import SettingsWindow
 from .dialog_handler import DialogHandler
 from .gui_logger import gui_logger
 from .constants import (
@@ -105,7 +106,8 @@ def init():
             version_label.set_markup("v.{}".format(VERSION))
         else:
             gui_logger.debug(">>> Loading DashboardWindow")
-            dashboard = DashboardWindow(interface, Gtk, messagedialog_window, messagedialog_label, messagedialog_sub_label, messagedialog_spinner)
+            settings_window = SettingsWindow(interface, Gtk, messagedialog_window, messagedialog_label, messagedialog_sub_label, messagedialog_spinner)
+            dashboard = DashboardWindow(interface, Gtk, messagedialog_window, messagedialog_label, messagedialog_sub_label, messagedialog_spinner, settings_window)
             dashboard.display_window()
 
     Gtk.main()
