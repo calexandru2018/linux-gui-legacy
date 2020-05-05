@@ -10,7 +10,7 @@ from protonvpn_cli.utils import(
 
 from protonvpn_linux_gui.gui_logger import gui_logger
 from protonvpn_linux_gui.constants import UI_SETTINGS
-from protonvpn_linux_gui.thread_functions import (
+from protonvpn_linux_gui.services.settings_service import (
     update_def_protocol,
     update_connect_preference,
     update_dns,
