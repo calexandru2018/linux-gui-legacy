@@ -20,14 +20,15 @@ from protonvpn_linux_gui.services.dashboard_service import (
     custom_quick_connect,
     connect_to_selected_server,
     reload_secure_core_servers,
-    load_content_on_start
+    load_content_on_start,
+    check_for_updates,
+    diagnose
 )
 from protonvpn_linux_gui.utils import (
     load_configurations,
     get_gui_config,
     set_gui_config,
     tab_style_manager,
-    message_dialog
 )
 
 class DashboardWindow:
@@ -281,33 +282,24 @@ class DashboardWindow:
 
         gui_logger.debug(">>> Starting \"message_dialog\" thread. [CHECK_FOR_UPDATES]")
 
-        thread = Thread(target=message_dialog, kwargs=dict(interface=self.interface, dialog_window=self.dialog_window, command="check_for_update"))
+        thread = Thread(target=check_for_updates, args=[self.dialog_window])
         thread.daemon = True
         thread.start()
 
     def diagnose_menu_button_clicked(self, button):
         """Button/Event handler top show diagnose window.
         """
-        self.messagedialog_sub_label.hide()
-        self.messagedialog_sub_label.set_text("")
-
-        self.messagedialog_label.set_markup("Diagnosing...")
-        self.messagedialog_spinner.show()
+        self.dialog_window.display_dialog(label="Diagnosing...", spinner=True)
 
         gui_logger.debug(">>> Starting \"message_dialog\" thread. [DIAGNOSE]")
-        thread = Thread(target=message_dialog, args=[self.interface, "diagnose", self.messagedialog_label, self.messagedialog_spinner, self.messagedialog_sub_label])
+        thread = Thread(target=diagnose, args=[self.dialog_window])
         thread.daemon = True
         thread.start()
-        
-        self.messagedialog_window.show()
 
     def help_button_clicked(self, button):
         """Button/Event handler to show help information.
         """
-        self.messagedialog_sub_label.hide()
-        self.messagedialog_label.set_markup(HELP_TEXT)
-
-        self.messagedialog_window.show()
+        self.dialog_window.display_dialog(label=HELP_TEXT)
 
     # To avoid getting the AboutDialog destroyed and not being re-rendered again
     def AboutDialog_delete_event(self, window, event):

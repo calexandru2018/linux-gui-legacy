@@ -14,25 +14,18 @@ from protonvpn_cli.utils import (
     get_servers,
     get_country_name,
     get_server_value,
-    set_config_value,
     get_config_value,
     is_connected,
     get_transferred_data,
-    change_file_owner,
-    make_ovpn_template
 )
 from protonvpn_cli.country_codes import country_codes
-from protonvpn_cli.constants import SPLIT_TUNNEL_FILE, USER, CONFIG_FILE, PASSFILE
+from protonvpn_cli.constants import SPLIT_TUNNEL_FILE, USER
 
-from .constants import (
+from protonvpn_linux_gui.constants import (
     PATH_AUTOCONNECT_SERVICE, 
-    TEMPLATE, VERSION, 
-    GITHUB_URL_RELEASE, 
-    SERVICE_NAME, 
-    TRAY_CFG_SERVERLOAD, 
-    TRAY_CFG_SERVENAME, 
-    TRAY_CFG_DATA_TX, 
-    TRAY_CFG_TIME_CONN, 
+    TEMPLATE, 
+    VERSION, 
+    SERVICE_NAME,  
     TRAY_CFG_DICT,
     GUI_CONFIG_FILE,
     LARGE_FLAGS_BASE_PATH,
@@ -94,126 +87,6 @@ def get_server_protocol_from_cli(raw_result, return_protocol=False):
 
     return False
 
-def message_dialog(**kwargs):
-    """Multipurpose message dialog function.
-    """
-    dialog_window = kwargs.get("dialog_window")
-
-    if kwargs.get("command") == "check_for_update":
-        with concurrent.futures.ThreadPoolExecutor() as executor:
-            future = executor.submit(check_for_updates)
-            return_value = future.result()
-            
-            dialog_window.update_dialog(label="<span>{0}</span>".format(return_value))
-    elif  kwargs.get("command") ==  "diagnose":
-        reccomendation = '' 
-
-        end_openvpn_process_guide = """\n
-        sudo pkill openvpn\n
-        or\n
-        sudo pkill -9 openvpn
-        """
-
-        restore_ip_tables_guide ="""\n
-        sudo iptables -F
-        sudo iptables -P INPUT ACCEPT
-        sudo iptables -P OUTPUT ACCEPT
-        sudo iptables -P FORWARD ACCEPT
-        """
-
-        restart_netwman_guide = """\n
-        sudo systemctl restart NetworkManager
-        """
-        # Check if there is internet connection
-            # Depending on next questions, some actions might be suggested.
-        has_internet = check_internet_conn(request_bool=True)
-        
-        # Check if killswitch is enabled
-            # Advice to restore IP tables manually and restart netowrk manager.
-        is_killswitch_enabled = True if get_config_value("USER", "killswitch") == 1 else False
-
-        # Check if VPN is running
-            # If there is a OpenVPN process running in the background, kill it.
-        is_ovpnprocess_running = is_connected()
-
-        # Check if custom DNS is enabled
-            # If there is no VPN connection and also no internet, then it is a DNS issue.
-        is_dns_protection_enabled = False if get_config_value("USER", "dns_leak_protection") == "0" or (not get_config_value("USER", "custom_dns") is None and get_config_value("USER", "dns_leak_protection") == "0") else True
-
-        # Check if custom DNS is in use. 
-            # It might that the user has disabled the custom DNS settings but the file still resides there
-        is_custom_resolv_conf = {
-            "logical": False,
-            "display": "Original"
-        }
-        with open("/etc/resolv.conf") as f:
-            lines = f.readlines()
-
-            # remove \n from all elements
-            lines = map(lambda l: l.strip(), lines)
-            # remove empty elements
-            lines = list(filter(None, lines))
-
-            if len(lines) < 2:
-                is_custom_resolv_conf["logical"] = None
-                is_custom_resolv_conf["display"] = "Missing"
-            else:
-                for item in lines:
-                    if "protonvpn" in item.lower():
-                        is_custom_resolv_conf["logical"] = True
-                        is_custom_resolv_conf["display"] = "Custom"
-        try:
-            is_splitunn_enabled = True if get_config_value("USER", "split_tunnel") == "1" else False
-        except (KeyError, IndexError):
-            is_splitunn_enabled = False
-        
-        # Reccomendations based on known issues
-        if not has_internet:
-            if is_ovpnprocess_running:
-                reccomendation = reccomendation + "\nYou have no internet connection and a VPN process is running.\n"
-                reccomendation = reccomendation + "This might be due to a DNS misconfiguration or lack of internet connection. You can try to disconnecto from the VPN by clicking on \"Disconnect\" or following the instructions below.\n"
-                reccomendation = reccomendation + "<b>Warning:</b> By doing this you are ending your VPN process, which might end exposing your traffic upon reconnecting, do at your own risk." + end_openvpn_process_guide
-            elif not is_ovpnprocess_running:
-                if is_killswitch_enabled:
-                    reccomendation = reccomendation + "\nYou Have killswitch enabled, which might be blocking your connection.\nTry to flush and then reconfigure your IP tables."
-                    reccomendation = reccomendation + "<b>Warning:</b> By doing this you are clearing all of your killswitch configurations. Do at your own risk." + restore_ip_tables_guide
-                elif is_custom_resolv_conf["logical"]:
-                    reccomendation = reccomendation + "\nCustom DNS is still present in resolv.conf even though you are not connected to a server. This might be blocking your from establishing a non-encrypted connection.\n"
-                    reccomendation = reccomendation + "Try to restart your network manager to restore default configurations:" + restart_netwman_guide
-                elif is_custom_resolv_conf["logical"] is None:
-                    reccomendation = reccomendation + "\nNo running VPN process was found, though DNS configurations are lacking in resolv.conf.\n"
-                    reccomendation = reccomendation + "This might be due to some error or corruption during DNS restoration or lack of internet connection.\n"
-                    reccomendation = reccomendation + "Try to restart your network manager to restore default configurations, if it still does not work, then you probably experiencing some internet connection issues." + restart_netwman_guide
-                else:
-                    reccomendation = "\nYou have no internet connection.\nTry to connect to a different nework to resolve the issue."
-            else:
-                reccomendation = "<b>Unkown problem!</b>"
-        else:
-            reccomendation = "\nYour system seems to be ok. There are no reccomendations at the moment."
-
-        result = """
-        Has internet:\t\t\t\t<b>{has_internet}</b>
-        resolv.conf status:\t\t\t<b>{resolv_conf_status}</b>
-        Killswitch enabled:\t\t\t<b>{is_ks_enabled}</b>
-        VPN Process Running:\t\t<b>{is_vpnprocess_running}</b>
-        DNS Protection Enabled:\t\t<b>{is_dns_enabled}</b>
-        Split Tunneling Enabled:\t\t<b>{is_sp_enabled}</b>
-        """.format(
-            has_internet= "Yes" if has_internet else "No",
-            resolv_conf_status=is_custom_resolv_conf["display"],
-            is_ks_enabled= "Yes" if is_killswitch_enabled else "No",
-            is_vpnprocess_running= "Yes" if is_ovpnprocess_running else "No", 
-            is_dns_enabled= "Yes" if is_dns_protection_enabled else "No",
-            is_sp_enabled= "Yes" if is_splitunn_enabled else "No")
-
-        gui_logger.debug(result)
-
-        label_object.set_markup(result)
-        label_object.show()
-        sub_label_object.set_markup("<b><u>Reccomendation:</u></b>\n<span>{recc}</span>".format(recc=reccomendation))
-        sub_label_object.show()
-        spinner_object.hide()
-
 def check_internet_conn(request_bool=False):
     """Function that checks for internet connection.
     """
@@ -256,44 +129,6 @@ def custom_call_api(endpoint=False, request_bool=False):
         return True
 
     return response.json()
-
-def check_for_updates():
-    """Function that searches for existing updates by checking the latest releases on github.
-    """
-    latest_release = ''
-    pip3_installed = False
-
-    is_pip3_installed = subprocess.run(["pip3", "show", "protonvpn-linux-gui-calexandru2018"],stdout=subprocess.PIPE) # nosec
-    if is_pip3_installed.returncode == 0:
-        is_pip3_installed = is_pip3_installed.stdout.decode().split("\n")
-        for el in is_pip3_installed:
-            if "Location:" in el:
-                el = el.split(" ")[1].split("/")
-                if not ".egg" in el[-1]:
-                    pip3_installed = True
-                    # print(".egg" in el[-1])
-                    break           
-
-    try:
-        check_version = requests.get(GITHUB_URL_RELEASE, timeout=2)
-        latest_release =  check_version.url.split("/")[-1][1:]
-    except (requests.exceptions.ConnectionError,
-            requests.exceptions.ConnectTimeout):
-        return "Failed to check for updates."
-
-    if latest_release == VERSION:
-        return "You have the latest version!"
-
-    if VERSION < latest_release:
-        return_string = "There is a newer release, you should upgrade to <b>v{0}</b>.\n\n".format(latest_release)
-        if pip3_installed:
-            return_string = return_string + "You can upgrade with the following command:\n\n<b>sudo pip3 install protonvpn-linux-gui-calexandru2018 --upgrade</b>\n\n"
-        else:
-            return_string = return_string + "You can upgrade by <b>first removing this version</b>, and then cloning the new one with the following commands:\n\n<b>git clone https://github.com/calexandru2018/protonvpn-linux-gui</b>\n\n<b>cd protonvpn-linux-gui</b>\n\n<b>sudo python3 setup.py install</b>"
-        
-        return return_string
-   
-    return "Developer Mode."
 
 def prepare_initilizer(username_field, password_field, interface):
     """Funciton that collects and prepares user input from login window.

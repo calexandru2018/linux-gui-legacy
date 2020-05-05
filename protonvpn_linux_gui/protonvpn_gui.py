@@ -35,9 +35,6 @@ from protonvpn_linux_gui.services.dashboard_service import load_content_on_start
 from protonvpn_linux_gui.services.login_service import initialize_gui_config
 
 from protonvpn_linux_gui.utils import (
-    load_configurations,
-    message_dialog,
-    check_for_updates,
     get_gui_processes,
     find_cli,
     kill_duplicate_gui_process
