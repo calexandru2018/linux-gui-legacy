@@ -21,15 +21,17 @@ from protonvpn_linux_gui.utils import (
     load_on_start,
 )
 
-def on_login(interface, username_field, password_field, messagedialog_label, user_window, login_window, messagedialog_window):
+def on_login(**kwargs):
     """Function that initializes a user profile.
     """     
+    interface = kwargs.get("interface")
+    username_field = kwargs.get("username_field")
+    password_field = kwargs.get("password_field")
+    dialog_window = kwargs.get("dialog_window")
+    login_window = kwargs.get("login_window")
+    dashboard_window = kwargs.get("dashboard_window")
+
     server_list_object = interface.get_object("ServerListStore")
-    
-    populate_servers_dict = {
-        "list_object": server_list_object,
-        "servers": False
-    }
 
     user_data = prepare_initilizer(username_field, password_field, interface)
     
@@ -84,11 +86,12 @@ def on_login(interface, username_field, password_field, messagedialog_label, use
         os.chmod(PASSFILE, 0o600)
 
     if not initialize_gui_config():
-        sys.exit(1)
+        dialog_window.update_dialog(label="Unable to create gui configuration file!")
+        return
 
     set_config_value("USER", "initialized", 1)
 
-    load_on_start({"interface":interface, "gui_enabled": True, "messagedialog_label": messagedialog_label})
+    # dialog_window.update_dialog(label="User account <b>added</b>!")
 
 def initialize_gui_config():
     gui_config = configparser.ConfigParser()
@@ -114,8 +117,12 @@ def initialize_gui_config():
     with open(GUI_CONFIG_FILE, "w") as f:
         gui_config.write(f)
         gui_logger.debug("pvpn-gui.cfg initialized.")
+
     change_file_owner(GUI_CONFIG_FILE)
 
     if not os.path.isfile(GUI_CONFIG_FILE):
+        print("something")
         gui_logger.debug("Unablt to initialize pvpn-gui.cfg. {}".format(Exception))
         return False
+
+    return True

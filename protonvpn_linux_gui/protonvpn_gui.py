@@ -78,19 +78,17 @@ def init():
             
         if not os.path.isfile(CONFIG_FILE): 
             gui_logger.debug(">>> Loading LoginWindow")
+            
+            settings_window = SettingsWindow(interface, Gtk, dialog_window)
+            dashboard_window = DashboardWindow(interface, Gtk, dialog_window, settings_window)
 
-            interface.connect_signals(LoginWindow(interface))
-
-            interface.add_from_file(UI_LOGIN)
-
-            window = interface.get_object("LoginWindow")
-            version_label = interface.get_object("login_window_version_label")
-            version_label.set_markup("v.{}".format(VERSION))
+            login_window = LoginWindow(interface, Gtk, dialog_window, dashboard_window)
+            login_window.display_window()
         else:
             gui_logger.debug(">>> Loading DashboardWindow")
             settings_window = SettingsWindow(interface, Gtk, dialog_window)
-            dashboard = DashboardWindow(interface, Gtk, dialog_window, settings_window)
-            dashboard.display_window()
+            dashboard_window = DashboardWindow(interface, Gtk, dialog_window, settings_window)
+            dashboard_window.display_window()
 
     Gtk.main()
 
