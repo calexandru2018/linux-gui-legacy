@@ -3,6 +3,7 @@ import time
 import datetime
 import subprocess
 
+# Remote imports
 from protonvpn_cli.utils import (
     get_country_name,
     get_config_value,
@@ -13,17 +14,22 @@ from protonvpn_cli.utils import (
     get_server_value
 )
 
-from .utils import get_gui_config, set_gui_config
-from .constants import TRAY_CFG_SERVERLOAD, TRAY_CFG_SERVENAME, TRAY_CFG_DATA_TX, TRAY_CFG_TIME_CONN
-from .gui_logger import gui_logger
-
 import gi
 gi.require_version('Gtk', '3.0')
 gi.require_version('AppIndicator3', '0.1')
 from gi.repository import Gtk, GObject
 from gi.repository import AppIndicator3 as appindicator
 
-CURRDIR = os.path.dirname(os.path.abspath(__file__))
+# Local imports
+from protonvpn_linux_gui.gui_logger import gui_logger
+from protonvpn_linux_gui.constants import (
+    TRAY_CFG_SERVERLOAD, 
+    TRAY_CFG_SERVENAME, 
+    TRAY_CFG_DATA_TX, 
+    TRAY_CFG_TIME_CONN, 
+    CURRDIR
+)
+from protonvpn_linux_gui.utils import get_gui_config, set_gui_config
 
 class ProtonVPNIndicator:
     def __init__(self):

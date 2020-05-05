@@ -9,7 +9,6 @@ GITHUB_URL_RELEASE = "https://github.com/calexandru2018/protonvpn-linux-gui/rele
 GUI_CONFIG_DIR = os.path.join(os.path.expanduser("~{0}".format(USER)), ".pvpn-gui")
 GUI_CONFIG_FILE = os.path.join(GUI_CONFIG_DIR, "pvpn-gui.cfg")
 
-
 CURRDIR = os.path.dirname(os.path.abspath(__file__))
 
 UI_LOGIN = os.path.join(CURRDIR, "resources/login_window.glade")
