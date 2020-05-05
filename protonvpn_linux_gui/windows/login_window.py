@@ -1,6 +1,6 @@
 from threading import Thread
 
-from protonvpn_linux_gui.thread_functions import on_login
+from protonvpn_linux_gui.services.login_service import on_login
 from protonvpn_linux_gui.utils import gui_logger
 
 class LoginWindow:

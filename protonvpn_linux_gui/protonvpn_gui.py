@@ -17,8 +17,8 @@ from protonvpn_linux_gui.windows.login_window import LoginWindow
 from protonvpn_linux_gui.windows.dashboard_window import DashboardWindow
 from protonvpn_linux_gui.windows.settings_window import SettingsWindow
 from protonvpn_linux_gui.windows.dialog_window import DialogWindow
-from .gui_logger import gui_logger
-from .constants import (
+from protonvpn_linux_gui.gui_logger import gui_logger
+from protonvpn_linux_gui.constants import (
     VERSION, 
     HELP_TEXT, 
     GUI_CONFIG_DIR, 
@@ -31,18 +31,16 @@ from .constants import (
     UI_STYLES,
     CLI_ABSENCE_INFO
 )
-from .thread_functions import(
-    kill_duplicate_gui_process,
-    initialize_gui_config
-)
-from .services.dashboard_service import load_content_on_start
+from protonvpn_linux_gui.services.dashboard_service import load_content_on_start
+from protonvpn_linux_gui.services.login_service import initialize_gui_config
 
-from .utils import (
+from protonvpn_linux_gui.utils import (
     load_configurations,
     message_dialog,
     check_for_updates,
     get_gui_processes,
     find_cli,
+    kill_duplicate_gui_process
 )
 
 def init():

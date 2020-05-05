@@ -1013,6 +1013,45 @@ def custom_get_ip_info():
 
     return ip, isp, country
 
+def kill_duplicate_gui_process():
+    """Function to kill duplicate/existing protonvpn-linux-gui processes.
+    """
+    return_message = {
+        "message": "Unable to automatically end service. Please manually end the process.",
+        "success": False
+    }
+    
+    process = get_gui_processes()
+    if len(process) > 1:
+        gui_logger.debug("[!] Found following processes: {0}. Will attempt to end \"{1}\"".format(process, process[0]))
+
+        # select first(longest living) process from list
+        process_to_kill = process[0]
+
+        timer_start = time.time()
+
+        while len(get_gui_processes()) > 1:
+            if time.time() - timer_start <= 10:
+                subprocess.run(["kill", process_to_kill]) # nosec
+                time.sleep(0.2)
+            else:
+                subprocess.run(["kill", "-9", process_to_kill]) # nosec
+                gui_logger.debug("[!] Unable to pkill process \"{0}\". Will attempt a SIGKILL.".format(process[0]))
+                break
+
+        if len(get_gui_processes()) == 1:
+            return_message['message'] = "Previous process ended, resuming actual session."        
+            return_message['success'] = True
+            gui_logger.debug("[!] Process \"{0}\" was ended.".format(process[0]))
+
+    elif len(process) == 1:
+        return_message['message'] = "Only one process, normal startup."        
+        return_message['success'] = True
+        gui_logger.debug(">>> Only one process was found, continuing with normal startup.")
+
+    return return_message
+
+
 def get_gui_processes():
     """Function that returns all possible running GUI processes. 
     """
@@ -1025,4 +1064,6 @@ def get_gui_processes():
     gui_logger.debug(">>> Existing process running: {0}".format(processes))
 
     return processes
+
+
     

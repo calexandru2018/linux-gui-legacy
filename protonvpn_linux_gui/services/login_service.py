@@ -1,53 +1,29 @@
-import re
 import os
 import sys
 import time
-import shutil
-import subprocess
-import concurrent.futures
 import configparser
 
-from protonvpn_cli.constants import USER, CONFIG_FILE, CONFIG_DIR, PASSFILE, SPLIT_TUNNEL_FILE #noqa
-from protonvpn_cli.utils import get_config_value, is_valid_ip, set_config_value, change_file_owner, pull_server_data, make_ovpn_template #noqa
-from protonvpn_cli.country_codes import country_codes #noqa
+from protonvpn_cli.constants import CONFIG_FILE, CONFIG_DIR, PASSFILE #noqa
+from protonvpn_cli.utils import set_config_value, change_file_owner, pull_server_data, make_ovpn_template #noqa
 
 # Custom helper functions
-from .utils import (
-    update_labels_status,
-    populate_server_list,
+from protonvpn_linux_gui.utils import (
     prepare_initilizer,
     load_on_start,
-    update_labels_server_list,
-    get_gui_processes,
-    manage_autoconnect,
-    populate_autoconnect_list,
-    get_server_protocol_from_cli,
-    get_gui_config,
-    set_gui_config
 )
 
 # Import GUI logger
-from .gui_logger import gui_logger
+from protonvpn_linux_gui.gui_logger import gui_logger
 
 # Import constants
-from .constants import (
-    VERSION, 
-    GITHUB_URL_RELEASE, 
+from protonvpn_linux_gui.constants import (
     TRAY_CFG_SERVERLOAD, 
     TRAY_CFG_SERVENAME, 
     TRAY_CFG_DATA_TX, 
     TRAY_CFG_TIME_CONN, 
-    TRAY_CFG_DICT, 
     GUI_CONFIG_FILE
 )
 
-# PyGObject import
-import gi
-gi.require_version('Gtk', '3.0')
-from gi.repository import GObject as gobject
-  
-
-# Login handler
 def on_login(interface, username_field, password_field, messagedialog_label, user_window, login_window, messagedialog_window):
     """Function that initializes a user profile.
     """     
@@ -146,41 +122,3 @@ def initialize_gui_config():
     if not os.path.isfile(GUI_CONFIG_FILE):
         gui_logger.debug("Unablt to initialize pvpn-gui.cfg. {}".format(Exception))
         return False
-
-def kill_duplicate_gui_process():
-    """Function to kill duplicate/existing protonvpn-linux-gui processes.
-    """
-    return_message = {
-        "message": "Unable to automatically end service. Please manually end the process.",
-        "success": False
-    }
-    
-    process = get_gui_processes()
-    if len(process) > 1:
-        gui_logger.debug("[!] Found following processes: {0}. Will attempt to end \"{1}\"".format(process, process[0]))
-
-        # select first(longest living) process from list
-        process_to_kill = process[0]
-
-        timer_start = time.time()
-
-        while len(get_gui_processes()) > 1:
-            if time.time() - timer_start <= 10:
-                subprocess.run(["kill", process_to_kill]) # nosec
-                time.sleep(0.2)
-            else:
-                subprocess.run(["kill", "-9", process_to_kill]) # nosec
-                gui_logger.debug("[!] Unable to pkill process \"{0}\". Will attempt a SIGKILL.".format(process[0]))
-                break
-
-        if len(get_gui_processes()) == 1:
-            return_message['message'] = "Previous process ended, resuming actual session."        
-            return_message['success'] = True
-            gui_logger.debug("[!] Process \"{0}\" was ended.".format(process[0]))
-
-    elif len(process) == 1:
-        return_message['message'] = "Only one process, normal startup."        
-        return_message['success'] = True
-        gui_logger.debug(">>> Only one process was found, continuing with normal startup.")
-
-    return return_message
