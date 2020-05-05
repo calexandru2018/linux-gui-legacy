@@ -514,17 +514,12 @@ def update_connection_time(dict_data):
     return True
 
 def load_configurations(interface):
-    """Function that sets and populates user configurations before showing the configurations window.
+    """Function that loads user configurations before showing the configurations window.
     """
-    # pref_dialog = interface.get_object("ConfigurationsWindow")
-    pref_dialog = interface.get_object("SettingsWindow")
-
     load_general_settings(interface)
     load_tray_settings(interface)
     load_connection_settings(interface)
     load_advanced_settings(interface)
-   
-    pref_dialog.show()
 
 def load_general_settings(interface):
     username_field = interface.get_object("update_username_input")
