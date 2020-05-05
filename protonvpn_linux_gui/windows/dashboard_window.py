@@ -1,7 +1,6 @@
 from threading import Thread
 
 # Remote imports
-from protonvpn_cli.constants import (VERSION) #noqa
 from protonvpn_cli.utils import(
     get_config_value, 
     change_file_owner, 
@@ -12,7 +11,7 @@ from protonvpn_cli.utils import(
 # Local imports
 from protonvpn_linux_gui.windows.settings_window import SettingsWindow
 from protonvpn_linux_gui.gui_logger import gui_logger
-from protonvpn_linux_gui.constants import HELP_TEXT, UI_DASHBOARD, UI_SETTINGS
+from protonvpn_linux_gui.constants import HELP_TEXT, UI_DASHBOARD, UI_SETTINGS, VERSION
 from protonvpn_linux_gui.services.dashboard_service import (
     quick_connect,
     last_connect,
