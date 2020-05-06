@@ -16,113 +16,25 @@ from protonvpn_linux_gui.constants import (
     TRAY_CFG_TIME_CONN, 
     GUI_CONFIG_FILE
 )
-from protonvpn_linux_gui.utils import (
-    prepare_initilizer,
-    load_on_start,
-)
 
-def on_login(**kwargs):
-    """Function that initializes a user profile.
-    """     
-    interface = kwargs.get("interface")
-    username_field = kwargs.get("username_field")
-    password_field = kwargs.get("password_field")
-    dialog_window = kwargs.get("dialog_window")
-    login_window = kwargs.get("login_window")
-    dashboard_window = kwargs.get("dashboard_window")
+class LoginPresenter:
+    def __init__(self, interface, login_service):
+        self.interface = interface
+        self.login_service = login_service
 
-    server_list_object = interface.get_object("ServerListStore")
+    def set_view(self, login_view):
+        self.login_view = login_service
 
-    user_data = prepare_initilizer(username_field, password_field, interface)
-    
-    config = configparser.ConfigParser()
-    config["USER"] = {
-        "username": "None",
-        "tier": "None",
-        "default_protocol": "None",
-        "initialized": "0",
-        "dns_leak_protection": "1",
-        "custom_dns": "None",
-        "check_update_interval": "3",
-        "killswitch": "0",
-        "split_tunnel": "0",
-        "autoconnect": "0"
-    }
-    config["metadata"] = {
-        "last_api_pull": "0",
-        "last_update_check": str(int(time.time())),
-    }
-    with open(CONFIG_FILE, "w") as f:
-        config.write(f)
-    change_file_owner(CONFIG_FILE)
-    gui_logger.debug("pvpn-cli.cfg initialized")
+    def on_login(self, **kwargs):
+        """Function that initializes a user profile.
+        """    
+        print("here") 
+        # username_field = kwargs.get("username_field")
+        # password_field = kwargs.get("password_field")
+        # dialog_window = kwargs.get("dialog_window")
+        # login_window = kwargs.get("login_window")
+        # # dashboard_window = kwargs.get("dashboard_window")
 
-    change_file_owner(CONFIG_DIR)
-
-    ovpn_username = user_data['username']
-    ovpn_password = user_data['password']
-    user_tier = user_data['protonvpn_plan']
-    user_protocol = user_data['openvpn_protocol']
-
-    pull_server_data(force=True)
-    make_ovpn_template()
-
-    if user_tier == 4:
-        user_tier = 3
-    user_tier -= 1
-
-    set_config_value("USER", "username", ovpn_username)
-    set_config_value("USER", "tier", user_tier)
-    set_config_value("USER", "default_protocol", user_protocol)
-    set_config_value("USER", "dns_leak_protection", 1)
-    set_config_value("USER", "custom_dns", None)
-    set_config_value("USER", "killswitch", 0)
-    set_config_value("USER", "split_tunnel", 0)
-    set_config_value("USER", "autoconnect", "0")
-
-    with open(PASSFILE, "w") as f:
-        f.write("{0}\n{1}".format(ovpn_username, ovpn_password))
-        gui_logger.debug("Passfile created")
-        os.chmod(PASSFILE, 0o600)
-
-    if not initialize_gui_config():
-        dialog_window.update_dialog(label="Unable to create gui configuration file!")
-        return
-
-    set_config_value("USER", "initialized", 1)
-
-    # dialog_window.update_dialog(label="User account <b>added</b>!")
-
-def initialize_gui_config():
-    gui_config = configparser.ConfigParser()
-    gui_config["connections"] = {
-        "display_secure_core": False
-    }
-    gui_config["general_tab"] = {
-        "start_min": False,
-        "start_on_boot": False,
-        "show_notifications": False,
-    }
-    gui_config["tray_tab"] = {
-        TRAY_CFG_DATA_TX: "0",
-        TRAY_CFG_SERVENAME: "0",
-        TRAY_CFG_TIME_CONN: "0",
-        TRAY_CFG_SERVERLOAD: "0",
-    }
-    gui_config["conn_tab"] = {
-        "autoconnect": "dis",
-        "quick_connect": "dis",
-    }
-
-    with open(GUI_CONFIG_FILE, "w") as f:
-        gui_config.write(f)
-        gui_logger.debug("pvpn-gui.cfg initialized.")
-
-    change_file_owner(GUI_CONFIG_FILE)
-
-    if not os.path.isfile(GUI_CONFIG_FILE):
-        print("something")
-        gui_logger.debug("Unablt to initialize pvpn-gui.cfg. {}".format(Exception))
-        return False
-
-    return True
+        # user_data = self.login_service.prepare_initilizer(username_field, password_field, self.interface)
+        
+        

@@ -127,37 +127,6 @@ def custom_call_api(endpoint=False, request_bool=False):
 
     return response.json()
 
-def prepare_initilizer(username_field, password_field, interface):
-    """Funciton that collects and prepares user input from login window.
-    Returns:
-    ----
-    - A dictionary with username, password, plan type and default protocol.
-    """
-    # Get user specified protocol
-    protonvpn_plan = ''
-    
-    protonvpn_plans = {
-        '1': interface.get_object('member_free').get_active(),
-        '2': interface.get_object('member_basic').get_active(),
-        '3': interface.get_object('member_plus').get_active(),
-        '4': interface.get_object('member_visionary').get_active()
-    }
-
-    # Get user plan
-    for k,v in protonvpn_plans.items():
-        if v:
-            protonvpn_plan = k
-            break
-    
-    user_data = {
-        'username': username_field,
-        'password': password_field,
-        'protonvpn_plan': int(protonvpn_plan),
-        'openvpn_protocol': "tcp"
-    }
-
-    return user_data
-
 def load_on_start(params_dict):
     """Function that checks if there is an internet connection, if not then return False, else calls update_labels_server_list.
     """
