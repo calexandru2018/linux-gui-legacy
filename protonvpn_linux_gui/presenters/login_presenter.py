@@ -23,18 +23,37 @@ class LoginPresenter:
         self.login_service = login_service
 
     def set_view(self, login_view):
-        self.login_view = login_service
+        self.login_view = login_view
 
     def on_login(self, **kwargs):
         """Function that initializes a user profile.
-        """    
-        print("here") 
-        # username_field = kwargs.get("username_field")
-        # password_field = kwargs.get("password_field")
-        # dialog_window = kwargs.get("dialog_window")
-        # login_window = kwargs.get("login_window")
-        # # dashboard_window = kwargs.get("dashboard_window")
+        """      
+        username_field = kwargs.get("username_field")
+        password_field = kwargs.get("password_field")
+        dialog_window = kwargs.get("dialog_window")
+        
+        protonvpn_plans = {
+            '1': kwargs.get("member_free_radio"),
+            '2': kwargs.get("member_basic_radio"),
+            '3': kwargs.get("member_plus_radio"),
+            '4': kwargs.get("member_visionary_radio"),
+        }
 
-        # user_data = self.login_service.prepare_initilizer(username_field, password_field, self.interface)
+        user_data = self.login_service.prepare_initilizer(username_field, password_field, protonvpn_plans)
+
+        if not self.login_service.initialize_gui_config():
+            dialog_window.display_dialog(label="Couldn't create folder for application configurations.")
+            return 
+
+        if not self.login_service.intialize_cli_config():
+            dialog_window.display_dialog(label="Couldn't create folder for cli configurations.")
+            return 
+
+        if not self.login_service.setup_user(user_data):
+            dialog_window.display_dialog(label="Couldn't intialize your profile.")
+            return
+        
+        dialog_window.display_dialog(label="Your profile was successfully created.")
+
         
         

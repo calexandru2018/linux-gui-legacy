@@ -1,8 +1,7 @@
 from threading import Thread
 
 from protonvpn_linux_gui.constants import UI_LOGIN, VERSION
-from protonvpn_linux_gui.utils import gui_logger
-# from protonvpn_linux_gui.presenters.login_presenter import LoginPresenter
+from protonvpn_linux_gui.gui_logger import gui_logger
 
 class LoginView:
     def __init__(self, interface, Gtk, login_presenter, dialog_window, dashboard_window):
@@ -28,55 +27,76 @@ class LoginView:
 
         self.login_username_label = self.interface.get_object("login_username_label")
         self.login_password_label = self.interface.get_object("login_password_label")
+
+        self.username_field = self.interface.get_object('username_field')
+        self.password_field = self.interface.get_object('password_field')
+
+        self.member_free_radio =  self.interface.get_object('member_free')
+        self.member_basic_radio =  self.interface.get_object('member_basic')
+        self.member_plus_radio =  self.interface.get_object('member_plus')
+        self.member_visionary_radio =  self.interface.get_object('member_visionary')
+
+        self.login_button =  self.interface.get_object('login_button')
+
+        self.popover = self.interface.get_object("login_window_popover")
+
         self.version_label = interface.get_object("login_window_version_label")
         self.version_label.set_markup("v.{}".format(VERSION))
 
     def login_username_entry_key_release(self, entry, event):
+        self.login_username_label.set_markup("")
+
+        self.login_button.set_property("sensitive", False)
         if len(entry.get_text().strip()) > 0:
             # self.login_username_label.show()
             self.login_username_label.set_markup("ProtonVPN (OpenVPN/IKEv2) Username")
-        else:
-            self.login_username_label.set_markup("")
-            # self.login_username_label.hide()
+
+            
+            if len(self.password_field.get_text().strip()) > 0:
+                print("Enable button in username")
+                self.login_button.set_property("sensitive", True)
+            else:
+                print("Disable button in username")
+                self.login_button.set_property("sensitive", False)
         
     def login_password_entry_key_release(self, entry, event):
+        self.login_password_label.set_markup("")
+        
+        self.login_button.set_property("sensitive", False)
         if len(entry.get_text().strip()) > 0:
             # self.login_password_label.show()
             self.login_password_label.set_markup("ProtonVPN (OpenVPN/IKEv2) Password")
-        else:
-            # self.login_password_label.hide()
-            self.login_password_label.set_markup("")
-    
+
+            if len(self.username_field.get_text().strip()) > 0:
+                print("Enable button in password")
+                self.login_button.set_property("sensitive", True)
+            else:
+                print("Disable button in password")
+                self.login_button.set_property("sensitive", False)
+
     def need_help_link_activate(self, label, link):
-        popover = self.interface.get_object("login_window_popover")
-        popover.show()
+        self.popover.show()
 
     def login_button_clicked(self, button):
         """Button/Event handler to intialize user account. Calls populate_server_list(server_tree_store) to populate server list.
         """     
-        # login_window = self.interface.get_object("LoginWindow")
-        # user_window = self.interface.get_object("DashboardWindow")
-        
-        # username_field = self.interface.get_object('username_field').get_text().strip()
-        # password_field = self.interface.get_object('password_field').get_text().strip()
 
-        # if len(username_field) == 0 or len(password_field) == 0:
-        #     gui_logger.debug("[!] One of the fields were left empty upon profile initialization.")
-        #     self.dialog_window.display_dialog(label="Username and password need to be provided.")
-        #     return
-
-        # self.dialog_window.display_dialog(label="Intializing profile...", spinner=True)
+        # Queue has to be used
+        self.dialog_window.display_dialog(label="Intializing profile...", spinner=True)
 
         thread = Thread(target=self.login_presenter.on_login, kwargs=dict(
-                                            interface=self.interface, 
-                                            dialog_window=self.dialog_window, 
-                                            # username_field=username_field, 
-                                            # password_field=password_field,
-                                            login_window=self.login_view,
-                                            dashboard_window=self.dashboard_window))
+                                                username_field=username_field.get_text().strip(), 
+                                                password_field=password_field.get_text().strip(),
+                                                member_free_radio=self.member_free_radio.get_active(),
+                                                member_basic_radio=self.member_basic_radio.get_active(),
+                                                member_plus_radio=self.member_plus_radio.get_active(),
+                                                member_visionary_radio=self.member_visionary_radio .get_active(),
+                                                dialog_window=self.dialog_window, 
+                                            ))
         thread.daemon = True
         thread.start()
 
+        # Queue has to be used
         # self.login_view.hide()
         # self.dashboard_window.display_window()
    

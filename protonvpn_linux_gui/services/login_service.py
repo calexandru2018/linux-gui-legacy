@@ -19,7 +19,7 @@ from protonvpn_linux_gui.constants import (
 
 class LoginService:
 
-    def prepare_initilizer(self, username_field, password_field):
+    def prepare_initilizer(self, username_field, password_field, protonvpn_plans):
         """Funciton that collects and prepares user input from login window.
         Returns:
         ----
@@ -27,15 +27,7 @@ class LoginService:
         """
         # Get user specified protocol
         protonvpn_plan = ''
-        
-        # protonvpn_plans = {
-        #     '1': interface.get_object('member_free').get_active(),
-        #     '2': interface.get_object('member_basic').get_active(),
-        #     '3': interface.get_object('member_plus').get_active(),
-        #     '4': interface.get_object('member_visionary').get_active()
-        # }
-        protonvpn_plans = {}
-        
+                
         # Get user plan
         for k,v in protonvpn_plans.items():
             if v:
@@ -51,35 +43,7 @@ class LoginService:
 
         return user_data
         
-    def create_configuration_files(self, user_data):
-        if not initialize_gui_config():
-            # dialog_window.update_dialog(label="Unable to create gui configuration file!")
-            return False
-
-        config = configparser.ConfigParser()
-        config["USER"] = {
-            "username": "None",
-            "tier": "None",
-            "default_protocol": "None",
-            "initialized": "0",
-            "dns_leak_protection": "1",
-            "custom_dns": "None",
-            "check_update_interval": "3",
-            "killswitch": "0",
-            "split_tunnel": "0",
-            "autoconnect": "0"
-        }
-        config["metadata"] = {
-            "last_api_pull": "0",
-            "last_update_check": str(int(time.time())),
-        }
-        with open(CONFIG_FILE, "w") as f:
-            config.write(f)
-        change_file_owner(CONFIG_FILE)
-        gui_logger.debug("pvpn-cli.cfg initialized")
-
-        change_file_owner(CONFIG_DIR)
-
+    def setup_user(self, user_data):
         ovpn_username = user_data['username']
         ovpn_password = user_data['password']
         user_tier = user_data['protonvpn_plan']
@@ -109,6 +73,35 @@ class LoginService:
         set_config_value("USER", "initialized", 1)
 
         return True
+
+    def intialize_cli_config(self):
+        config = configparser.ConfigParser()
+        config["USER"] = {
+            "username": "None",
+            "tier": "None",
+            "default_protocol": "None",
+            "initialized": "0",
+            "dns_leak_protection": "1",
+            "custom_dns": "None",
+            "check_update_interval": "3",
+            "killswitch": "0",
+            "split_tunnel": "0",
+        }
+        config["metadata"] = {
+            "last_api_pull": "0",
+            "last_update_check": str(int(time.time())),
+        }
+
+        try:
+            with open(CONFIG_FILE, "w") as f:
+                config.write(f)
+            change_file_owner(CONFIG_FILE)
+            gui_logger.debug("pvpn-cli.cfg initialized")
+
+            change_file_owner(CONFIG_DIR)
+            return True
+        except:
+            return False
 
     def initialize_gui_config(self):
         gui_config = configparser.ConfigParser()
