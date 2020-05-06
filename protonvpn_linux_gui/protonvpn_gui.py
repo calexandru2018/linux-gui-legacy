@@ -91,17 +91,18 @@ def init():
         if not os.path.isfile(CONFIG_FILE): 
             gui_logger.debug(">>> Loading LoginWindow")
             
-            settings_service = SettingsService()
-            settings_presenter = SettingsPresenter()
-            settings_view = SettingsView(interface, Gtk, dialog_window)
+            # settings_service = SettingsService()
+            # settings_presenter = SettingsPresenter()
+            # settings_view = SettingsView(interface, Gtk, dialog_window)
 
-            dashboard_service = DashboardService()
-            dashboard_presenter = DashboardPresenter()
-            dashboard_view = DashboardView(interface, Gtk, dashboard_presenter, dialog_window, settings_view)
+            # dashboard_service = DashboardService()
+            # dashboard_presenter = DashboardPresenter()
+            # dashboard_view = DashboardView(interface, Gtk, dashboard_presenter, dialog_window, settings_view)
 
             login_service = LoginService()
-            login_presenter = LoginPresenter(interface, login_service, queue)
-            login_view = LoginView(interface, Gtk, login_presenter, dialog_window, dashboard_view)
+            login_presenter = LoginPresenter(login_service, queue)
+            # login_view = LoginView(interface, Gtk, login_presenter, dialog_window, dashboard_view)
+            login_view = LoginView(interface, Gtk, login_presenter, dialog_window)
 
             login_view.display_window()
         else:

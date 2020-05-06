@@ -6,19 +6,19 @@ from protonvpn_cli.utils import get_config_value #noqa
 # Local imports
 from protonvpn_linux_gui.gui_logger import gui_logger
 from protonvpn_linux_gui.constants import UI_SETTINGS
-from protonvpn_linux_gui.presenters.settings_presenter import (
-    update_def_protocol,
-    update_connect_preference,
-    update_dns,
-    update_killswitch,
-    update_pvpn_plan,
-    update_split_tunneling,
-    update_split_tunneling_status,
-    update_user_pass,
-    tray_configurations,
-    purge_configurations,
-    load_configurations
-)
+# from protonvpn_linux_gui.presenters.settings_presenter import (
+#     update_def_protocol,
+#     update_connect_preference,
+#     update_dns,
+#     update_killswitch,
+#     update_pvpn_plan,
+#     update_split_tunneling,
+#     update_split_tunneling_status,
+#     update_user_pass,
+#     tray_configurations,
+#     purge_configurations,
+#     load_configurations
+# )
 from protonvpn_linux_gui.utils import get_gui_config, tab_style_manager
 
 class SettingsView: 

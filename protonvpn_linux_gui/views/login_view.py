@@ -4,9 +4,11 @@ from protonvpn_linux_gui.constants import UI_LOGIN, VERSION
 from protonvpn_linux_gui.gui_logger import gui_logger
 
 class LoginView:
-    def __init__(self, interface, Gtk, login_presenter, dialog_window, dashboard_window):
+    # def __init__(self, interface, Gtk, login_presenter, dialog_window, dashboard_window):
+    def __init__(self, interface, Gtk, login_presenter, dialog_window):
         interface.add_from_file(UI_LOGIN)
-        self.set_objects(interface, Gtk, login_presenter, dialog_window, dashboard_window)
+        # self.set_objects(interface, Gtk, login_presenter, dialog_window, dashboard_window)
+        self.set_objects(interface, Gtk, login_presenter, dialog_window)
         
         interface.connect_signals({
             "login_username_entry_key_release": self.login_username_entry_key_release,
@@ -18,11 +20,12 @@ class LoginView:
     def display_window(self):
         self.login_view.show()
 
-    def set_objects(self, interface, Gtk, login_presenter, dialog_window, dashboard_window):
+    # def set_objects(self, interface, Gtk, login_presenter, dialog_window, dashboard_window):
+    def set_objects(self, interface, Gtk, login_presenter, dialog_window):
         self.interface = interface
         self.login_presenter = login_presenter
         self.dialog_window = dialog_window
-        self.dashboard_window = dashboard_window
+        # self.dashboard_window = dashboard_window
         self.login_view = self.interface.get_object("LoginWindow")
 
         self.login_username_label = self.interface.get_object("login_username_label")
