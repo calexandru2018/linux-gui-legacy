@@ -11,10 +11,10 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import  Gtk, Gdk
 
 # Local imports
-from protonvpn_linux_gui.windows.login_window import LoginWindow
-from protonvpn_linux_gui.windows.dashboard_window import DashboardWindow
-from protonvpn_linux_gui.windows.settings_window import SettingsWindow
-from protonvpn_linux_gui.windows.dialog_window import DialogWindow
+from protonvpn_linux_gui.views.login_view import LoginView
+from protonvpn_linux_gui.views.dashboard_view import DashboardView
+from protonvpn_linux_gui.views.settings_view import SettingsView
+from protonvpn_linux_gui.views.dialog_view import DialogView
 from protonvpn_linux_gui.gui_logger import gui_logger
 from protonvpn_linux_gui.constants import (
     VERSION, 
@@ -29,8 +29,8 @@ from protonvpn_linux_gui.constants import (
     UI_STYLES,
     CLI_ABSENCE_INFO
 )
-from protonvpn_linux_gui.services.dashboard_service import load_content_on_start
-from protonvpn_linux_gui.services.login_service import initialize_gui_config
+from protonvpn_linux_gui.presenters.dashboard_presenter import load_content_on_start
+from protonvpn_linux_gui.presenters.login_presenter import initialize_gui_config
 
 from protonvpn_linux_gui.utils import (
     get_gui_processes,
@@ -66,7 +66,7 @@ def init():
         Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
     )
 
-    dialog_window = DialogWindow(interface, Gtk)
+    dialog_window = DialogView(interface, Gtk)
     
     if not find_cli():
         dialog_window.display_dialog(label=CLI_ABSENCE_INFO, spinner=False, hide_close_button=True)
@@ -75,19 +75,24 @@ def init():
 
         if not os.path.isfile(GUI_CONFIG_FILE):
             initialize_gui_config()
-            
+
+
+        # Get the model
+        # Get the presenter and pass model
+        # Get the view and pass presenter 
+
         if not os.path.isfile(CONFIG_FILE): 
             gui_logger.debug(">>> Loading LoginWindow")
             
-            settings_window = SettingsWindow(interface, Gtk, dialog_window)
-            dashboard_window = DashboardWindow(interface, Gtk, dialog_window, settings_window)
+            settings_window = SettingsView(interface, Gtk, dialog_window)
+            dashboard_window = DashboardView(interface, Gtk, dialog_window, settings_window)
 
-            login_window = LoginWindow(interface, Gtk, dialog_window, dashboard_window)
+            login_window = LoginView(interface, Gtk, dialog_window, dashboard_window)
             login_window.display_window()
         else:
             gui_logger.debug(">>> Loading DashboardWindow")
-            settings_window = SettingsWindow(interface, Gtk, dialog_window)
-            dashboard_window = DashboardWindow(interface, Gtk, dialog_window, settings_window)
+            settings_window = SettingsView(interface, Gtk, dialog_window)
+            dashboard_window = DashboardView(interface, Gtk, dialog_window, settings_window)
             dashboard_window.display_window()
 
     Gtk.main()

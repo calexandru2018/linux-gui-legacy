@@ -2,9 +2,9 @@ from threading import Thread
 
 from protonvpn_linux_gui.constants import UI_LOGIN, VERSION
 from protonvpn_linux_gui.utils import gui_logger
-from protonvpn_linux_gui.services.login_service import on_login
+from protonvpn_linux_gui.presenters.login_presenter import on_login
 
-class LoginWindow:
+class LoginView:
     def __init__(self, interface, Gtk, dialog_window, dashboard_window):
         interface.add_from_file(UI_LOGIN)
         self.set_objects(interface, Gtk, dialog_window, dashboard_window)

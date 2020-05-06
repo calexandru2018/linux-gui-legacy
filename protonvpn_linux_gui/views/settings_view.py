@@ -6,7 +6,7 @@ from protonvpn_cli.utils import get_config_value #noqa
 # Local imports
 from protonvpn_linux_gui.gui_logger import gui_logger
 from protonvpn_linux_gui.constants import UI_SETTINGS
-from protonvpn_linux_gui.services.settings_service import (
+from protonvpn_linux_gui.presenters.settings_presenter import (
     update_def_protocol,
     update_connect_preference,
     update_dns,
@@ -21,7 +21,7 @@ from protonvpn_linux_gui.services.settings_service import (
 )
 from protonvpn_linux_gui.utils import get_gui_config, tab_style_manager
 
-class SettingsWindow: 
+class SettingsView: 
     def __init__(self, interface, Gtk, dialog_window): 
         interface.add_from_file(UI_SETTINGS)
         self.set_objects(interface, Gtk, dialog_window)

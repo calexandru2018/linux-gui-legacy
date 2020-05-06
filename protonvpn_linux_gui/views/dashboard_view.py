@@ -9,10 +9,10 @@ from protonvpn_cli.utils import(
 )    
 
 # Local imports
-from protonvpn_linux_gui.windows.settings_window import SettingsWindow
+from protonvpn_linux_gui.views.settings_view import SettingsView
 from protonvpn_linux_gui.gui_logger import gui_logger
 from protonvpn_linux_gui.constants import HELP_TEXT, UI_DASHBOARD, UI_SETTINGS, VERSION
-from protonvpn_linux_gui.services.dashboard_service import (
+from protonvpn_linux_gui.presenters.dashboard_presenter import (
     quick_connect,
     last_connect,
     random_connect,
@@ -29,7 +29,7 @@ from protonvpn_linux_gui.utils import (
     tab_style_manager,
 )
 
-class DashboardWindow:
+class DashboardView:
     def __init__(self, interface, Gtk, dialog_window, settings_window):
         interface.add_from_file(UI_DASHBOARD)
         self.set_objects(interface, Gtk, dialog_window, settings_window)

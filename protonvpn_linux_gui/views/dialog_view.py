@@ -2,7 +2,7 @@ from protonvpn_linux_gui.constants import (
     UI_DIALOG, 
 )
 
-class DialogWindow: 
+class DialogView: 
     def __init__(self, interface, Gtk):
         interface.add_from_file(UI_DIALOG)
         interface.connect_signals({
