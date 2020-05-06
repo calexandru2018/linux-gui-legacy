@@ -1,0 +1,2 @@
+class SettingsService:
+    pass

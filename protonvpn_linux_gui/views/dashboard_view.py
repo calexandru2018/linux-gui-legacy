@@ -12,27 +12,15 @@ from protonvpn_cli.utils import(
 from protonvpn_linux_gui.views.settings_view import SettingsView
 from protonvpn_linux_gui.gui_logger import gui_logger
 from protonvpn_linux_gui.constants import HELP_TEXT, UI_DASHBOARD, UI_SETTINGS, VERSION
-# from protonvpn_linux_gui.presenters.dashboard_presenter import (
-#     quick_connect,
-#     last_connect,
-#     random_connect,
-#     disconnect,
-#     custom_quick_connect,
-#     connect_to_selected_server,
-#     reload_secure_core_servers,
-#     load_content_on_start,
-#     check_for_updates,
-#     diagnose
-# )
 from protonvpn_linux_gui.utils import (
     get_gui_config,
     tab_style_manager,
 )
 
 class DashboardView:
-    def __init__(self, interface, Gtk, dialog_window, settings_window):
+    def __init__(self, interface, Gtk, dashboard_presenter, dialog_window, settings_view):
         interface.add_from_file(UI_DASHBOARD)
-        self.set_objects(interface, Gtk, dialog_window, settings_window)
+        self.set_objects(interface, Gtk, dashboard_presenter, dialog_window, settings_view)
 
         interface.connect_signals({
             "profile_quick_connect_button_clicked": self.profile_quick_connect_button_clicked,
@@ -65,18 +53,21 @@ class DashboardView:
             "dialog_window": self.dialog_window
         }
 
-        thread = Thread(target=load_content_on_start, args=[objects])
+        thread = Thread(target=self.dashboard_presenter.load_content_on_start, args=[objects])
         thread.daemon = True
         thread.start()
 
         self.dashboard_window.show()
 
-    def set_objects(self, interface, Gtk, dialog_window, settings_window):
+    def set_objects(self, interface, Gtk, dashboard_presenter, dialog_window, settings_view):
         self.gtk = Gtk
         self.interface = interface
-        self.dashboard_window = self.interface.get_object("DashboardWindow")
-        self.settings_window = settings_window
+
+        self.dashboard_presenter = dashboard_presenter
+        self.dashboard_view = self.interface.get_object("DashboardWindow")
+        self.settings_window = settings_view
         self.dialog_window = dialog_window
+
         self.conn_disc_button_label = self.interface.get_object("main_conn_disc_button_label")
         self.secure_core_label_style = self.interface.get_object("secure_core_label").get_style_context()
         self.dashboard_tab_dict = {
@@ -91,7 +82,7 @@ class DashboardView:
 
         gui_logger.debug(">>> Starting \"quick_connect\" thread.")
 
-        thread = Thread(target=quick_connect, kwargs=dict(interface=self.interface, dialog_window=self.dialog_window)) 
+        thread = Thread(target=self.dashboard_presenter.quick_connect, kwargs=dict(interface=self.interface, dialog_window=self.dialog_window)) 
         thread.daemon = True
         thread.start()
 
@@ -110,7 +101,7 @@ class DashboardView:
 
         gui_logger.debug(">>> Starting \"last_connect\" thread.")
 
-        thread = Thread(target=last_connect, kwargs=dict(interface=self.interface, dialog_window=self.dialog_window))
+        thread = Thread(target=self.dashboard_presenter.last_connect, kwargs=dict(interface=self.interface, dialog_window=self.dialog_window))
         thread.daemon = True
         thread.start()
 
@@ -121,7 +112,7 @@ class DashboardView:
         
         gui_logger.debug(">>> Starting \"random_connect\" thread.")
 
-        thread = Thread(target=random_connect, kwargs=dict(interface=self.interface, dialog_window=self.dialog_window))
+        thread = Thread(target=self.dashboard_presenter.random_connect, kwargs=dict(interface=self.interface, dialog_window=self.dialog_window))
         thread.daemon = True
         thread.start()
 
@@ -132,7 +123,7 @@ class DashboardView:
 
         gui_logger.debug(">>> Starting \"disconnect\" thread.")
 
-        thread = Thread(target=disconnect, kwargs=dict(interface=self.interface, dialog_window=self.dialog_window))
+        thread = Thread(target=self.dashboard_presenter.disconnect, kwargs=dict(interface=self.interface, dialog_window=self.dialog_window))
         thread.daemon = True
         thread.start()
 
@@ -178,19 +169,19 @@ class DashboardView:
 
         server_list.unselect_all()
 
-        target = quick_connect 
+        target = self.dashboard_presenter.quick_connect 
         message = "Connecting to the fastest server..."
         
         if get_gui_config("conn_tab","quick_connect") != "dis":
-            target = custom_quick_connect 
+            target = self.dashboard_presenter.custom_quick_connect 
             message = "Connecting to custom quick connect..."
 
         if is_connected() and not user_selected_server:
-            target = disconnect
+            target = self.dashboard_presenter.disconnect
             message = "Disconnecting..."
 
         if user_selected_server:
-            target = connect_to_selected_server
+            target = self.dashboard_presenter.connect_to_selected_server
             message = "Connecting to <b>{}</b>".format(user_selected_server) 
 
         self.dialog_window.display_dialog(label=message, spinner=True)
@@ -214,7 +205,7 @@ class DashboardView:
         
         if (state and display_secure_core == "False") or (not state and display_secure_core != "False"):
             self.dialog_window.display_dialog(label="Loading {} servers...".format("secure-core" if update_to == "True" else "non secure-core"), spinner=True)
-            thread = Thread(target=reload_secure_core_servers, kwargs=dict(
+            thread = Thread(target=self.dashboard_presenter.reload_secure_core_servers, kwargs=dict(
                                                     interface=self.interface, 
                                                     dialog_window=self.dialog_window,
                                                     update_to=update_to))
@@ -279,7 +270,7 @@ class DashboardView:
 
         gui_logger.debug(">>> Starting \"message_dialog\" thread. [CHECK_FOR_UPDATES]")
 
-        thread = Thread(target=check_for_updates, args=[self.dialog_window])
+        thread = Thread(target=self.dashboard_presenter.check_for_updates, args=[self.dialog_window])
         thread.daemon = True
         thread.start()
 
@@ -289,7 +280,7 @@ class DashboardView:
         self.dialog_window.display_dialog(label="Diagnosing...", spinner=True)
 
         gui_logger.debug(">>> Starting \"message_dialog\" thread. [DIAGNOSE]")
-        thread = Thread(target=diagnose, args=[self.dialog_window])
+        thread = Thread(target=self.dashboard_presenter.diagnose, args=[self.dialog_window])
         thread.daemon = True
         thread.start()
 
