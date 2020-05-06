@@ -18,10 +18,11 @@ from protonvpn_linux_gui.constants import (
 )
 
 class LoginPresenter:
-    def __init__(self, interface, login_service):
+    def __init__(self, interface, login_service, queue):
         self.interface = interface
         self.login_service = login_service
-
+        self.queue = queue
+        
     def set_view(self, login_view):
         self.login_view = login_view
 
