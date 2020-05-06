@@ -51,12 +51,9 @@ class LoginView:
             # self.login_username_label.show()
             self.login_username_label.set_markup("ProtonVPN (OpenVPN/IKEv2) Username")
 
-            
             if len(self.password_field.get_text().strip()) > 0:
-                print("Enable button in username")
                 self.login_button.set_property("sensitive", True)
             else:
-                print("Disable button in username")
                 self.login_button.set_property("sensitive", False)
         
     def login_password_entry_key_release(self, entry, event):
@@ -68,10 +65,8 @@ class LoginView:
             self.login_password_label.set_markup("ProtonVPN (OpenVPN/IKEv2) Password")
 
             if len(self.username_field.get_text().strip()) > 0:
-                print("Enable button in password")
                 self.login_button.set_property("sensitive", True)
             else:
-                print("Disable button in password")
                 self.login_button.set_property("sensitive", False)
 
     def need_help_link_activate(self, label, link):
@@ -85,8 +80,8 @@ class LoginView:
         self.dialog_window.display_dialog(label="Intializing profile...", spinner=True)
 
         thread = Thread(target=self.login_presenter.on_login, kwargs=dict(
-                                                username_field=username_field.get_text().strip(), 
-                                                password_field=password_field.get_text().strip(),
+                                                username_field=self.username_field.get_text().strip(), 
+                                                password_field=self.password_field.get_text().strip(),
                                                 member_free_radio=self.member_free_radio.get_active(),
                                                 member_basic_radio=self.member_basic_radio.get_active(),
                                                 member_plus_radio=self.member_plus_radio.get_active(),
