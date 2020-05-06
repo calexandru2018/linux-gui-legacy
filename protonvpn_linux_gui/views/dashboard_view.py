@@ -12,18 +12,18 @@ from protonvpn_cli.utils import(
 from protonvpn_linux_gui.views.settings_view import SettingsView
 from protonvpn_linux_gui.gui_logger import gui_logger
 from protonvpn_linux_gui.constants import HELP_TEXT, UI_DASHBOARD, UI_SETTINGS, VERSION
-from protonvpn_linux_gui.presenters.dashboard_presenter import (
-    quick_connect,
-    last_connect,
-    random_connect,
-    disconnect,
-    custom_quick_connect,
-    connect_to_selected_server,
-    reload_secure_core_servers,
-    load_content_on_start,
-    check_for_updates,
-    diagnose
-)
+# from protonvpn_linux_gui.presenters.dashboard_presenter import (
+#     quick_connect,
+#     last_connect,
+#     random_connect,
+#     disconnect,
+#     custom_quick_connect,
+#     connect_to_selected_server,
+#     reload_secure_core_servers,
+#     load_content_on_start,
+#     check_for_updates,
+#     diagnose
+# )
 from protonvpn_linux_gui.utils import (
     get_gui_config,
     tab_style_manager,
