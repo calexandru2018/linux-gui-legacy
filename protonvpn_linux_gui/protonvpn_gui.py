@@ -103,8 +103,6 @@ def init():
             login_presenter = LoginPresenter(interface, login_service, queue)
             login_view = LoginView(interface, Gtk, login_presenter, dialog_window, dashboard_view)
 
-            login_presenter.set_view(login_view)
-
             login_view.display_window()
         else:
             gui_logger.debug(">>> Loading DashboardWindow")

@@ -22,9 +22,6 @@ class LoginPresenter:
         self.interface = interface
         self.login_service = login_service
         self.queue = queue
-        
-    def set_view(self, login_view):
-        self.login_view = login_view
 
     def on_login(self, **kwargs):
         """Function that initializes a user profile.
