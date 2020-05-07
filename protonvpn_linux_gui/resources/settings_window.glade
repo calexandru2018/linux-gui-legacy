@@ -286,6 +286,7 @@ Author: Alexandru Cheltuitor
                           <object class="GtkButton" id="update_user_pass_button">
                             <property name="width_request">150</property>
                             <property name="visible">True</property>
+                            <property name="sensitive">False</property>
                             <property name="can_focus">True</property>
                             <property name="receives_default">True</property>
                             <property name="halign">end</property>
@@ -312,6 +313,7 @@ Author: Alexandru Cheltuitor
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="has_frame">False</property>
+                            <signal name="key-release-event" handler="update_username_input_key_release" swapped="no"/>
                             <style>
                               <class name="default_style_entry"/>
                             </style>
@@ -328,6 +330,7 @@ Author: Alexandru Cheltuitor
                             <property name="visibility">False</property>
                             <property name="has_frame">False</property>
                             <property name="invisible_char">•</property>
+                            <signal name="key-release-event" handler="update_password_input_key_release" swapped="no"/>
                             <style>
                               <class name="default_style_entry"/>
                             </style>
