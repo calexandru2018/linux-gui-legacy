@@ -25,10 +25,8 @@ from protonvpn_linux_gui.constants import (
     SERVICE_NAME
 )
 from protonvpn_linux_gui.utils import (
-    populate_server_list,
     set_gui_config,
     get_gui_config,
-    populate_autoconnect_list,
     find_cli,
 )
 

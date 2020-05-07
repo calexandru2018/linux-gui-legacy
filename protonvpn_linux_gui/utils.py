@@ -1,4 +1,5 @@
 import re
+import os
 import time
 import datetime
 import requests
@@ -14,6 +15,7 @@ from protonvpn_cli.utils import (
     get_config_value,
     is_connected,
     get_transferred_data,
+    change_file_owner
 )
 from protonvpn_cli.country_codes import country_codes
 from protonvpn_cli.constants import SPLIT_TUNNEL_FILE, USER
@@ -24,6 +26,10 @@ from protonvpn_linux_gui.constants import (
     VERSION, 
     SERVICE_NAME,  
     TRAY_CFG_DICT,
+    TRAY_CFG_DATA_TX,
+    TRAY_CFG_SERVENAME,
+    TRAY_CFG_SERVERLOAD,
+    TRAY_CFG_TIME_CONN,
     GUI_CONFIG_FILE,
     LARGE_FLAGS_BASE_PATH,
     SMALL_FLAGS_BASE_PATH,
@@ -53,7 +59,6 @@ def get_gui_config(group, key):
 
     return config[group][key]
 
-
 def set_gui_config(group, key, value):
     """Write a specific value to GUI_CONFIG_FILE"""
 
@@ -67,6 +72,40 @@ def set_gui_config(group, key, value):
 
     with open(GUI_CONFIG_FILE, "w+") as f:
         config.write(f)
+
+def initialize_gui_config():
+        gui_config = configparser.ConfigParser()
+        gui_config["connections"] = {
+            "display_secure_core": False
+        }
+        gui_config["general_tab"] = {
+            "start_min": False,
+            "start_on_boot": False,
+            "show_notifications": False,
+        }
+        gui_config["tray_tab"] = {
+            TRAY_CFG_DATA_TX: "0",
+            TRAY_CFG_SERVENAME: "0",
+            TRAY_CFG_TIME_CONN: "0",
+            TRAY_CFG_SERVERLOAD: "0",
+        }
+        gui_config["conn_tab"] = {
+            "autoconnect": "dis",
+            "quick_connect": "dis",
+        }
+
+        with open(GUI_CONFIG_FILE, "w") as f:
+            gui_config.write(f)
+            gui_logger.debug("pvpn-gui.cfg initialized.")
+
+        change_file_owner(GUI_CONFIG_FILE)
+
+        if not os.path.isfile(GUI_CONFIG_FILE):
+            print("something")
+            gui_logger.debug("Unablt to initialize pvpn-gui.cfg. {}".format(Exception))
+            return False
+
+        return True
 
 def get_server_protocol_from_cli(raw_result, return_protocol=False):
     """Function that collects servername and protocol from CLI print statement after establishing connection.

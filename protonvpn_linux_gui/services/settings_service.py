@@ -15,10 +15,8 @@ from protonvpn_linux_gui.constants import (
     SERVICE_NAME
 )
 from protonvpn_linux_gui.utils import (
-    populate_server_list,
     set_gui_config,
     get_gui_config,
-    populate_autoconnect_list,
     find_cli,
 )
 
@@ -174,7 +172,7 @@ class SettingsService:
     def set_tray_setting(self, tray_display, tray_setting):
         try:
             set_gui_config("tray_tab", TRAY_CFG_DICT[tray_display], tray_setting)
-        else:
+        except:
             return False
 
         return True
