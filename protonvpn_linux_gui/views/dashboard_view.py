@@ -49,19 +49,7 @@ class DashboardView:
         self.dialog_window.display_dialog(label="Loading...", spinner=True)
 
         objects = {
-            "connection_labels":{
-                "time_connected_label": self.time_connected_label,
-                "protocol_label": self.protocol_label,
-                "conn_disc_button_label": self.conn_disc_button_label,
-                "ip_label": self.ip_label,
-                "server_load_label": self.server_load_label,
-                "country_label": self.country_label,
-                "isp_label": self.isp_label,
-                "data_received_label": self.data_received_label,
-                "data_sent_label": self.data_sent_label,
-                "background_large_flag": self.background_large_flag,
-                "protonvpn_sign_green": self.protonvpn_sign_green,
-            },
+            "connection_labels": self.connection_labels,
             "secure_core":{
                 "secure_core_switch":self.secure_core_switch,
                 "secure_core_label_style":self.secure_core_label_style,
@@ -97,7 +85,19 @@ class DashboardView:
         self.data_sent_label =          self.interface.get_object("data_sent_label") 
         self.background_large_flag =    self.interface.get_object("background_large_flag")
         self.protonvpn_sign_green =     self.interface.get_object("protonvpn_sign_green")
-
+        self.connection_labels = {
+            "time_connected_label": self.time_connected_label,
+            "protocol_label": self.protocol_label,
+            "conn_disc_button_label": self.conn_disc_button_label,
+            "ip_label": self.ip_label,
+            "server_load_label": self.server_load_label,
+            "country_label": self.country_label,
+            "isp_label": self.isp_label,
+            "data_received_label": self.data_received_label,
+            "data_sent_label": self.data_sent_label,
+            "background_large_flag": self.background_large_flag,
+            "protonvpn_sign_green": self.protonvpn_sign_green,
+        },
         # Secure core
         self.secure_core_switch = self.interface.get_object("secure_core_switch")
         self.secure_core_label_style = self.interface.get_object("secure_core_label")
@@ -118,7 +118,7 @@ class DashboardView:
 
         gui_logger.debug(">>> Starting \"quick_connect\" thread.")
 
-        thread = Thread(target=self.dashboard_presenter.quick_connect, kwargs=dict(interface=self.interface, dialog_window=self.dialog_window)) 
+        thread = Thread(target=self.dashboard_presenter.quick_connect, kwargs=dict(connection_labels=self.connection_labels, dialog_window=self.dialog_window)) 
         thread.daemon = True
         thread.start()
 
@@ -137,7 +137,7 @@ class DashboardView:
 
         gui_logger.debug(">>> Starting \"last_connect\" thread.")
 
-        thread = Thread(target=self.dashboard_presenter.on_last_connect, kwargs=dict(interface=self.interface, dialog_window=self.dialog_window))
+        thread = Thread(target=self.dashboard_presenter.on_last_connect, kwargs=dict(connection_labels=self.connection_labels, dialog_window=self.dialog_window))
         thread.daemon = True
         thread.start()
 
@@ -148,7 +148,7 @@ class DashboardView:
         
         gui_logger.debug(">>> Starting \"random_connect\" thread.")
 
-        thread = Thread(target=self.dashboard_presenter.random_connect, kwargs=dict(interface=self.interface, dialog_window=self.dialog_window))
+        thread = Thread(target=self.dashboard_presenter.random_connect, kwargs=dict(connection_labels=self.connection_labels, dialog_window=self.dialog_window))
         thread.daemon = True
         thread.start()
 
@@ -159,7 +159,7 @@ class DashboardView:
 
         gui_logger.debug(">>> Starting \"disconnect\" thread.")
 
-        thread = Thread(target=self.dashboard_presenter.on_disconnect, kwargs=dict(interface=self.interface, dialog_window=self.dialog_window))
+        thread = Thread(target=self.dashboard_presenter.on_disconnect, kwargs=dict(connection_labels=self.connection_labels, dialog_window=self.dialog_window))
         thread.daemon = True
         thread.start()
 
@@ -221,9 +221,9 @@ class DashboardView:
             message = "Connecting to <b>{}</b>".format(user_selected_server) 
 
         self.dialog_window.display_dialog(label=message, spinner=True)
-
+        
         thread = Thread(target=target, kwargs=dict(
-                                            interface=self.interface, 
+                                            connection_labels=self.connection_labels, 
                                             dialog_window=self.dialog_window,
                                             user_selected_server=user_selected_server))
         thread.daemon = True
@@ -234,10 +234,10 @@ class DashboardView:
  
         if display_secure_core == "False":
             update_to = "True"
-            self.secure_core_label_style.remove_class("disabled_label")
+            self.secure_core_label_style.get_style_context().remove_class("disabled_label")
         else:
             update_to = "False"
-            self.secure_core_label_style.add_class("disabled_label")
+            self.secure_core_label_style.get_style_context().add_class("disabled_label")
         
         if (state and display_secure_core == "False") or (not state and display_secure_core != "False"):
             self.dialog_window.display_dialog(label="Loading {} servers...".format("secure-core" if update_to == "True" else "non secure-core"), spinner=True)
@@ -335,4 +335,3 @@ class DashboardView:
         if window.get_property("visible") is True:
             window.hide()
             return True    
-

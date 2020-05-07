@@ -83,7 +83,7 @@ class DashboardPresenter:
                 "tree_object": kwargs.get("tree_object"),
                 "servers": False
             }
-            gobject.idle_add(populate_server_list, populate_servers_dict)
+            gobject.idle_add(self.populate_server_list, populate_servers_dict)
             msg = "Displaying <b>{}</b> servers!".format("secure-core" if kwargs.get("update_to") == "True" else "non secure-core")
         
         dialog_window.update_dialog(label=msg)
@@ -115,14 +115,13 @@ class DashboardPresenter:
         dialog_window.update_dialog(label=display_message)
 
         update_labels_dict = {
-            # objects will be sent
-            # "interface": self.interface,
+            "connection_labels": kwargs.get("connection_labels"),
             "servers": False,
             "disconnecting": False,
             "conn_info": False
         }
 
-        update_labels_status(update_labels_dict)
+        self.update_labels_status(update_labels_dict)
 
         gui_logger.debug(">>> Ended tasks in \"openvpn_connect\" thread.")
 
@@ -130,8 +129,7 @@ class DashboardPresenter:
         """Make a custom quick connection 
         """              
         update_labels_dict = {
-            # pass necessary objects
-            # "interface": self.interface,
+            "connection_labels": kwargs.get("connection_labels"),
             "servers": False,
             "disconnecting": False,
             "conn_info": False
@@ -150,7 +148,7 @@ class DashboardPresenter:
 
         gui_logger.debug(">>> Result: \"{0}\"".format(result))
         
-        update_labels_status(update_labels_dict)
+        self.update_labels_status(update_labels_dict)
 
         gui_logger.debug(">>> Ended tasks in \"custom_quick_connect\" thread.")
 
@@ -162,7 +160,7 @@ class DashboardPresenter:
         gui_logger.debug(">>> Running \"fastest\".")
 
         update_labels_dict = {
-            # "interface": self.interface,
+            "connection_labels": kwargs.get("connection_labels"),
             "servers": False,
             "disconnecting": False,
             "conn_info": False
@@ -180,7 +178,7 @@ class DashboardPresenter:
 
         gui_logger.debug(">>> Result: \"{0}\"".format(result))
         
-        update_labels_status(update_labels_dict)
+        self.update_labels_status(update_labels_dict)
 
         gui_logger.debug(">>> Ended tasks in \"fastest\" thread.")
 
@@ -191,7 +189,7 @@ class DashboardPresenter:
 
         dialog_window = kwargs.get("dialog_window")
         update_labels_dict = {
-            # "interface": self.interface,
+            "connection_labels": kwargs.get("connection_labels"),
             "servers": False,
             "disconnecting": False,
             "conn_info": False
@@ -210,7 +208,7 @@ class DashboardPresenter:
 
         gui_logger.debug(">>> Result: \"{0}\"".format(result))
 
-        update_labels_status(update_labels_dict)
+        self.update_labels_status(update_labels_dict)
 
         gui_logger.debug(">>> Ended tasks in \"reconnect\" thread.")
 
@@ -221,7 +219,7 @@ class DashboardPresenter:
 
         dialog_window = kwargs.get("dialog_window")
         update_labels_dict = {
-            # "interface": self.interface,
+            "connection_labels": kwargs.get("connection_labels"),
             "servers": False,
             "disconnecting": False,
             "conn_info": False
@@ -239,7 +237,7 @@ class DashboardPresenter:
 
         gui_logger.debug(">>> Result: \"{0}\"".format(result))
 
-        update_labels_status(update_labels_dict)
+        self.update_labels_status(update_labels_dict)
 
         gui_logger.debug(">>> Ended tasks in \"random_c\" thread.")
 
@@ -250,19 +248,19 @@ class DashboardPresenter:
         
         dialog_window = kwargs.get("dialog_window")
         update_labels_dict = {
-            # "interface": self.interface,
+            "connection_labels": kwargs.get("connection_labels"),
             "servers": False,
             "disconnecting": True,
             "conn_info": False
         }
 
-        result = self.dashboard_service.random_connect()
+        result = self.dashboard_service.disconnect()
 
         dialog_window.update_dialog(label=result.stdout.decode())
 
         gui_logger.debug(">>> Result: \"{0}\"".format(result))
 
-        update_labels_status(update_labels_dict)
+        self.update_labels_status(update_labels_dict)
 
         gui_logger.debug(">>> Ended tasks in \"disconnect\" thread.")
 
@@ -327,7 +325,7 @@ class DashboardPresenter:
             servers = False
             
         update_labels_dict = {
-            "objects": object_dict["connection_labels"],
+            "connection_labels": object_dict["connection_labels"],
             "servers": servers,
             "disconnecting": False,
             "conn_info": conn_info if conn_info else False
@@ -359,19 +357,19 @@ class DashboardPresenter:
         is_vpn_connected = True if is_connected() else False
         country_cc = False
         load = False
-        
-        time_connected_label =      update_labels_dict["objects"]["time_connected_label"]
-        protocol_label =            update_labels_dict["objects"]["protocol_label"]
-        conn_disc_button_label =    update_labels_dict["objects"]["conn_disc_button_label"]
-        ip_label =                  update_labels_dict["objects"]["ip_label"]
-        server_load_label =         update_labels_dict["objects"]["server_load_label"]
-        country_label =             update_labels_dict["objects"]["country_label"]
-        isp_label    =              update_labels_dict["objects"]["isp_label"]
-        data_received_label =       update_labels_dict["objects"]["data_received_label"]
-        data_sent_label =           update_labels_dict["objects"]["data_sent_label"]
-        background_large_flag =     update_labels_dict["objects"]["background_large_flag"]
-        protonvpn_sign_green =      update_labels_dict["objects"]["protonvpn_sign_green"]
 
+        time_connected_label =      update_labels_dict["connection_labels"][0]["time_connected_label"]
+        protocol_label =            update_labels_dict["connection_labels"][0]["protocol_label"]
+        conn_disc_button_label =    update_labels_dict["connection_labels"][0]["conn_disc_button_label"]
+        ip_label =                  update_labels_dict["connection_labels"][0]["ip_label"]
+        server_load_label =         update_labels_dict["connection_labels"][0]["server_load_label"]
+        country_label =             update_labels_dict["connection_labels"][0]["country_label"]
+        isp_label    =              update_labels_dict["connection_labels"][0]["isp_label"]
+        data_received_label =       update_labels_dict["connection_labels"][0]["data_received_label"]
+        data_sent_label =           update_labels_dict["connection_labels"][0]["data_sent_label"]
+        background_large_flag =     update_labels_dict["connection_labels"][0]["background_large_flag"]
+        protonvpn_sign_green =      update_labels_dict["connection_labels"][0]["protonvpn_sign_green"]
+        
         try:
             connected_server = get_config_value("metadata", "connected_server")
         except (KeyError, IndexError):
