@@ -50,17 +50,28 @@ class DashboardView:
 
         objects = {
             "connection_labels":{
-
+                "time_connected_label": self.time_connected_label,
+                "protocol_label": self.protocol_label,
+                "conn_disc_button_label": self.conn_disc_button_label,
+                "ip_label": self.ip_label,
+                "server_load_label": self.server_load_label,
+                "country_label": self.country_label,
+                "isp_label": self.isp_label,
+                "data_received_label": self.data_received_label,
+                "data_sent_label": self.data_sent_label,
+                "background_large_flag": self.background_large_flag,
+                "protonvpn_sign_green": self.protonvpn_sign_green,
             },
             "secure_core":{
-
+                "secure_core_switch":self.secure_core_switch,
+                "secure_core_label_style":self.secure_core_label_style,
             },
             "server_tree_list":{
                 "tree_object": self.tree_object,
             },
             "dialog_window": self.dialog_window
         }
-
+        print("before")
         thread = Thread(target=self.dashboard_presenter.on_load, args=[objects])
         thread.daemon = True
         thread.start()
@@ -71,12 +82,22 @@ class DashboardView:
         self.gtk = Gtk
         self.interface = interface
         self.dashboard_presenter = dashboard_presenter
-        self.dashboard_view = self.interface.get_object("DashboardWindow")
+        self.dashboard_window = self.interface.get_object("DashboardWindow")
         self.settings_window = settings_view
         self.dialog_window = dialog_window
 
         # Top labels
-        self.conn_disc_button_label = self.interface.get_object("main_conn_disc_button_label")
+        self.time_connected_label =     self.interface.get_object("time_connected_label")
+        self.protocol_label =           self.interface.get_object("protocol_label")
+        self.conn_disc_button_label =   self.interface.get_object("main_conn_disc_button_label")
+        self.ip_label =                 self.interface.get_object("ip_label")
+        self.server_load_label =        self.interface.get_object("server_load_label")
+        self.country_label =            self.interface.get_object("country_label")
+        self.isp_label    =             self.interface.get_object("isp_label")
+        self.data_received_label =      self.interface.get_object("data_received_label")
+        self.data_sent_label =          self.interface.get_object("data_sent_label") 
+        self.background_large_flag =    self.interface.get_object("background_large_flag")
+        self.protonvpn_sign_green =     self.interface.get_object("protonvpn_sign_green")
 
         # Secure core
         self.secure_core_switch = self.interface.get_object("secure_core_switch")

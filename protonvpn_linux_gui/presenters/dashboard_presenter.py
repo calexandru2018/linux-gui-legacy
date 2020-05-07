@@ -20,15 +20,12 @@ from protonvpn_cli.country_codes import country_codes #noqa
 # PyGObject import
 import gi
 gi.require_version('Gtk', '3.0')
-from gi.repository import GObject as gobject
+from gi.repository import GObject as gobject, GdkPixbuf
 
 # Local imports
 from protonvpn_linux_gui.gui_logger import gui_logger
 from protonvpn_linux_gui.constants import GITHUB_URL_RELEASE, VERSION, LARGE_FLAGS_BASE_PATH, SMALL_FLAGS_BASE_PATH, FEATURES_BASE_PATH
 from protonvpn_linux_gui.utils import (
-    update_labels_status,
-    populate_server_list,
-    load_on_start,
     get_server_protocol_from_cli,
     get_gui_config,
     set_gui_config,
@@ -46,16 +43,17 @@ class DashboardPresenter:
         """
         gui_logger.debug(">>> Running \"load_on_start\".")
         msg = "Could not load necessary resources, there might be connectivity issues."
-        time.sleep(2)
+        # time.sleep(2)
         objects_dict["dialog_window"].hide_spinner()
-
+        print("in")
         conn = custom_get_ip_info()
         if conn and not conn is None:
+            print("echo")
             objects_dict["dialog_window"].update_dialog(label="Populating dashboard...")
             
             display_secure_core = get_gui_config("connections", "display_secure_core")
-            secure_core_switch = object["secure_core_switch"]
-            secure_core_label_style = object["secure_core_label_style"].get_style_context() 
+            secure_core_switch = objects_dict["secure_core"]["secure_core_switch"]
+            secure_core_label_style = objects_dict["secure_core"]["secure_core_label_style"].get_style_context() 
 
             if display_secure_core == "True":
                 secure_core_switch.set_state(True)
@@ -63,7 +61,7 @@ class DashboardPresenter:
             else:
                 secure_core_switch.set_state(False)
 
-            update_labels_server_list(objects_dict["connection_labels"], objects_dict["server_tree_list"], conn_info=conn)
+            self.update_labels_server_list(objects_dict, conn_info=conn)
         else:
             objects_dict["dialog_window"].update_dialog(label=msg, spinner=False)
 
@@ -319,14 +317,9 @@ class DashboardPresenter:
 
         dialog_window.update_dialog(label="<b><u>Reccomendation:</u></b>\n<span>{recc}</span>".format(recc=reccomendation))
 
-    def update_labels_server_list(self, interface, server_tree_list_object=False, conn_info=False):
+    def update_labels_server_list(self, object_dict, conn_info=False):
         """Function that updates dashboard labels and server list.
         """
-        if not server_tree_list_object:
-            server_tree_list_obj = interface.get_object("ServerTreeStore")
-        else:
-            server_tree_list_obj = server_tree_list_object
-
         gui_logger.debug(">>> Running \"update_labels_server_list\" getting servers.")
 
         servers = get_servers()
@@ -334,22 +327,22 @@ class DashboardPresenter:
             servers = False
             
         update_labels_dict = {
-            "interface": interface,
+            "objects": object_dict["connection_labels"],
             "servers": servers,
             "disconnecting": False,
             "conn_info": conn_info if conn_info else False
         }
 
         populate_servers_dict = {
-            "tree_object": server_tree_list_obj,
+            "tree_object": object_dict["server_tree_list"]["tree_object"],
             "servers": servers
         }
 
         # Update labels
-        gobject.idle_add(update_labels_status, update_labels_dict)
+        gobject.idle_add(self.update_labels_status, update_labels_dict)
 
         # Populate server list
-        gobject.idle_add(populate_server_list, populate_servers_dict)
+        # gobject.idle_add(populate_server_list, populate_servers_dict)
 
     def update_labels_status(self, update_labels_dict):
         """Function prepares data to update labels.
@@ -361,24 +354,23 @@ class DashboardPresenter:
         else:
             servers = update_labels_dict["servers"]
 
-        interface =  update_labels_dict["interface"]
         disconnecting = update_labels_dict["disconnecting"]
         conn_info = update_labels_dict["conn_info"]
         is_vpn_connected = True if is_connected() else False
         country_cc = False
         load = False
-
-        time_connected_label =  interface.get_object("time_connected_label")
-        protocol_label =        interface.get_object("protocol_label")
-        conn_disc_button_label = interface.get_object("main_conn_disc_button_label")
-        ip_label =              interface.get_object("ip_label")
-        server_load_label =     interface.get_object("server_load_label")
-        country_label =         interface.get_object("country_label")
-        isp_label    =          interface.get_object("isp_label")
-        data_received_label =   interface.get_object("data_received_label")
-        data_sent_label =       interface.get_object("data_sent_label") 
-        background_large_flag = interface.get_object("background_large_flag")
-        protonvpn_sign_green =  interface.get_object("protonvpn_sign_green")
+        
+        time_connected_label =      update_labels_dict["objects"]["time_connected_label"]
+        protocol_label =            update_labels_dict["objects"]["protocol_label"]
+        conn_disc_button_label =    update_labels_dict["objects"]["conn_disc_button_label"]
+        ip_label =                  update_labels_dict["objects"]["ip_label"]
+        server_load_label =         update_labels_dict["objects"]["server_load_label"]
+        country_label =             update_labels_dict["objects"]["country_label"]
+        isp_label    =              update_labels_dict["objects"]["isp_label"]
+        data_received_label =       update_labels_dict["objects"]["data_received_label"]
+        data_sent_label =           update_labels_dict["objects"]["data_sent_label"]
+        background_large_flag =     update_labels_dict["objects"]["background_large_flag"]
+        protonvpn_sign_green =      update_labels_dict["objects"]["protonvpn_sign_green"]
 
         try:
             connected_server = get_config_value("metadata", "connected_server")
@@ -416,6 +408,7 @@ class DashboardPresenter:
                     flag_path = LARGE_FLAGS_BASE_PATH+"{}.jpg".format(k.lower())
                     background_large_flag.set_from_file(flag_path)
                 country_cc = v
+                break
 
         protonvpn_sign_green.hide()
         country_server = country_cc
@@ -435,7 +428,7 @@ class DashboardPresenter:
         country_label.set_markup(country_server if country_server else "")
 
         # Update sent and received data
-        gobject.timeout_add_seconds(1, update_sent_received_data, {"is_vpn_connected": is_vpn_connected, "received_label": data_received_label, "sent_label": data_sent_label})
+        gobject.timeout_add_seconds(1, self.update_sent_received_data, {"is_vpn_connected": is_vpn_connected, "received_label": data_received_label, "sent_label": data_sent_label})
         
         # Check and set VPN status label. Get also protocol status if vpn is connected
         protocol = "No VPN Connection"
@@ -453,7 +446,7 @@ class DashboardPresenter:
         dns_enabled = get_config_value("USER", "dns_leak_protection")
 
         # Update time connected label
-        gobject.timeout_add_seconds(1, update_connection_time, {"is_vpn_connected":is_vpn_connected, "label":time_connected_label})
+        gobject.timeout_add_seconds(1, self.update_connection_time, {"is_vpn_connected":is_vpn_connected, "label":time_connected_label})
 
         # Check and set protocol label
         protocol_label.set_markup(protocol)
@@ -501,14 +494,14 @@ class DashboardPresenter:
         if servers:
             populate_servers_dict["tree_object"].clear()
 
-            country_servers = get_country_servers(servers)
-            images_dict = create_features_img()
+            country_servers = self.dashboard_service.get_country_servers(servers)
+            images_dict = self.dashboard_service.create_features_img(GdkPixbuf)
 
             for country in country_servers:
                 # Get average load and highest feature
-                avrg_load, country_feature = get_country_avrg_features(country, country_servers, servers, only_secure_core)
+                avrg_load, country_feature = self.dashboard_service.get_country_avrg_features(country, country_servers, servers, only_secure_core)
 
-                flag = GdkPixbuf.Pixbuf.new_from_file_at_size(get_flag_path(country), 15,15)
+                flag = GdkPixbuf.Pixbuf.new_from_file_at_size(self.dashboard_service.get_flag_path(country), 15,15)
                 
                 # Check plus servers
                 if country_feature == "normal" or country_feature == "p2p":
@@ -530,138 +523,11 @@ class DashboardPresenter:
                     country_row = populate_servers_dict["tree_object"].append(None, [flag, country, plus_feature, feature, avrg_load])
 
                 for servername in country_servers[country]:
-                    servername, plus_feature, feature, load, secure_core  = set_individual_server(servername, images_dict, servers, feature)
+                    servername, plus_feature, feature, load, secure_core  = self.dashboard_service.set_individual_server(servername, images_dict, servers, feature)
 
                     if secure_core and only_secure_core:
                         populate_servers_dict["tree_object"].append(country_row, [images_dict["empty_pix"], servername, plus_feature, feature, load])
                     elif not secure_core and not only_secure_core:
                         populate_servers_dict["tree_object"].append(country_row, [images_dict["empty_pix"], servername, plus_feature, feature, load])
 
-    def set_individual_server(self, servername, images_dict, servers, feature):
-        server_tiers = {0: "Free", 1: "Basic", 2: "Plus/Visionary"}
-        features = {0: "Normal", 1: "Secure-Core", 2: "Tor", 4: "P2P"}
-
-        secure_core = False
-
-        load = str(get_server_value(servername, "Load", servers)).rjust(3, " ")
-        load = load + "%"               
-
-        tier = server_tiers[get_server_value(servername, "Tier", servers)]
-        
-        if not "Plus/Visionary".lower() == tier.lower():
-            plus_feature = images_dict["empty_pix"]
-        else:
-            plus_feature = images_dict["plus_pix"]
-
-        server_feature = features[get_server_value(servername, 'Features', servers)].lower()
-        
-        if server_feature == "Normal".lower():
-            feature = images_dict["empty_pix"]
-        elif server_feature == "P2P".lower():
-            feature = images_dict["p2p_pix"]
-        elif server_feature == "Tor".lower():
-            feature = images_dict["tor_pix"]
-        else:
-            # Should be secure core
-            secure_core = True
-
-        return (servername, plus_feature, feature, load, secure_core)
-
-    def get_flag_path(self, country):
-        for k,v in country_codes.items():
-            if country == v:
-                flag_path = SMALL_FLAGS_BASE_PATH+"{}.png".format(v)
-                break
-            else:
-                flag_path = SMALL_FLAGS_BASE_PATH+"Unknown.png"
-
-        return flag_path
-
-    def get_country_servers(self, servers):
-        countries = {}
-        for server in servers:
-            country = get_country_name(server["ExitCountry"])
-            if country not in countries.keys():
-                countries[country] = []
-            countries[country].append(server["Name"])
-
-        country_servers = {} 
-        # Order server list by country alphabetically
-        countries = collections.OrderedDict(sorted(countries.items()))
-
-        for country in countries:
-            country_servers[country] = sorted(countries[country], key=lambda s: get_server_value(s, "Load", servers))
-
-        return country_servers
-
-    def create_features_img(self):
-        # Create empty image
-        empty_path = FEATURES_BASE_PATH+"normal.png"
-        empty_pix = GdkPixbuf.Pixbuf.new_from_file_at_size(empty_path, 15,15)
-        # Create P2P image
-        p2p_path = FEATURES_BASE_PATH+"p2p-arrows.png"
-        p2p_pix = GdkPixbuf.Pixbuf.new_from_file_at_size(p2p_path, 15,15)
-        # Create TOR image
-        tor_path = FEATURES_BASE_PATH+"tor-onion.png"
-        tor_pix = GdkPixbuf.Pixbuf.new_from_file_at_size(tor_path, 15,15)
-        # Create Plus image
-        plus_server_path = FEATURES_BASE_PATH+"plus-server.png"
-        plus_pix = GdkPixbuf.Pixbuf.new_from_file_at_size(plus_server_path, 15,15)
-
-        images_dict = {
-            "empty_pix": empty_pix,
-            "p2p_pix": p2p_pix,
-            "tor_pix": tor_pix,
-            "plus_pix": plus_pix,
-        }
-        return images_dict
-
-    def get_country_avrg_features(self, country, country_servers, servers, only_secure_core):
-        """Function that returns average load and features of a specific country.
-        """
-        features = {0: "Normal", 1: "Secure-Core", 2: "Tor", 4: "P2P"}
-        # Variables for average per country
-        count = 0
-        load_sum = 0
-        # Variable for feature per country
-        features_per_country = set()
-
-        order_dict = {
-            "normal": 0,
-            "p2p": 1,
-            "tor": 2,
-            "secure-core": 3,
-        }
-        top_choice = 0
-
-        for servername in country_servers[country]:
-            # Get average per country
-            load_sum = load_sum + int(str(get_server_value(servername, "Load", servers)).rjust(3, " "))
-            count += 1
-            
-            # Get features per country
-            feature = features[get_server_value(servername, 'Features', servers)]
-            features_per_country.add(feature)
-        
-        # Convert set to list
-        country_feature_list = list(features_per_country)
-        
-        for feature in country_feature_list:
-            for k,v in order_dict.items():
-                if feature.lower() == k.lower():
-                    # if top_choice < v and (not only_secure_core and not v > 2):
-                    if top_choice < v:
-                        top_choice = v
-
-        if top_choice == 0:
-            top_choice = "normal"
-        elif top_choice == 1:
-            top_choice = "p2p"
-        elif top_choice == 2:
-            top_choice = "tor"
-        else:
-            top_choice = "secure-core"
-
-        # print(country,top_choice)
-
-        return  (str(int(round(load_sum/count)))+"%", top_choice)    
+       

@@ -1,11 +1,12 @@
 import requests
 import subprocess
+import collections
 
 from protonvpn_cli.country_codes import country_codes
-from protonvpn_cli.utils import get_config_value, set_config_value, is_connected
+from protonvpn_cli.utils import get_config_value, set_config_value, is_connected, get_server_value, get_country_name
 
 from protonvpn_linux_gui.utils import set_gui_config, get_gui_config, check_internet_conn
-from protonvpn_linux_gui.constants import GITHUB_URL_RELEASE
+from protonvpn_linux_gui.constants import GITHUB_URL_RELEASE, SMALL_FLAGS_BASE_PATH, FEATURES_BASE_PATH
 
 class DashboardService:
     
@@ -247,3 +248,132 @@ class DashboardService:
             return False
 
         return is_splitunn_enabled
+
+    def set_individual_server(self, servername, images_dict, servers, feature):
+        server_tiers = {0: "Free", 1: "Basic", 2: "Plus/Visionary"}
+        features = {0: "Normal", 1: "Secure-Core", 2: "Tor", 4: "P2P"}
+
+        secure_core = False
+
+        load = str(get_server_value(servername, "Load", servers)).rjust(3, " ")
+        load = load + "%"               
+
+        tier = server_tiers[get_server_value(servername, "Tier", servers)]
+        
+        if not "Plus/Visionary".lower() == tier.lower():
+            plus_feature = images_dict["empty_pix"]
+        else:
+            plus_feature = images_dict["plus_pix"]
+
+        server_feature = features[get_server_value(servername, 'Features', servers)].lower()
+        
+        if server_feature == "Normal".lower():
+            feature = images_dict["empty_pix"]
+        elif server_feature == "P2P".lower():
+            feature = images_dict["p2p_pix"]
+        elif server_feature == "Tor".lower():
+            feature = images_dict["tor_pix"]
+        else:
+            # Should be secure core
+            secure_core = True
+
+        return (servername, plus_feature, feature, load, secure_core)
+
+    def get_flag_path(self, country):
+        for k,v in country_codes.items():
+            if country == v:
+                flag_path = SMALL_FLAGS_BASE_PATH+"{}.png".format(v)
+                break
+            else:
+                flag_path = SMALL_FLAGS_BASE_PATH+"Unknown.png"
+
+        return flag_path
+
+    def get_country_servers(self, servers):
+        countries = {}
+        for server in servers:
+            country = get_country_name(server["ExitCountry"])
+            if country not in countries.keys():
+                countries[country] = []
+            countries[country].append(server["Name"])
+
+        country_servers = {} 
+        # Order server list by country alphabetically
+        countries = collections.OrderedDict(sorted(countries.items()))
+
+        for country in countries:
+            country_servers[country] = sorted(countries[country], key=lambda s: get_server_value(s, "Load", servers))
+
+        return country_servers
+
+    def create_features_img(self, GdkPixbuf):
+        # Create empty image
+        empty_path = FEATURES_BASE_PATH+"normal.png"
+        empty_pix = GdkPixbuf.Pixbuf.new_from_file_at_size(empty_path, 15,15)
+        # Create P2P image
+        p2p_path = FEATURES_BASE_PATH+"p2p-arrows.png"
+        p2p_pix = GdkPixbuf.Pixbuf.new_from_file_at_size(p2p_path, 15,15)
+        # Create TOR image
+        tor_path = FEATURES_BASE_PATH+"tor-onion.png"
+        tor_pix = GdkPixbuf.Pixbuf.new_from_file_at_size(tor_path, 15,15)
+        # Create Plus image
+        plus_server_path = FEATURES_BASE_PATH+"plus-server.png"
+        plus_pix = GdkPixbuf.Pixbuf.new_from_file_at_size(plus_server_path, 15,15)
+
+        images_dict = {
+            "empty_pix": empty_pix,
+            "p2p_pix": p2p_pix,
+            "tor_pix": tor_pix,
+            "plus_pix": plus_pix,
+        }
+        return images_dict
+
+    def get_country_avrg_features(self, country, country_servers, servers, only_secure_core):
+        """Function that returns average load and features of a specific country.
+        """
+        features = {0: "Normal", 1: "Secure-Core", 2: "Tor", 4: "P2P"}
+        # Variables for average per country
+        count = 0
+        load_sum = 0
+        # Variable for feature per country
+        features_per_country = set()
+
+        order_dict = {
+            "normal": 0,
+            "p2p": 1,
+            "tor": 2,
+            "secure-core": 3,
+        }
+        top_choice = 0
+
+        for servername in country_servers[country]:
+            # Get average per country
+            load_sum = load_sum + int(str(get_server_value(servername, "Load", servers)).rjust(3, " "))
+            count += 1
+            
+            # Get features per country
+            feature = features[get_server_value(servername, 'Features', servers)]
+            features_per_country.add(feature)
+        
+        # Convert set to list
+        country_feature_list = list(features_per_country)
+        
+        for feature in country_feature_list:
+            for k,v in order_dict.items():
+                if feature.lower() == k.lower():
+                    # if top_choice < v and (not only_secure_core and not v > 2):
+                    if top_choice < v:
+                        top_choice = v
+
+        if top_choice == 0:
+            top_choice = "normal"
+        elif top_choice == 1:
+            top_choice = "p2p"
+        elif top_choice == 2:
+            top_choice = "tor"
+        else:
+            top_choice = "secure-core"
+
+        # print(country,top_choice)
+
+        return  (str(int(round(load_sum/count)))+"%", top_choice) 
