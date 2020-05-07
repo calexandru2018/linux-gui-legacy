@@ -80,14 +80,15 @@ class SettingsPresenter:
 
         gui_logger.debug(">>> Result: \"{0}\"".format("ProtonVPN Plan has been updated!"))
 
-        # time.sleep(1.5)
+        time.sleep(1.5)
 
+        # Reload servers after update pvpn_plan
         # populate_servers_dict = {
-        #     "tree_object": interface.get_object("ServerTreeStore"),
+        #     "tree_object": kwargs.get("tree_object"),
         #     "servers": False
         # }
 
-        #gobject.idle_add(populate_server_list, populate_servers_dict)
+        # gobject.idle_add(populate_server_list, populate_servers_dict)
 
         gui_logger.debug(">>> Ended tasks in \"set_protonvpn_tier\" thread.")   
 

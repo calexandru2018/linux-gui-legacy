@@ -93,6 +93,10 @@ class SettingsView:
         self.split_tunneling_switch = self.interface.get_object("split_tunneling_switch")
         self.split_tunneling_list = self.interface.get_object("split_tunneling_textview")
         self.update_split_tunneling_button = self.interface.get_object("update_split_tunneling_button")
+        self.split_tunnel_grid = self.interface.get_object("split_tunneling_grid") 
+
+        # DASHBOARD - Server List
+        self.tree_object = self.interface.get_object("ServerTreeStore")
 
         self.settings_tab_dict = {
             "general_tab_style": self.interface.get_object("general_tab_label").get_style_context(), 
@@ -124,7 +128,7 @@ class SettingsView:
                 self.dialog_window.display_dialog(label="Updating ProtoVPN plan...", spinner=True)
                 gui_logger.debug(">>> Starting \"update_tier_combobox_changed\" thread.")
                 thread = Thread(target=self.settings_presenter.update_pvpn_plan, kwargs=dict(
-                                                                interface=self.interface, 
+                                                                tree_object=self.tree_object, 
                                                                 dialog_window=self.dialog_window, 
                                                                 tier=int(selected_tier+1),
                                                                 tier_display=tier_display))
@@ -239,7 +243,6 @@ class SettingsView:
                 gui_logger.debug(">>> Starting \"update_quick_connect_combobox_changed\" thread.")
 
                 thread = Thread(target=self.settings_presenter.update_connect_preference, kwargs=dict(
-                                                                interface=self.interface, 
                                                                 dialog_window=self.dialog_window, 
                                                                 user_choice=user_choice,
                                                                 country_display=country_display,
@@ -306,7 +309,6 @@ class SettingsView:
             thread.start()
 
     def split_tunneling_switch_changed(self, switch, state):
-        split_tunnel_grid = self.interface.get_object("split_tunneling_grid") 
         killswitch_protection = int(get_config_value("USER", "killswitch"))
 
         try:
@@ -321,9 +323,9 @@ class SettingsView:
             update_to = 0
 
         if state:
-            split_tunnel_grid.show()
+            self.split_tunnel_grid.show()
         else:
-            split_tunnel_grid.hide()
+            self.split_tunnel_grid.hide()
 
         if (state and split_tunnel == 0) or (not state and split_tunnel != 0):
             if update_to == 1 and killswitch_protection >= 0:
