@@ -42,7 +42,8 @@ from protonvpn_linux_gui.constants import (
 from protonvpn_linux_gui.utils import (
     get_gui_processes,
     find_cli,
-    kill_duplicate_gui_process
+    kill_duplicate_gui_process,
+    initialize_gui_config
 )
 
 def init():
@@ -80,8 +81,8 @@ def init():
     else:
         gui_logger.debug("\n______________________________________\n\n\tINITIALIZING NEW GUI WINDOW\n______________________________________\n")
 
-        # if not os.path.isfile(GUI_CONFIG_FILE):
-        #     # initialize_gui_config()
+        if not os.path.isfile(GUI_CONFIG_FILE):
+            initialize_gui_config()
 
 
         # Get the model
@@ -92,12 +93,12 @@ def init():
             gui_logger.debug(">>> Loading LoginWindow")
             
             settings_service = SettingsService()
-            settings_presenter = SettingsPresenter()
-            settings_view = SettingsView(interface, Gtk, dialog_window)
+            settings_presenter = SettingsPresenter(settings_service)
+            settings_view = SettingsView(interface, Gtk, settings_presenter, dialog_window)
 
-            # dashboard_service = DashboardService()
-            # dashboard_presenter = DashboardPresenter()
-            # dashboard_view = DashboardView(interface, Gtk, dashboard_presenter, dialog_window, settings_view)
+            dashboard_service = DashboardService()
+            dashboard_presenter = DashboardPresenter()
+            dashboard_view = DashboardView(interface, Gtk, dashboard_presenter, dialog_window, settings_view)
 
             login_service = LoginService()
             login_presenter = LoginPresenter(login_service, queue)
@@ -107,8 +108,13 @@ def init():
             login_view.display_window()
         else:
             gui_logger.debug(">>> Loading DashboardWindow")
-            settings_view = SettingsView(interface, Gtk, dialog_window)
-            dashboard_view = DashboardView(interface, Gtk, dialog_window, settings_view)
+            settings_service = SettingsService()
+            settings_presenter = SettingsPresenter(settings_service, queue)
+            settings_view = SettingsView(interface, Gtk, settings_presenter, dialog_window)
+
+            dashboard_service = DashboardService()
+            dashboard_presenter = DashboardPresenter(dashboard_service, queue)
+            dashboard_view = DashboardView(interface, Gtk, dashboard_presenter, dialog_window, settings_view)
             dashboard_view.display_window()
 
     Gtk.main()
