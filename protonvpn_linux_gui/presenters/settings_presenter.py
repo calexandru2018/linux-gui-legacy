@@ -97,7 +97,7 @@ class SettingsPresenter:
         """
         gui_logger.debug(">>> Running \"set_default_protocol\".")
 
-        if not self.settings_service.set_pvpn_tier(openvpn_protocol):
+        if not self.settings_service.set_default_protocol(openvpn_protocol):
             gui_logger.debug(">>> Could not update default protocol.")   
 
         gui_logger.debug(">>> Ended tasks in \"set_default_protocol\" thread.")   
@@ -167,7 +167,7 @@ class SettingsPresenter:
         
         valid_ips = self.settings_service.check_valid_ips(ip_list)
 
-        if len(valid_ips) > 1 and not valid_ips[0]:
+        if not type(valid_ips) == bool and len(valid_ips) > 1 and not valid_ips[0]:
             dialog_window.update_dialog(label="<b>{0}</b> is not valid!\nNone of the IP's were added, please try again with a different IP.".format(valid_ips[1]))
             gui_logger.debug("[!] Invalid IP \"{0}\".".format(valid_ips[1]))
             return

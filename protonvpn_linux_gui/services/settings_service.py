@@ -46,7 +46,7 @@ class SettingsService:
     def set_pvpn_tier(self, protonvpn_plan):
         visionary_compare = 0
 
-        visionary_compare = protonvpn_plan
+        visionary_compare = int(protonvpn_plan)
         if protonvpn_plan == 4:
             protonvpn_plan = 3
 
@@ -71,24 +71,24 @@ class SettingsService:
     def set_autoconnect(self, update_to):
             # autoconnect_alternatives = ["dis", "fast", "rand", "p2p", "sc", "tor"]
             return_val = False
-            self.settings_service.manage_autoconnect(mode="disable")
+            self.manage_autoconnect(mode="disable")
 
             if update_to == "dis":
                 return_val = True
                 pass
             elif update_to == "fast":
-                return_val = self.settings_service.manage_autoconnect(mode="enable", command="connect -f")
+                return_val = self.manage_autoconnect(mode="enable", command="connect -f")
             elif update_to == "rand":
-                return_val = self.settings_service.manage_autoconnect(mode="enable", command="connect -r")
+                return_val = self.manage_autoconnect(mode="enable", command="connect -r")
             elif update_to == "p2p":
-                return_val = self.settings_service.manage_autoconnect(mode="enable", command="connect --p2p")
+                return_val = self.manage_autoconnect(mode="enable", command="connect --p2p")
             elif update_to == "sc":
-                return_val = self.settings_service.manage_autoconnect(mode="enable", command="connect --sc")
+                return_val = self.manage_autoconnect(mode="enable", command="connect --sc")
             elif update_to == "tor":
-                return_val = self.settings_service.manage_autoconnect(mode="enable", command="connect --tor")
+                return_val = self.manage_autoconnect(mode="enable", command="connect --tor")
             else:
                 # Connect to a specific country
-                return_val = self.settings_service.manage_autoconnect(mode="enable", command="connect --cc " + update_to.upper())
+                return_val = self.manage_autoconnect(mode="enable", command="connect --cc " + update_to.upper())
 
             if not return_val:
                 return False
@@ -162,12 +162,12 @@ class SettingsService:
         return (True)
         
     def reformat_ip_list(self, ip_list):
-            # Split IP/CIDR by either ";" and/or "\n"
-            split_tunneling_content = re.split('[;\n]', split_tunneling_content)
-            # Remove empty spaces
-            split_tunneling_content = [content.strip() for content in split_tunneling_content]
-            # Remove empty list elements
-            return list(filter(None, split_tunneling_content))
+        # Split IP/CIDR by either ";" and/or "\n"
+        split_tunneling_content = re.split('[;\n]', ip_list)
+        # Remove empty spaces
+        split_tunneling_content = [content.strip() for content in split_tunneling_content]
+        # Remove empty list elements
+        return list(filter(None, split_tunneling_content))
 
     def set_tray_setting(self, tray_display, tray_setting):
         try:
@@ -198,7 +198,7 @@ class SettingsService:
         """Function that manages autoconnect functionality. It takes a mode (enabled/disabled) and a command that is to be passed to the CLI.
         """
         if mode == 'enable':
-            if not enable_autoconnect(command):
+            if not self.enable_autoconnect(command):
                 print("[!] Unable to enable autoconnect")
                 gui_logger.debug("[!] Unable to enable autoconnect.")
                 return False
@@ -209,7 +209,7 @@ class SettingsService:
 
         if mode == 'disable':
 
-            if not disable_autoconnect():
+            if not self.disable_autoconnect():
                 print("[!] Could not disable autoconnect")
                 gui_logger.debug("[!] Could not disable autoconnect.")
                 return False
@@ -230,18 +230,18 @@ class SettingsService:
         template = with_cli_path.replace("STOP", protonvpn_path + " disconnect")
         template = template.replace("=user", "="+USER)
         
-        if not generate_template(template):
+        if not self.generate_template(template):
             return False
 
-        return enable_daemon() 
+        return self.enable_daemon() 
 
     def disable_autoconnect(self, ):
         """Function that disables autoconnect.
         """
-        if not stop_and_disable_daemon():
+        if not self.stop_and_disable_daemon():
             return False
 
-        if not remove_template():
+        if not self.remove_template():
             return False
 
         return True
@@ -268,13 +268,13 @@ class SettingsService:
         if resp.returncode == 1:
             gui_logger.debug("[!] Could not remove .serivce file.\n{}".format(resp))
 
-        reload_daemon()
+        self.reload_daemon()
         return True
 
     def enable_daemon(self, ):
         """Function that enables the autoconnect daemon service.
         """
-        reload_daemon()
+        self.reload_daemon()
 
         resp = subprocess.run(['sudo', 'systemctl', 'enable' , SERVICE_NAME], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
         if resp.returncode == 1:
@@ -286,7 +286,7 @@ class SettingsService:
     def stop_and_disable_daemon(self, ):
         """Function that stops and disables the autoconnect daemon service.
         """
-        if not daemon_exists():
+        if not self.daemon_exists():
             return True
 
         resp_stop = subprocess.run(['sudo', 'systemctl', 'stop' , SERVICE_NAME], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec

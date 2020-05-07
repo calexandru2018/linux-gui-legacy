@@ -59,7 +59,7 @@ class SettingsView:
                 "dns_leak_switch":self.dns_leak_switch,
                 "killswitch_switch":self.killswitch_switch,
                 "split_tunneling_switch":self.split_tunneling_switch,
-                "split_tunneling_list":self.split_tunneling_list,
+                "split_tunneling_list": self.split_tunneling_textview,
                 "update_split_tunneling_button":self.update_split_tunneling_button,
             }
         }
@@ -91,7 +91,7 @@ class SettingsView:
         self.dns_leak_switch = self.interface.get_object("update_dns_leak_switch")
         self.killswitch_switch = self.interface.get_object("update_killswitch_switch")
         self.split_tunneling_switch = self.interface.get_object("split_tunneling_switch")
-        self.split_tunneling_list = self.interface.get_object("split_tunneling_textview")
+        self.split_tunneling_textview = self.interface.get_object("split_tunneling_textview")
         self.update_split_tunneling_button = self.interface.get_object("update_split_tunneling_button")
         self.split_tunnel_grid = self.interface.get_object("split_tunneling_grid") 
 
@@ -329,9 +329,9 @@ class SettingsView:
 
         if (state and split_tunnel == 0) or (not state and split_tunnel != 0):
             if update_to == 1 and killswitch_protection >= 0:
-                self.update_killswitch_switch.set_property('sensitive', False)
+                self.killswitch_switch.set_property('sensitive', False)
             else:
-                self.update_killswitch_switch.set_property('sensitive', True)
+                self.killswitch_switch.set_property('sensitive', True)
 
             thread = Thread(target=self.settings_presenter.update_split_tunneling_status, args=[update_to])
             thread.daemon = True
