@@ -498,50 +498,6 @@ def get_country_avrg_features(country, country_servers, servers, only_secure_cor
 
     return  (str(int(round(load_sum/count)))+"%", top_choice)    
 
-def populate_autoconnect_list(interface, return_list=False):
-    """Function that populates autoconnect dropdown list.
-    """
-    autoconnect_liststore = interface.get_object("AutoconnectListStore")
-    countries = {}
-    servers = get_servers()
-    other_choice_dict = {
-        "dis": "Disabled",
-        "fast": "Fastest",
-        "rand": "Random", 
-        "p2p": "Peer2Peer", 
-        "sc": "Secure Core (Plus/Visionary)",
-        "tor": "Tor (Plus/Visionary)"
-    }
-    autoconnect_alternatives = ["dis", "fast", "rand", "p2p", "sc", "tor"]
-    # return_values = collections.OrderedDict()
-    return_values = collections.OrderedDict()
-
-    for server in servers:
-        country = get_country_name(server["ExitCountry"])
-        if country not in countries.keys():
-            countries[country] = []
-        countries[country].append(server["Name"])
-    
-    for country in sorted(countries):
-        autoconnect_alternatives.append(country)
-
-    for alt in autoconnect_alternatives:
-        if alt in other_choice_dict:
-            # if return_list:
-            return_values[alt] = other_choice_dict[alt]
-            # else:
-            autoconnect_liststore.append([alt, other_choice_dict[alt], alt])
-        else:
-            for k,v in country_codes.items():
-                if alt.lower() == v.lower():
-                    # if return_list:
-                    return_values[k] = v
-                    # else:
-                    autoconnect_liststore.append([k, v, k])
-    
-    if return_list:
-        return return_values
-
 def find_cli():
     """Function that searches for the CLI. Returns CLIs path if it is found, otherwise it returns False.
     """

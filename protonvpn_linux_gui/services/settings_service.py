@@ -1,2 +1,327 @@
+import os
+import re
+import subprocess
+
+# Remote imports
+from protonvpn_cli.constants import CONFIG_DIR, PASSFILE, SPLIT_TUNNEL_FILE, USER #noqa
+from protonvpn_cli.utils import get_config_value, is_valid_ip, set_config_value, change_file_owner, get_servers, get_country_name #noqa
+from protonvpn_cli.connection import disconnect as pvpn_disconnect
+
+from protonvpn_linux_gui.gui_logger import gui_logger
+from protonvpn_linux_gui.constants import (
+    TRAY_CFG_DICT, 
+    TEMPLATE,
+    PATH_AUTOCONNECT_SERVICE,
+    SERVICE_NAME
+)
+from protonvpn_linux_gui.utils import (
+    populate_server_list,
+    set_gui_config,
+    get_gui_config,
+    populate_autoconnect_list,
+    find_cli,
+)
+
 class SettingsService:
-    pass
+    
+    def set_user_pass(self, username, password):
+        try:
+            set_config_value("USER", "username", username)
+
+            with open(PASSFILE, "w") as f:
+                f.write("{0}\n{1}".format(username, password))
+                gui_logger.debug("Passfile updated")
+                os.chmod(PASSFILE, 0o600)
+        except: 
+            return False
+
+        return True
+
+    def set_dns(self, dns_value):
+        try:
+            set_config_value("USER", "dns_leak_protection", dns_value)
+        except:
+            return False
+
+        return True
+
+    def set_pvpn_tier(self, protonvpn_plan):
+        visionary_compare = 0
+
+        visionary_compare = protonvpn_plan
+        if protonvpn_plan == 4:
+            protonvpn_plan = 3
+
+        # Lower tier by one to match API allocation
+        protonvpn_plan -= 1    
+
+        try:
+            set_config_value("USER", "tier", str(protonvpn_plan))
+        except:
+            return False
+
+        return True
+    
+    def set_default_protocol(self, protocol):
+        try:
+            set_config_value("USER", "default_protocol", protocol)
+        except:
+            return False
+
+        return True
+
+    def set_autoconnect(self, update_to):
+            # autoconnect_alternatives = ["dis", "fast", "rand", "p2p", "sc", "tor"]
+            return_val = False
+            self.settings_service.manage_autoconnect(mode="disable")
+
+            if update_to == "dis":
+                return_val = True
+                pass
+            elif update_to == "fast":
+                return_val = self.settings_service.manage_autoconnect(mode="enable", command="connect -f")
+            elif update_to == "rand":
+                return_val = self.settings_service.manage_autoconnect(mode="enable", command="connect -r")
+            elif update_to == "p2p":
+                return_val = self.settings_service.manage_autoconnect(mode="enable", command="connect --p2p")
+            elif update_to == "sc":
+                return_val = self.settings_service.manage_autoconnect(mode="enable", command="connect --sc")
+            elif update_to == "tor":
+                return_val = self.settings_service.manage_autoconnect(mode="enable", command="connect --tor")
+            else:
+                # Connect to a specific country
+                return_val = self.settings_service.manage_autoconnect(mode="enable", command="connect --cc " + update_to.upper())
+
+            if not return_val:
+                return False
+
+            try:
+                set_gui_config("conn_tab", "autoconnect", update_to)
+            except:
+                return False
+
+            return True
+
+    def set_quickconnect(self, update_to):
+        try:
+            set_gui_config("conn_tab", "quick_connect", update_to)
+        except:
+            return False
+
+        return True
+
+    def set_killswitch(self, update_to):
+        try:
+            set_config_value("USER", "killswitch", update_to)
+        except:
+            return False
+
+        return True
+
+    def set_split_tunneling(self, update_to):
+        if not update_to == "1":
+            try:
+                if os.path.isfile(SPLIT_TUNNEL_FILE):
+                    os.remove(SPLIT_TUNNEL_FILE)
+            except:
+                return False
+
+        try:
+            if int(get_config_value("USER", "killswitch")):
+                set_config_value("USER", "killswitch", 0)
+        except:
+            return False
+
+        try:
+            set_config_value("USER", "split_tunnel", update_to)
+        except:
+            return False
+
+    def set_split_tunneling_ips(self, ip_list):
+        try:
+            set_config_value("USER", "split_tunnel", 1)
+        except:
+            return False
+
+        try:
+            with open(SPLIT_TUNNEL_FILE, "w") as f:
+                for ip in ip_list:
+                    f.write("\n{0}".format(ip))
+            change_file_owner(SPLIT_TUNNEL_FILE)
+        except:
+            set_config_value("USER", "split_tunnel", 0)
+            return False
+
+        return True
+
+    def check_valid_ips(self, split_tunneling_content):
+        for ip in split_tunneling_content:
+            if not is_valid_ip(ip):
+                # dialog_window.update_dialog(label="<b>{0}</b> is not valid!\nNone of the IP's were added, please try again with a different IP.".format(ip))
+                gui_logger.debug("[!] Invalid IP \"{0}\".".format(ip))
+                return (False, ip)
+
+        return (True)
+        
+    def reformat_ip_list(self, ip_list):
+            # Split IP/CIDR by either ";" and/or "\n"
+            split_tunneling_content = re.split('[;\n]', split_tunneling_content)
+            # Remove empty spaces
+            split_tunneling_content = [content.strip() for content in split_tunneling_content]
+            # Remove empty list elements
+            return list(filter(None, split_tunneling_content))
+
+    def set_tray_setting(self, tray_display, tray_setting):
+        try:
+            set_gui_config("tray_tab", TRAY_CFG_DICT[tray_display], tray_setting)
+        else:
+            return False
+
+        return True
+
+    def generate_autoconnect_list(self):
+        countries = {}
+        servers = get_servers()
+        
+        autoconnect_alternatives = ["dis", "fast", "rand", "p2p", "sc", "tor"]
+
+        for server in servers:
+            country = get_country_name(server["ExitCountry"])
+            if country not in countries.keys():
+                countries[country] = []
+            countries[country].append(server["Name"])
+        
+        for country in sorted(countries):
+            autoconnect_alternatives.append(country)
+
+        return autoconnect_alternatives
+    
+    def manage_autoconnect(self, mode, command=False):
+        """Function that manages autoconnect functionality. It takes a mode (enabled/disabled) and a command that is to be passed to the CLI.
+        """
+        if mode == 'enable':
+            if not enable_autoconnect(command):
+                print("[!] Unable to enable autoconnect")
+                gui_logger.debug("[!] Unable to enable autoconnect.")
+                return False
+
+            print("Autoconnect on boot enabled")
+            gui_logger.debug(">>> Autoconnect on boot enabled")
+            return True
+
+        if mode == 'disable':
+
+            if not disable_autoconnect():
+                print("[!] Could not disable autoconnect")
+                gui_logger.debug("[!] Could not disable autoconnect.")
+                return False
+
+            print("Autoconnect on boot disabled")
+            gui_logger.debug(">>> Autoconnect on boot disabled")
+            return True
+
+    def enable_autoconnect(self, command):
+        """Function that enables autoconnect.
+        """
+        protonvpn_path = find_cli()
+        if not protonvpn_path:
+            return False
+
+        # Injects CLIs start and stop path and username
+        with_cli_path = TEMPLATE.replace("PATH", (protonvpn_path + " " + command))
+        template = with_cli_path.replace("STOP", protonvpn_path + " disconnect")
+        template = template.replace("=user", "="+USER)
+        
+        if not generate_template(template):
+            return False
+
+        return enable_daemon() 
+
+    def disable_autoconnect(self, ):
+        """Function that disables autoconnect.
+        """
+        if not stop_and_disable_daemon():
+            return False
+
+        if not remove_template():
+            return False
+
+        return True
+    
+    def generate_template(self, template):
+        """Function that generates the service file for autoconnect.
+        """
+        generate_service_command = "cat > {0} <<EOF {1}\nEOF".format(PATH_AUTOCONNECT_SERVICE, template)
+        gui_logger.debug(">>> Template:\n{}".format(generate_service_command))
+
+        resp = subprocess.run(["sudo", "bash", "-c", generate_service_command], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
+        if resp.returncode == 1:
+            gui_logger.debug("[!] Unable to generate template.\n{}".format(resp))
+            return False
+
+        return True
+
+    def remove_template(self, ):
+        """Function that removes the service file from /etc/systemd/system/.
+        """
+        resp = subprocess.run(["sudo", "rm", PATH_AUTOCONNECT_SERVICE], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
+        # If return code 1: File does not exist in path
+        # This is fired when a user wants to remove template a that does not exist
+        if resp.returncode == 1:
+            gui_logger.debug("[!] Could not remove .serivce file.\n{}".format(resp))
+
+        reload_daemon()
+        return True
+
+    def enable_daemon(self, ):
+        """Function that enables the autoconnect daemon service.
+        """
+        reload_daemon()
+
+        resp = subprocess.run(['sudo', 'systemctl', 'enable' , SERVICE_NAME], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
+        if resp.returncode == 1:
+            gui_logger.debug("[!] Unable to enable deamon.\n{}".format(resp))
+            return False
+
+        return True
+        
+    def stop_and_disable_daemon(self, ):
+        """Function that stops and disables the autoconnect daemon service.
+        """
+        if not daemon_exists():
+            return True
+
+        resp_stop = subprocess.run(['sudo', 'systemctl', 'stop' , SERVICE_NAME], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
+        if resp_stop.returncode == 1:
+            gui_logger.debug("[!] Unable to stop deamon.\n{}".format(resp_stop))
+            return False
+
+        resp_disable = subprocess.run(['sudo', 'systemctl', 'disable' ,SERVICE_NAME], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
+        if resp_disable.returncode == 1:
+            gui_logger.debug("[!] Unable not disable daemon.\n{}".format(resp_disable))
+            return False
+
+        return True
+
+    def reload_daemon(self, ):
+        """Function that reloads the autoconnect daemon service.
+        """
+        resp = subprocess.run(['sudo', 'systeasdasdsmctl', 'daemoasdasdn-reloadasdasdasd'], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
+        if resp.returncode == 1:
+            gui_logger.debug("[!] Unable to reload daemon.\n{}".format(resp))
+            return False
+
+        return True
+
+    def daemon_exists(self, ):
+        """Function that checks if autoconnect daemon service exists.
+        """
+        # Return code 3: service exists
+        # Return code 4: service could not be found
+        resp_stop = subprocess.run(['systemctl', 'status' , SERVICE_NAME], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
+        return_val = True
+
+        if resp_stop.returncode == 4:
+            return_val = False
+
+        return return_val

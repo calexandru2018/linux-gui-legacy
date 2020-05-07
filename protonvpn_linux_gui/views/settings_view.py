@@ -5,26 +5,19 @@ from protonvpn_cli.utils import get_config_value #noqa
 
 # Local imports
 from protonvpn_linux_gui.gui_logger import gui_logger
+from protonvpn_linux_gui.constants import (
+    TRAY_CFG_DICT, 
+    TEMPLATE,
+    PATH_AUTOCONNECT_SERVICE,
+    SERVICE_NAME
+)
 from protonvpn_linux_gui.constants import UI_SETTINGS
-# from protonvpn_linux_gui.presenters.settings_presenter import (
-#     update_def_protocol,
-#     update_connect_preference,
-#     update_dns,
-#     update_killswitch,
-#     update_pvpn_plan,
-#     update_split_tunneling,
-#     update_split_tunneling_status,
-#     update_user_pass,
-#     tray_configurations,
-#     purge_configurations,
-#     load_configurations
-# )
 from protonvpn_linux_gui.utils import get_gui_config, tab_style_manager
 
 class SettingsView: 
-    def __init__(self, interface, Gtk, dialog_window): 
+    def __init__(self, interface, Gtk, settings_presenter, dialog_window): 
         interface.add_from_file(UI_SETTINGS)
-        self.set_objects(interface, Gtk, dialog_window)
+        self.set_objects(interface, Gtk, settings_presenter, dialog_window)
 
         interface.connect_signals({
             "settings_notebook_page_changed": self.settings_notebook_page_changed,
@@ -48,16 +41,55 @@ class SettingsView:
         })
 
     def display_window(self):
-        load_configurations(self.interface)
+        object_dict = {
+            "general":{
+                "pvpn_plan_combobox": self.pvpn_plan_combobox,
+                "username": self.username_field.get_text().strip(),
+            },
+            "tray_comboboxes": self.tray_dict,
+            "connection":{
+                "autoconnect_liststore": self.autoconnect_liststore,
+                "update_autoconnect_combobox": self.update_autoconnect_combobox,
+                "update_quick_connect_combobox": self.update_quick_connect_combobox,
+                "update_protocol_combobox": self.update_protocol_combobox,
+            },
+            "advanced": {
+                "dns_leak_switch":self.dns_leak_switch,
+                "killswitch_switch":self.killswitch_switch,
+                "split_tunneling_switch":self.split_tunneling_switch,
+                "split_tunneling_list":self.split_tunneling_list,
+                "update_split_tunneling_button":self.update_split_tunneling_button,
+            }
+        }
+        self.settings_presenter.load_configurations(object_dict)
         self.settings_window.show()
 
-    def set_objects(self, interface, Gtk, dialog_window):
+    def set_objects(self, interface, Gtk, settings_presenter, dialog_window):
         self.interface = interface
         self.dialog_window = dialog_window
+        self.settings_presenter = settings_presenter
         self.settings_window = self.interface.get_object("SettingsWindow")
 
-        self.update_killswitch_switch = self.interface.get_object("update_killswitch_switch")
+        # General Tab
+        self.pvpn_plan_combobox = self.interface.get_object("update_tier_combobox")
+        self.username_field = self.interface.get_object("update_username_input")
+        self.password_field = self.interface.get_object("update_password_input")
+
+        # Tray tab
+        self.tray_dict = {k:interface.get_object(k) for k,v in TRAY_CFG_DICT.items()}
+
+        # Connection Tab
+        self.autoconnect_liststore = interface.get_object("AutoconnectListStore")
+        self.update_autoconnect_combobox = self.interface.get_object("update_autoconnect_combobox")
+        self.update_quick_connect_combobox = self.interface.get_object("update_quick_connect_combobox")
+        self.update_protocol_combobox = self.interface.get_object("update_protocol_combobox")
+
+        # Advanced Tab
+        self.dns_leak_switch = self.interface.get_object("update_dns_leak_switch")
+        self.killswitch_switch = self.interface.get_object("update_killswitch_switch")
         self.split_tunneling_switch = self.interface.get_object("split_tunneling_switch")
+        self.split_tunneling_list = self.interface.get_object("split_tunneling_textview")
+        self.update_split_tunneling_button = self.interface.get_object("update_split_tunneling_button")
 
         self.settings_tab_dict = {
             "general_tab_style": self.interface.get_object("general_tab_label").get_style_context(), 
@@ -88,7 +120,7 @@ class SettingsView:
             if selected_tier != tier:
                 self.dialog_window.display_dialog(label="Updating ProtoVPN plan...", spinner=True)
                 gui_logger.debug(">>> Starting \"update_tier_combobox_changed\" thread.")
-                thread = Thread(target=update_pvpn_plan, kwargs=dict(
+                thread = Thread(target=self.settings_presenter.update_pvpn_plan, kwargs=dict(
                                                                 interface=self.interface, 
                                                                 dialog_window=self.dialog_window, 
                                                                 tier=int(selected_tier+1),
@@ -102,7 +134,10 @@ class SettingsView:
         self.dialog_window.display_dialog(label="Updating username and password...", spinner=True)
         gui_logger.debug(">>> Starting \"update_user_pass\" thread.")
 
-        thread = Thread(target=update_user_pass, kwargs=dict(interface=self.interface, dialog_window=self.dialog_window))
+        thread = Thread(target=self.settings_presenter.update_user_pass, kwargs=dict(
+                                                    username=self.username_field.get_text().strip(),
+                                                    password=self.password_field.get_text().strip(),
+                                                    dialog_window=self.dialog_window))
         thread.daemon = True
         thread.start()
 
@@ -116,7 +151,7 @@ class SettingsView:
             option, display = model[tree_iter][:2]
             if option != int(display_data_tx):
                 gui_logger.debug(">>> Starting \"tray_data_tx_combobox_changed\" thread.")
-                thread = Thread(target=tray_configurations, kwargs=dict(setting_value=option, setting_display="tray_data_tx_combobox"))
+                thread = Thread(target=self.settings_presenter.tray_configurations, kwargs=dict(setting_value=option, setting_display="tray_data_tx_combobox"))
                 thread.daemon = True
                 thread.start()
 
@@ -128,7 +163,7 @@ class SettingsView:
             option, display = model[tree_iter][:2]
             if option != int(display_data_tx):
                 gui_logger.debug(">>> Starting \"tray_servername_combobox_changed\" thread.")
-                thread = Thread(target=tray_configurations, kwargs=dict(setting_value=option, setting_display="tray_servername_combobox"))
+                thread = Thread(target=self.settings_presenter.tray_configurations, kwargs=dict(setting_value=option, setting_display="tray_servername_combobox"))
                 thread.daemon = True
                 thread.start()
 
@@ -140,7 +175,7 @@ class SettingsView:
             option, display = model[tree_iter][:2]
             if option != int(display_data_tx):
                 gui_logger.debug(">>> Starting \"tray_servername_combobox_changed\" thread.")
-                thread = Thread(target=tray_configurations, kwargs=dict(setting_value=option, setting_display="tray_time_connected_combobox"))
+                thread = Thread(target=self.settings_presenter.tray_configurations, kwargs=dict(setting_value=option, setting_display="tray_time_connected_combobox"))
                 thread.daemon = True
                 thread.start()
 
@@ -152,7 +187,7 @@ class SettingsView:
             option, display = model[tree_iter][:2]
             if option != int(display_data_tx):
                 gui_logger.debug(">>> Starting \"tray_servername_combobox_changed\" thread.")
-                thread = Thread(target=tray_configurations, kwargs=dict(setting_value=option, setting_display="tray_serverload_combobox"))
+                thread = Thread(target=self.settings_presenter.tray_configurations, kwargs=dict(setting_value=option, setting_display="tray_serverload_combobox"))
                 thread.daemon = True
                 thread.start()
 
@@ -166,8 +201,7 @@ class SettingsView:
             if user_choice != autoconnect_setting:
                 self.dialog_window.display_dialog(label="Updating autoconnect settings...", spinner=True)
                 gui_logger.debug(">>> Starting \"update_autoconnect_combobox_changed\" thread.")
-                thread = Thread(target=update_connect_preference, kwargs=dict(
-                                                                interface=self.interface, 
+                thread = Thread(target=self.settings_presenter.update_connect_preference, kwargs=dict(
                                                                 dialog_window=self.dialog_window, 
                                                                 user_choice=user_choice,
                                                                 country_display=country_display))
@@ -185,7 +219,7 @@ class SettingsView:
                 self.dialog_window.display_dialog(label="Updating quick connect settings...", spinner=True)
                 gui_logger.debug(">>> Starting \"update_quick_connect_combobox_changed\" thread.")
 
-                thread = Thread(target=update_connect_preference, kwargs=dict(
+                thread = Thread(target=self.settings_presenter.update_connect_preference, kwargs=dict(
                                                                 interface=self.interface, 
                                                                 dialog_window=self.dialog_window, 
                                                                 user_choice=user_choice,
@@ -211,7 +245,7 @@ class SettingsView:
             protocol = protocol.lower()
             if protocol.lower() != autoconnect_setting.lower():
                 gui_logger.debug(">>> Starting \"update_protocol_combobox_changed\" thread.")
-                thread = Thread(target=update_def_protocol, args=[protocol])
+                thread = Thread(target=self.settings_presenter.update_def_protocol, args=[protocol])
                 thread.daemon = True
                 thread.start()   
 
@@ -236,7 +270,7 @@ class SettingsView:
             else:
                 self.split_tunneling_switch.set_property('sensitive', True)
                 
-            thread = Thread(target=update_killswitch, args=[update_to])
+            thread = Thread(target=self.settings_presenter.update_killswitch, args=[update_to])
             thread.daemon = True
             thread.start()
 
@@ -248,7 +282,7 @@ class SettingsView:
             update_to = "0"
 
         if (state and dns_protection == "0") or (not state and dns_protection != "0"):
-            thread = Thread(target=update_dns, args=[update_to])
+            thread = Thread(target=self.settings_presenter.update_dns, args=[update_to])
             thread.daemon = True
             thread.start()
 
@@ -278,7 +312,7 @@ class SettingsView:
             else:
                 self.update_killswitch_switch.set_property('sensitive', True)
 
-            thread = Thread(target=update_split_tunneling_status, args=[update_to])
+            thread = Thread(target=self.settings_presenter.update_split_tunneling_status, args=[update_to])
             thread.daemon = True
             thread.start()
 
@@ -289,7 +323,11 @@ class SettingsView:
 
         gui_logger.debug(">>> Starting \"update_split_tunneling\" thread.")
 
-        thread = Thread(target=update_split_tunneling, kwargs=dict(interface=self.interface, dialog_window=self.dialog_window))
+        buffer = self.split_tunneling_textview.get_buffer()
+        split_tunneling_content = buffer.get_text(buffer.get_start_iter(), buffer.get_end_iter(), buffer)
+        thread = Thread(target=self.settings_presenter.update_split_tunneling, kwargs=dict(
+                                                        split_tunneling_content=split_tunneling_content, 
+                                                        dialog_window=self.dialog_window))
         thread.daemon = True
         thread.start()
 
@@ -312,6 +350,6 @@ class SettingsView:
 
         gui_logger.debug(">>> Starting \"purge_configurations\" thread.")
 
-        thread = Thread(target=purge_configurations, args=[self.dialog_window])
+        thread = Thread(target=self.settings_presenter.purge_configurations, args=[self.dialog_window])
         thread.daemon = True
         thread.start()
