@@ -43,12 +43,11 @@ class DashboardPresenter:
         """
         gui_logger.debug(">>> Running \"load_on_start\".")
         msg = "Could not load necessary resources, there might be connectivity issues."
-        # time.sleep(2)
+        time.sleep(2)
         objects_dict["dialog_window"].hide_spinner()
-        print("in")
+        
         conn = custom_get_ip_info()
         if conn and not conn is None:
-            print("echo")
             objects_dict["dialog_window"].update_dialog(label="Populating dashboard...")
             
             display_secure_core = get_gui_config("connections", "display_secure_core")
@@ -62,6 +61,7 @@ class DashboardPresenter:
                 secure_core_switch.set_state(False)
 
             self.update_labels_server_list(objects_dict, conn_info=conn)
+            objects_dict["dialog_window"].hide_dialog()
         else:
             objects_dict["dialog_window"].update_dialog(label=msg, spinner=False)
 
@@ -342,7 +342,7 @@ class DashboardPresenter:
         gobject.idle_add(self.update_labels_status, update_labels_dict)
 
         # Populate server list
-        # gobject.idle_add(populate_server_list, populate_servers_dict)
+        gobject.idle_add(self.populate_server_list, populate_servers_dict)
 
     def update_labels_status(self, update_labels_dict):
         """Function prepares data to update labels.

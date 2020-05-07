@@ -238,17 +238,17 @@ class SettingsPresenter:
     def load_configurations(self, object_dict):
         """Function that loads user configurations before showing the configurations window.
         """
-        load_general_settings(object_dict["general"]["pvpn_plan_combobox"], object_dict["general"]["username"])
-        load_tray_settings(object_dict["tray_comboboxes"])
-        load_connection_settings(object_dict["connection"])
-        load_advanced_settings(object_dict["advanced"])
+        self.load_general_settings(object_dict["general"]["pvpn_plan_combobox"], object_dict["general"]["username"])
+        self.load_tray_settings(object_dict["tray_comboboxes"])
+        self.load_connection_settings(object_dict["connection"])
+        self.load_advanced_settings(object_dict["advanced"])
 
-    def load_general_settings(self, username, pvpn_plan_combobox):
+    def load_general_settings(self, pvpn_plan_combobox, username_field):
         username = get_config_value("USER", "username")
         tier = int(get_config_value("USER", "tier"))
 
         # Populate username
-        username.set_text(username)   
+        username_field.set_text(username)   
         # Set tier
         pvpn_plan_combobox.set_active(tier)
 
@@ -271,7 +271,7 @@ class SettingsPresenter:
         update_quick_connect_combobox = object_dict["update_quick_connect_combobox"]
         update_protocol_combobox = object_dict["update_protocol_combobox"]
 
-        server_list = populate_autoconnect_list(autoconnect_liststore, return_list=True)
+        server_list = self.populate_autoconnect_list(autoconnect_liststore, return_list=True)
 
         #Get values
         try:

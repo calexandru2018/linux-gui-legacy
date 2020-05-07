@@ -38,13 +38,15 @@ class SettingsView:
             "update_split_tunneling_button_clicked": self.update_split_tunneling_button_clicked,
             "SettingsWindow_delete_event": self.SettingsWindow_delete_event,
             "purge_configurations_button_clicked": self.purge_configurations_button_clicked,
+            "update_username_input_key_release": self.update_username_input_key_release,
+            "update_password_input_key_release": self.update_password_input_key_release,
         })
 
     def display_window(self):
         object_dict = {
             "general":{
                 "pvpn_plan_combobox": self.pvpn_plan_combobox,
-                "username": self.username_field.get_text().strip(),
+                "username": self.username_field,
             },
             "tray_comboboxes": self.tray_dict,
             "connection":{
@@ -74,6 +76,7 @@ class SettingsView:
         self.pvpn_plan_combobox = self.interface.get_object("update_tier_combobox")
         self.username_field = self.interface.get_object("update_username_input")
         self.password_field = self.interface.get_object("update_password_input")
+        self.update_user_pass_button = self.interface.get_object("update_user_pass_button")
 
         # Tray tab
         self.tray_dict = {k:interface.get_object(k) for k,v in TRAY_CFG_DICT.items()}
@@ -127,6 +130,22 @@ class SettingsView:
                                                                 tier_display=tier_display))
                 thread.daemon = True
                 thread.start()
+
+    def update_username_input_key_release(self, entry, event):
+        self.update_user_pass_button.set_property("sensitive", False)
+        if len(entry.get_text().strip()) > 0:
+            if len(self.password_field.get_text().strip()) > 0:
+                self.update_user_pass_button.set_property("sensitive", True)
+            else:
+                self.update_user_pass_button.set_property("sensitive", False)
+        
+    def update_password_input_key_release(self, entry, event):
+        self.update_user_pass_button.set_property("sensitive", False)
+        if len(entry.get_text().strip()) > 0:
+            if len(self.username_field.get_text().strip()) > 0:
+                self.update_user_pass_button.set_property("sensitive", True)
+            else:
+                self.update_user_pass_button.set_property("sensitive", False)
 
     def update_user_pass_button_clicked(self, button):
         """Button/Event handler to update Username & Password

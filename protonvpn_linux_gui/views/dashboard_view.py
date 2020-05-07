@@ -71,7 +71,6 @@ class DashboardView:
             },
             "dialog_window": self.dialog_window
         }
-        print("before")
         thread = Thread(target=self.dashboard_presenter.on_load, args=[objects])
         thread.daemon = True
         thread.start()
