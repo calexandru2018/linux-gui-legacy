@@ -442,9 +442,10 @@ def update_labels_status(update_labels_dict):
                 flag_path = LARGE_FLAGS_BASE_PATH+"{}.jpg".format(k.lower())
                 background_large_flag.set_from_file(flag_path)
             country_cc = v
+            break
 
     protonvpn_sign_green.hide()
-    country_server = country_cc
+    country_server = country_cc if type(country_cc) is not bool else connected_server
 
     if is_vpn_connected:
         try:
