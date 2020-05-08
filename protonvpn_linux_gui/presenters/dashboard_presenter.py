@@ -409,7 +409,7 @@ class DashboardPresenter:
                 break
 
         protonvpn_sign_green.hide()
-        country_server = country_cc
+        country_server = country_cc if type(country_cc) is not bool else connected_server
 
         if is_vpn_connected:
             try:
