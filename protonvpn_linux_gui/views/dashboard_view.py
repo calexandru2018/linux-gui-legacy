@@ -50,7 +50,6 @@ class DashboardView:
     def display_window(self):
         self.dashboard_window.connect("destroy", self.gtk.main_quit)
 
-        self.dialog_view.display_dialog(label="Loading...", spinner=True)
         
         objects = {
             "connection_labels": self.connection_labels,
@@ -63,11 +62,13 @@ class DashboardView:
             }
         }
 
+        self.dashboard_window.show()
+        
         thread = Thread(target=self.dashboard_presenter.on_load, args=[objects])
         thread.daemon = True
         thread.start()
 
-        self.dashboard_window.show()
+        self.dialog_view.display_dialog(label="Loading...", spinner=True)
 
     def set_objects(self, interface, Gtk, dashboard_presenter, settings_view, dialog_view, queue):
         self.gtk = Gtk

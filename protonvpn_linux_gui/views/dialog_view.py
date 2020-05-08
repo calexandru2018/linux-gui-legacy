@@ -38,15 +38,17 @@ class DialogView:
 
             # if "display_dialog" in kwargs.get("action"):
             #     self.display_dialog(**kwargs)
+            try:
+                if "update_dialog" in kwargs.get("action"):
+                    self.update_dialog(**kwargs)
 
-            if "update_dialog" in kwargs.get("action"):
-                self.update_dialog(**kwargs)
-
-            if "hide_dialog" in kwargs.get("action"):
-                self.hide_dialog()
-                
-            if "hide_spinner" in kwargs.get("action"):
-                self.hide_spinner()
+                if "hide_dialog" in kwargs.get("action"):
+                    self.hide_dialog()
+                    
+                if "hide_spinner" in kwargs.get("action"):
+                    self.hide_spinner()
+            except TypeError:
+                pass
 
     def display_dialog(self, **kwargs):
         if "label" in kwargs:

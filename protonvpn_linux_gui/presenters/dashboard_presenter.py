@@ -63,7 +63,7 @@ class DashboardPresenter:
             self.update_labels_server_list(objects_dict, conn_info=conn)
             self.queue.put(dict(action="hide_dialog"))
         else:
-            self.queue.put(dict(label=display_message, spinner=False))
+            self.queue.put(dict(action="update_dialog", label=display_message, spinner=False))
 
         gui_logger.debug(">>> Ended tasks in \"load_on_start\" thread.")  
 
