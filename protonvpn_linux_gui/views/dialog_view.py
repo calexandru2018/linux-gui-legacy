@@ -1,9 +1,15 @@
+from threading import Thread
+
 from protonvpn_linux_gui.constants import (
     UI_DIALOG, 
 )
 
+import gi
+gi.require_version('Gtk', '3.0')
+from gi.repository import GObject as gobject
+
 class DialogView: 
-    def __init__(self, interface, Gtk):
+    def __init__(self, interface, Gtk, queue):
         interface.add_from_file(UI_DIALOG)
         interface.connect_signals({
             "close_message_dialog": self.close_message_dialog,
@@ -20,9 +26,29 @@ class DialogView:
 
         self.interface = interface 
         self.gtk = Gtk
+        self.queue = queue
+
+        thread = Thread(target=self.listener)
+        thread.daemon = True
+        thread.start()
+
+    def listener(self):
+        while True:
+            kwargs = self.queue.get()
+
+            # if "display_dialog" in kwargs.get("action"):
+            #     self.display_dialog(**kwargs)
+
+            if "update_dialog" in kwargs.get("action"):
+                self.update_dialog(**kwargs)
+
+            if "hide_dialog" in kwargs.get("action"):
+                self.hide_dialog()
+                
+            if "hide_spinner" in kwargs.get("action"):
+                self.hide_spinner()
 
     def display_dialog(self, **kwargs):
-        # print(kwargs)
         if "label" in kwargs:
             self.messagedialog_label.set_markup(kwargs.get("label")) 
 

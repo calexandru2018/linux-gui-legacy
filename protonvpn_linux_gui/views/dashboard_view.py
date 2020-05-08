@@ -1,5 +1,5 @@
 from threading import Thread
-
+import time
 # Remote imports
 from protonvpn_cli.utils import(
     get_config_value, 
@@ -17,10 +17,14 @@ from protonvpn_linux_gui.utils import (
     tab_style_manager,
 )
 
+import gi
+gi.require_version('Gtk', '3.0')
+from gi.repository import GObject as gobject
+
 class DashboardView:
-    def __init__(self, interface, Gtk, dashboard_presenter, dialog_window, settings_view):
+    def __init__(self, interface, Gtk, dashboard_presenter, settings_view, dialog_view, queue):
         interface.add_from_file(UI_DASHBOARD)
-        self.set_objects(interface, Gtk, dashboard_presenter, dialog_window, settings_view)
+        self.set_objects(interface, Gtk, dashboard_presenter, settings_view, dialog_view, queue)
 
         interface.connect_signals({
             "profile_quick_connect_button_clicked": self.profile_quick_connect_button_clicked,
@@ -46,8 +50,8 @@ class DashboardView:
     def display_window(self):
         self.dashboard_window.connect("destroy", self.gtk.main_quit)
 
-        self.dialog_window.display_dialog(label="Loading...", spinner=True)
-
+        self.dialog_view.display_dialog(label="Loading...", spinner=True)
+        
         objects = {
             "connection_labels": self.connection_labels,
             "secure_core":{
@@ -56,22 +60,23 @@ class DashboardView:
             },
             "server_tree_list":{
                 "tree_object": self.tree_object,
-            },
-            "dialog_window": self.dialog_window
+            }
         }
+
         thread = Thread(target=self.dashboard_presenter.on_load, args=[objects])
         thread.daemon = True
         thread.start()
 
         self.dashboard_window.show()
 
-    def set_objects(self, interface, Gtk, dashboard_presenter, dialog_window, settings_view):
+    def set_objects(self, interface, Gtk, dashboard_presenter, settings_view, dialog_view, queue):
         self.gtk = Gtk
         self.interface = interface
+        self.queue = queue
         self.dashboard_presenter = dashboard_presenter
         self.dashboard_window = self.interface.get_object("DashboardWindow")
         self.settings_window = settings_view
-        self.dialog_window = dialog_window
+        self.dialog_view = dialog_view
 
         # Top labels
         self.time_connected_label =     self.interface.get_object("time_connected_label")
@@ -114,11 +119,10 @@ class DashboardView:
     def profile_quick_connect_button_clicked(self, button):
         """Button/Event handler to connect to the fastest server
         """
-        self.dialog_window.display_dialog(label="Connecting to the fastest server...", spinner=True)
-
+        self.dialog_view.display_dialog(label="Connecting to the fastest server...", spinner=True)
         gui_logger.debug(">>> Starting \"quick_connect\" thread.")
 
-        thread = Thread(target=self.dashboard_presenter.quick_connect, kwargs=dict(connection_labels=self.connection_labels, dialog_window=self.dialog_window)) 
+        thread = Thread(target=self.dashboard_presenter.quick_connect, kwargs=dict(connection_labels=self.connection_labels, dialog_view=self.dialog_view)) 
         thread.daemon = True
         thread.start()
 
@@ -129,37 +133,37 @@ class DashboardView:
             servername = get_config_value("metadata", "connected_server")
             protocol = get_config_value("metadata", "connected_proto")     
         except KeyError:
-            self.dialog_window.display_dialog(label="You have not previously connected to any server, please do first connect to a server before attempting to reconnect.")
+            self.dialog_view.display_dialog(label="You have not previously connected to any server, please do first connect to a server before attempting to reconnect.")
             gui_logger.debug("[!] Attempted to connect to previously connected server without having made any previous connections.")
             return
 
-        self.dialog_window.display_dialog(label="Connecting to previously connected server <b>{0}</b> with <b>{1}</b>.".format(servername, protocol.upper()))
+        self.dialog_view.display_dialog(label="Connecting to previously connected server <b>{0}</b> with <b>{1}</b>.".format(servername, protocol.upper()))
 
         gui_logger.debug(">>> Starting \"last_connect\" thread.")
 
-        thread = Thread(target=self.dashboard_presenter.on_last_connect, kwargs=dict(connection_labels=self.connection_labels, dialog_window=self.dialog_window))
+        thread = Thread(target=self.dashboard_presenter.on_last_connect, kwargs=dict(connection_labels=self.connection_labels, dialog_view=self.dialog_view))
         thread.daemon = True
         thread.start()
 
     def profile_random_connect_button_clicked(self, button):
         """Button/Event handler to connect to a random server
         """
-        self.dialog_window.display_dialog(label="Connecting to a random server...", spinner=True)
+        self.dialog_view.display_dialog(label="Connecting to a random server...", spinner=True)
         
         gui_logger.debug(">>> Starting \"random_connect\" thread.")
 
-        thread = Thread(target=self.dashboard_presenter.random_connect, kwargs=dict(connection_labels=self.connection_labels, dialog_window=self.dialog_window))
+        thread = Thread(target=self.dashboard_presenter.random_connect, kwargs=dict(connection_labels=self.connection_labels, dialog_view=self.dialog_view))
         thread.daemon = True
         thread.start()
 
     def disconnect_button_clicked(self, button):
         """Button/Event handler to disconnect any existing connections
         """
-        self.dialog_window.display_dialog(label="Disconnecting...", spinner=True)
+        self.dialog_view.display_dialog(label="Disconnecting...", spinner=True)
 
         gui_logger.debug(">>> Starting \"disconnect\" thread.")
 
-        thread = Thread(target=self.dashboard_presenter.on_disconnect, kwargs=dict(connection_labels=self.connection_labels, dialog_window=self.dialog_window))
+        thread = Thread(target=self.dashboard_presenter.on_disconnect, kwargs=dict(connection_labels=self.connection_labels, dialog_view=self.dialog_view))
         thread.daemon = True
         thread.start()
 
@@ -220,11 +224,11 @@ class DashboardView:
             target = self.dashboard_presenter.connect_to_selected_server
             message = "Connecting to <b>{}</b>".format(user_selected_server) 
 
-        self.dialog_window.display_dialog(label=message, spinner=True)
+        self.dialog_view.display_dialog(label=message, spinner=True)
         
         thread = Thread(target=target, kwargs=dict(
                                             connection_labels=self.connection_labels, 
-                                            dialog_window=self.dialog_window,
+                                            dialog_view=self.dialog_view,
                                             user_selected_server=user_selected_server))
         thread.daemon = True
         thread.start()
@@ -240,19 +244,19 @@ class DashboardView:
             self.secure_core_label_style.get_style_context().add_class("disabled_label")
         
         if (state and display_secure_core == "False") or (not state and display_secure_core != "False"):
-            self.dialog_window.display_dialog(label="Loading {} servers...".format("secure-core" if update_to == "True" else "non secure-core"), spinner=True)
+            self.dialog_view.display_dialog(label="Loading {} servers...".format("secure-core" if update_to == "True" else "non secure-core"), spinner=True)
             thread = Thread(target=self.dashboard_presenter.reload_secure_core_servers, kwargs=dict(
                                                     tree_object=self.tree_object,
-                                                    dialog_window=self.dialog_window,
+                                                    dialog_view=self.dialog_view,
                                                     update_to=update_to))
             thread.daemon = True
             thread.start()
     
     def manage_profiles_button_clicked(self, button):
-        self.dialog_window.display_dialog(label="This feature is not yet implemented.")
+        self.dialog_view.display_dialog(label="This feature is not yet implemented.")
         
     def delete_active_profile_button_clicked(self, button):
-        self.dialog_window.display_dialog(label="This feature is not yet implemented.")
+        self.dialog_view.display_dialog(label="This feature is not yet implemented.")
 
     def server_filter_input_key_release(self, entry, event):
         """Event handler, to filter servers after each key release
@@ -302,28 +306,28 @@ class DashboardView:
     def check_for_updates_button_clicked(self, button):
         """Button/Event handler to check for update.
         """
-        self.dialog_window.display_dialog(label="Checking...", spinner=True)
+        self.dialog_view.display_dialog(label="Checking...", spinner=True)
 
         gui_logger.debug(">>> Starting \"message_dialog\" thread. [CHECK_FOR_UPDATES]")
 
-        thread = Thread(target=self.dashboard_presenter.on_check_for_updates, args=[self.dialog_window])
+        thread = Thread(target=self.dashboard_presenter.on_check_for_updates, args=[self.dialog_view])
         thread.daemon = True
         thread.start()
 
     def diagnose_menu_button_clicked(self, button):
         """Button/Event handler top show diagnose window.
         """
-        self.dialog_window.display_dialog(label="Diagnosing...", spinner=True)
+        self.dialog_view.display_dialog(label="Diagnosing...", spinner=True)
 
         gui_logger.debug(">>> Starting \"message_dialog\" thread. [DIAGNOSE]")
-        thread = Thread(target=self.dashboard_presenter.on_diagnose, args=[self.dialog_window])
+        thread = Thread(target=self.dashboard_presenter.on_diagnose, args=[self.dialog_view])
         thread.daemon = True
         thread.start()
 
     def help_button_clicked(self, button):
         """Button/Event handler to show help information.
         """
-        self.dialog_window.display_dialog(label=HELP_TEXT)
+        self.dialog_view.display_dialog(label=HELP_TEXT)
 
     # To avoid getting the AboutDialog destroyed and not being re-rendered again
     def AboutDialog_delete_event(self, window, event):

@@ -42,13 +42,13 @@ class DashboardPresenter:
         """Calls load_on_start, which returns False if there is no internet connection, otherwise populates dashboard labels and server list
         """
         gui_logger.debug(">>> Running \"load_on_start\".")
-        msg = "Could not load necessary resources, there might be connectivity issues."
+        display_message = "Could not load necessary resources, there might be connectivity issues."
         time.sleep(2)
-        objects_dict["dialog_window"].hide_spinner()
+        self.queue.put(dict(action="hide_spinner"))
         
         conn = custom_get_ip_info()
         if conn and not conn is None:
-            objects_dict["dialog_window"].update_dialog(label="Populating dashboard...")
+            self.queue.put(dict(action="update_dialog", label="Populating dashboard..."))
             
             display_secure_core = get_gui_config("connections", "display_secure_core")
             secure_core_switch = objects_dict["secure_core"]["secure_core_switch"]
@@ -61,9 +61,9 @@ class DashboardPresenter:
                 secure_core_switch.set_state(False)
 
             self.update_labels_server_list(objects_dict, conn_info=conn)
-            objects_dict["dialog_window"].hide_dialog()
+            self.queue.put(dict(action="hide_dialog"))
         else:
-            objects_dict["dialog_window"].update_dialog(label=msg, spinner=False)
+            self.queue.put(dict(label=display_message, spinner=False))
 
         gui_logger.debug(">>> Ended tasks in \"load_on_start\" thread.")  
 
@@ -75,25 +75,26 @@ class DashboardPresenter:
         time.sleep(1)
         gui_logger.debug(">>> Running \"update_reload_secure_core_serverslabels_server_list\".")
 
-        dialog_window = kwargs.get("dialog_window")
+        # dialog_window = kwargs.get("dialog_window")
         
-        msg = "Unable to reload servers!"
+        display_message = "Unable to reload servers!"
         if self.dashboard_service.set_display_secure_core(kwargs.get("update_to")):
             populate_servers_dict = {
                 "tree_object": kwargs.get("tree_object"),
                 "servers": False
             }
             gobject.idle_add(self.populate_server_list, populate_servers_dict)
-            msg = "Displaying <b>{}</b> servers!".format("secure-core" if kwargs.get("update_to") == "True" else "non secure-core")
+            display_message = "Displaying <b>{}</b> servers!".format("secure-core" if kwargs.get("update_to") == "True" else "non secure-core")
         
-        dialog_window.update_dialog(label=msg)
+        self.queue.put(dict(action="update_dialog", label=display_message))
+        #  dialog_window.update_dialog(label=display_message)
 
         gui_logger.debug(">>> Ended tasks in \"reload_secure_core_servers\" thread.")
 
     def connect_to_selected_server(self, **kwargs):
         """Function that either connects by selected server or selected country.
         """     
-        dialog_window = kwargs.get("dialog_window")
+        # dialog_window = kwargs.get("dialog_window")
         user_selected_server = kwargs.get("user_selected_server")
 
         gui_logger.debug(">>> Running \"openvpn_connect\".")
@@ -112,7 +113,8 @@ class DashboardPresenter:
         if server_protocol:
             display_message = "You are connected to <b>{}</b> via <b>{}</b>!".format(server_protocol[0], server_protocol[1].upper())
 
-        dialog_window.update_dialog(label=display_message)
+        self.queue.put(dict(action="update_dialog", label=display_message))
+        # dialog_window.update_dialog(label=display_message)
 
         update_labels_dict = {
             "connection_labels": kwargs.get("connection_labels"),
@@ -143,9 +145,10 @@ class DashboardPresenter:
         if server_protocol:
             display_message = "You are connected to <b>{}</b> via <b>{}</b>!".format(server_protocol[0], server_protocol[1].upper())
 
-        dialog_window = kwargs.get("dialog_window")
-        dialog_window.update_dialog(label=display_message)
-
+        # dialog_window = kwargs.get("dialog_window")
+        # dialog_window.update_dialog(label=display_message)
+        self.queue.put(dict(action="update_dialog", label=display_message))
+        
         gui_logger.debug(">>> Result: \"{0}\"".format(result))
         
         self.update_labels_status(update_labels_dict)
@@ -155,7 +158,7 @@ class DashboardPresenter:
     def quick_connect(self, **kwargs):
         """Function that connects to the quickest server.
         """
-        dialog_window = kwargs.get("dialog_window")
+        # dialog_window = kwargs.get("dialog_window")
 
         gui_logger.debug(">>> Running \"fastest\".")
 
@@ -174,7 +177,8 @@ class DashboardPresenter:
         if server_protocol:
             display_message = "You are connected to <b>{}</b> via <b>{}</b>!".format(server_protocol[0], server_protocol[1].upper())
 
-        dialog_window.update_dialog(label=display_message)
+        # dialog_window.update_dialog(label=display_message)
+        self.queue.put(dict(action="update_dialog", label=display_message))
 
         gui_logger.debug(">>> Result: \"{0}\"".format(result))
         
@@ -187,7 +191,7 @@ class DashboardPresenter:
         """        
         gui_logger.debug(">>> Running \"reconnect\".")
 
-        dialog_window = kwargs.get("dialog_window")
+        # dialog_window = kwargs.get("dialog_window")
         update_labels_dict = {
             "connection_labels": kwargs.get("connection_labels"),
             "servers": False,
@@ -204,7 +208,8 @@ class DashboardPresenter:
         if server_protocol:
             display_message = "You are connected to <b>{}</b> via <b>{}</b>!".format(server_protocol[0], server_protocol[1].upper())
 
-        dialog_window.update_dialog(label=display_message)
+        # dialog_window.update_dialog(label=display_message)
+        self.queue.put(dict(action="update_dialog", label=display_message))
 
         gui_logger.debug(">>> Result: \"{0}\"".format(result))
 
@@ -217,7 +222,7 @@ class DashboardPresenter:
         """
         gui_logger.debug(">>> Running \"reconnect\"")
 
-        dialog_window = kwargs.get("dialog_window")
+        # dialog_window = kwargs.get("dialog_window")
         update_labels_dict = {
             "connection_labels": kwargs.get("connection_labels"),
             "servers": False,
@@ -233,7 +238,8 @@ class DashboardPresenter:
         if server_protocol:
             display_message = "You are connected to <b>{}</b> via <b>{}</b>!".format(server_protocol[0], server_protocol[1].upper())
 
-        dialog_window.update_dialog(label=display_message)
+        # dialog_window.update_dialog(label=display_message)
+        self.queue.put(dict(action="update_dialog", label=display_message))
 
         gui_logger.debug(">>> Result: \"{0}\"".format(result))
 
@@ -246,7 +252,7 @@ class DashboardPresenter:
         """
         gui_logger.debug(">>> Running \"disconnect\".")
         
-        dialog_window = kwargs.get("dialog_window")
+        # dialog_window = kwargs.get("dialog_window")
         update_labels_dict = {
             "connection_labels": kwargs.get("connection_labels"),
             "servers": False,
@@ -256,7 +262,8 @@ class DashboardPresenter:
 
         result = self.dashboard_service.disconnect()
 
-        dialog_window.update_dialog(label=result.stdout.decode())
+        self.queue.put(dict(action="update_dialog", label=result.stdout.decode()))
+        # dialog_window.update_dialog(label=result.stdout.decode())
 
         gui_logger.debug(">>> Result: \"{0}\"".format(result))
 
@@ -288,7 +295,8 @@ class DashboardPresenter:
                 else:
                     return_string = return_string + "You can upgrade by <b>first removing this version</b>, and then cloning the new one with the following commands:\n\n<b>git clone https://github.com/calexandru2018/protonvpn-linux-gui</b>\n\n<b>cd protonvpn-linux-gui</b>\n\n<b>sudo python3 setup.py install</b>"
 
-        dialog_window.update_dialog(label=return_string)
+        # dialog_window.update_dialog(label=return_string)
+        self.queue.put(dict(action="update_dialog", label=return_string))
 
     def on_diagnose(self, dialog_window):
         """Multipurpose message dialog function.
@@ -313,7 +321,9 @@ class DashboardPresenter:
 
         gui_logger.debug(result)
 
-        dialog_window.update_dialog(label="<b><u>Reccomendation:</u></b>\n<span>{recc}</span>".format(recc=reccomendation))
+
+        self.queue.put(dict(action="update_dialog", label="<b><u>Reccomendation:</u></b>\n<span>{recc}</span>".format(recc=reccomendation)))
+        # dialog_window.update_dialog(label="<b><u>Reccomendation:</u></b>\n<span>{recc}</span>".format(recc=reccomendation)))
 
     def update_labels_server_list(self, object_dict, conn_info=False):
         """Function that updates dashboard labels and server list.

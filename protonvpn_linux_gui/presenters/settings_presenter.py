@@ -38,18 +38,19 @@ class SettingsPresenter:
     def update_user_pass(self, **kwargs):
         """Function that updates username and password.
         """
-        dialog_window = kwargs.get("dialog_window")
+        # dialog_window = kwargs.get("dialog_window")
 
         username = kwargs.get("username")
         password = kwargs.get("password")
 
         gui_logger.debug(">>> Running \"set_username_password\".")
 
-        msg = "Unable to update username and password!"
+        display_message = "Unable to update username and password!"
         if self.settings_service.set_user_pass(username, password):
-            msg = "Username and password <b>updated</b>!"
+            display_message = "Username and password <b>updated</b>!"
 
-        dialog_window.update_dialog(label=msg)
+        self.queue.put(dict(action="update_dialog", label=display_message))
+        # dialog_window.update_dialog(label=display_message)
 
         gui_logger.debug(">>> Ended tasks in \"set_username_password\" thread.")
 
@@ -68,15 +69,16 @@ class SettingsPresenter:
         """
         gui_logger.debug(">>> Running \"set_protonvpn_tier\".")
 
-        dialog_window = kwargs.get("dialog_window")
+        # dialog_window = kwargs.get("dialog_window")
         #interface = kwargs.get("interface")
         protonvpn_plan = kwargs.get("tier")
         
-        msg = "Unable to update ProtonVPN Plan!"
+        display_message = "Unable to update ProtonVPN Plan!"
         if self.settings_service.set_pvpn_tier(protonvpn_plan):
-            msg = "ProtonVPN Plan has been updated to <b>{}</b>!\nServers list will be refreshed.".format(kwargs.get("tier_display"))
+            display_message = "ProtonVPN Plan has been updated to <b>{}</b>!\nRestart the application to update servers.".format(kwargs.get("tier_display"))
         
-        dialog_window.update_dialog(label=msg)
+        # dialog_window.update_dialog(label=display_message)
+        self.queue.put(dict(action="update_dialog", label=display_message))
 
         gui_logger.debug(">>> Result: \"{0}\"".format("ProtonVPN Plan has been updated!"))
 
@@ -105,8 +107,8 @@ class SettingsPresenter:
     def update_connect_preference(self, **kwargs):
         """Function that updates autoconnect. 
         """
+        # dialog_window = kwargs.get("dialog_window")
         active_choice = kwargs.get("user_choice")
-        dialog_window = kwargs.get("dialog_window")
         return_val = False
 
         gui_logger.debug(">>> Running \"update_connect_preference\".")
@@ -116,22 +118,23 @@ class SettingsPresenter:
         else:
             return_val = self.settings_service.set_quickconnect(active_choice)
 
-        msg = "Unable to update configuration!"
+        display_message = "Unable to update configuration!"
         if return_val:
-            msg = "{} setting updated to connect to <b>{}</b>!".format("Autoconnect" if not "quick_connect" in kwargs else "Quick connect", kwargs.get("country_display"))
+            display_message = "{} setting updated to connect to <b>{}</b>!".format("Autoconnect" if not "quick_connect" in kwargs else "Quick connect", kwargs.get("country_display"))
         
-        dialog_window.update_dialog(label=msg)
+        self.queue.put(dict(action="update_dialog", label=display_message))
+        # dialog_window.update_dialog(label=display_message)
 
         gui_logger.debug(">>> Ended tasks in \"update_autoconnect\" thread.") 
 
     def update_killswitch(self, update_to):
         """Function that updates killswitch configurations. 
         """
-        msg = "Unable to update killswitch configuration!"
+        display_message = "Unable to update killswitch configuration!"
         if self.settings_service.set_killswitch(update_to):
-            msg = ">>> Kill Switch configuration updated to {}".format("enabled" if update_to == "1" else "disabled")
+            display_message = ">>> Kill Switch configuration updated to {}".format("enabled" if update_to == "1" else "disabled")
 
-        gui_logger.debug(">>> Result: \"{0}\"".format(msg))
+        gui_logger.debug(">>> Result: \"{0}\"".format(display_message))
 
         gui_logger.debug(">>> Ended tasks in \"update_killswitch_switch_changed\" thread.")   
 
@@ -145,9 +148,9 @@ class SettingsPresenter:
             result = result + "Split Tunneling <b>can't</b> be used with Kill Switch, Kill Switch has been <b>disabled</b>!\n\n"
             time.sleep(1)
 
-        msg = "Unable to update split tunneling status!"
+        display_message = "Unable to update split tunneling status!"
         if not self.settings_service.set_split_tunneling(update_to):
-            result = msg
+            result = display_message
 
         gui_logger.debug(">>> Result: \"{0}\"".format(result))
 
@@ -158,7 +161,7 @@ class SettingsPresenter:
         """
         gui_logger.debug(">>> Running \"set_split_tunnel\".")
 
-        dialog_window = kwargs.get("dialog_window")
+        # dialog_window = kwargs.get("dialog_window")
         split_tunneling_content = kwargs.get("split_tunneling_content")
         result = "Split tunneling configurations <b>updated</b>!\n"
         disabled_ks = False
@@ -168,7 +171,8 @@ class SettingsPresenter:
         valid_ips = self.settings_service.check_valid_ips(ip_list)
 
         if not type(valid_ips) == bool and len(valid_ips) > 1 and not valid_ips[0]:
-            dialog_window.update_dialog(label="<b>{0}</b> is not valid!\nNone of the IP's were added, please try again with a different IP.".format(valid_ips[1]))
+            self.queue.put(dict(action="update_dialog", label="<b>{0}</b> is not valid!\nNone of the IP's were added, please try again with a different IP.".format(valid_ips[1])))
+            # dialog_window.update_dialog(label="<b>{0}</b> is not valid!\nNone of the IP's were added, please try again with a different IP.".format(valid_ips[1]))
             gui_logger.debug("[!] Invalid IP \"{0}\".".format(valid_ips[1]))
             return
 
@@ -188,7 +192,8 @@ class SettingsPresenter:
             if not disabled_ks and not self.settings_service.set_split_tunneling_ips(ip_list):
                 result = "Unable to add IPs to Split Tunneling file!"
 
-        dialog_window.update_dialog(label=result)
+        # dialog_window.update_dialog(label=result)
+        self.queue.put(dict(action="update_dialog", label=result))
 
         gui_logger.debug(">>> Result: \"{0}\"".format(result))
 
@@ -200,20 +205,20 @@ class SettingsPresenter:
         setting_value = kwargs.get("setting_value")
         setting_display = kwargs.get("setting_display")
         gui_logger.debug(">>> Running \"tray_configurations\".")
-        msg = ''
+        display_message = ''
 
         if "serverload" in setting_display:
-            msg = "server load"
+            display_message = "server load"
         elif "server" in setting_display:
-            msg = "server name"
+            display_message = "server name"
         elif "data" in setting_display:
-            msg = "data transmission"
+            display_message = "data transmission"
         elif "time" in setting_display:
-            msg = "time connected"
+            display_message = "time connected"
 
-        result = "Tray {0} is <b>{1}</b>!".format(msg, "displayed" if setting_value == 1 else "hidden")
+        result = "Tray {0} is <b>{1}</b>!".format(display_message, "displayed" if setting_value == 1 else "hidden")
         if not self.settings_service.set_tray_setting(setting_display, setting_value):
-            result = "Unable to update {} to {}!".format(msg, "displayed" if setting_value == 1 else "hidden")
+            result = "Unable to update {} to {}!".format(display_message, "displayed" if setting_value == 1 else "hidden")
 
         gui_logger.debug(">>> Result: \"{0}\"".format(result))
 
@@ -231,7 +236,8 @@ class SettingsPresenter:
             shutil.rmtree(CONFIG_DIR)
             gui_logger.debug(">>> Result: \"{0}\"".format("Configurations purged."))
 
-        dialog_window.update_dialog(label="Configurations purged!")
+        self.queue.put(dict(action="update_dialog", label="Configurations purged!"))
+        # dialog_window.update_dialog(label="Configurations purged!")
 
         gui_logger.debug(">>> Ended tasks in \"set_split_tunnel\" thread.")   
 
@@ -286,8 +292,15 @@ class SettingsPresenter:
         default_protocol = get_config_value("USER", "default_protocol")
 
         # Get indexes
-        autoconnect_index = list(server_list.keys()).index(autoconnect_setting)
-        quick_connect_index = list(server_list.keys()).index(quick_connect_setting)
+        try:
+            autoconnect_index = list(server_list.keys()).index(autoconnect_setting)
+        except ValueError:
+            autoconnect_index = 0
+
+        try:
+            quick_connect_index = list(server_list.keys()).index(quick_connect_setting)
+        except ValueError:
+            quick_connect_index = 0
 
         # Set values
         update_autoconnect_combobox.set_active(autoconnect_index)
