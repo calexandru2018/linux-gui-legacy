@@ -38,11 +38,6 @@ from protonvpn_linux_gui.constants import (
 
 from .gui_logger import gui_logger
 
-# PyGObject import
-import gi
-gi.require_version('Gtk', '3.0')
-from gi.repository import GObject as gobject, Gtk, GdkPixbuf
-
 def tab_style_manager(tab_to_show: str, tab_dict):
     for k, v in tab_dict.items():
         if k == tab_to_show:
