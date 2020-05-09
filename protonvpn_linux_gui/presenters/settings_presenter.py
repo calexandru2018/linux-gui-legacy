@@ -11,11 +11,6 @@ from protonvpn_cli.utils import get_config_value, is_valid_ip, set_config_value,
 from protonvpn_cli.connection import disconnect as pvpn_disconnect
 from protonvpn_cli.country_codes import country_codes
 
-# PyGObject import
-import gi
-gi.require_version('Gtk', '3.0')
-from gi.repository import GObject as gobject
-
 # Local imports
 from protonvpn_linux_gui.gui_logger import gui_logger
 from protonvpn_linux_gui.constants import (
