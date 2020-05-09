@@ -92,8 +92,8 @@ def init():
             settings_view = SettingsView(interface, Gtk, settings_presenter, queue)
 
             dashboard_service = DashboardService()
-            dashboard_presenter = DashboardPresenter(dashboard_service, dialog_view, queue)
-            dashboard_view = DashboardView(interface, Gtk, dashboard_presenter, settings_view, dialog_view, queue)
+            dashboard_presenter = DashboardPresenter(dashboard_service, queue)
+            dashboard_view = DashboardView(interface, Gtk, dashboard_presenter, settings_view, queue)
 
             login_service = LoginService()
             login_presenter = LoginPresenter(login_service, queue)
@@ -104,13 +104,12 @@ def init():
             gui_logger.debug(">>> Loading DashboardWindow")
             settings_service = SettingsService()
             settings_presenter = SettingsPresenter(settings_service, queue)
-            settings_view = SettingsView(interface, Gtk, settings_presenter, dialog_view, queue)
+            settings_view = SettingsView(interface, Gtk, settings_presenter, queue)
 
             dashboard_service = DashboardService()
             dashboard_presenter = DashboardPresenter(dashboard_service, queue)
-            dashboard_view = DashboardView(interface, Gtk, dashboard_presenter, settings_view, dialog_view, queue)
+            dashboard_view = DashboardView(interface, Gtk, dashboard_presenter, settings_view, queue)
             
             dashboard_view.display_window()
-
     Gtk.main()
 

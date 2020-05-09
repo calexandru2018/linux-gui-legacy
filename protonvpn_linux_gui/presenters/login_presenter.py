@@ -39,18 +39,18 @@ class LoginPresenter:
         user_data = self.login_service.prepare_initilizer(username_field, password_field, protonvpn_plans)
 
         if not self.login_service.initialize_gui_config():
-            dialog_window.display_dialog(label="Couldn't create folder for application configurations.")
-            return 
+            self.queue.put(dict(action="update_dialog", label="Couldn't create folder for application configurations."))
+            return False
 
         if not self.login_service.intialize_cli_config():
-            dialog_window.display_dialog(label="Couldn't create folder for cli configurations.")
-            return 
+            self.queue.put(dict(action="update_dialog", label="Couldn't create folder for cli configurations."))
+            return False 
 
         if not self.login_service.setup_user(user_data):
-            dialog_window.display_dialog(label="Couldn't intialize your profile.")
-            return
+            self.queue.put(dict(action="update_dialog", label="Couldn't intialize your profile."))
+            return False
         
-        dialog_window.display_dialog(label="Your profile was successfully created.")
-
+        self.queue.put(dict(action="update_dialog", label="Your profile was successfully created."))
+        return True
         
         

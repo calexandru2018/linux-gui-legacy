@@ -3,6 +3,10 @@ from threading import Thread
 # Remote imports
 from protonvpn_cli.utils import get_config_value #noqa
 
+import gi
+gi.require_version('Gtk', '3.0')
+from gi.repository import GObject as gobject
+
 # Local imports
 from protonvpn_linux_gui.gui_logger import gui_logger
 from protonvpn_linux_gui.constants import (
@@ -15,9 +19,9 @@ from protonvpn_linux_gui.constants import UI_SETTINGS
 from protonvpn_linux_gui.utils import get_gui_config, tab_style_manager
 
 class SettingsView: 
-    def __init__(self, interface, Gtk, settings_presenter, dialog_view, queue): 
+    def __init__(self, interface, Gtk, settings_presenter, queue): 
         interface.add_from_file(UI_SETTINGS)
-        self.set_objects(interface, Gtk, settings_presenter, dialog_view, queue)
+        self.set_objects(interface, Gtk, settings_presenter, queue)
 
         interface.connect_signals({
             "settings_notebook_page_changed": self.settings_notebook_page_changed,
@@ -64,12 +68,12 @@ class SettingsView:
             }
         }
         self.settings_presenter.load_configurations(object_dict)
-        self.settings_window.show()
+        # self.settings_window.show()
+        gobject.idle_add(self.settings_window.show)
 
-    def set_objects(self, interface, Gtk, settings_presenter, dialog_view, queue):
+    def set_objects(self, interface, Gtk, settings_presenter, queue):
         self.interface = interface
         self.queue = queue
-        self.dialog_view = dialog_view
         self.settings_presenter = settings_presenter
         self.settings_window = self.interface.get_object("SettingsWindow")
 
@@ -126,11 +130,10 @@ class SettingsView:
             model = combobox.get_model()
             selected_tier, tier_display = model[tree_iter][:2]
             if selected_tier != tier:
-                self.dialog_view.display_dialog(label="Updating ProtoVPN plan...", spinner=True)
+                self.queue.put(dict(action="display_dialog", label="Updating ProtoVPN plan...", spinner=True))
                 gui_logger.debug(">>> Starting \"update_tier_combobox_changed\" thread.")
                 thread = Thread(target=self.settings_presenter.update_pvpn_plan, kwargs=dict(
                                                                 tree_object=self.tree_object, 
-                                                                dialog_view=self.dialog_view, 
                                                                 tier=int(selected_tier+1),
                                                                 tier_display=tier_display))
                 thread.daemon = True
@@ -155,13 +158,12 @@ class SettingsView:
     def update_user_pass_button_clicked(self, button):
         """Button/Event handler to update Username & Password
         """
-        self.dialog_view.display_dialog(label="Updating username and password...", spinner=True)
+        self.queue.put(dict(action="display_dialog", label="Updating username and password...", spinner=True))
         gui_logger.debug(">>> Starting \"update_user_pass\" thread.")
 
         thread = Thread(target=self.settings_presenter.update_user_pass, kwargs=dict(
                                                     username=self.username_field.get_text().strip(),
-                                                    password=self.password_field.get_text().strip(),
-                                                    dialog_view=self.dialog_view))
+                                                    password=self.password_field.get_text().strip()))
         thread.daemon = True
         thread.start()
 
@@ -223,10 +225,9 @@ class SettingsView:
             model = combobox.get_model()
             user_choice, country_display = model[tree_iter][:2]
             if user_choice != autoconnect_setting:
-                self.dialog_view.display_dialog(label="Updating autoconnect settings...", spinner=True)
+                self.queue.put(dict(action="display_dialog", label="Updating autoconnect settings...", spinner=True))
                 gui_logger.debug(">>> Starting \"update_autoconnect_combobox_changed\" thread.")
                 thread = Thread(target=self.settings_presenter.update_connect_preference, kwargs=dict(
-                                                                dialog_view=self.dialog_view, 
                                                                 user_choice=user_choice,
                                                                 country_display=country_display))
                 thread.daemon = True
@@ -240,11 +241,10 @@ class SettingsView:
             user_choice, country_display = model[tree_iter][:2]
 
             if user_choice != autoconnect_setting:
-                self.dialog_view.display_dialog(label="Updating quick connect settings...", spinner=True)
+                self.queue.put(dict(action="display_dialog", label="Updating quick connect settings...", spinner=True))
                 gui_logger.debug(">>> Starting \"update_quick_connect_combobox_changed\" thread.")
 
                 thread = Thread(target=self.settings_presenter.update_connect_preference, kwargs=dict(
-                                                                dialog_view=self.dialog_view, 
                                                                 user_choice=user_choice,
                                                                 country_display=country_display,
                                                                 quick_connect=True))
@@ -341,15 +341,14 @@ class SettingsView:
     def update_split_tunneling_button_clicked(self, button):
         """Button/Event handler to update Split Tunneling IP list.
         """
-        self.dialog_view.display_dialog(label="Updating split tunneling configurations...", spinner=True)
-
         gui_logger.debug(">>> Starting \"update_split_tunneling\" thread.")
+        
+        self.queue.put(dict(action="display_dialog", label="Updating split tunneling configurations...", spinner=True))
 
         buffer = self.split_tunneling_textview.get_buffer()
         split_tunneling_content = buffer.get_text(buffer.get_start_iter(), buffer.get_end_iter(), buffer)
         thread = Thread(target=self.settings_presenter.update_split_tunneling, kwargs=dict(
-                                                        split_tunneling_content=split_tunneling_content, 
-                                                        dialog_view=self.dialog_view))
+                                                        split_tunneling_content=split_tunneling_content))
         thread.daemon = True
         thread.start()
 
@@ -368,10 +367,11 @@ class SettingsView:
     def purge_configurations_button_clicked(self, button):
         """Button/Event handler to purge configurations
         """
-        self.dialog_view.display_dialog(label="Purging configurations configurations...", spinner=True)
-
         gui_logger.debug(">>> Starting \"purge_configurations\" thread.")
 
-        thread = Thread(target=self.settings_presenter.purge_configurations, args=[self.dialog_view])
+        self.queue.put(dict(action="display_dialog", label="Purging configurations configurations...", spinner=True))
+
+
+        thread = Thread(target=self.settings_presenter.purge_configurations)
         thread.daemon = True
         thread.start()

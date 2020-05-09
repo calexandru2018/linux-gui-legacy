@@ -4,11 +4,11 @@ from protonvpn_linux_gui.constants import UI_LOGIN, VERSION
 from protonvpn_linux_gui.gui_logger import gui_logger
 
 class LoginView:
-    # def __init__(self, interface, Gtk, login_presenter, dialog_window, dashboard_window):
-    def __init__(self, interface, Gtk, login_presenter, dialog_window):
+    # def __init__(self, interface, Gtk, login_presenter, dashboard_window):
+    def __init__(self, interface, Gtk, login_presenter, queue):
         interface.add_from_file(UI_LOGIN)
-        # self.set_objects(interface, Gtk, login_presenter, dialog_window, dashboard_window)
-        self.set_objects(interface, Gtk, login_presenter, dialog_window)
+        # self.set_objects(interface, Gtk, login_presenter, dashboard_window)
+        self.set_objects(interface, Gtk, login_presenter, queue)
         
         interface.connect_signals({
             "login_username_entry_key_release": self.login_username_entry_key_release,
@@ -20,11 +20,11 @@ class LoginView:
     def display_window(self):
         self.login_view.show()
 
-    # def set_objects(self, interface, Gtk, login_presenter, dialog_window, dashboard_window):
-    def set_objects(self, interface, Gtk, login_presenter, dialog_window):
+    # def set_objects(self, interface, Gtk, login_presenter, dashboard_window, queue):
+    def set_objects(self, interface, Gtk, login_presenter, queue):
         self.interface = interface
         self.login_presenter = login_presenter
-        self.dialog_window = dialog_window
+        self.queue = queue
         # self.dashboard_window = dashboard_window
         self.login_view = self.interface.get_object("LoginWindow")
 
@@ -80,7 +80,7 @@ class LoginView:
         """     
 
         # Queue has to be used
-        self.dialog_window.display_dialog(label="Intializing profile...", spinner=True)
+        self.queue.put(dict(action="display_dialog", label="Intializing profile...", spinner=True))
 
         thread = Thread(target=self.login_presenter.on_login, kwargs=dict(
                                                 username_field=self.username_field.get_text().strip(), 
@@ -89,7 +89,6 @@ class LoginView:
                                                 member_basic_radio=self.member_basic_radio.get_active(),
                                                 member_plus_radio=self.member_plus_radio.get_active(),
                                                 member_visionary_radio=self.member_visionary_radio .get_active(),
-                                                dialog_window=self.dialog_window, 
                                             ))
         thread.daemon = True
         thread.start()

@@ -36,21 +36,29 @@ class DialogView:
         while True:
             kwargs = self.queue.get()
 
-            # if "display_dialog" in kwargs.get("action"):
-            #     self.display_dialog(**kwargs)
             try:
+                if "display_dialog" in kwargs.get("action"):
+                    # self.display_dialog(**kwargs)
+                    gobject.idle_add(self.display_dialog, kwargs)
+                    self.queue.task_done()
                 if "update_dialog" in kwargs.get("action"):
-                    self.update_dialog(**kwargs)
+                    # self.update_dialog(**kwargs)
+                    gobject.idle_add(self.update_dialog, kwargs)
+                    self.queue.task_done()
 
                 if "hide_dialog" in kwargs.get("action"):
-                    self.hide_dialog()
+                    # self.hide_dialog()
+                    gobject.idle_add(self.hide_dialog)
+                    self.queue.task_done()
                     
                 if "hide_spinner" in kwargs.get("action"):
-                    self.hide_spinner()
+                    # self.hide_spinner()
+                    gobject.idle_add(self.hide_spinner)
+                    self.queue.task_done()
             except TypeError:
                 pass
 
-    def display_dialog(self, **kwargs):
+    def display_dialog(self, kwargs):
         if "label" in kwargs:
             self.messagedialog_label.set_markup(kwargs.get("label")) 
 
@@ -71,8 +79,7 @@ class DialogView:
         
         self.messagedialog_window.show()
 
-    def update_dialog(self, **kwargs):
-        # print(kwargs)
+    def update_dialog(self, kwargs):
         if "label" in kwargs:
             self.messagedialog_label.set_markup(kwargs.get("label")) 
 
