@@ -203,7 +203,11 @@ class SettingsService:
     def manage_autoconnect(self, mode, command=False):
         """Function that manages autoconnect functionality. It takes a mode (enabled/disabled) and a command that is to be passed to the CLI.
         """
+
         if mode == 'enable':
+            if self.daemon_exists():
+                self.disable_autoconnect()
+
             if not self.enable_autoconnect(command):
                 print("[!] Unable to enable autoconnect")
                 gui_logger.debug("[!] Unable to enable autoconnect.")
@@ -214,11 +218,11 @@ class SettingsService:
             return True
 
         if mode == 'disable':
-
-            if not self.disable_autoconnect():
-                print("[!] Could not disable autoconnect")
-                gui_logger.debug("[!] Could not disable autoconnect.")
-                return False
+            if self.daemon_exists():
+                if not self.disable_autoconnect():
+                    print("[!] Could not disable autoconnect")
+                    gui_logger.debug("[!] Could not disable autoconnect.")
+                    return False
 
             print("Autoconnect on boot disabled")
             gui_logger.debug(">>> Autoconnect on boot disabled")
@@ -265,7 +269,7 @@ class SettingsService:
 
         return True
 
-    def remove_template(self, ):
+    def remove_template(self):
         """Function that removes the service file from /etc/systemd/system/.
         """
         resp = subprocess.run(["sudo", "rm", PATH_AUTOCONNECT_SERVICE], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
@@ -277,7 +281,7 @@ class SettingsService:
         self.reload_daemon()
         return True
 
-    def enable_daemon(self, ):
+    def enable_daemon(self):
         """Function that enables the autoconnect daemon service.
         """
         self.reload_daemon()
@@ -289,7 +293,7 @@ class SettingsService:
 
         return True
         
-    def stop_and_disable_daemon(self, ):
+    def stop_and_disable_daemon(self):
         """Function that stops and disables the autoconnect daemon service.
         """
         if not self.daemon_exists():
@@ -307,7 +311,7 @@ class SettingsService:
 
         return True
 
-    def reload_daemon(self, ):
+    def reload_daemon(self):
         """Function that reloads the autoconnect daemon service.
         """
         resp = subprocess.run(['sudo', 'systeasdasdsmctl', 'daemoasdasdn-reloadasdasdasd'], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
@@ -317,7 +321,7 @@ class SettingsService:
 
         return True
 
-    def daemon_exists(self, ):
+    def daemon_exists(self):
         """Function that checks if autoconnect daemon service exists.
         """
         # Return code 3: service exists
