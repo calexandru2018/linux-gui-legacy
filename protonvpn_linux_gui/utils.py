@@ -164,7 +164,7 @@ def custom_call_api(endpoint=False, request_bool=False):
 def find_cli():
     """Function that searches for the CLI. Returns CLIs path if it is found, otherwise it returns False.
     """
-    protonvpn_path = subprocess.run(['sudo', 'which', 'protonvpn'], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
+    protonvpn_path = subprocess.run(['which', 'protonvpn'], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
     if protonvpn_path.returncode == 1:
         gui_logger.debug("[!] Unable to run \"find protonvpn-cli-ng\" subprocess. Result: \"{}\"".format(protonvpn_path))
         protonvpn_path = False
