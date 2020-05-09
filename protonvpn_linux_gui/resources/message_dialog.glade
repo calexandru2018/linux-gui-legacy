@@ -30,19 +30,22 @@ Author: Alexandru Cheltuitor
   <!-- interface-authors Alexandru Cheltuitor -->
   <object class="GtkDialog" id="MessageDialog">
     <property name="width_request">400</property>
-    <property name="height_request">200</property>
+    <property name="height_request">400</property>
     <property name="can_focus">False</property>
+    <property name="vexpand">True</property>
     <property name="type">popup</property>
     <property name="title" translatable="yes">ProtonVPN GUI</property>
     <property name="resizable">False</property>
-    <property name="modal">True</property>
-    <property name="window_position">center</property>
+    <property name="window_position">center-always</property>
+    <property name="default_width">400</property>
+    <property name="default_height">400</property>
     <property name="destroy_with_parent">True</property>
     <property name="icon">img/logo/protonvpn_logo.png</property>
     <property name="type_hint">normal</property>
     <property name="skip_taskbar_hint">True</property>
     <property name="skip_pager_hint">True</property>
-    <property name="gravity">center</property>
+    <property name="urgency_hint">True</property>
+    <property name="gravity">static</property>
     <signal name="delete-event" handler="MessageDialog_delete_event" swapped="no"/>
     <child type="titlebar">
       <object class="GtkHeaderBar">
