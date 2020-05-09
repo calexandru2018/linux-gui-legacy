@@ -85,11 +85,14 @@ def test_add_ips():
     """Checks that valid IP's are added and that invalid IPs are filtered
     """
     list = [
-        dict(split_tunneling_content="192.168.1.0"), 
-        dict(split_tunneling_content="192.168.1.0asdasdasd2")
+        [dict(split_tunneling_content="192.168.1.0"), True],
+        [dict(split_tunneling_content="255.255.255.255"), True],
+        [dict(split_tunneling_content="192.168.1.0asdasdasd2"), False],
+        [dict(split_tunneling_content="192.168.1."), False],
+        [dict(split_tunneling_content="192.168.1. \n 192.12312,312"), False],
     ]
     for arg in list:
-        assert settings_presenter.update_split_tunneling(**arg) == True
+        assert settings_presenter.update_split_tunneling(**arg[0]) == arg[1]
 
 def test_tray_configurations():
     list = [

@@ -209,7 +209,7 @@ class SettingsPresenter:
 
         gui_logger.debug(">>> Ended tasks in \"set_split_tunnel\" thread. Result: \"{0}\"".format(result))   
         
-        return return_val or (not return_val == invalid_ip)
+        return return_val
 
     def tray_configurations(self, **kwargs):
         """Function to update what the tray should display.
