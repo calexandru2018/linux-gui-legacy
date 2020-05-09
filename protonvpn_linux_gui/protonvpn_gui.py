@@ -97,7 +97,7 @@ def init():
 
             login_service = LoginService()
             login_presenter = LoginPresenter(login_service, queue)
-            login_view = LoginView(interface, Gtk, login_presenter, queue)
+            login_view = LoginView(interface, Gtk, login_presenter, dashboard_view, queue)
 
             login_view.display_window()
         else:

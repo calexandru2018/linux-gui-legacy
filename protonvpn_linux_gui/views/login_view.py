@@ -1,14 +1,14 @@
+import time
 from threading import Thread
+from concurrent import futures
 
 from protonvpn_linux_gui.constants import UI_LOGIN, VERSION
 from protonvpn_linux_gui.gui_logger import gui_logger
 
 class LoginView:
-    # def __init__(self, interface, Gtk, login_presenter, dashboard_window):
-    def __init__(self, interface, Gtk, login_presenter, queue):
+    def __init__(self, interface, Gtk, login_presenter, dashboard_view, queue):
         interface.add_from_file(UI_LOGIN)
-        # self.set_objects(interface, Gtk, login_presenter, dashboard_window)
-        self.set_objects(interface, Gtk, login_presenter, queue)
+        self.set_objects(interface, Gtk, login_presenter, dashboard_view, queue)
         
         interface.connect_signals({
             "login_username_entry_key_release": self.login_username_entry_key_release,
@@ -20,12 +20,11 @@ class LoginView:
     def display_window(self):
         self.login_view.show()
 
-    # def set_objects(self, interface, Gtk, login_presenter, dashboard_window, queue):
-    def set_objects(self, interface, Gtk, login_presenter, queue):
+    def set_objects(self, interface, Gtk, login_presenter, dashboard_view, queue):
         self.interface = interface
         self.login_presenter = login_presenter
         self.queue = queue
-        # self.dashboard_window = dashboard_window
+        self.dashboard_view = dashboard_view
         self.login_view = self.interface.get_object("LoginWindow")
 
         self.login_username_label = self.interface.get_object("login_username_label")
@@ -81,19 +80,21 @@ class LoginView:
 
         # Queue has to be used
         self.queue.put(dict(action="display_dialog", label="Intializing profile...", spinner=True))
+        
+        with futures.ThreadPoolExecutor(max_workers=1) as executor:
+            var_dict = dict(
+                        username_field=self.username_field.get_text().strip(), 
+                        password_field=self.password_field.get_text().strip(),
+                        member_free_radio=self.member_free_radio.get_active(),
+                        member_basic_radio=self.member_basic_radio.get_active(),
+                        member_plus_radio=self.member_plus_radio.get_active(),
+                        member_visionary_radio=self.member_visionary_radio .get_active()
+            )
+            future = executor.submit(self.login_presenter.on_login, **var_dict)
+            return_value = future.result()
+            
+            if return_value:
+                self.login_view.hide()
+                self.dashboard_view.display_window()
 
-        thread = Thread(target=self.login_presenter.on_login, kwargs=dict(
-                                                username_field=self.username_field.get_text().strip(), 
-                                                password_field=self.password_field.get_text().strip(),
-                                                member_free_radio=self.member_free_radio.get_active(),
-                                                member_basic_radio=self.member_basic_radio.get_active(),
-                                                member_plus_radio=self.member_plus_radio.get_active(),
-                                                member_visionary_radio=self.member_visionary_radio .get_active(),
-                                            ))
-        thread.daemon = True
-        thread.start()
-
-        # Queue has to be used
-        # self.login_view.hide()
-        # self.dashboard_window.display_window()
    
