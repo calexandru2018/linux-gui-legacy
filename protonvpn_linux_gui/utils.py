@@ -166,7 +166,7 @@ def find_cli():
     """
     protonvpn_path = subprocess.run(['sudo', 'which', 'protonvpn'], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
     if protonvpn_path.returncode == 1:
-        gui_logger.debug("[!] Unable to run \"find protonvpn-cli-ng\" subprocess.")
+        gui_logger.debug("[!] Unable to run \"find protonvpn-cli-ng\" subprocess. Result: \"{}\"".format(protonvpn_path))
         protonvpn_path = False
 
     return protonvpn_path.stdout.decode()[:-1] if (protonvpn_path and protonvpn_path.returncode == 0) else False
