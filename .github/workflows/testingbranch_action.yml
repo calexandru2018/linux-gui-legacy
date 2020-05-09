@@ -5,7 +5,9 @@ name: testing flake8
 
 on:
   push:
-    branches: [ queue-dev ]
+    branches: [ testing ]
+  pull_request:
+    branches: [ testing ]
 
 jobs:
   build:
