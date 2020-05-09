@@ -38,8 +38,6 @@ class SettingsPresenter:
     def update_user_pass(self, **kwargs):
         """Function that updates username and password.
         """
-        # dialog_window = kwargs.get("dialog_window")
-
         username = kwargs.get("username")
         password = kwargs.get("password")
 
@@ -50,7 +48,6 @@ class SettingsPresenter:
             display_message = "Username and password <b>updated</b>!"
 
         self.queue.put(dict(action="update_dialog", label=display_message))
-        # dialog_window.update_dialog(label=display_message)
 
         gui_logger.debug(">>> Ended tasks in \"set_username_password\" thread.")
 
@@ -69,15 +66,12 @@ class SettingsPresenter:
         """
         gui_logger.debug(">>> Running \"set_protonvpn_tier\".")
 
-        # dialog_window = kwargs.get("dialog_window")
-        #interface = kwargs.get("interface")
         protonvpn_plan = kwargs.get("tier")
         
         display_message = "Unable to update ProtonVPN Plan!"
         if self.settings_service.set_pvpn_tier(protonvpn_plan):
             display_message = "ProtonVPN Plan has been updated to <b>{}</b>!\nRestart the application to update servers.".format(kwargs.get("tier_display"))
         
-        # dialog_window.update_dialog(label=display_message)
         self.queue.put(dict(action="update_dialog", label=display_message))
 
         gui_logger.debug(">>> Result: \"{0}\"".format("ProtonVPN Plan has been updated!"))
@@ -107,7 +101,6 @@ class SettingsPresenter:
     def update_connect_preference(self, **kwargs):
         """Function that updates autoconnect. 
         """
-        # dialog_window = kwargs.get("dialog_window")
         active_choice = kwargs.get("user_choice")
         return_val = False
 
@@ -123,7 +116,6 @@ class SettingsPresenter:
             display_message = "{} setting updated to connect to <b>{}</b>!".format("Autoconnect" if not "quick_connect" in kwargs else "Quick connect", kwargs.get("country_display"))
         
         self.queue.put(dict(action="update_dialog", label=display_message))
-        # dialog_window.update_dialog(label=display_message)
 
         gui_logger.debug(">>> Ended tasks in \"update_autoconnect\" thread.") 
 
@@ -161,7 +153,6 @@ class SettingsPresenter:
         """
         gui_logger.debug(">>> Running \"set_split_tunnel\".")
 
-        # dialog_window = kwargs.get("dialog_window")
         split_tunneling_content = kwargs.get("split_tunneling_content")
         result = "Split tunneling configurations <b>updated</b>!\n"
         disabled_ks = False
@@ -172,7 +163,6 @@ class SettingsPresenter:
 
         if not type(valid_ips) == bool and len(valid_ips) > 1 and not valid_ips[0]:
             self.queue.put(dict(action="update_dialog", label="<b>{0}</b> is not valid!\nNone of the IP's were added, please try again with a different IP.".format(valid_ips[1])))
-            # dialog_window.update_dialog(label="<b>{0}</b> is not valid!\nNone of the IP's were added, please try again with a different IP.".format(valid_ips[1]))
             gui_logger.debug("[!] Invalid IP \"{0}\".".format(valid_ips[1]))
             return
 
@@ -192,7 +182,6 @@ class SettingsPresenter:
             if not disabled_ks and not self.settings_service.set_split_tunneling_ips(ip_list):
                 result = "Unable to add IPs to Split Tunneling file!"
 
-        # dialog_window.update_dialog(label=result)
         self.queue.put(dict(action="update_dialog", label=result))
 
         gui_logger.debug(">>> Result: \"{0}\"".format(result))
@@ -224,7 +213,7 @@ class SettingsPresenter:
 
         gui_logger.debug(">>> Ended tasks in \"tray_configurations\" thread.")   
         
-    def purge_configurations(self, dialog_window):
+    def purge_configurations(self):
         """Function to purge all current configurations.
         """
         # To-do: Confirm prior to allowing user to do this
@@ -237,7 +226,6 @@ class SettingsPresenter:
             gui_logger.debug(">>> Result: \"{0}\"".format("Configurations purged."))
 
         self.queue.put(dict(action="update_dialog", label="Configurations purged!"))
-        # dialog_window.update_dialog(label="Configurations purged!")
 
         gui_logger.debug(">>> Ended tasks in \"set_split_tunnel\" thread.")   
 
