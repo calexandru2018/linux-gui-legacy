@@ -6,6 +6,7 @@ import subprocess
 from protonvpn_cli.constants import CONFIG_DIR, PASSFILE, SPLIT_TUNNEL_FILE, USER #noqa
 from protonvpn_cli.utils import get_config_value, is_valid_ip, set_config_value, change_file_owner, get_servers, get_country_name #noqa
 from protonvpn_cli.connection import disconnect as pvpn_disconnect
+from protonvpn_cli.country_codes import country_codes
 
 from protonvpn_linux_gui.gui_logger import gui_logger
 from protonvpn_linux_gui.constants import (
@@ -88,7 +89,8 @@ class SettingsService:
                 return_val = self.manage_autoconnect(mode="enable", command="connect --tor")
             else:
                 # Connect to a specific country
-                return_val = self.manage_autoconnect(mode="enable", command="connect --cc " + update_to.upper())
+                if update_to in country_codes:
+                    return_val = self.manage_autoconnect(mode="enable", command="connect --cc " + update_to.upper())
 
             if not return_val:
                 return False
@@ -101,12 +103,16 @@ class SettingsService:
             return True
 
     def set_quickconnect(self, update_to):
-        try:
-            set_gui_config("conn_tab", "quick_connect", update_to)
-        except:
-            return False
+        return_val = False
 
-        return True
+        if update_to in country_codes or update_to in ["dis", "fast", "rand", "p2p", "sc", "tor"]:
+            try:
+                set_gui_config("conn_tab", "quick_connect", update_to)
+                return_val = True
+            except:
+                return False
+
+        return return_val
 
     def set_killswitch(self, update_to):
         try:

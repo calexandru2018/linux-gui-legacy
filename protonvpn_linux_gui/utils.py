@@ -62,7 +62,7 @@ def set_gui_config(group, key, value):
     config[group][key] = str(value)
 
     gui_logger.debug(
-        "Writing {0} to [{1}] in config file".format(key, group)
+        "Writing {0} on {1} to [{2}] in gui config file".format(str(value), key, group)
     )
 
     with open(GUI_CONFIG_FILE, "w+") as f:

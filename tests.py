@@ -57,19 +57,21 @@ def test_procotol():
 
 def test_connect_preference():
     list = [
-        dict(user_choice="dis", country_display="TEST", quick_connect=True),
-        dict(user_choice="fast", country_display="TEST", quick_connect=True),
-        dict(user_choice="rand", country_display="TEST", quick_connect=True),
-        dict(user_choice="p2p", country_display="TEST", quick_connect=True),
-        dict(user_choice="sc", country_display="TEST", quick_connect=True),
-        dict(user_choice="tor", country_display="TEST", quick_connect=True),
-        dict(user_choice="PT", country_display="TEST", quick_connect=True),
-        dict(user_choice="PT", country_display="TEST"),
-        dict(user_choice="ES", country_display="TEST"),
-        dict(user_choice="SE", country_display="TEST"),
+        [dict(user_choice="dis", country_display="TEST", quick_connect=True), True],
+        [dict(user_choice="fast", country_display="TEST", quick_connect=True), True],
+        [dict(user_choice="rand", country_display="TEST", quick_connect=True), True],
+        [dict(user_choice="p2p", country_display="TEST", quick_connect=True), True],
+        [dict(user_choice="sc", country_display="TEST", quick_connect=True), True],
+        [dict(user_choice="tor", country_display="TEST", quick_connect=True), True],
+        [dict(user_choice="PT", country_display="TEST", quick_connect=True), True],
+        [dict(user_choice="testing", country_display="TEST", quick_connect=True), False],
+        [dict(user_choice="PT", country_display="TEST"), True],
+        [dict(user_choice="ES", country_display="TEST"), True],
+        [dict(user_choice="SE", country_display="TEST"), True],
+        [dict(user_choice="testing", country_display="TEST"), False],
     ]
     for arg in list:
-        assert settings_presenter.update_connect_preference(**arg) == True
+        assert settings_presenter.update_connect_preference(**arg[0]) == arg[1]
 
 def test_killswitch():
     list = ["0", "1"]
