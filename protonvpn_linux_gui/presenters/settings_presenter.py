@@ -70,23 +70,11 @@ class SettingsPresenter:
         
         display_message = "Unable to update ProtonVPN Plan!"
         if self.settings_service.set_pvpn_tier(protonvpn_plan):
-            display_message = "ProtonVPN Plan has been updated to <b>{}</b>!\nRestart the application to update servers.".format(kwargs.get("tier_display"))
+            display_message = "ProtonVPN Plan has been updated to <b>{}</b>!\nPlease refresh servers!".format(kwargs.get("tier_display"))
         
         self.queue.put(dict(action="update_dialog", label=display_message))
 
-        gui_logger.debug(">>> Result: \"{0}\"".format("ProtonVPN Plan has been updated!"))
-
-        time.sleep(1.5)
-
-        # Reload servers after update pvpn_plan
-        # populate_servers_dict = {
-        #     "tree_object": kwargs.get("tree_object"),
-        #     "servers": False
-        # }
-
-        # gobject.idle_add(populate_server_list, populate_servers_dict)
-
-        gui_logger.debug(">>> Ended tasks in \"set_protonvpn_tier\" thread.")   
+        gui_logger.debug(">>> Ended tasks in \"set_protonvpn_tier\" thread. Result:{}".format("ProtonVPN Plan has been updated!"))   
 
     def update_def_protocol(self, openvpn_protocol):
         """Function that updates default protocol.

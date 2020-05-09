@@ -233,6 +233,34 @@ class DashboardPresenter:
 
         gui_logger.debug(">>> Ended tasks in \"random_c\" thread.")
 
+    def on_refresh_servers(self, **kwargs):
+        """Function that reloads server list to either secure-core or non-secure-core.
+        """  
+        # Sleep is needed because it takes a second to update the information,
+        # which makes the button "lag". Temporary solution.
+        time.sleep(1)
+        gui_logger.debug(">>> Running \"update_reload_secure_core_serverslabels_server_list\".")
+
+        return_val = False
+        populate_servers_dict = {
+            "tree_object": kwargs.get("tree_object"),
+            "servers": False
+        }
+
+        self.queue.put(dict(action="hide_spinner"))
+
+        conn = custom_get_ip_info()
+        if conn and not conn is None:
+            gobject.idle_add(self.populate_server_list, populate_servers_dict)
+            self.queue.put(dict(action="hide_dialog"))
+            return_val = True
+        else:
+            self.queue.put(dict(action="update_dialog", label="Could not update servers!", spinner=False))
+        
+        gui_logger.debug(">>> Ended tasks in \"reload_secure_core_servers\" thread.")
+
+        return return_val
+
     def on_disconnect(self, **kwargs):
         """Function that disconnects from the VPN.
         """

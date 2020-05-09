@@ -44,6 +44,7 @@ class DashboardView:
             "diagnose_menu_button_clicked": self.diagnose_menu_button_clicked,
             "help_button_clicked": self.help_button_clicked,
             "AboutDialog_delete_event": self.AboutDialog_delete_event,
+            "refresh_servers_button_clicked": self.refresh_servers_button_clicked,
             
         })
 
@@ -153,6 +154,15 @@ class DashboardView:
         gui_logger.debug(">>> Starting \"random_connect\" thread.")
 
         thread = Thread(target=self.dashboard_presenter.random_connect, kwargs=dict(connection_labels=self.connection_labels))
+        thread.daemon = True
+        thread.start()
+
+    def refresh_servers_button_clicked(self, button):
+        gui_logger.debug(">>> Starting \"on_refresh_servers\" thread.")
+
+        self.queue.put(dict(action="display_dialog", label="Fetching servers...", spinner=True))
+        
+        thread = Thread(target=self.dashboard_presenter.on_refresh_servers, kwargs=dict(tree_object=self.tree_object))
         thread.daemon = True
         thread.start()
 

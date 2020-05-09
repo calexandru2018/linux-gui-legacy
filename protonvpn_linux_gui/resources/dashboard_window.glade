@@ -306,6 +306,26 @@ Author: Alexandru Cheltuitor
                       </object>
                     </child>
                     <child>
+                      <object class="GtkMenuItem" id="refresh_servers">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="label" translatable="yes">Refresh Servers</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="refresh_servers_button_clicked" swapped="no"/>
+                        <style>
+                          <class name="white_text"/>
+                          <class name="text_hamburger_identation"/>
+                          <class name="menu_list_hover"/>
+                        </style>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkSeparatorMenuItem" id="&lt;separator&gt;">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                      </object>
+                    </child>
+                    <child>
                       <object class="GtkMenuItem" id="disconnect">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
