@@ -6,6 +6,7 @@ import configparser
 # Remote imports
 from protonvpn_cli.constants import CONFIG_FILE, CONFIG_DIR, PASSFILE #noqa
 from protonvpn_cli.utils import set_config_value, change_file_owner, pull_server_data, make_ovpn_template #noqa
+from protonvpn_cli.logger import logger
 
 # Local imports
 from protonvpn_linux_gui.gui_logger import gui_logger
@@ -14,7 +15,8 @@ from protonvpn_linux_gui.constants import (
     TRAY_CFG_SERVENAME, 
     TRAY_CFG_DATA_TX, 
     TRAY_CFG_TIME_CONN, 
-    GUI_CONFIG_FILE
+    GUI_CONFIG_FILE,
+    GUI_CONFIG_DIR
 )
 
 class LoginService:
@@ -75,6 +77,10 @@ class LoginService:
         return True
 
     def intialize_cli_config(self):
+        if not os.path.isdir(CONFIG_DIR):
+            os.mkdir(CONFIG_DIR)
+            change_file_owner(CONFIG_DIR)
+
         config = configparser.ConfigParser()
         config["USER"] = {
             "username": "None",
@@ -96,14 +102,19 @@ class LoginService:
             with open(CONFIG_FILE, "w") as f:
                 config.write(f)
             change_file_owner(CONFIG_FILE)
-            gui_logger.debug("pvpn-cli.cfg initialized")
 
-            change_file_owner(CONFIG_DIR)
-            return True
+            gui_logger.debug("pvpn-cli.cfg initialized")
+            logger.debug("pvpn-cli.cfg initialized")
         except:
             return False
 
+        return True
+
     def initialize_gui_config(self):
+        if not os.path.isdir(GUI_CONFIG_DIR):
+            os.mkdir(GUI_CONFIG_DIR)
+            change_file_owner(GUI_CONFIG_DIR)
+
         gui_config = configparser.ConfigParser()
         gui_config["connections"] = {
             "display_secure_core": False
@@ -127,11 +138,9 @@ class LoginService:
         with open(GUI_CONFIG_FILE, "w") as f:
             gui_config.write(f)
             gui_logger.debug("pvpn-gui.cfg initialized.")
-
-        change_file_owner(GUI_CONFIG_FILE)
+            change_file_owner(GUI_CONFIG_FILE)
 
         if not os.path.isfile(GUI_CONFIG_FILE):
-            print("something")
             gui_logger.debug("Unablt to initialize pvpn-gui.cfg. {}".format(Exception))
             return False
 

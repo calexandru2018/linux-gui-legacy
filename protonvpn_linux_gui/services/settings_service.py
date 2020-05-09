@@ -159,7 +159,7 @@ class SettingsService:
                 gui_logger.debug("[!] Invalid IP \"{0}\".".format(ip))
                 return (False, ip)
 
-        return (True)
+        return True
         
     def reformat_ip_list(self, ip_list):
         # Split IP/CIDR by either ";" and/or "\n"

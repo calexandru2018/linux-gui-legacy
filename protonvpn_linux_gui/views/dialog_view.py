@@ -1,5 +1,6 @@
 from threading import Thread
 
+from protonvpn_linux_gui.gui_logger import gui_logger
 from protonvpn_linux_gui.constants import (
     UI_DIALOG, 
 )
@@ -56,7 +57,7 @@ class DialogView:
                     gobject.idle_add(self.hide_spinner)
                     self.queue.task_done()
             except TypeError:
-                pass
+                gui_logger.debug(">>> Error occurs due to testing.") 
 
     def display_dialog(self, kwargs):
         if "label" in kwargs:

@@ -42,11 +42,13 @@ class DashboardPresenter:
         """Calls load_on_start, which returns False if there is no internet connection, otherwise populates dashboard labels and server list
         """
         gui_logger.debug(">>> Running \"load_on_start\".")
+        return_val = False
         display_message = "Could not load necessary resources, there might be connectivity issues."
         time.sleep(2)
         self.queue.put(dict(action="hide_spinner"))
         
         conn = custom_get_ip_info()
+
         if conn and not conn is None:
             self.queue.put(dict(action="update_dialog", label="Populating dashboard..."))
             
@@ -62,10 +64,13 @@ class DashboardPresenter:
 
             self.update_labels_server_list(objects_dict, conn_info=conn)
             self.queue.put(dict(action="hide_dialog"))
+            return_val = True
         else:
             self.queue.put(dict(action="update_dialog", label=display_message, spinner=False))
 
         gui_logger.debug(">>> Ended tasks in \"load_on_start\" thread.")  
+        
+        # return return_val
 
     def reload_secure_core_servers(self, **kwargs):
         """Function that reloads server list to either secure-core or non-secure-core.
@@ -75,18 +80,24 @@ class DashboardPresenter:
         time.sleep(1)
         gui_logger.debug(">>> Running \"update_reload_secure_core_serverslabels_server_list\".")
 
+        return_val = False
         display_message = "Unable to reload servers!"
+
         if self.dashboard_service.set_display_secure_core(kwargs.get("update_to")):
             populate_servers_dict = {
                 "tree_object": kwargs.get("tree_object"),
                 "servers": False
             }
+            return_val = True
+
             gobject.idle_add(self.populate_server_list, populate_servers_dict)
             display_message = "Displaying <b>{}</b> servers!".format("secure-core" if kwargs.get("update_to") == "True" else "non secure-core")
-        
+
         self.queue.put(dict(action="update_dialog", label=display_message))
 
         gui_logger.debug(">>> Ended tasks in \"reload_secure_core_servers\" thread.")
+
+        # return return_val
 
     def connect_to_selected_server(self, **kwargs):
         """Function that either connects by selected server or selected country.
@@ -259,7 +270,7 @@ class DashboardPresenter:
         
         gui_logger.debug(">>> Ended tasks in \"reload_secure_core_servers\" thread.")
 
-        return return_val
+        # return return_val
 
     def on_disconnect(self, **kwargs):
         """Function that disconnects from the VPN.
@@ -288,6 +299,7 @@ class DashboardPresenter:
         """
         
         return_string = "Developer Mode."
+        return_val = False
         
         try:
             latest_release, pip3_installed = self.dashboard_service.check_for_updates()
@@ -299,6 +311,7 @@ class DashboardPresenter:
         else:
             if latest_release == VERSION:
                 return_string = "You have the latest version!"
+                return_val = True
 
             if VERSION < latest_release:
                 return_string = "There is a newer release, you should upgrade to <b>v{0}</b>.\n\n".format(latest_release)
@@ -306,8 +319,11 @@ class DashboardPresenter:
                     return_string = return_string + "You can upgrade with the following command:\n\n<b>sudo pip3 install protonvpn-linux-gui-calexandru2018 --upgrade</b>\n\n"
                 else:
                     return_string = return_string + "You can upgrade by <b>first removing this version</b>, and then cloning the new one with the following commands:\n\n<b>git clone https://github.com/calexandru2018/protonvpn-linux-gui</b>\n\n<b>cd protonvpn-linux-gui</b>\n\n<b>sudo python3 setup.py install</b>"
+                return_val = True
 
         self.queue.put(dict(action="update_dialog", label=return_string))
+
+        return return_val
 
     def on_diagnose(self):
         """Multipurpose message dialog function.
@@ -330,7 +346,6 @@ class DashboardPresenter:
             is_sp_enabled= "Yes" if is_splitunn_enabled else "No")
 
         gui_logger.debug(result)
-
 
         self.queue.put(dict(action="update_dialog", label="<b><u>Reccomendation:</u></b>\n<span>{recc}</span>".format(recc=reccomendation)))
 

@@ -27,7 +27,6 @@ class LoginPresenter:
         """      
         username_field = kwargs.get("username_field")
         password_field = kwargs.get("password_field")
-        dialog_window = kwargs.get("dialog_window")
         
         protonvpn_plans = {
             '1': kwargs.get("member_free_radio"),
