@@ -23,7 +23,6 @@ Author: Alexandru Cheltuitor
 -->
 <interface>
   <requires lib="gtk+" version="3.20"/>
-  <!-- interface-css-provider-path main.css -->
   <!-- interface-license-type gplv3 -->
   <!-- interface-name Protonvpn-linux-gui -->
   <!-- interface-description Linux GUI for ProtonVPN users -->
@@ -40,7 +39,7 @@ Author: Alexandru Cheltuitor
     <property name="default_width">400</property>
     <property name="default_height">400</property>
     <property name="destroy_with_parent">True</property>
-    <property name="icon">img/logo/protonvpn_logo.png</property>
+    <property name="icon">../img/logo/protonvpn_logo.png</property>
     <property name="type_hint">normal</property>
     <property name="skip_taskbar_hint">True</property>
     <property name="skip_pager_hint">True</property>
@@ -58,7 +57,7 @@ Author: Alexandru Cheltuitor
           <object class="GtkImage">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-            <property name="pixbuf">img/logo/protonvpn_sign_green.png</property>
+            <property name="pixbuf">../img/logo/protonvpn_sign_green.png</property>
           </object>
         </child>
         <style>

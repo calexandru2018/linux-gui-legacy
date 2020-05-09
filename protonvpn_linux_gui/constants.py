@@ -11,11 +11,11 @@ GUI_CONFIG_FILE = os.path.join(GUI_CONFIG_DIR, "pvpn-gui.cfg")
 
 CURRDIR = os.path.dirname(os.path.abspath(__file__))
 
-UI_LOGIN = os.path.join(CURRDIR, "resources/login_window.glade")
-UI_DASHBOARD = os.path.join(CURRDIR, "resources/dashboard_window.glade")
-UI_SETTINGS = os.path.join(CURRDIR, "resources/settings_window.glade")
-UI_DIALOG = os.path.join(CURRDIR, "resources/message_dialog.glade")
-UI_STYLES = os.path.join(CURRDIR, "resources/main.css")
+UI_LOGIN = os.path.join(CURRDIR, "resources/ui/login_window.glade")
+UI_DASHBOARD = os.path.join(CURRDIR, "resources/ui/dashboard_window.glade")
+UI_SETTINGS = os.path.join(CURRDIR, "resources/ui/settings_window.glade")
+UI_DIALOG = os.path.join(CURRDIR, "resources/ui/message_dialog.glade")
+UI_STYLES = os.path.join(CURRDIR, "resources/styles/main.css")
 
 LARGE_FLAGS_BASE_PATH = os.path.join(CURRDIR, "resources/img/flags/large/")
 SMALL_FLAGS_BASE_PATH = os.path.join(CURRDIR, "resources/img/flags/small/")

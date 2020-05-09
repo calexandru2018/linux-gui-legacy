@@ -23,7 +23,6 @@ Author: Alexandru Cheltuitor
 -->
 <interface>
   <requires lib="gtk+" version="3.20"/>
-  <!-- interface-css-provider-path main.css -->
   <!-- interface-license-type gplv3 -->
   <!-- interface-name Protonvpn-linux-gui -->
   <!-- interface-description Linux GUI for ProtonVPN users -->
@@ -35,7 +34,7 @@ Author: Alexandru Cheltuitor
     <property name="modal">True</property>
     <property name="window_position">center-always</property>
     <property name="destroy_with_parent">True</property>
-    <property name="icon">img/logo/protonvpn_logo.png</property>
+    <property name="icon">../img/logo/protonvpn_logo.png</property>
     <property name="type_hint">notification</property>
     <property name="urgency_hint">True</property>
     <property name="accept_focus">False</property>
@@ -47,7 +46,7 @@ Author: Alexandru Cheltuitor
     <property name="website">https://github.com/calexandru2018/protonvpn-linux-gui</property>
     <property name="website_label" translatable="yes">Github Repo</property>
     <property name="authors">calexandru2018</property>
-    <property name="logo">img/logo/protonvpn-logo-white.png</property>
+    <property name="logo">../img/logo/protonvpn-logo-white.png</property>
     <property name="license_type">gpl-3-0</property>
     <signal name="delete-event" handler="AboutDialog_delete_event" swapped="no"/>
     <child type="titlebar">
@@ -61,7 +60,7 @@ Author: Alexandru Cheltuitor
           <object class="GtkImage">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-            <property name="pixbuf">img/logo/protonvpn_sign_green.png</property>
+            <property name="pixbuf">../img/logo/protonvpn_sign_green.png</property>
           </object>
         </child>
         <style>
@@ -228,7 +227,7 @@ Author: Alexandru Cheltuitor
   <object class="GtkImage" id="gtk-justify-fill">
     <property name="visible">True</property>
     <property name="can_focus">False</property>
-    <property name="pixbuf">img/utils/hamburger-menu-icon.png</property>
+    <property name="pixbuf">../img/utils/hamburger-menu-icon.png</property>
     <property name="icon_size">3</property>
     <style>
       <class name="top_menu_hamburger"/>
@@ -242,7 +241,7 @@ Author: Alexandru Cheltuitor
     <property name="title" translatable="yes">ProtonVPN GUI - Dashboard</property>
     <property name="resizable">False</property>
     <property name="window_position">center-always</property>
-    <property name="icon">img/logo/protonvpn_logo.png</property>
+    <property name="icon">../img/logo/protonvpn_logo.png</property>
     <property name="gravity">center</property>
     <child type="titlebar">
       <object class="GtkHeaderBar">
@@ -255,7 +254,7 @@ Author: Alexandru Cheltuitor
           <object class="GtkImage">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-            <property name="pixbuf">img/logo/protonvpn_sign_green.png</property>
+            <property name="pixbuf">../img/logo/protonvpn_sign_green.png</property>
           </object>
         </child>
         <child>
@@ -281,8 +280,6 @@ Author: Alexandru Cheltuitor
                         <signal name="activate" handler="configuration_menu_button_clicked" swapped="no"/>
                         <style>
                           <class name="white_text"/>
-                          <class name="text_hamburger_identation"/>
-                          <class name="menu_list_hover"/>
                         </style>
                       </object>
                     </child>
@@ -294,8 +291,6 @@ Author: Alexandru Cheltuitor
                         <signal name="activate" handler="diagnose_menu_button_clicked" swapped="no"/>
                         <style>
                           <class name="white_text"/>
-                          <class name="text_hamburger_identation"/>
-                          <class name="menu_list_hover"/>
                         </style>
                       </object>
                     </child>
@@ -314,8 +309,6 @@ Author: Alexandru Cheltuitor
                         <signal name="activate" handler="refresh_servers_button_clicked" swapped="no"/>
                         <style>
                           <class name="white_text"/>
-                          <class name="text_hamburger_identation"/>
-                          <class name="menu_list_hover"/>
                         </style>
                       </object>
                     </child>
@@ -334,8 +327,6 @@ Author: Alexandru Cheltuitor
                         <signal name="activate" handler="disconnect_button_clicked" swapped="no"/>
                         <style>
                           <class name="white_text"/>
-                          <class name="text_hamburger_identation"/>
-                          <class name="menu_list_hover"/>
                         </style>
                       </object>
                     </child>
@@ -354,8 +345,6 @@ Author: Alexandru Cheltuitor
                         <signal name="activate" handler="about_menu_button_clicked" swapped="no"/>
                         <style>
                           <class name="white_text"/>
-                          <class name="text_hamburger_identation"/>
-                          <class name="menu_list_hover"/>
                         </style>
                       </object>
                     </child>
@@ -372,8 +361,6 @@ Author: Alexandru Cheltuitor
                         <property name="label" translatable="yes">Exit</property>
                         <style>
                           <class name="white_text"/>
-                          <class name="text_hamburger_identation"/>
-                          <class name="menu_list_hover"/>
                         </style>
                       </object>
                     </child>
@@ -391,9 +378,6 @@ Author: Alexandru Cheltuitor
                 </style>
               </object>
             </child>
-            <style>
-              <class name="menu_bar"/>
-            </style>
           </object>
           <packing>
             <property name="position">1</property>
@@ -463,7 +447,7 @@ Author: Alexandru Cheltuitor
                                     <property name="visible">True</property>
                                     <property name="can_focus">False</property>
                                     <property name="opacity">0.5</property>
-                                    <property name="pixbuf">img/logo/protonvpn_logo.png</property>
+                                    <property name="pixbuf">../img/logo/protonvpn_logo.png</property>
                                   </object>
                                   <packing>
                                     <property name="x">-90</property>
@@ -495,7 +479,7 @@ Author: Alexandru Cheltuitor
                                     <child>
                                       <object class="GtkImage" id="protonvpn_sign_green">
                                         <property name="can_focus">False</property>
-                                        <property name="pixbuf">img/logo/protonvpn_sign_green.png</property>
+                                        <property name="pixbuf">../img/logo/protonvpn_sign_green.png</property>
                                       </object>
                                       <packing>
                                         <property name="left_attach">0</property>
@@ -537,7 +521,7 @@ Author: Alexandru Cheltuitor
                                       <object class="GtkImage">
                                         <property name="visible">True</property>
                                         <property name="can_focus">False</property>
-                                        <property name="pixbuf">img/utils/bitrate-download-arrow.png</property>
+                                        <property name="pixbuf">../img/utils/bitrate-download-arrow.png</property>
                                       </object>
                                       <packing>
                                         <property name="left_attach">0</property>
@@ -564,7 +548,7 @@ Author: Alexandru Cheltuitor
                                       <object class="GtkImage">
                                         <property name="visible">True</property>
                                         <property name="can_focus">False</property>
-                                        <property name="pixbuf">img/utils/bitrate-upload-arrow.png</property>
+                                        <property name="pixbuf">../img/utils/bitrate-upload-arrow.png</property>
                                       </object>
                                       <packing>
                                         <property name="left_attach">2</property>
@@ -819,7 +803,7 @@ Author: Alexandru Cheltuitor
                                         <property name="valign">center</property>
                                         <property name="margin_top">3</property>
                                         <property name="hexpand">True</property>
-                                        <property name="pixbuf">img/utils/info-green.png</property>
+                                        <property name="pixbuf">../img/utils/info-green.png</property>
                                       </object>
                                       <packing>
                                         <property name="left_attach">2</property>
@@ -1067,7 +1051,7 @@ Author: Alexandru Cheltuitor
                                                       <object class="GtkImage">
                                                         <property name="visible">True</property>
                                                         <property name="can_focus">False</property>
-                                                        <property name="pixbuf">img/utils/fastest.png</property>
+                                                        <property name="pixbuf">../img/utils/fastest.png</property>
                                                       </object>
                                                       <packing>
                                                         <property name="left_attach">0</property>
@@ -1103,7 +1087,7 @@ Author: Alexandru Cheltuitor
                                                       <object class="GtkImage">
                                                         <property name="visible">True</property>
                                                         <property name="can_focus">False</property>
-                                                        <property name="pixbuf">img/utils/random.png</property>
+                                                        <property name="pixbuf">../img/utils/random.png</property>
                                                       </object>
                                                       <packing>
                                                         <property name="left_attach">0</property>
@@ -1262,7 +1246,7 @@ Author: Alexandru Cheltuitor
                     <property name="can_focus">False</property>
                     <property name="hexpand">True</property>
                     <property name="vexpand">True</property>
-                    <property name="pixbuf">img/logo/protonvpn_logo_full.png</property>
+                    <property name="pixbuf">../img/logo/protonvpn_logo_full.png</property>
                   </object>
                   <packing>
                     <property name="left_attach">1</property>

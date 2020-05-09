@@ -23,7 +23,6 @@ Author: Alexandru Cheltuitor
 -->
 <interface>
   <requires lib="gtk+" version="3.20"/>
-  <!-- interface-css-provider-path main.css -->
   <!-- interface-license-type gplv3 -->
   <!-- interface-name Protonvpn-linux-gui -->
   <!-- interface-description Linux GUI for ProtonVPN users -->
@@ -141,7 +140,7 @@ Author: Alexandru Cheltuitor
     <property name="height_request">400</property>
     <property name="can_focus">False</property>
     <property name="title" translatable="yes">ProtonVPN GUI - Settings</property>
-    <property name="icon">img/logo/protonvpn_logo.png</property>
+    <property name="icon">../img/logo/protonvpn_logo.png</property>
     <signal name="delete-event" handler="SettingsWindow_delete_event" swapped="no"/>
     <child type="titlebar">
       <object class="GtkHeaderBar">
@@ -154,7 +153,7 @@ Author: Alexandru Cheltuitor
           <object class="GtkImage">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-            <property name="pixbuf">img/logo/protonvpn_sign_green.png</property>
+            <property name="pixbuf">../img/logo/protonvpn_sign_green.png</property>
           </object>
         </child>
         <style>
@@ -217,7 +216,7 @@ Author: Alexandru Cheltuitor
                       <object class="GtkImage">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="pixbuf">img/logo/protonvpn-logo-white.png</property>
+                        <property name="pixbuf">../img/logo/protonvpn-logo-white.png</property>
                         <style>
                           <class name="settings_main_logo"/>
                         </style>
@@ -808,7 +807,7 @@ Author: Alexandru Cheltuitor
                                 <property name="can_focus">False</property>
                                 <property name="tooltip_text" translatable="yes">On login, you are automatically connected to the specific profile.</property>
                                 <property name="margin_top">3</property>
-                                <property name="pixbuf">img/utils/info-green.png</property>
+                                <property name="pixbuf">../img/utils/info-green.png</property>
                               </object>
                               <packing>
                                 <property name="left_attach">1</property>
@@ -854,7 +853,7 @@ Author: Alexandru Cheltuitor
                                 <property name="can_focus">False</property>
                                 <property name="tooltip_text" translatable="yes">The Quick Connect button connects you to the selected profile.</property>
                                 <property name="margin_top">3</property>
-                                <property name="pixbuf">img/utils/info-green.png</property>
+                                <property name="pixbuf">../img/utils/info-green.png</property>
                               </object>
                               <packing>
                                 <property name="left_attach">1</property>
@@ -900,7 +899,7 @@ Author: Alexandru Cheltuitor
                                 <property name="can_focus">False</property>
                                 <property name="tooltip_text" translatable="yes">The default OpenVPN protocol to be used.</property>
                                 <property name="margin_top">3</property>
-                                <property name="pixbuf">img/utils/info-green.png</property>
+                                <property name="pixbuf">../img/utils/info-green.png</property>
                               </object>
                               <packing>
                                 <property name="left_attach">1</property>
@@ -960,7 +959,7 @@ Author: Alexandru Cheltuitor
                                 <property name="can_focus">False</property>
                                 <property name="tooltip_text" translatable="yes">Enter a private DNS server (like AdGuard DNS) to process your DNS request. Using custom DNS servers will disable NetShield. DNS servers are responsible for directing you to the correct site, so only use servers you trust.</property>
                                 <property name="margin_top">3</property>
-                                <property name="pixbuf">img/utils/info-green.png</property>
+                                <property name="pixbuf">../img/utils/info-green.png</property>
                               </object>
                               <packing>
                                 <property name="left_attach">1</property>
@@ -1185,7 +1184,7 @@ Author: Alexandru Cheltuitor
 Ex:
 192.168.0.1; 192.168.0.1
 192.168.0.1</property>
-                                    <property name="pixbuf">img/utils/info-green.png</property>
+                                    <property name="pixbuf">../img/utils/info-green.png</property>
                                   </object>
                                   <packing>
                                     <property name="left_attach">1</property>
@@ -1245,7 +1244,7 @@ Ex:
                                 <property name="tooltip_text" translatable="yes">Blocks all network traffic when the VPN tunnel is lost. Cannot be switched on together with Split Tunneling.</property>
                                 <property name="valign">center</property>
                                 <property name="margin_top">3</property>
-                                <property name="pixbuf">img/utils/info-green.png</property>
+                                <property name="pixbuf">../img/utils/info-green.png</property>
                               </object>
                               <packing>
                                 <property name="left_attach">1</property>
@@ -1292,7 +1291,7 @@ Ex:
                                 <property name="tooltip_text" translatable="yes">Prevent leaking details of DNS queries to third parties.</property>
                                 <property name="valign">center</property>
                                 <property name="margin_top">3</property>
-                                <property name="pixbuf">img/utils/info-green.png</property>
+                                <property name="pixbuf">../img/utils/info-green.png</property>
                               </object>
                               <packing>
                                 <property name="left_attach">1</property>
@@ -1339,7 +1338,7 @@ Ex:
                                 <property name="tooltip_text" translatable="yes">Exclude an application (not yet implemented) or an IP adress from VPN traffic or include only specific apps. Cannot be switched on together with Kill Switch.</property>
                                 <property name="valign">center</property>
                                 <property name="margin_top">3</property>
-                                <property name="pixbuf">img/utils/info-green.png</property>
+                                <property name="pixbuf">../img/utils/info-green.png</property>
                               </object>
                               <packing>
                                 <property name="left_attach">1</property>
