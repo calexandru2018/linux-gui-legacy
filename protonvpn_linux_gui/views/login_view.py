@@ -79,7 +79,7 @@ class LoginView:
         """     
 
         # Queue has to be used
-        self.queue.put(dict(action="display_dialog", label="Intializing profile...", spinner=True))
+        self.queue.put(dict(action="display_dialog", label="Intializing profile...", spinner=True, hide_close_button=True))
         
         with futures.ThreadPoolExecutor(max_workers=1) as executor:
             var_dict = dict(
