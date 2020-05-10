@@ -16,8 +16,10 @@ from protonvpn_cli.utils import (
 
 import gi
 gi.require_version('Gtk', '3.0')
+gi.require_version('Notify', '0.7')
 gi.require_version('AppIndicator3', '0.1')
-from gi.repository import Gtk, GObject
+from gi.repository import Gtk, GObject, GdkPixbuf
+from gi.repository import Notify
 from gi.repository import AppIndicator3 as appindicator
 
 # Local imports
@@ -31,11 +33,16 @@ from protonvpn_linux_gui.constants import (
 )
 from protonvpn_linux_gui.utils import get_gui_config, set_gui_config
 
+LOGO_PATH = os.path.join(CURRDIR, "resources/img/logo/protonvpn_logo.png")
+ALT_LOGO_PATH = os.path.join(CURRDIR, "resources/img/logo/protonvpn_logo_alt.png")
+
 class ProtonVPNIndicator:
     def __init__(self):
         self.gtk = Gtk
         self.gobject = GObject
+        
         self.display_serverload = False
+        self.connection_error = False
         self.serverload_msg = "Load: -"
         self.menu = self.menu()
         self.ind = appindicator.Indicator.new(
@@ -44,6 +51,10 @@ class ProtonVPNIndicator:
             appindicator.IndicatorCategory.APPLICATION_STATUS)
         self.ind.set_status(appindicator.IndicatorStatus.ACTIVE)
         self.ind.set_menu(self.menu)
+
+        self.tray_title = "ProtonVPN"
+        self.notify = Notify
+        self.notify.init("ProtonVPN Tray")
 
         gui_logger.debug("TRAY >>> Starting tray.")
 
@@ -112,14 +123,14 @@ class ProtonVPNIndicator:
     def main_loop(self, _):
         """Main loop that updates all labels.
         """
-        icon_path = "/resources/img/logo/protonvpn_logo_alt.png"
+        tray_icon = ALT_LOGO_PATH
         self.display_serverload = False
         display_data_rec = False
         display_server = False
         display_time_conn = False
 
         if is_connected():
-            icon_path = "/resources/img/logo/protonvpn_logo.png"
+            tray_icon = LOGO_PATH
             settings = self.get_tray_settings()
 
             self.display_serverload = True if settings["display_serverload"] else False
@@ -133,7 +144,7 @@ class ProtonVPNIndicator:
                                 display_server=display_server, 
                                 display_time_conn=display_time_conn)
 
-        self.ind.set_icon_full(CURRDIR + icon_path, 'protonvpn')
+        self.ind.set_icon_full(tray_icon, 'protonvpn')
 
         return True
     
@@ -141,25 +152,29 @@ class ProtonVPNIndicator:
         """Updates server load.
         """
         gui_logger.debug("TRAY >>> Updating server load in update_serverload.")
-
+        
         connected_server = False
         load = False
 
+        # force_pull servers
+        try:
+            pull_server_data(force=True)
+        except:
+            gui_logger.debug("[!] Could not pull from servers, possible due to unstable connection.")
+            self.connection_error = True
+            return True
+        
         try:
             connected_server = get_config_value("metadata", "connected_server")
         except (KeyError, IndexError):
             gui_logger.debug("[!] Could not find specified key.")
             return True
 
-        # force_pull servers
-        try:
-            pull_server_data(force=True)
-        except KeyError:
-            gui_logger.debug("[!] Could not pull from servers, possible due to unstable connection.")
-            return True
-
         # get_servers
-        servers = get_servers()
+        try:
+            servers = get_servers()
+        except:
+            return True
 
         # get server load
         try:
@@ -175,22 +190,39 @@ class ProtonVPNIndicator:
     def quick_connect(self, _):
         """Makes a quick connection by making a cli call to protonvpn-cli-ng"""
         gui_logger.debug("TRAY >>> Starting quick connect.")
-        proces = subprocess.Popen(["sudo", "protonvpn", "connect", "--fastest"], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
-        resp = proces.communicate()
-        self.update_serverload(None)
+
+        msg = "Unable to connected to VPN!"
+
+        self.notify.Notification.new(self.tray_title, "Starting quick connect...", LOGO_PATH).show()
+
+        process = subprocess.Popen(["sudo", "protonvpn", "connect", "--fastest"], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
+        resp = process.communicate()
+
+        if "connected" in resp[0].decode().lower():
+            msg = "Connected"
+            self.update_serverload(None)
+
+        self.notify.Notification.new(self.tray_title, msg, LOGO_PATH).show()
+        
         gui_logger.debug("TRAY >>> Successfully started quick connect: {}".format(resp))
+
+    def disconnect(self, _):
+        """Disconnects from a current vpn connection."""
+        gui_logger.debug("TRAY >>> Starting disconnect.")
+
+        self.notify.Notification.new(self.tray_title, "Disconnecting from VPN...", LOGO_PATH).show()
+
+        subprocess.Popen(["sudo", "protonvpn", "disconnect"], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
+
+        self.notify.Notification.new(self.tray_title, "Disconnected!", LOGO_PATH).show()
+        
+        gui_logger.debug("TRAY >>> Successfully disconnected user.")
 
     def show_gui(self, _):
         """Displays the GUI."""
         gui_logger.debug("TRAY >>> Starting to display GUI.")
         subprocess.Popen(["sudo", "protonvpn-gui"], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
         gui_logger.debug("TRAY >>> GUI display called, GUI should be visible.")
-
-    def disconnect(self, _):
-        """Disconnects from a current vpn connection."""
-        gui_logger.debug("TRAY >>> Starting disconnect.")
-        subprocess.Popen(["sudo", "protonvpn", "disconnect"], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
-        gui_logger.debug("TRAY >>> Successfully disconnected user.")
 
     def get_tray_settings(self):
         """Gets and returns tray settings from config file.
