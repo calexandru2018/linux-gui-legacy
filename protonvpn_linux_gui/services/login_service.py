@@ -42,7 +42,6 @@ class LoginService:
             'protonvpn_plan': int(protonvpn_plan),
             'openvpn_protocol': "tcp"
         }
-
         return user_data
         
     def setup_user(self, user_data):
@@ -79,7 +78,8 @@ class LoginService:
     def intialize_cli_config(self):
         if not os.path.isdir(CONFIG_DIR):
             os.mkdir(CONFIG_DIR)
-            change_file_owner(CONFIG_DIR)
+
+        change_file_owner(CONFIG_DIR)
 
         config = configparser.ConfigParser()
         config["USER"] = {
@@ -101,6 +101,7 @@ class LoginService:
         try:
             with open(CONFIG_FILE, "w") as f:
                 config.write(f)
+                
             change_file_owner(CONFIG_FILE)
 
             gui_logger.debug("pvpn-cli.cfg initialized")
@@ -113,7 +114,8 @@ class LoginService:
     def initialize_gui_config(self):
         if not os.path.isdir(GUI_CONFIG_DIR):
             os.mkdir(GUI_CONFIG_DIR)
-            change_file_owner(GUI_CONFIG_DIR)
+
+        change_file_owner(GUI_CONFIG_DIR)
 
         gui_config = configparser.ConfigParser()
         gui_config["connections"] = {
@@ -138,7 +140,8 @@ class LoginService:
         with open(GUI_CONFIG_FILE, "w") as f:
             gui_config.write(f)
             gui_logger.debug("pvpn-gui.cfg initialized.")
-            change_file_owner(GUI_CONFIG_FILE)
+
+        change_file_owner(GUI_CONFIG_FILE)
 
         if not os.path.isfile(GUI_CONFIG_FILE):
             gui_logger.debug("Unablt to initialize pvpn-gui.cfg. {}".format(Exception))
