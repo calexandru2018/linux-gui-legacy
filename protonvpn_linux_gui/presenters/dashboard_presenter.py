@@ -347,7 +347,7 @@ class DashboardPresenter:
 
         gui_logger.debug(result)
 
-        self.queue.put(dict(action="update_dialog", label="<b><u>Reccomendation:</u></b>\n<span>{recc}</span>".format(recc=reccomendation)))
+        self.queue.put(dict(action="update_dialog", label=result, sub_label="<b><u>Reccomendation:</u></b>\n<span>{recc}</span>".format(recc=reccomendation)))
 
     def update_labels_server_list(self, object_dict, conn_info=False):
         """Function that updates dashboard labels and server list.

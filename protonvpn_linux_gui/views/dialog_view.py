@@ -61,20 +61,18 @@ class DialogView:
 
     def display_dialog(self, kwargs):
         self.message_dialog_close_button.show()
+        self.messagedialog_sub_label.hide()
+        self.messagedialog_spinner.hide()
 
         if "label" in kwargs:
             self.messagedialog_label.set_markup(kwargs.get("label")) 
 
         if "spinner" in kwargs and kwargs.get("spinner"):
             self.messagedialog_spinner.show()
-        else:
-            self.messagedialog_spinner.hide()
 
         if "sub_label" in kwargs and kwargs.get("sub_label"):
             self.messagedialog_sub_label.set_markup(kwargs.get("sub_label"))
             self.messagedialog_sub_label.show()
-        else:
-            self.messagedialog_sub_label.hide()
 
         if "hide_close_button" in kwargs and kwargs.get("hide_close_button"):
             self.message_dialog_close_button.hide()
@@ -84,20 +82,18 @@ class DialogView:
 
     def update_dialog(self, kwargs):
         self.message_dialog_close_button.show()
+        self.messagedialog_sub_label.hide()
+        self.messagedialog_spinner.hide()
 
         if "label" in kwargs:
             self.messagedialog_label.set_markup(kwargs.get("label")) 
 
         if "spinner" in kwargs and kwargs.get("spinner"):
             self.messagedialog_spinner.show()
-        else:
-            self.messagedialog_spinner.hide()
 
         if "sub_label" in kwargs and kwargs.get("sub_label"):
             self.messagedialog_sub_label.set_markup(kwargs.get("sub_label"))
             self.messagedialog_sub_label.show()
-        else:
-            self.messagedialog_sub_label.hide()
 
         if "hide_close_button" in kwargs and kwargs.get("hide_close_button"):
             self.message_dialog_close_button.hide()
