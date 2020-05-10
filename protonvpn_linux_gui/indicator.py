@@ -195,7 +195,7 @@ class ProtonVPNIndicator:
 
         self.notify.Notification.new(self.tray_title, "Starting quick connect...", LOGO_PATH).show()
 
-        process = subprocess.Popen(["sudo", "protonvpn", "connect", "--fastest"], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
+        process = subprocess.Popen(["sudo", "protonvpn", "connect", "--fastest", "--askpass"], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
         resp = process.communicate()
         
         if "connected" in resp[0].decode().lower():
@@ -204,7 +204,7 @@ class ProtonVPNIndicator:
 
         self.notify.Notification.new(self.tray_title, msg, LOGO_PATH).show()
         
-        gui_logger.debug("TRAY >>> Successfully started quick connect: {}".format(resp))
+        gui_logger.debug("TRAY >>> Quick connect response: {}".format(resp))
 
     def disconnect(self, _):
         """Disconnects from a current vpn connection."""
@@ -214,7 +214,7 @@ class ProtonVPNIndicator:
 
         self.notify.Notification.new(self.tray_title, "Disconnecting from VPN...", LOGO_PATH).show()
 
-        process = subprocess.Popen(["sudo", "protonvpn", "disconnect"], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
+        process = subprocess.Popen(["sudo", "protonvpn", "disconnect", "--askpass"], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
         resp = process.communicate()
 
         if "disconnected" in resp[0].decode().lower():
@@ -222,7 +222,7 @@ class ProtonVPNIndicator:
 
         self.notify.Notification.new(self.tray_title, msg, LOGO_PATH).show()
         
-        gui_logger.debug("TRAY >>> Successfully disconnected user.")
+        gui_logger.debug("TRAY >>> Disconnect response: {}".format(resp))
 
     def show_gui(self, _):
         """Displays the GUI."""
