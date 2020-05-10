@@ -137,10 +137,3 @@ entry.default_style_entry:focus{
 	color:rgb(255,255,255);
 }
 
-.remove_borders{
-    border: none;
-}
-
-.bottom_border{
-    border-bottom: 1px solid rgba(255,255,255, 0.3);
-}
