@@ -31,7 +31,6 @@ Author: Alexandru Cheltuitor
     <property name="can_focus">False</property>
     <property name="title" translatable="yes">ProtonVPN GUI - About</property>
     <property name="resizable">False</property>
-    <property name="modal">True</property>
     <property name="window_position">center-always</property>
     <property name="destroy_with_parent">True</property>
     <property name="icon">../img/logo/protonvpn_logo.png</property>
