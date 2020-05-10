@@ -1,5 +1,12 @@
 import os
-from protonvpn_cli.constants import VERSION as cli_version, USER
+from protonvpn_cli.constants import VERSION as cli_version, USER as cli_user
+import pwd
+
+try:
+    USER = pwd.getpwuid(int(os.environ["PKEXEC_UID"])).pw_name
+except KeyError:
+    USER = cli_user
+
 
 VERSION = "2.0.7"
 
