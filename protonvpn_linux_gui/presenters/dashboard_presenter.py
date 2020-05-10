@@ -50,7 +50,7 @@ class DashboardPresenter:
         conn = custom_get_ip_info()
 
         if conn and not conn is None:
-            self.queue.put(dict(action="update_dialog", label="Populating dashboard..."))
+            self.queue.put(dict(action="update_dialog", label="Populating dashboard...", hide_close_button=True))
             
             display_secure_core = get_gui_config("connections", "display_secure_core")
             secure_core_switch = objects_dict["secure_core"]["secure_core_switch"]

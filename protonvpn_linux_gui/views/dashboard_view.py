@@ -51,7 +51,7 @@ class DashboardView:
     def display_window(self):
         self.dashboard_window.connect("destroy", self.gtk.main_quit)
 
-        self.queue.put(dict(action="display_dialog", label="Loading...", spinner=True))
+        self.queue.put(dict(action="display_dialog", label="Loading...", spinner=True, hide_close_button=True))
 
         objects = {
             "connection_labels": self.connection_labels,
@@ -120,7 +120,7 @@ class DashboardView:
     def profile_quick_connect_button_clicked(self, button):
         """Button/Event handler to connect to the fastest server
         """
-        self.queue.put(dict(action="display_dialog", label="Connecting to the fastest server...", spinner=True))
+        self.queue.put(dict(action="display_dialog", label="Connecting to the fastest server...", spinner=True, hide_close_button=True))
         gui_logger.debug(">>> Starting \"quick_connect\" thread.")
 
         thread = Thread(target=self.dashboard_presenter.quick_connect, kwargs=dict(connection_labels=self.connection_labels)) 
@@ -138,7 +138,7 @@ class DashboardView:
             gui_logger.debug("[!] Attempted to connect to previously connected server without having made any previous connections.")
             return
 
-        self.queue.put(dict(action="display_dialog", label="Connecting to previously connected server <b>{0}</b> with <b>{1}</b>.".format(servername, protocol.upper()), spinner=True))
+        self.queue.put(dict(action="display_dialog", label="Connecting to previously connected server <b>{0}</b> with <b>{1}</b>.".format(servername, protocol.upper()), spinner=True, hide_close_button=True))
 
         gui_logger.debug(">>> Starting \"last_connect\" thread.")
 
@@ -149,7 +149,7 @@ class DashboardView:
     def profile_random_connect_button_clicked(self, button):
         """Button/Event handler to connect to a random server
         """
-        self.queue.put(dict(action="display_dialog", label="Connecting to a random server...", spinner=True))
+        self.queue.put(dict(action="display_dialog", label="Connecting to a random server...", spinner=True, hide_close_button=True))
 
         gui_logger.debug(">>> Starting \"random_connect\" thread.")
 
@@ -160,7 +160,7 @@ class DashboardView:
     def refresh_servers_button_clicked(self, button):
         gui_logger.debug(">>> Starting \"on_refresh_servers\" thread.")
 
-        self.queue.put(dict(action="display_dialog", label="Fetching servers...", spinner=True))
+        self.queue.put(dict(action="display_dialog", label="Fetching servers...", spinner=True, hide_close_button=True))
         
         thread = Thread(target=self.dashboard_presenter.on_refresh_servers, kwargs=dict(tree_object=self.tree_object))
         thread.daemon = True
@@ -169,7 +169,7 @@ class DashboardView:
     def disconnect_button_clicked(self, button):
         """Button/Event handler to disconnect any existing connections
         """
-        self.queue.put(dict(action="display_dialog", label="Disconnecting...", spinner=True))
+        self.queue.put(dict(action="display_dialog", label="Disconnecting...", spinner=True, hide_close_button=True))
 
         gui_logger.debug(">>> Starting \"disconnect\" thread.")
 
@@ -234,7 +234,7 @@ class DashboardView:
             target = self.dashboard_presenter.connect_to_selected_server
             message = "Connecting to <b>{}</b>".format(user_selected_server) 
 
-        self.queue.put(dict(action="display_dialog", label=message, spinner=True))
+        self.queue.put(dict(action="display_dialog", label=message, spinner=True, hide_close_button=True))
 
         thread = Thread(target=target, kwargs=dict(
                                             connection_labels=self.connection_labels, 
@@ -253,7 +253,7 @@ class DashboardView:
             self.secure_core_label_style.get_style_context().add_class("disabled_label")
         
         if (state and display_secure_core == "False") or (not state and display_secure_core != "False"):
-            self.queue.put(dict(action="display_dialog", label="Loading {} servers...".format("secure-core" if update_to == "True" else "non secure-core"), spinner=True))
+            self.queue.put(dict(action="display_dialog", label="Loading {} servers...".format("secure-core" if update_to == "True" else "non secure-core"), spinner=True, hide_close_button=True))
             thread = Thread(target=self.dashboard_presenter.reload_secure_core_servers, kwargs=dict(
                                                     tree_object=self.tree_object,
                                                     update_to=update_to))
@@ -314,7 +314,7 @@ class DashboardView:
     def check_for_updates_button_clicked(self, button):
         """Button/Event handler to check for update.
         """
-        self.queue.put(dict(action="display_dialog", label="Checking...", spinner=True))
+        self.queue.put(dict(action="display_dialog", label="Checking...", spinner=True, hide_close_button=True))
 
         gui_logger.debug(">>> Starting \"message_dialog\" thread. [CHECK_FOR_UPDATES]")
 
@@ -325,7 +325,7 @@ class DashboardView:
     def diagnose_menu_button_clicked(self, button):
         """Button/Event handler top show diagnose window.
         """
-        self.queue.put(dict(action="display_dialog", label="Diagnosing...", spinner=True))
+        self.queue.put(dict(action="display_dialog", label="Diagnosing...", spinner=True, hide_close_button=True))
 
         gui_logger.debug(">>> Starting \"message_dialog\" thread. [DIAGNOSE]")
         thread = Thread(target=self.dashboard_presenter.on_diagnose)
