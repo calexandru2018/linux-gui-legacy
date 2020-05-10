@@ -60,6 +60,8 @@ class DialogView:
                 gui_logger.debug(">>> Error occurs due to testing.") 
 
     def display_dialog(self, kwargs):
+        self.message_dialog_close_button.show()
+
         if "label" in kwargs:
             self.messagedialog_label.set_markup(kwargs.get("label")) 
 
@@ -81,6 +83,8 @@ class DialogView:
         self.messagedialog_window.show()
 
     def update_dialog(self, kwargs):
+        self.message_dialog_close_button.show()
+
         if "label" in kwargs:
             self.messagedialog_label.set_markup(kwargs.get("label")) 
 
@@ -94,6 +98,10 @@ class DialogView:
             self.messagedialog_sub_label.show()
         else:
             self.messagedialog_sub_label.hide()
+
+        if "hide_close_button" in kwargs and kwargs.get("hide_close_button"):
+            self.message_dialog_close_button.hide()
+            self.messagedialog_window.connect("destroy", self.gtk.main_quit)            
 
     def hide_spinner(self):
         self.messagedialog_spinner.hide()
