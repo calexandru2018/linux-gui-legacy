@@ -62,6 +62,7 @@ def init():
             gui_logger.debug("[!] Unable to end previous process: {}.".format(response['message']))
             sys.exit(1)
 
+    Gtk.init()
     queue = Queue()
     interface = Gtk.Builder()
 
