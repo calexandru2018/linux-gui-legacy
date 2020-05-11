@@ -40,7 +40,7 @@ class ProtonVPNIndicator:
     def __init__(self):
         self.gtk = Gtk
         self.gobject = GObject
-        
+        self.sudo = "sudo"
         self.display_serverload = False
         self.connection_error = False
         self.serverload_msg = "Load: -"
@@ -57,6 +57,8 @@ class ProtonVPNIndicator:
         self.notify.init("ProtonVPN Tray")
 
         gui_logger.debug("TRAY >>> Starting tray.")
+        
+        self.set_pkexec()
 
         # Get first server load
         self.update_serverload(None)
@@ -192,43 +194,92 @@ class ProtonVPNIndicator:
         gui_logger.debug("TRAY >>> Starting quick connect.")
 
         msg = "Unable to connected to VPN!"
-
         self.notify.Notification.new(self.tray_title, "Starting quick connect...", LOGO_PATH).show()
 
-        process = subprocess.Popen(["sudo", "protonvpn", "connect", "--fastest", "--askpass"], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
-        resp = process.communicate()
+        process = subprocess.Popen([self.sudo, "protonvpn", "connect", "-f"], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
         
-        if "connected" in resp[0].decode().lower():
-            msg = "Connected"
-            self.update_serverload(None)
+        try:
+            outs, errs = process.communicate(timeout=7)
+        except subprocess.TimeoutExpired:
+            msg = "Unable to connect, make sure that your connection is stable and that the you app has been given root privilege."
+            timeout = True
+            process.kill()
+            outs, errs = process.communicate()
+
+        errs = errs.decode().lower()
+        outs = outs.decode().lower()
+
+        if not "dismissed" in errs and not timeout:
+            msg = "Unable to connect to VPN."
+            if "connected" in outs:
+                msg = "Connected"
 
         self.notify.Notification.new(self.tray_title, msg, LOGO_PATH).show()
         
-        gui_logger.debug("TRAY >>> Quick connect response: {}".format(resp))
+        gui_logger.debug("TRAY >>> Connect msg: {} --- response: {}<->{}".format(msg, outs, errs))
 
     def disconnect(self, _):
         """Disconnects from a current vpn connection."""
         gui_logger.debug("TRAY >>> Starting disconnect.")
 
-        msg = "Unable to disconnect from VPN!"
-
+        msg = "Root authorization was not provided."
+        timeout = False
         self.notify.Notification.new(self.tray_title, "Disconnecting from VPN...", LOGO_PATH).show()
+        
+        process = subprocess.Popen([self.sudo, "protonvpn", "disconnect"], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
 
-        process = subprocess.Popen(["sudo", "protonvpn", "disconnect", "--askpass"], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
-        resp = process.communicate()
+        try:
+            outs, errs = process.communicate(timeout=7)
+        except subprocess.TimeoutExpired:
+            msg = "Unable to disconnect, make sure that the app has been given root privilege."
+            timeout = True
+            process.kill()
+            outs, errs = process.communicate()
 
-        if "disconnected" in resp[0].decode().lower():
-            msg = "Disconnected"
+        errs = errs.decode().lower()
+        outs = outs.decode().lower()
+
+        if not "dismissed" in errs and not timeout:
+            msg = "Unable to disconnect from VPN."
+            if "disconnected" in outs:
+                msg = "Disconnected"
 
         self.notify.Notification.new(self.tray_title, msg, LOGO_PATH).show()
         
-        gui_logger.debug("TRAY >>> Disconnect response: {}".format(resp))
+        gui_logger.debug("TRAY >>> Disconnect msg: {} --- response: {}<->{}".format(msg, outs, errs))
 
     def show_gui(self, _):
         """Displays the GUI."""
         gui_logger.debug("TRAY >>> Starting to display GUI.")
-        subprocess.Popen(["sudo", "protonvpn-gui"], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
-        gui_logger.debug("TRAY >>> GUI display called, GUI should be visible.")
+        
+        timeout = False
+        no_policy = False
+        msg = "Unable to display GUI!"
+        self.notify.Notification.new(self.tray_title, "Calling for ProtonVPN GUI...", LOGO_PATH).show()
+
+
+        try:
+            process = subprocess.Popen([self.sudo, "protonvpn-gui"], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
+            outs, errs = process.communicate(timeout=7)
+        except:
+            msg = "Unable to display GUI, make sure that the app has been given root privilege."
+            timeout = True
+            process.kill()
+            outs, errs = process.communicate()
+        
+        errs = errs.decode().lower()
+        outs = outs.decode().lower()
+
+        if not "dismissed" in errs and not "connection refused" in errs and not timeout:
+            msg = "Was not dissmissed"
+            # if "connected" in outs:
+            #     msg = "Connected"
+        elif "connection refused" in errs:
+            no_policy = True
+            msg = "Policy was not added for ProtonVPN GUI. Please visit https://github.com/ProtonVPN/linux-gui on how to add one."       
+
+        self.notify.Notification.new(self.tray_title, msg, LOGO_PATH).show()
+        gui_logger.debug("TRAY >>> GUI display msg: {} --- response: {}<->{}".format(msg, outs, errs))
 
     def get_tray_settings(self):
         """Gets and returns tray settings from config file.
@@ -336,3 +387,12 @@ class ProtonVPNIndicator:
         """Quit/Stop the tray icon.
         """
         self.gtk.main_quit()
+
+    def set_pkexec(self):
+        """Checks for polkit/pkexec and sets to it if found.
+        """
+        process = subprocess.run(["which", "pkexec"], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
+
+        if process.returncode == 0 and process.stdout.decode().strip("\n").split("/")[-1:][0] == "pkexec":
+            self.sudo = "pkexec"
+            gui_logger.debug(">>> TRAY PolKit/pkexec found.")
