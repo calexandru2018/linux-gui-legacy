@@ -18,7 +18,8 @@ from protonvpn_linux_gui.constants import (
     TEMPLATE,
     PATH_AUTOCONNECT_SERVICE,
     SERVICE_NAME,
-    GUI_CONFIG_DIR
+    GUI_CONFIG_DIR,
+    TRAY_SUDO_TYPES
 )
 from protonvpn_linux_gui.utils import (
     set_gui_config,
@@ -206,7 +207,7 @@ class SettingsPresenter:
         
         return return_val
 
-    def tray_configurations(self, **kwargs):
+    def update_tray_display(self, **kwargs):
         """Function to update what the tray should display.
         """    
         gui_logger.debug(">>> Running \"tray_configurations\".")
@@ -226,13 +227,23 @@ class SettingsPresenter:
             display_message = "time connected"
 
         result = "Unable to update {} to {}!".format(display_message, "displayed" if setting_value == 1 else "hidden")
-        if self.settings_service.set_tray_setting(setting_display, setting_value):
+        if self.settings_service.set_tray_display_setting(setting_display, setting_value):
             result = "Tray {0} is <b>{1}</b>!".format(display_message, "displayed" if setting_value == 1 else "hidden")
             return_val = True
 
         gui_logger.debug(">>> Ended tasks in \"tray_configurations\" thread. Result: \"{0}\"".format(result))   
         
         return return_val
+
+    def on_sudo_type(self, **kwargs):
+        setting_value = kwargs.get("user_choice")
+        sudo_type = kwargs.get("sudo_type")
+        
+        if not self.settings_service.set_tray_sudo_type(sudo_type, setting_value):
+            gui_logger.debug("[!] Unable to update {} to {}.".format(sudo_type, setting_value))   
+            return False
+
+        return True
 
     def purge_configurations(self):
         """Function to purge all current configurations.
@@ -261,6 +272,7 @@ class SettingsPresenter:
 
         return config_removed == gui_removed
 
+
     def load_configurations(self, object_dict):
         """Function that loads user configurations before showing the configurations window.
         """
@@ -278,16 +290,32 @@ class SettingsPresenter:
         # Set tier
         pvpn_plan_combobox.set_active(tier)
 
-    def load_tray_settings(self, object_dict):
+    def load_tray_settings(self, display_dict):
         # Load tray configurations
+        sudo_objects = {}
+        sudo_objects["tray_run_gui_combobox"] = display_dict.pop("tray_run_gui_combobox")
+        sudo_objects["tray_run_commands_combobox"] = display_dict.pop("tray_run_commands_combobox")
+
         for k,v in TRAY_CFG_DICT.items(): 
             setter = 0
             try: 
                 setter = int(get_gui_config("tray_tab", v))
             except KeyError:
                 gui_logger.debug("[!] Unable to find {} key.".format(v))
+                set_gui_config("tray_tab", v, 0)
 
-            combobox = object_dict[k]
+            combobox = display_dict[k]
+            combobox.set_active(setter)
+
+        for k,v in TRAY_SUDO_TYPES.items():
+            setter = 0
+            try:
+                setter = int(get_gui_config("tray_tab", v))
+            except KeyError:
+                gui_logger.debug("[!] Unable to find {} key. Setting a default value.".format(v))
+                set_gui_config("tray_tab", v, 0)
+
+            combobox = sudo_objects[k]
             combobox.set_active(setter)
 
     def load_connection_settings(self, object_dict):

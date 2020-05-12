@@ -13,7 +13,8 @@ from protonvpn_linux_gui.constants import (
     TRAY_CFG_DICT, 
     TEMPLATE,
     PATH_AUTOCONNECT_SERVICE,
-    SERVICE_NAME
+    SERVICE_NAME,
+    TRAY_SUDO_TYPES
 )
 from protonvpn_linux_gui.utils import (
     set_gui_config,
@@ -175,9 +176,17 @@ class SettingsService:
         # Remove empty list elements
         return list(filter(None, split_tunneling_content))
 
-    def set_tray_setting(self, tray_display, tray_setting):
+    def set_tray_display_setting(self, tray_display, tray_setting):
         try:
             set_gui_config("tray_tab", TRAY_CFG_DICT[tray_display], tray_setting)
+        except:
+            return False
+
+        return True
+    
+    def set_tray_sudo_type(self, sudo_type, tray_setting):
+        try:
+            set_gui_config("tray_tab", TRAY_SUDO_TYPES[sudo_type], tray_setting)
         except:
             return False
 

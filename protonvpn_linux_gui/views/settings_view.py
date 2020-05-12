@@ -44,6 +44,8 @@ class SettingsView:
             "purge_configurations_button_clicked": self.purge_configurations_button_clicked,
             "update_username_input_key_release": self.update_username_input_key_release,
             "update_password_input_key_release": self.update_password_input_key_release,
+            "tray_run_gui_combobox_changed": self.tray_run_gui_combobox_changed,
+            "tray_run_commands_combobox_changed": self.tray_run_commands_combobox_changed,
         })
 
     def display_window(self):
@@ -84,7 +86,9 @@ class SettingsView:
         self.update_user_pass_button = self.interface.get_object("update_user_pass_button")
 
         # Tray tab
-        self.tray_dict = {k:interface.get_object(k) for k,v in TRAY_CFG_DICT.items()}
+        self.tray_dict = {k:self.interface.get_object(k) for k,v in TRAY_CFG_DICT.items()}
+        self.tray_dict["tray_run_gui_combobox"] = self.interface.get_object("tray_run_gui_combobox")
+        self.tray_dict["tray_run_commands_combobox"] = self.interface.get_object("tray_run_commands_combobox")
 
         # Connection Tab
         self.autoconnect_liststore = interface.get_object("AutoconnectListStore")
@@ -177,7 +181,7 @@ class SettingsView:
             option, display = model[tree_iter][:2]
             if option != int(display_data_tx):
                 gui_logger.debug(">>> Starting \"tray_data_tx_combobox_changed\" thread.")
-                thread = Thread(target=self.settings_presenter.tray_configurations, kwargs=dict(setting_value=option, setting_display="tray_data_tx_combobox"))
+                thread = Thread(target=self.settings_presenter.update_tray_display, kwargs=dict(setting_value=option, setting_display="tray_data_tx_combobox"))
                 thread.daemon = True
                 thread.start()
 
@@ -189,7 +193,7 @@ class SettingsView:
             option, display = model[tree_iter][:2]
             if option != int(display_data_tx):
                 gui_logger.debug(">>> Starting \"tray_servername_combobox_changed\" thread.")
-                thread = Thread(target=self.settings_presenter.tray_configurations, kwargs=dict(setting_value=option, setting_display="tray_servername_combobox"))
+                thread = Thread(target=self.settings_presenter.update_tray_display, kwargs=dict(setting_value=option, setting_display="tray_servername_combobox"))
                 thread.daemon = True
                 thread.start()
 
@@ -201,7 +205,7 @@ class SettingsView:
             option, display = model[tree_iter][:2]
             if option != int(display_data_tx):
                 gui_logger.debug(">>> Starting \"tray_servername_combobox_changed\" thread.")
-                thread = Thread(target=self.settings_presenter.tray_configurations, kwargs=dict(setting_value=option, setting_display="tray_time_connected_combobox"))
+                thread = Thread(target=self.settings_presenter.update_tray_display, kwargs=dict(setting_value=option, setting_display="tray_time_connected_combobox"))
                 thread.daemon = True
                 thread.start()
 
@@ -213,7 +217,39 @@ class SettingsView:
             option, display = model[tree_iter][:2]
             if option != int(display_data_tx):
                 gui_logger.debug(">>> Starting \"tray_servername_combobox_changed\" thread.")
-                thread = Thread(target=self.settings_presenter.tray_configurations, kwargs=dict(setting_value=option, setting_display="tray_serverload_combobox"))
+                thread = Thread(target=self.settings_presenter.update_tray_display, kwargs=dict(setting_value=option, setting_display="tray_serverload_combobox"))
+                thread.daemon = True
+                thread.start()
+
+    def tray_run_gui_combobox_changed(self, combobox):
+        run_gui_as = get_gui_config("tray_tab", "run_gui_as")
+        tree_iter = combobox.get_active_iter()
+        if tree_iter is not None:
+            model = combobox.get_model()
+            user_choice, sudo_type = model[tree_iter][:2]
+            if user_choice != run_gui_as:
+                gui_logger.debug(">>> Starting \"update_quick_connect_combobox_changed\" thread.")
+                
+                thread = Thread(target=self.settings_presenter.on_sudo_type, kwargs=dict(
+                                                                user_choice=user_choice,
+                                                                sudo_type="tray_run_gui_combobox",
+                                                                ))
+                thread.daemon = True
+                thread.start()
+
+    def tray_run_commands_combobox_changed(self, combobox):
+        run_commands_as = get_gui_config("tray_tab", "run_commands_as")
+        tree_iter = combobox.get_active_iter()
+        if tree_iter is not None:
+            model = combobox.get_model()
+            user_choice, sudo_type = model[tree_iter][:2]
+            if user_choice != run_commands_as:
+                gui_logger.debug(">>> Starting \"update_quick_connect_combobox_changed\" thread.")
+
+                thread = Thread(target=self.settings_presenter.on_sudo_type, kwargs=dict(
+                                                                user_choice=user_choice,
+                                                                sudo_type="tray_run_commands_combobox",
+                                                                ))
                 thread.daemon = True
                 thread.start()
 
