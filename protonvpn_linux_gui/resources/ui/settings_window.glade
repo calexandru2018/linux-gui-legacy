@@ -135,6 +135,24 @@ Author: Alexandru Cheltuitor
       </row>
     </data>
   </object>
+  <object class="GtkListStore" id="Tray_SudoTypes">
+    <columns>
+      <!-- column-name ID -->
+      <column type="gint"/>
+      <!-- column-name Sudo -->
+      <column type="gchararray"/>
+    </columns>
+    <data>
+      <row>
+        <col id="0">0</col>
+        <col id="1" translatable="yes">sudo</col>
+      </row>
+      <row>
+        <col id="0">1</col>
+        <col id="1" translatable="yes">pkexec</col>
+      </row>
+    </data>
+  </object>
   <object class="GtkWindow" id="SettingsWindow">
     <property name="width_request">400</property>
     <property name="height_request">400</property>
@@ -669,6 +687,84 @@ Author: Alexandru Cheltuitor
                           <packing>
                             <property name="left_attach">1</property>
                             <property name="top_attach">3</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkLabel">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="halign">start</property>
+                            <property name="label" translatable="yes">Run GUI with</property>
+                            <attributes>
+                              <attribute name="weight" value="medium"/>
+                              <attribute name="size" value="12000"/>
+                            </attributes>
+                          </object>
+                          <packing>
+                            <property name="left_attach">0</property>
+                            <property name="top_attach">4</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkLabel">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="halign">start</property>
+                            <property name="label" translatable="yes">Run VPN commands  with</property>
+                            <attributes>
+                              <attribute name="weight" value="medium"/>
+                              <attribute name="size" value="12000"/>
+                            </attributes>
+                          </object>
+                          <packing>
+                            <property name="left_attach">0</property>
+                            <property name="top_attach">5</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkComboBox" id="tray_run_gui_combobox">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="model">Tray_SudoTypes</property>
+                            <property name="active">0</property>
+                            <signal name="changed" handler="tray_run_gui_combobox_changed" swapped="no"/>
+                            <child>
+                              <object class="GtkCellRendererText"/>
+                              <attributes>
+                                <attribute name="text">1</attribute>
+                              </attributes>
+                            </child>
+                            <style>
+                              <class name="default_style_combobox"/>
+                              <class name="white_text"/>
+                            </style>
+                          </object>
+                          <packing>
+                            <property name="left_attach">1</property>
+                            <property name="top_attach">4</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkComboBox" id="tray_run_commands_combobox">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="model">Tray_SudoTypes</property>
+                            <property name="active">0</property>
+                            <signal name="changed" handler="tray_run_commands_combobox_changed" swapped="no"/>
+                            <child>
+                              <object class="GtkCellRendererText"/>
+                              <attributes>
+                                <attribute name="text">1</attribute>
+                              </attributes>
+                            </child>
+                            <style>
+                              <class name="default_style_combobox"/>
+                              <class name="white_text"/>
+                            </style>
+                          </object>
+                          <packing>
+                            <property name="left_attach">1</property>
+                            <property name="top_attach">5</property>
                           </packing>
                         </child>
                         <style>
