@@ -25,6 +25,7 @@ from protonvpn_linux_gui.utils import (
     set_gui_config,
     get_gui_config,
     find_cli,
+    check_polkit_exists
 )
 
 class SettingsPresenter:
@@ -294,6 +295,9 @@ class SettingsPresenter:
         # Load tray configurations
         sudo_objects = {}
         sudo_objects["tray_run_commands_combobox"] = display_dict.pop("tray_run_commands_combobox")
+        sudo_info_tooltip = display_dict.pop("sudo_info_tooltip")
+        polkit_exists = check_polkit_exists()
+        tooltip_msg = "Change how tray commands should be invoked. If \"Root\" is selected then visudo should be configured approprietly. For more information, please visit: \nhttps://github.com/ProtonVPN/linux-gui"
 
         for k,v in TRAY_CFG_DICT.items(): 
             setter = 0
@@ -316,6 +320,13 @@ class SettingsPresenter:
 
             combobox = sudo_objects[k]
             combobox.set_active(setter)
+            if not polkit_exists:
+                tooltip_msg = "PolKit was not found on your system. To change from sudo to PolKit please install the appropriate package. For more information, please visit: \nhttps://github.com/ProtonVPN/linux-gui"
+                combobox.get_style_context().remove_class("white_text")
+                combobox.get_style_context().add_class("disabled_label")
+                combobox.set_property("sensitive", False)
+
+        sudo_info_tooltip.set_tooltip_text(tooltip_msg)
 
     def load_connection_settings(self, object_dict):
         # Set Autoconnect on boot combobox 

@@ -86,8 +86,8 @@ class SettingsView:
 
         # Tray tab
         self.tray_dict = {k:self.interface.get_object(k) for k,v in TRAY_CFG_DICT.items()}
-        self.tray_dict["tray_run_gui_combobox"] = self.interface.get_object("tray_run_gui_combobox")
         self.tray_dict["tray_run_commands_combobox"] = self.interface.get_object("tray_run_commands_combobox")
+        self.tray_dict["sudo_info_tooltip"] = self.interface.get_object("sudo_info_tooltip")
 
         # Connection Tab
         self.autoconnect_liststore = interface.get_object("AutoconnectListStore")
