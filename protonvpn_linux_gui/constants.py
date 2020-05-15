@@ -62,6 +62,29 @@ Environment=SUDO_USER=user
 [Install]
 WantedBy=multi-user.target
 """
+POLKIT_PATH = "/usr/share/polkit-1/actions/org.freedesktop.protonvpn-gui.policy"
+POLKIT_TEMPLATE = """
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE policyconfig PUBLIC
+ "-//freedesktop//DTD PolicyKit Policy Configuration 1.0//EN"
+ "http://www.freedesktop.org/standards/PolicyKit/1/policyconfig.dtd">
+
+<policyconfig>
+
+  <action id="org.freedesktop.policykit.pkexec.run-ProtonVPN-GUI">
+    <description>Run ProtonVPN GUI</description>
+    <message>Authentication is required to run ProtonVPN</message>
+    <defaults>
+      <allow_any>no</allow_any>
+      <allow_inactive>no</allow_inactive>
+      <allow_active>auth_admin_keep</allow_active>
+    </defaults>
+    <annotate key="org.freedesktop.policykit.exec.path">[PATH]</annotate>
+    <annotate key="org.freedesktop.policykit.exec.allow_gui">TRUE</annotate>
+  </action>
+
+</policyconfig>
+"""
 CLI_ABSENCE_INFO = """
 <b>Could not find protonvpn-cli-ng installed on your system!</b>\t
 Original protonvpn-cli-ng is needed for the GUI to work.
@@ -95,3 +118,4 @@ Then fill in the template and concisely explain what you would like to see imple
 <b>I woule like to donate, do you have any e-wallets ?</b>
 First of all, thank you! Any help is very much appreciated and welcome, all this is developed during my free time. If you would like to donate, at the moment I have a liberapay account: https://liberapay.com/calexandru2018
 """.format(cli_version=cli_version)
+

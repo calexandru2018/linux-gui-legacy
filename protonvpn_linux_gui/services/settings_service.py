@@ -14,7 +14,9 @@ from protonvpn_linux_gui.constants import (
     TEMPLATE,
     PATH_AUTOCONNECT_SERVICE,
     SERVICE_NAME,
-    TRAY_SUDO_TYPES
+    TRAY_SUDO_TYPES,
+    POLKIT_PATH,
+    POLKIT_TEMPLATE,
 )
 from protonvpn_linux_gui.utils import (
     set_gui_config,
@@ -323,7 +325,7 @@ class SettingsService:
     def reload_daemon(self):
         """Function that reloads the autoconnect daemon service.
         """
-        resp = subprocess.run(['sudo', 'systeasdasdsmctl', 'daemoasdasdn-reloadasdasdasd'], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
+        resp = subprocess.run(['sudo', 'systemcl', 'daemon-reload'], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
         if resp.returncode == 1:
             gui_logger.debug("[!] Unable to reload daemon.\n{}".format(resp))
             return False
@@ -342,3 +344,45 @@ class SettingsService:
             return_val = False
 
         return return_val
+
+    def manage_polkit(self, mode):
+        self.remove_polkit_template()
+
+        if mode == 1:
+            self.generate_polkit_template()
+
+    def generate_polkit_template(self):
+        gui_path = self.get_gui_path()
+        if not gui_path:
+            return False
+
+        template = POLKIT_TEMPLATE.replace("[PATH]", gui_path)
+        generate_command = "cat > {0} <<EOF {1}\nEOF".format(POLKIT_PATH, template)
+
+        resp = subprocess.run(["sudo", "bash", "-c", generate_command], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
+        if resp.returncode == 1:
+            gui_logger.debug("[!] Unable to generate policykit template.\n{}".format(resp))
+            return False
+
+        return True
+
+    def remove_polkit_template(self):
+        resp = subprocess.run(["sudo", "rm", POLKIT_PATH], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
+        # If return code 1: File does not exist in path
+        # This is fired when a user wants to remove template a that does not exist
+        if resp.returncode == 1:
+            gui_logger.debug("[!] Could not remove .policy file.\n{}".format(resp))
+            return False
+
+        return True
+
+    def get_gui_path(self):
+        """Function that searches for the CLI. Returns CLIs path if it is found, otherwise it returns False.
+        """
+        protonvpn_gui_path = subprocess.run(['which', 'protonvpn-gui'], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
+        if protonvpn_gui_path.returncode == 1:
+            gui_logger.debug("[!] Unable to run \"get_gui_path\" subprocess. Result: \"{}\"".format(protonvpn_gui_path))
+            protonvpn_gui_path = False
+
+        return protonvpn_gui_path.stdout.decode()[:-1] if (protonvpn_gui_path and protonvpn_gui_path.returncode == 0) else False
+       
