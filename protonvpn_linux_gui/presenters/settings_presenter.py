@@ -239,11 +239,17 @@ class SettingsPresenter:
     def on_sudo_type(self, **kwargs):
         setting_value = kwargs.get("user_choice")
         sudo_type = kwargs.get("sudo_type")
-        
+
         if not self.settings_service.set_tray_sudo_type(sudo_type, setting_value):
             gui_logger.debug("[!] Unable to update {} to {}.".format(sudo_type, setting_value))   
+            self.queue.put(dict(action="update_dialog", label="Unable to update sudo type setting!"))
             return False
 
+        if not self.settings_service.manage_polkit(setting_value):
+            gui_logger.debug("[!] Unable to create .policy file.".format(sudo_type, setting_value))   
+            self.queue.put(dict(action="update_dialog", label="Unable to update generate .policy file!"))
+
+        self.queue.put(dict(action="update_dialog", label="Sudo type setting <b>updated</b> to {}!".format("Sudo" if setting_value == 0 else "PolicyKit")))
         return True
 
     def purge_configurations(self):
