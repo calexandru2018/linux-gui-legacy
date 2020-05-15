@@ -221,14 +221,14 @@ class SettingsView:
                 thread.start()
 
     def tray_run_commands_combobox_changed(self, combobox):
-        run_commands_as = get_gui_config("tray_tab", "run_commands_as")
+        run_commands_as = int(get_gui_config("tray_tab", "run_commands_as"))
         tree_iter = combobox.get_active_iter()
         if tree_iter is not None:
             model = combobox.get_model()
             user_choice, sudo_type = model[tree_iter][:2]
             if user_choice != run_commands_as:
+                self.queue.put(dict(action="display_dialog", label="Updating sudo type...", spinner=True, hide_close_button=True))
                 gui_logger.debug(">>> Starting \"on_sudo_type\" thread.")
-
                 thread = Thread(target=self.settings_presenter.on_sudo_type, kwargs=dict(
                                                                 user_choice=user_choice,
                                                                 sudo_type="tray_run_commands_combobox",
