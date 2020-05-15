@@ -44,7 +44,6 @@ class SettingsView:
             "purge_configurations_button_clicked": self.purge_configurations_button_clicked,
             "update_username_input_key_release": self.update_username_input_key_release,
             "update_password_input_key_release": self.update_password_input_key_release,
-            "tray_run_gui_combobox_changed": self.tray_run_gui_combobox_changed,
             "tray_run_commands_combobox_changed": self.tray_run_commands_combobox_changed,
         })
 
@@ -221,22 +220,6 @@ class SettingsView:
                 thread.daemon = True
                 thread.start()
 
-    def tray_run_gui_combobox_changed(self, combobox):
-        run_gui_as = get_gui_config("tray_tab", "run_gui_as")
-        tree_iter = combobox.get_active_iter()
-        if tree_iter is not None:
-            model = combobox.get_model()
-            user_choice, sudo_type = model[tree_iter][:2]
-            if user_choice != run_gui_as:
-                gui_logger.debug(">>> Starting \"update_quick_connect_combobox_changed\" thread.")
-                
-                thread = Thread(target=self.settings_presenter.on_sudo_type, kwargs=dict(
-                                                                user_choice=user_choice,
-                                                                sudo_type="tray_run_gui_combobox",
-                                                                ))
-                thread.daemon = True
-                thread.start()
-
     def tray_run_commands_combobox_changed(self, combobox):
         run_commands_as = get_gui_config("tray_tab", "run_commands_as")
         tree_iter = combobox.get_active_iter()
@@ -244,7 +227,7 @@ class SettingsView:
             model = combobox.get_model()
             user_choice, sudo_type = model[tree_iter][:2]
             if user_choice != run_commands_as:
-                gui_logger.debug(">>> Starting \"update_quick_connect_combobox_changed\" thread.")
+                gui_logger.debug(">>> Starting \"on_sudo_type\" thread.")
 
                 thread = Thread(target=self.settings_presenter.on_sudo_type, kwargs=dict(
                                                                 user_choice=user_choice,

@@ -16,7 +16,8 @@ from protonvpn_linux_gui.constants import (
     TRAY_CFG_DATA_TX, 
     TRAY_CFG_TIME_CONN, 
     GUI_CONFIG_FILE,
-    GUI_CONFIG_DIR
+    GUI_CONFIG_DIR,
+    TRAY_CFG_SUDO
 )
 
 class LoginService:
@@ -131,6 +132,8 @@ class LoginService:
             TRAY_CFG_SERVENAME: "0",
             TRAY_CFG_TIME_CONN: "0",
             TRAY_CFG_SERVERLOAD: "0",
+            TRAY_CFG_SUDO: "0"
+            
         }
         gui_config["conn_tab"] = {
             "autoconnect": "dis",

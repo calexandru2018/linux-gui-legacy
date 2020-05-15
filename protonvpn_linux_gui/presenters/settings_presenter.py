@@ -293,7 +293,6 @@ class SettingsPresenter:
     def load_tray_settings(self, display_dict):
         # Load tray configurations
         sudo_objects = {}
-        sudo_objects["tray_run_gui_combobox"] = display_dict.pop("tray_run_gui_combobox")
         sudo_objects["tray_run_commands_combobox"] = display_dict.pop("tray_run_commands_combobox")
 
         for k,v in TRAY_CFG_DICT.items(): 
