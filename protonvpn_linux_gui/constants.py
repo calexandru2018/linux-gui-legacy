@@ -39,9 +39,9 @@ TRAY_CFG_DICT = {
     "tray_time_connected_combobox": TRAY_CFG_TIME_CONN,
     "tray_serverload_combobox": TRAY_CFG_SERVERLOAD
 }
+TRAY_CFG_SUDO = "run_commands_as"
 TRAY_SUDO_TYPES = {
-    "tray_run_gui_combobox": "run_gui_as",
-    "tray_run_commands_combobox": "run_commands_as",
+    "tray_run_commands_combobox": TRAY_CFG_SUDO,
 }
 
 SERVICE_NAME = "custompvpn-autoconnect" 
