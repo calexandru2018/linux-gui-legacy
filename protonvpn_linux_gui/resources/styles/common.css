@@ -33,7 +33,7 @@ entry.default_style_entry:focus{
 }
 /* Entry default style */
 
-.disabled_label{
+.disabled_label, .disabled_label * {
     color: rgb(157,157,157);
 }
 
