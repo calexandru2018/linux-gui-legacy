@@ -186,9 +186,9 @@ class SettingsService:
 
         return True
     
-    def set_tray_sudo_type(self, sudo_type, tray_setting):
+    def set_polkit(self, update_to):
         try:
-            set_gui_config("tray_tab", TRAY_SUDO_TYPES[sudo_type], tray_setting)
+            set_gui_config("general_tab", "polkit_enabled", update_to)
         except:
             return False
 
@@ -346,10 +346,11 @@ class SettingsService:
         return return_val
 
     def manage_polkit(self, mode):
-        self.remove_polkit_template()
 
         if mode == 1:
-            self.generate_polkit_template()
+            return self.generate_polkit_template()
+        else:
+            return self.remove_polkit_template()
 
     def generate_polkit_template(self):
         gui_path = self.get_gui_path()
@@ -367,11 +368,16 @@ class SettingsService:
         return True
 
     def remove_polkit_template(self):
+        try:
+            polkit_enabled = int(get_gui_config("general_tab", "polkit_enabled"))
+        except KeyError:
+            polkit_enabled = 0
+
         resp = subprocess.run(["sudo", "rm", POLKIT_PATH], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
         # If return code 1: File does not exist in path
         # This is fired when a user wants to remove template a that does not exist
-        if resp.returncode == 1:
-            gui_logger.debug("[!] Could not remove .policy file.\n{}".format(resp))
+        if not polkit_enabled == 1 and resp.returncode == 1:
+            gui_logger.debug("[!] Could not remove .policy file. File might be non existent: \n{}".format(resp))
             return False
 
         return True

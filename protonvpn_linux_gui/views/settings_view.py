@@ -44,7 +44,7 @@ class SettingsView:
             "purge_configurations_button_clicked": self.purge_configurations_button_clicked,
             "update_username_input_key_release": self.update_username_input_key_release,
             "update_password_input_key_release": self.update_password_input_key_release,
-            "tray_run_commands_combobox_changed": self.tray_run_commands_combobox_changed,
+            "polkit_support_switch_changed": self.polkit_support_switch_changed,
         })
 
     def display_window(self):
@@ -52,6 +52,8 @@ class SettingsView:
             "general":{
                 "pvpn_plan_combobox": self.pvpn_plan_combobox,
                 "username": self.username_field,
+                "polkit_support_switch": self.polkit_support_switch,
+                "sudo_info_tooltip": self.sudo_info_tooltip
             },
             "tray_comboboxes": self.tray_dict,
             "connection":{
@@ -83,12 +85,12 @@ class SettingsView:
         self.username_field = self.interface.get_object("update_username_input")
         self.password_field = self.interface.get_object("update_password_input")
         self.update_user_pass_button = self.interface.get_object("update_user_pass_button")
+        self.polkit_support_switch = self.interface.get_object("polkit_support_switch")
+        self.sudo_info_tooltip = self.interface.get_object("sudo_info_tooltip")
 
         # Tray tab
         self.tray_dict = {k:self.interface.get_object(k) for k,v in TRAY_CFG_DICT.items()}
-        self.tray_dict["tray_run_commands_combobox"] = self.interface.get_object("tray_run_commands_combobox")
-        self.tray_dict["sudo_info_tooltip"] = self.interface.get_object("sudo_info_tooltip")
-
+        
         # Connection Tab
         self.autoconnect_liststore = interface.get_object("AutoconnectListStore")
         self.update_autoconnect_combobox = self.interface.get_object("update_autoconnect_combobox")
@@ -170,7 +172,20 @@ class SettingsView:
         thread.daemon = True
         thread.start()
 
-    
+    def polkit_support_switch_changed(self, switch, state):
+        polkit_enabled = int(get_gui_config("general_tab", "polkit_enabled"))
+        
+        update_to = 0
+        if polkit_enabled == 0:
+            update_to = 1
+
+        if (state and polkit_enabled == 0) or (not state and polkit_enabled != 0):
+            self.queue.put(dict(action="display_dialog", label="Applying changes...", spinner=True, hide_close_button=True))
+            
+            thread = Thread(target=self.settings_presenter.on_polkit_change, args=[update_to])
+            thread.daemon = True
+            thread.start()
+
     # System tray tab
     def tray_data_tx_combobox_changed(self, combobox):
         display_data_tx = get_gui_config("tray_tab", "display_data_tx")
@@ -220,21 +235,22 @@ class SettingsView:
                 thread.daemon = True
                 thread.start()
 
-    def tray_run_commands_combobox_changed(self, combobox):
-        run_commands_as = int(get_gui_config("tray_tab", "run_commands_as"))
-        tree_iter = combobox.get_active_iter()
-        if tree_iter is not None:
-            model = combobox.get_model()
-            user_choice, sudo_type = model[tree_iter][:2]
-            if user_choice != run_commands_as:
-                self.queue.put(dict(action="display_dialog", label="Updating sudo type...", spinner=True, hide_close_button=True))
-                gui_logger.debug(">>> Starting \"on_sudo_type\" thread.")
-                thread = Thread(target=self.settings_presenter.on_sudo_type, kwargs=dict(
-                                                                user_choice=user_choice,
-                                                                sudo_type="tray_run_commands_combobox",
-                                                                ))
-                thread.daemon = True
-                thread.start()
+    # def tray_run_commands_combobox_changed(self, combobox):
+    #     run_commands_as = int(get_gui_config("tray_tab", "run_commands_as"))
+    #     tree_iter = combobox.get_active_iter()
+    #     if tree_iter is not None:
+    #         model = combobox.get_model()
+    #         user_choice, sudo_type = model[tree_iter][:2]
+    #         if user_choice != run_commands_as:
+    #             self.queue.put(dict(action="display_dialog", label="Updating sudo type...", spinner=True, hide_close_button=True))
+    #             gui_logger.debug(">>> Starting \"on_sudo_type\" thread.")
+    #             thread = Thread(target=self.settings_presenter.on_sudo_type, kwargs=dict(
+    #                                                             user_choice=user_choice,
+    #                                                             sudo_type="tray_run_commands_combobox",
+    #                                                             ))
+    #             thread.daemon = True
+    #             thread.start()
+    # polkit_support_switch_changed
 
     # Connection tab
     def update_autoconnect_combobox_changed(self, combobox):

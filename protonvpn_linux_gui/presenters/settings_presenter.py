@@ -236,21 +236,20 @@ class SettingsPresenter:
         
         return return_val
 
-    def on_sudo_type(self, **kwargs):
-        setting_value = kwargs.get("user_choice")
-        sudo_type = kwargs.get("sudo_type")
+    def on_polkit_change(self, update_to):
+        enabled_msg = "\nYou can now use \"pkexec\" command to start ProtonVPN GUI."
+        result = "PolKit Support <b>{}</b>!{}".format("disabled" if update_to == 0 else "enabled", enabled_msg if update_to == 1 else "")
+        update_polkit_status = self.settings_service.set_polkit(update_to)
 
-        if not self.settings_service.set_tray_sudo_type(sudo_type, setting_value):
-            gui_logger.debug("[!] Unable to update {} to {}.".format(sudo_type, setting_value))   
-            self.queue.put(dict(action="update_dialog", label="Unable to update sudo type setting!"))
-            return False
+        if not update_polkit_status:
+            gui_logger.debug("[!] Unable to enable polkit.")  
+            result = "Unable to update PolKit settings!"
+        else:
+            if not self.settings_service.manage_polkit(update_to):
+                gui_logger.debug("[!] Unable to create .policy file.")   
+                result = "Unable to {} files!".format("remove" if update_to == 0 else "generate")
 
-        if not self.settings_service.manage_polkit(setting_value):
-            gui_logger.debug("[!] Unable to create .policy file.".format(sudo_type, setting_value))   
-            self.queue.put(dict(action="update_dialog", label="Unable to update generate .policy file!"))
-
-        self.queue.put(dict(action="update_dialog", label="Sudo type setting <b>updated</b> to {}!".format("Sudo" if setting_value == 0 else "PolicyKit")))
-        return True
+        self.queue.put(dict(action="update_dialog", label=result))
 
     def purge_configurations(self):
         """Function to purge all current configurations.
@@ -283,28 +282,46 @@ class SettingsPresenter:
     def load_configurations(self, object_dict):
         """Function that loads user configurations before showing the configurations window.
         """
-        self.load_general_settings(object_dict["general"]["pvpn_plan_combobox"], object_dict["general"]["username"])
+        self.load_general_settings(object_dict["general"])
         self.load_tray_settings(object_dict["tray_comboboxes"])
         self.load_connection_settings(object_dict["connection"])
         self.load_advanced_settings(object_dict["advanced"])
 
-    def load_general_settings(self, pvpn_plan_combobox, username_field):
+    def load_general_settings(self, general_settings_dict):
+        polkit_support_switch = general_settings_dict["polkit_support_switch"]
+        sudo_info_tooltip = general_settings_dict["sudo_info_tooltip"]
+        setter = 0
+
+        polkit_exists = check_polkit_exists()
+
+        tooltip_msg = "Could not find PolKit installed on your system. For more information, please visit: \nhttps://github.com/ProtonVPN/linux-gui"
+
         username = get_config_value("USER", "username")
         tier = int(get_config_value("USER", "tier"))
 
         # Populate username
-        username_field.set_text(username)   
+        general_settings_dict["username"].set_text(username)   
         # Set tier
-        pvpn_plan_combobox.set_active(tier)
+        general_settings_dict["pvpn_plan_combobox"].set_active(tier)
+
+        polkit_support_switch.set_property('sensitive', False)
+        try:
+            setter = int(get_gui_config("general_tab", "polkit_enabled"))
+        except KeyError:
+            gui_logger.debug("[!] Unable to find \"polkit_enabled\" key. Setting a default value.")
+            set_gui_config("general_tab", "polkit_enabled", 0)
+
+        if check_polkit_exists():
+            if setter == 1:
+                polkit_support_switch.set_state(True)
+            
+            polkit_support_switch.set_property('sensitive', True)
+            tooltip_msg = "Makes possible to call the GUI with \"pkexec protonvpn-gui\"."
+
+        sudo_info_tooltip.set_tooltip_text(tooltip_msg)
 
     def load_tray_settings(self, display_dict):
         # Load tray configurations
-        sudo_objects = {}
-        sudo_objects["tray_run_commands_combobox"] = display_dict.pop("tray_run_commands_combobox")
-        sudo_info_tooltip = display_dict.pop("sudo_info_tooltip")
-        polkit_exists = check_polkit_exists()
-        tooltip_msg = "Change how tray commands should be invoked. If \"Root\" is selected then visudo should be configured approprietly. For more information, please visit: \nhttps://github.com/ProtonVPN/linux-gui"
-
         for k,v in TRAY_CFG_DICT.items(): 
             setter = 0
             try: 
@@ -315,24 +332,6 @@ class SettingsPresenter:
 
             combobox = display_dict[k]
             combobox.set_active(setter)
-
-        for k,v in TRAY_SUDO_TYPES.items():
-            setter = 0
-            try:
-                setter = int(get_gui_config("tray_tab", v))
-            except KeyError:
-                gui_logger.debug("[!] Unable to find {} key. Setting a default value.".format(v))
-                set_gui_config("tray_tab", v, 0)
-
-            combobox = sudo_objects[k]
-            combobox.set_active(setter)
-            if not polkit_exists:
-                tooltip_msg = "PolKit was not found on your system. To change from sudo to PolKit please install the appropriate package. For more information, please visit: \nhttps://github.com/ProtonVPN/linux-gui"
-                combobox.get_style_context().remove_class("white_text")
-                combobox.get_style_context().add_class("disabled_label")
-                combobox.set_property("sensitive", False)
-
-        sudo_info_tooltip.set_tooltip_text(tooltip_msg)
 
     def load_connection_settings(self, object_dict):
         # Set Autoconnect on boot combobox 
