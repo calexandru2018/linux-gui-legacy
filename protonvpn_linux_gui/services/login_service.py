@@ -107,6 +107,8 @@ class LoginService:
 
             gui_logger.debug("pvpn-cli.cfg initialized")
             logger.debug("pvpn-cli.cfg initialized")
+
+            change_file_owner(os.path.join(CONFIG_DIR, "pvpn-cli.log"))
         except:
             return False
 
@@ -126,14 +128,13 @@ class LoginService:
             "start_min": False,
             "start_on_boot": False,
             "show_notifications": False,
+            "polkit_enabled": 0
         }
         gui_config["tray_tab"] = {
             TRAY_CFG_DATA_TX: "0",
             TRAY_CFG_SERVENAME: "0",
             TRAY_CFG_TIME_CONN: "0",
             TRAY_CFG_SERVERLOAD: "0",
-            TRAY_CFG_SUDO: "0"
-            
         }
         gui_config["conn_tab"] = {
             "autoconnect": "dis",
