@@ -30,7 +30,6 @@ from protonvpn_linux_gui.constants import (
     TRAY_CFG_DATA_TX, 
     TRAY_CFG_TIME_CONN, 
     CURRDIR,
-    TRAY_CFG_SUDO
 )
 from protonvpn_linux_gui.utils import get_gui_config, set_gui_config, check_polkit_exists
 
@@ -57,7 +56,6 @@ class ProtonVPNIndicator:
         self.notify.init("ProtonVPN Tray")
 
         gui_logger.debug("TRAY >>> Starting tray.")
-
         # Get first server load
         self.update_serverload(None)
         # Call main loop
