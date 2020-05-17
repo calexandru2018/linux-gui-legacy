@@ -135,24 +135,6 @@ Author: Alexandru Cheltuitor
       </row>
     </data>
   </object>
-  <object class="GtkListStore" id="Tray_SudoTypes">
-    <columns>
-      <!-- column-name ID -->
-      <column type="gint"/>
-      <!-- column-name Sudo -->
-      <column type="gchararray"/>
-    </columns>
-    <data>
-      <row>
-        <col id="0">0</col>
-        <col id="1" translatable="yes">Root</col>
-      </row>
-      <row>
-        <col id="0">1</col>
-        <col id="1" translatable="yes">PolKit (Recommended)</col>
-      </row>
-    </data>
-  </object>
   <object class="GtkWindow" id="SettingsWindow">
     <property name="width_request">400</property>
     <property name="height_request">400</property>
@@ -469,10 +451,66 @@ Author: Alexandru Cheltuitor
                           </packing>
                         </child>
                         <child>
-                          <placeholder/>
+                          <object class="GtkGrid">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <child>
+                              <object class="GtkLabel">
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="halign">start</property>
+                                <property name="label" translatable="yes">PolKit Support</property>
+                                <attributes>
+                                  <attribute name="weight" value="medium"/>
+                                  <attribute name="size" value="12000"/>
+                                </attributes>
+                                <style>
+                                  <class name="labels_with_info_tooltip_grid"/>
+                                </style>
+                              </object>
+                              <packing>
+                                <property name="left_attach">0</property>
+                                <property name="top_attach">0</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <object class="GtkImage" id="sudo_info_tooltip">
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="margin_top">3</property>
+                                <property name="pixbuf">../img/utils/info-green.png</property>
+                              </object>
+                              <packing>
+                                <property name="left_attach">1</property>
+                                <property name="top_attach">0</property>
+                              </packing>
+                            </child>
+                            <style>
+                              <class name="labels_with_info_tooltip_grid"/>
+                            </style>
+                          </object>
+                          <packing>
+                            <property name="left_attach">0</property>
+                            <property name="top_attach">4</property>
+                          </packing>
                         </child>
                         <child>
-                          <placeholder/>
+                          <object class="GtkSwitch" id="polkit_support_switch">
+                            <property name="visible">True</property>
+                            <property name="can_focus">True</property>
+                            <property name="halign">end</property>
+                            <property name="valign">center</property>
+                            <property name="margin_top">5</property>
+                            <property name="margin_bottom">5</property>
+                            <signal name="state-set" handler="polkit_support_switch_changed" swapped="no"/>
+                            <style>
+                              <class name="default_style_switch"/>
+                            </style>
+                          </object>
+                          <packing>
+                            <property name="left_attach">1</property>
+                            <property name="top_attach">4</property>
+                          </packing>
                         </child>
                         <child>
                           <placeholder/>
@@ -681,72 +719,10 @@ Author: Alexandru Cheltuitor
                           </packing>
                         </child>
                         <child>
-                          <object class="GtkComboBox" id="tray_run_commands_combobox">
-                            <property name="visible">True</property>
-                            <property name="can_focus">False</property>
-                            <property name="model">Tray_SudoTypes</property>
-                            <property name="active">0</property>
-                            <signal name="changed" handler="tray_run_commands_combobox_changed" swapped="no"/>
-                            <child>
-                              <object class="GtkCellRendererText"/>
-                              <attributes>
-                                <attribute name="text">1</attribute>
-                              </attributes>
-                            </child>
-                            <style>
-                              <class name="default_style_combobox"/>
-                              <class name="white_text"/>
-                            </style>
-                          </object>
-                          <packing>
-                            <property name="left_attach">1</property>
-                            <property name="top_attach">4</property>
-                          </packing>
+                          <placeholder/>
                         </child>
                         <child>
-                          <object class="GtkGrid">
-                            <property name="visible">True</property>
-                            <property name="can_focus">False</property>
-                            <child>
-                              <object class="GtkLabel">
-                                <property name="visible">True</property>
-                                <property name="can_focus">False</property>
-                                <property name="halign">start</property>
-                                <property name="margin_right">10</property>
-                                <property name="label" translatable="yes">Run commands with</property>
-                                <attributes>
-                                  <attribute name="weight" value="medium"/>
-                                  <attribute name="size" value="12000"/>
-                                </attributes>
-                                <style>
-                                  <class name="labels_with_info_tooltip_grid"/>
-                                </style>
-                              </object>
-                              <packing>
-                                <property name="left_attach">0</property>
-                                <property name="top_attach">0</property>
-                              </packing>
-                            </child>
-                            <child>
-                              <object class="GtkImage" id="sudo_info_tooltip">
-                                <property name="visible">True</property>
-                                <property name="can_focus">False</property>
-                                <property name="margin_top">3</property>
-                                <property name="pixbuf">../img/utils/info-green.png</property>
-                              </object>
-                              <packing>
-                                <property name="left_attach">1</property>
-                                <property name="top_attach">0</property>
-                              </packing>
-                            </child>
-                            <style>
-                              <class name="labels_with_info_tooltip_grid"/>
-                            </style>
-                          </object>
-                          <packing>
-                            <property name="left_attach">0</property>
-                            <property name="top_attach">4</property>
-                          </packing>
+                          <placeholder/>
                         </child>
                         <style>
                           <class name="default_notebook_grid_content"/>
@@ -863,7 +839,6 @@ Author: Alexandru Cheltuitor
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
                                 <property name="halign">start</property>
-                                <property name="margin_right">10</property>
                                 <property name="label" translatable="yes">Auto Connect</property>
                                 <attributes>
                                   <attribute name="weight" value="medium"/>
@@ -891,9 +866,6 @@ Author: Alexandru Cheltuitor
                                 <property name="top_attach">0</property>
                               </packing>
                             </child>
-                            <style>
-                              <class name="labels_with_info_tooltip_grid"/>
-                            </style>
                           </object>
                           <packing>
                             <property name="left_attach">0</property>
@@ -909,7 +881,6 @@ Author: Alexandru Cheltuitor
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
                                 <property name="halign">start</property>
-                                <property name="margin_right">10</property>
                                 <property name="label" translatable="yes">Quick Connect</property>
                                 <attributes>
                                   <attribute name="weight" value="medium"/>
@@ -937,9 +908,6 @@ Author: Alexandru Cheltuitor
                                 <property name="top_attach">0</property>
                               </packing>
                             </child>
-                            <style>
-                              <class name="labels_with_info_tooltip_grid"/>
-                            </style>
                           </object>
                           <packing>
                             <property name="left_attach">0</property>
@@ -955,7 +923,6 @@ Author: Alexandru Cheltuitor
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
                                 <property name="halign">start</property>
-                                <property name="margin_right">10</property>
                                 <property name="label" translatable="yes">Default Protocol</property>
                                 <attributes>
                                   <attribute name="weight" value="medium"/>
@@ -983,9 +950,6 @@ Author: Alexandru Cheltuitor
                                 <property name="top_attach">0</property>
                               </packing>
                             </child>
-                            <style>
-                              <class name="labels_with_info_tooltip_grid"/>
-                            </style>
                           </object>
                           <packing>
                             <property name="left_attach">0</property>
@@ -1015,7 +979,6 @@ Author: Alexandru Cheltuitor
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
                                 <property name="halign">start</property>
-                                <property name="margin_right">10</property>
                                 <property name="label" translatable="yes">Custom DNS servers</property>
                                 <attributes>
                                   <attribute name="weight" value="medium"/>
@@ -1043,9 +1006,6 @@ Author: Alexandru Cheltuitor
                                 <property name="top_attach">0</property>
                               </packing>
                             </child>
-                            <style>
-                              <class name="labels_with_info_tooltip_grid"/>
-                            </style>
                           </object>
                           <packing>
                             <property name="left_attach">0</property>
@@ -1242,11 +1202,13 @@ Author: Alexandru Cheltuitor
                                     <property name="visible">True</property>
                                     <property name="can_focus">False</property>
                                     <property name="halign">start</property>
-                                    <property name="margin_right">10</property>
                                     <property name="label" translatable="yes">IP</property>
                                     <attributes>
                                       <attribute name="size" value="12000"/>
                                     </attributes>
+                                    <style>
+                                      <class name="labels_with_info_tooltip_grid"/>
+                                    </style>
                                   </object>
                                   <packing>
                                     <property name="left_attach">0</property>
@@ -1299,7 +1261,6 @@ Ex:
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
                                 <property name="halign">start</property>
-                                <property name="margin_right">10</property>
                                 <property name="label" translatable="yes">Kill Switch</property>
                                 <attributes>
                                   <attribute name="weight" value="medium"/>
@@ -1328,9 +1289,6 @@ Ex:
                                 <property name="top_attach">0</property>
                               </packing>
                             </child>
-                            <style>
-                              <class name="labels_with_info_tooltip_grid"/>
-                            </style>
                           </object>
                           <packing>
                             <property name="left_attach">0</property>
@@ -1346,7 +1304,6 @@ Ex:
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
                                 <property name="halign">start</property>
-                                <property name="margin_right">10</property>
                                 <property name="label" translatable="yes">DNS Leak Protection</property>
                                 <attributes>
                                   <attribute name="weight" value="medium"/>
@@ -1375,9 +1332,6 @@ Ex:
                                 <property name="top_attach">0</property>
                               </packing>
                             </child>
-                            <style>
-                              <class name="labels_with_info_tooltip_grid"/>
-                            </style>
                           </object>
                           <packing>
                             <property name="left_attach">0</property>
@@ -1393,7 +1347,6 @@ Ex:
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
                                 <property name="halign">start</property>
-                                <property name="margin_right">10</property>
                                 <property name="label" translatable="yes">Split Tunneling</property>
                                 <attributes>
                                   <attribute name="weight" value="medium"/>
@@ -1422,9 +1375,6 @@ Ex:
                                 <property name="top_attach">0</property>
                               </packing>
                             </child>
-                            <style>
-                              <class name="labels_with_info_tooltip_grid"/>
-                            </style>
                           </object>
                           <packing>
                             <property name="left_attach">0</property>
@@ -1503,5 +1453,23 @@ Ex:
         </style>
       </object>
     </child>
+  </object>
+  <object class="GtkListStore" id="Tray_SudoTypes">
+    <columns>
+      <!-- column-name ID -->
+      <column type="gint"/>
+      <!-- column-name Sudo -->
+      <column type="gchararray"/>
+    </columns>
+    <data>
+      <row>
+        <col id="0">0</col>
+        <col id="1" translatable="yes">Root</col>
+      </row>
+      <row>
+        <col id="0">1</col>
+        <col id="1" translatable="yes">PolKit (Recommended)</col>
+      </row>
+    </data>
   </object>
 </interface>
