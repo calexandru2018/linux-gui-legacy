@@ -373,14 +373,21 @@ class SettingsService:
         except KeyError:
             polkit_enabled = 0
 
-        resp = subprocess.run(["sudo", "rm", POLKIT_PATH], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
-        # If return code 1: File does not exist in path
-        # This is fired when a user wants to remove template a that does not exist
-        if not polkit_enabled == 1 and resp.returncode == 1:
-            gui_logger.debug("[!] Could not remove .policy file. File might be non existent: \n{}".format(resp))
-            return False
+        if self.check_policy_exists():
+            resp = subprocess.run(["sudo", "rm", POLKIT_PATH], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
+            # If return code 1: File does not exist in path
+            # This is fired when a user wants to remove template a that does not exist
+            if not polkit_enabled == 1 and resp.returncode == 1:
+                gui_logger.debug("[!] Could not remove .policy file. File might be non existent: \n{}".format(resp))
+                return False
 
         return True
+    
+    def check_policy_exists(self):
+        if os.path.isfile(POLKIT_PATH):
+            return True
+
+        return False
 
     def get_gui_path(self):
         """Function that searches for the CLI. Returns CLIs path if it is found, otherwise it returns False.
