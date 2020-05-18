@@ -42,7 +42,7 @@ Author: Alexandru Cheltuitor
     <property name="program_name">ProtonVPN Linux GUI</property>
     <property name="copyright" translatable="yes">Proton Technologies AG</property>
     <property name="comments" translatable="yes">Based on protonvpn-cli-ng</property>
-    <property name="website">https://github.com/calexandru2018/protonvpn-linux-gui</property>
+    <property name="website">https://github.com/ProtonVPN/protonvpn-linux-gui/</property>
     <property name="website_label" translatable="yes">Github Repo</property>
     <property name="authors">calexandru2018</property>
     <property name="logo">../img/logo/protonvpn-logo-white.png</property>
