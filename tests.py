@@ -96,7 +96,7 @@ def test_add_ips():
     for arg in list:
         assert settings_presenter.update_split_tunneling(**arg[0]) == arg[1]
 
-def test_tray_configurations():
+def test_tray_disply_configurations():
     list = [
         dict(setting_value=1, setting_display="tray_data_tx_combobox"),
         dict(setting_value=0, setting_display="tray_data_tx_combobox"),
@@ -111,7 +111,7 @@ def test_tray_configurations():
         dict(setting_value=0, setting_display="tray_serverload_combobox"),
     ]
     for arg in list:
-        assert settings_presenter.tray_configurations(**arg) == True
+        assert settings_presenter.update_tray_display(**arg) == True
 
 def test_purge():
     assert settings_presenter.purge_configurations() == True
