@@ -523,7 +523,7 @@ class DashboardPresenter:
     def populate_server_list(self, populate_servers_dict):
         """Function that updates server list.
         """
-        pull_server_data(force=True)
+        pull_server_data()
 
         only_secure_core = True if get_gui_config("connections", "display_secure_core") == "True" else False
         if not populate_servers_dict["servers"]:
