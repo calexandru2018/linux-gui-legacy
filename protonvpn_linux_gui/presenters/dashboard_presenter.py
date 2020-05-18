@@ -119,10 +119,8 @@ class DashboardPresenter:
         # Check if it should connect to country or server
         if "#" in user_selected_server:
             result = self.dashboard_service.connect_to_server(user_selected_server)
-            gui_logger.debug(">>> Log during connection to specific server: {}".format(result))
         else:
             result = self.dashboard_service.connect_to_country(user_selected_server)
-            gui_logger.debug(">>> Log during connection to country: {}".format(result))
 
         display_message = result
         server_protocol = get_server_protocol_from_cli(result, True)
