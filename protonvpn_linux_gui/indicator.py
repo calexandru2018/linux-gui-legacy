@@ -232,7 +232,7 @@ class ProtonVPNIndicator:
         except subprocess.TimeoutExpired:
             msg = "Unable to disconnect, make sure that the app has been given root privilege"
             timeout = True
-            process.kill()
+            # process.kill()
             outs, errs = process.communicate()
 
         errs = errs.decode().lower()
@@ -265,7 +265,7 @@ class ProtonVPNIndicator:
         except:
             msg = "Unable to display GUI, make sure that the app has been given root privilege"
             timeout = True
-            process.kill()
+            # process.kill()
             outs, errs = process.communicate()
         
         errs = errs.decode().lower()
