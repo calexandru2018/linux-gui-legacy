@@ -42,7 +42,7 @@ class DashboardPresenter:
         """Calls load_on_start, which returns False if there is no internet connection, otherwise populates dashboard labels and server list
         """
         gui_logger.debug(">>> Running \"load_on_start\".")
-        return_val = False
+        
         display_message = "Could not load necessary resources, there might be connectivity issues."
         time.sleep(2)
         self.queue.put(dict(action="hide_spinner"))
@@ -50,27 +50,35 @@ class DashboardPresenter:
         conn = custom_get_ip_info()
 
         if conn and not conn is None:
-            self.queue.put(dict(action="update_dialog", label="Populating dashboard...", hide_close_button=True))
-            
-            display_secure_core = get_gui_config("connections", "display_secure_core")
-            secure_core_switch = objects_dict["secure_core"]["secure_core_switch"]
-            secure_core_label_style = objects_dict["secure_core"]["secure_core_label_style"].get_style_context() 
-
-            if display_secure_core == "True":
-                secure_core_switch.set_state(True)
-                secure_core_label_style.remove_class("disabled_label")
-            else:
-                secure_core_switch.set_state(False)
-
-            self.update_labels_server_list(objects_dict, conn_info=conn)
-            self.queue.put(dict(action="hide_dialog"))
-            return_val = True
+            self.load_dashboard_content(objects_dict, conn)
         else:
             self.queue.put(dict(action="update_dialog", label=display_message, spinner=False))
 
         gui_logger.debug(">>> Ended tasks in \"load_on_start\" thread.")  
-        
-        # return return_val
+
+    def on_load_dashboard_content(self, objects_dict, conn):
+        self.queue.put(dict(action="update_dialog", label="Populating dashboard...", hide_close_button=True))
+
+        self.set_secure_core_on_load(objects_dict["secure_core"]["secure_core_switch"], objects_dict["secure_core"]["secure_core_label_style"])
+        self.update_labels_server_list(objects_dict, conn_info=conn)
+
+        self.queue.put(dict(action="hide_dialog"))
+
+    def on_load_set_secure_core(self, secure_core_switch, secure_core_label):
+        """Sets Secure-Core switch based on user setting.
+        """
+        try:
+            display_secure_core = get_gui_config("connections", "display_secure_core")
+        except KeyError:
+            display_secure_core = "False"
+
+        secure_core_label_style = secure_core_label.get_style_context() 
+
+        if display_secure_core == "True":
+            secure_core_switch.set_state(True)
+            secure_core_label_style.remove_class("disabled_label")
+        else:
+            secure_core_switch.set_state(False)
 
     def reload_secure_core_servers(self, **kwargs):
         """Function that reloads server list to either secure-core or non-secure-core.
