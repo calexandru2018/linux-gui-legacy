@@ -241,26 +241,23 @@ The instructions for seting up visudo are described below.
 
 # GUI Layout
 <p align="center">
-  <img src="https://i.imgur.com/OlcYrwf.png" alt="Login"></img>
+  <img src="https://i.imgur.com/ZmWlHV5.png" alt="Login"></img>
 </p>
 <p align="center">
-  <img src="https://i.imgur.com/VOpTlMR.png" alt="Dashboard"></img>
-</p>
-<p align="center">
-  <img src="https://i.imgur.com/BlVmFa9.png" alt="Profiles"></img>
+  <img src="https://i.imgur.com/aM9tTgd.png" alt="Dashboard"></img>
 </p>
 
 <p align="center">
-  <img src="https://i.imgur.com/S353btA.png" alt="General Settings"></img>
+  <img src="https://i.imgur.com/ScIcw10.png" alt="General Settings"></img>
 </p>
 <p align="center">
-  <img src="https://i.imgur.com/BWE9LDf.png" alt="Tray Settings"></img>
+  <img src="https://i.imgur.com/Nj0c5xf.png" alt="Tray Settings"></img>
 </p> 
 <p align="center">
-  <img src="https://i.imgur.com/md4ni6t.png" alt="Connection Settings"></img>
+  <img src="https://i.imgur.com/KMdDszk.png" alt="Connection Settings"></img>
 </p>  
 <p align="center">
-  <img src="https://i.imgur.com/KYMxSoe.png" alt="Advanced Settings"></img>
+  <img src="https://i.imgur.com/QkLbcuo.png" alt="Advanced Settings"></img>
 </p> 
 
 <p align="center">
