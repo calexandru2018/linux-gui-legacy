@@ -17,18 +17,21 @@ except FileNotFoundError:
     https://github.com/ProtonVPN/protonvpn-linux-gui
     """
 
-
-
 setup(
     name="protonvpn-gui",
     packages=[
         "protonvpn_linux_gui",
+        "protonvpn_linux_gui.presenters",
+        "protonvpn_linux_gui.services",
+        "protonvpn_linux_gui.views",
         "protonvpn_linux_gui.resources",
         "protonvpn_linux_gui.resources.img.flags",
         "protonvpn_linux_gui.resources.img.flags.small",
         "protonvpn_linux_gui.resources.img.flags.large",
         "protonvpn_linux_gui.resources.img.logo",
         "protonvpn_linux_gui.resources.img.utils",
+        "protonvpn_linux_gui.resources.styles",
+        "protonvpn_linux_gui.resources.ui",
         ],
     entry_points={
             "console_scripts": [
