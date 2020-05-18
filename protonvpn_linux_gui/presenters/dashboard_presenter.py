@@ -50,7 +50,7 @@ class DashboardPresenter:
         conn = custom_get_ip_info()
 
         if conn and not conn is None:
-            self.load_dashboard_content(objects_dict, conn)
+            self.on_load_dashboard_content(objects_dict, conn)
         else:
             self.queue.put(dict(action="update_dialog", label=display_message, spinner=False))
 
@@ -59,7 +59,7 @@ class DashboardPresenter:
     def on_load_dashboard_content(self, objects_dict, conn):
         self.queue.put(dict(action="update_dialog", label="Populating dashboard...", hide_close_button=True))
 
-        self.set_secure_core_on_load(objects_dict["secure_core"]["secure_core_switch"], objects_dict["secure_core"]["secure_core_label_style"])
+        self.on_load_set_secure_core(objects_dict["secure_core"]["secure_core_switch"], objects_dict["secure_core"]["secure_core_label_style"])
         self.update_labels_server_list(objects_dict, conn_info=conn)
 
         self.queue.put(dict(action="hide_dialog"))
@@ -122,7 +122,7 @@ class DashboardPresenter:
             result = self.dashboard_service.connect_to_country(user_selected_server)
             gui_logger.debug(">>> Log during connection to country: {}".format(result))
 
-        display_message = result.stdout.decode()
+        display_message = result
         server_protocol = get_server_protocol_from_cli(result, True)
 
         if server_protocol:
@@ -153,7 +153,7 @@ class DashboardPresenter:
 
         result = self.dashboard_service.custom_quick_connect(kwargs.get("user_selected_server"))
 
-        display_message = result.stdout.decode()
+        display_message = result
         server_protocol = get_server_protocol_from_cli(result,True)
 
         if server_protocol:
@@ -181,7 +181,7 @@ class DashboardPresenter:
 
         result = self.dashboard_service.quick_connect()
 
-        display_message = result.stdout.decode()
+        display_message = result
         server_protocol = get_server_protocol_from_cli(result, True)
 
         if server_protocol:
@@ -211,7 +211,7 @@ class DashboardPresenter:
 
         server_protocol = get_server_protocol_from_cli(result, return_protocol=True)
 
-        display_message = result.stdout.decode()
+        display_message = result
 
         if server_protocol:
             display_message = "You are connected to <b>{}</b> via <b>{}</b>!".format(server_protocol[0], server_protocol[1].upper())
@@ -238,7 +238,7 @@ class DashboardPresenter:
 
         result = self.dashboard_service.random_connect()
 
-        display_message = result.stdout.decode()
+        display_message = result
         server_protocol = get_server_protocol_from_cli(result, return_protocol=True)
 
         if server_protocol:
@@ -294,7 +294,7 @@ class DashboardPresenter:
 
         result = self.dashboard_service.disconnect()
 
-        self.queue.put(dict(action="update_dialog", label=result.stdout.decode()))
+        self.queue.put(dict(action="update_dialog", label=result))
 
         gui_logger.debug(">>> Result: \"{0}\"".format(result))
 
