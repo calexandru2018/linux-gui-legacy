@@ -38,7 +38,7 @@ setup(
         },
     include_package_data=True,
     version=VERSION,
-    description="Unofficial Linux GUI client for ProtonVPN",
+    description="Linux GUI client for ProtonVPN",
     long_description=long_descr,
     long_description_content_type="text/markdown",
     author="Proton Technologies AG",
