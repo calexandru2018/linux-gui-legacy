@@ -122,6 +122,7 @@ class DashboardPresenter:
         else:
             result = self.dashboard_service.connect_to_country(user_selected_server)
 
+
         display_message = result
         server_protocol = get_server_protocol_from_cli(result, True)
 

@@ -57,6 +57,7 @@ class DashboardService:
 
     def custom_quick_connect(self, quick_conn_pref):
         protocol = get_config_value("USER", "default_protocol")
+
         command = "--fastest"
         country = False
 
