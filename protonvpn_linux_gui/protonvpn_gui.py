@@ -3,7 +3,7 @@ import sys
 from queue import Queue
 
 # Remote imports
-from protonvpn_cli.constants import CONFIG_FILE #noqa
+from protonvpn_cli.constants import CONFIG_FILE, CONFIG_DIR #noqa
 from protonvpn_cli.utils import check_root, change_file_owner #noqa
 
 import gi
@@ -84,6 +84,10 @@ def init():
 
         if not os.path.isfile(GUI_CONFIG_FILE):
             initialize_gui_config()
+        
+        cli_log_path = os.path.join(CONFIG_DIR, "pvpn-cli.log")
+        if os.path.isfile(cli_log_path):
+            change_file_owner(cli_log_path)
 
         if not os.path.isfile(CONFIG_FILE): 
             gui_logger.debug(">>> Loading LoginWindow")
