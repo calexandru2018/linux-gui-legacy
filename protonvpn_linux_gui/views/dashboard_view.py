@@ -243,7 +243,7 @@ class DashboardView:
             message = "Disconnecting..."
 
         if user_selected_server:
-            target = self.dashboard_presenter.connect_to_selected_server
+            target = self.dashboard_presenter.on_connect_user_selected
             message = "Connecting to <b>{}</b>".format(user_selected_server) 
         
         self.queue.put(dict(action="display_dialog", label=message, spinner=True, hide_close_button=True))

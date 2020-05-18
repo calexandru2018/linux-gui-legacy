@@ -109,7 +109,7 @@ class DashboardPresenter:
 
         # return return_val
 
-    def connect_to_selected_server(self, **kwargs):
+    def on_connect_user_selected(self, **kwargs):
         """Function that either connects by selected server or selected country.
         """     
         user_selected_server = kwargs.get("user_selected_server")
