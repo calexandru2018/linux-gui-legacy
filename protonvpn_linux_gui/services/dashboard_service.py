@@ -44,9 +44,20 @@ class DashboardService:
 
         return result
 
+    def quick_connect_manager(self):
+        try:
+            user_selected_quick_connect = get_gui_config("conn_tab","quick_connect")
+        except KeyError:
+            user_selected_quick_connect = False
+
+        if user_selected_quick_connect and not user_selected_quick_connect == "dis":
+            return self.custom_quick_connect(user_selected_quick_connect)
+        
+        return self.quick_connect()
+
     def custom_quick_connect(self, quick_conn_pref):
-        quick_conn_pref = get_gui_config("conn_tab","quick_connect")
-        protocol = get_config_value("USER","default_protocol")
+        protocol = get_config_value("USER", "default_protocol")
+
         command = "--fastest"
         country = False
 

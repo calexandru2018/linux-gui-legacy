@@ -109,7 +109,7 @@ class DashboardPresenter:
 
         # return return_val
 
-    def connect_to_selected_server(self, **kwargs):
+    def on_connect_user_selected(self, **kwargs):
         """Function that either connects by selected server or selected country.
         """     
         user_selected_server = kwargs.get("user_selected_server")
@@ -119,10 +119,9 @@ class DashboardPresenter:
         # Check if it should connect to country or server
         if "#" in user_selected_server:
             result = self.dashboard_service.connect_to_server(user_selected_server)
-            gui_logger.debug(">>> Log during connection to specific server: {}".format(result))
         else:
             result = self.dashboard_service.connect_to_country(user_selected_server)
-            gui_logger.debug(">>> Log during connection to country: {}".format(result))
+
 
         display_message = result
         server_protocol = get_server_protocol_from_cli(result, True)
@@ -136,29 +135,12 @@ class DashboardPresenter:
 
         gui_logger.debug(">>> Ended tasks in \"openvpn_connect\" thread. Result: \"{0}\"".format(result))
 
-    def on_custom_quick_connect(self, **kwargs):
-        """Make a custom quick connection 
-        """              
-        result = self.dashboard_service.custom_quick_connect(kwargs.get("user_selected_server"))
-
-        display_message = result
-        server_protocol = get_server_protocol_from_cli(result,True)
-
-        if server_protocol:
-            display_message = "You are connected to <b>{}</b> via <b>{}</b>!".format(server_protocol[0], server_protocol[1].upper())
-
-        self.queue.put(dict(action="update_dialog", label=display_message))
-        
-        self.on_update_labels(kwargs.get("connection_labels"))
-
-        gui_logger.debug(">>> Ended tasks in \"custom_quick_connect\" thread. Result: \"{0}\"".format(result))
-
     def quick_connect(self, **kwargs):
         """Function that connects to the quickest server.
         """
         gui_logger.debug(">>> Running \"fastest\".")
-
-        result = self.dashboard_service.quick_connect()
+        
+        result = self.dashboard_service.quick_connect_manager()
 
         display_message = result
         server_protocol = get_server_protocol_from_cli(result, True)
