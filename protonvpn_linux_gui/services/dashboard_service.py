@@ -44,13 +44,13 @@ class DashboardService:
 
         return result
 
-    def quick_connect_manager(self):
+    def quick_connect_manager(self, profile_quick_connect):
         try:
             user_selected_quick_connect = get_gui_config("conn_tab","quick_connect")
         except KeyError:
             user_selected_quick_connect = False
 
-        if user_selected_quick_connect and not user_selected_quick_connect == "dis":
+        if user_selected_quick_connect and not user_selected_quick_connect == "dis" and not profile_quick_connect:
             return self.custom_quick_connect(user_selected_quick_connect)
         
         return self.quick_connect()

@@ -124,7 +124,7 @@ class DashboardView:
         self.queue.put(dict(action="display_dialog", label="Connecting to the fastest server...", spinner=True, hide_close_button=True))
         gui_logger.debug(">>> Starting \"quick_connect\" thread.")
 
-        thread = Thread(target=self.dashboard_presenter.quick_connect, kwargs=dict(connection_labels=self.connection_labels)) 
+        thread = Thread(target=self.dashboard_presenter.quick_connect, kwargs=dict(connection_labels=self.connection_labels, profile_quick_connect=True)) 
         thread.daemon = True
         thread.start()
 

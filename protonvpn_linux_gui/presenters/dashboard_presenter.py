@@ -140,7 +140,11 @@ class DashboardPresenter:
         """
         gui_logger.debug(">>> Running \"fastest\".")
         
-        result = self.dashboard_service.quick_connect_manager()
+        profile_quick_connect = False
+        if "profile_quick_connect" in kwargs:
+            profile_quick_connect = True
+
+        result = self.dashboard_service.quick_connect_manager(profile_quick_connect)
 
         display_message = result
         server_protocol = get_server_protocol_from_cli(result, True)
