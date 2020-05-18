@@ -222,21 +222,6 @@ class DashboardView:
 
         target = self.dashboard_presenter.quick_connect 
         message = "Connecting to the fastest server..."
-        
-        quick_connect_setting = get_gui_config("conn_tab","quick_connect")
-        if quick_connect_setting != "dis":
-
-            country_codes["dis"] = "Disabled"
-            country_codes["fast"] = "Fastest"
-            country_codes["rand"] = "Random"
-            country_codes["p2p"] = "Peer2Peer"
-            country_codes["sc"] = "Secure-Core"
-            country_codes["tor"] = "TOR"
-
-            message = "Connecting to custom quick connect..."
-            target = self.dashboard_presenter.on_custom_quick_connect 
-            if quick_connect_setting in country_codes:
-                message = "Custom quick connect to <b>{}</b>...".format(country_codes[quick_connect_setting])
 
         if is_connected() and not user_selected_server:
             target = self.dashboard_presenter.on_disconnect
