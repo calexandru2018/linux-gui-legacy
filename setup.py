@@ -10,17 +10,17 @@ try:
         long_descr = '\n' + f.read()
 except FileNotFoundError:
     long_descr = """
-    The Unofficial Linux GUI for ProtonVPN.
+    The Linux GUI for ProtonVPN.
 
     For further information and a usage guide, please view the project page:
 
-    https://github.com/calexandru2018/protonvpn-linux-gui
+    https://github.com/ProtonVPN/protonvpn-linux-gui
     """
 
 
 
 setup(
-    name="protonvpn-linux-gui-calexandru2018",
+    name="protonvpn-gui",
     packages=[
         "protonvpn_linux_gui",
         "protonvpn_linux_gui.resources",
@@ -41,10 +41,10 @@ setup(
     description="Unofficial Linux GUI client for ProtonVPN",
     long_description=long_descr,
     long_description_content_type="text/markdown",
-    author="calexandru2018",
-    author_email="acrandom@pm.me",
+    author="Proton Technologies AG",
+    author_email="contact@protonvpn.com",
     license="GPLv3",
-    url="https://github.com/calexandru2018/protonvpn-linux-gui",
+    url="https://github.com/ProtonVPN/protonvpn-linux-gui",
     install_requires=[
         "protonvpn-cli>=2.2.2",
         "requests>=2.23.0",
