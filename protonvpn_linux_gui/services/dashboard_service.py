@@ -21,7 +21,7 @@ class DashboardService:
     def connect_to_server(self, user_selected_server):
         protocol = get_config_value("USER", "default_protocol")
         try:
-            result = subprocess.run(["protonvpn", "connect", user_selected_server, "-p", protocol], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
+            result = subprocess.run(["protonvpn", "connect", user_selected_server, "-p", protocol], stdout=subprocess.PIPE, stderr=subprocess.PIPE).stdout.decode() # nosec
         except:
             return False
 
@@ -38,7 +38,7 @@ class DashboardService:
             return False
 
         try:
-            result = subprocess.run(["protonvpn", "connect", "--cc", selected_country, "-p", protocol], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
+            result = subprocess.run(["protonvpn", "connect", "--cc", selected_country, "-p", protocol], stdout=subprocess.PIPE, stderr=subprocess.PIPE).stdout.decode() # nosec
         except:
             return False
 
@@ -69,7 +69,7 @@ class DashboardService:
             command_list = ["protonvpn", "connect", command, country, "-p" ,protocol]
         
         try:
-            result = subprocess.run(command_list, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            result = subprocess.run(command_list, stdout=subprocess.PIPE, stderr=subprocess.PIPE).stdout.decode()
         except: 
             return False
         
@@ -82,7 +82,7 @@ class DashboardService:
             return False
 
         try:
-            result = subprocess.run(["protonvpn", "connect", "--fastest", "-p", protocol], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
+            result = subprocess.run(["protonvpn", "connect", "--fastest", "-p", protocol], stdout=subprocess.PIPE, stderr=subprocess.PIPE).stdout.decode() # nosec
         except:
             return False
 
@@ -90,7 +90,7 @@ class DashboardService:
 
     def last_connect(self):
         try:
-            result = subprocess.run(["protonvpn", "reconnect"], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
+            result = subprocess.run(["protonvpn", "reconnect"], stdout=subprocess.PIPE, stderr=subprocess.PIPE).stdout.decode() # nosec
         except:
             return False
 
@@ -103,7 +103,7 @@ class DashboardService:
             return False
 
         try:
-            result = subprocess.run(["protonvpn", "connect", "--random", "-p", protocol], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
+            result = subprocess.run(["protonvpn", "connect", "--random", "-p", protocol], stdout=subprocess.PIPE, stderr=subprocess.PIPE).stdout.decode() # nosec
         except:
             return False
 
@@ -111,7 +111,7 @@ class DashboardService:
 
     def disconnect(self):
         try:
-            result = subprocess.run(["protonvpn", "disconnect"], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
+            result = subprocess.run(["protonvpn", "disconnect"], stdout=subprocess.PIPE, stderr=subprocess.PIPE).stdout.decode() # nosec
         except:
             return False
 
