@@ -108,7 +108,9 @@ class LoginService:
             gui_logger.debug("pvpn-cli.cfg initialized")
             logger.debug("pvpn-cli.cfg initialized")
 
-            change_file_owner(os.path.join(CONFIG_DIR, "pvpn-cli.log"))
+            cli_log_path = os.path.join(CONFIG_DIR, "pvpn-cli.log")
+            if os.path.isfile(cli_log_path):
+                change_file_owner(cli_log_path)
         except:
             return False
 
