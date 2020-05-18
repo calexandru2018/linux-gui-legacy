@@ -57,12 +57,18 @@ class DashboardPresenter:
         gui_logger.debug(">>> Ended tasks in \"load_on_start\" thread.")  
 
     def on_load_dashboard_content(self, objects_dict, conn):
-        self.queue.put(dict(action="update_dialog", label="Populating dashboard...", hide_close_button=True))
-
-        self.on_load_set_secure_core(objects_dict["secure_core"]["secure_core_switch"], objects_dict["secure_core"]["secure_core_label_style"])
-        self.update_labels_server_list(objects_dict, conn_info=conn)
-
+        # self.queue.put(dict(action="update_dialog", label="Populating dashboard...", hide_close_button=True))
         self.queue.put(dict(action="hide_dialog"))
+
+        # Sets Secure-Core switch state
+        self.on_load_set_secure_core(objects_dict["secure_core"]["secure_core_switch"], objects_dict["secure_core"]["secure_core_label_style"])
+
+        # Loads the labels
+        self.on_update_labels(objects_dict["connection_labels"])
+        
+        # Loads the server list
+        self.on_update_server_list(objects_dict["server_tree_list"]["tree_object"])
+
 
     def on_load_set_secure_core(self, secure_core_switch, secure_core_label):
         """Sets Secure-Core switch based on user setting.
@@ -92,13 +98,9 @@ class DashboardPresenter:
         display_message = "Unable to reload servers!"
 
         if self.dashboard_service.set_display_secure_core(kwargs.get("update_to")):
-            populate_servers_dict = {
-                "tree_object": kwargs.get("tree_object"),
-                "servers": False
-            }
             return_val = True
 
-            gobject.idle_add(self.populate_server_list, populate_servers_dict)
+            self.on_update_server_list(kwargs.get("tree_object"))
             display_message = "Displaying <b>{}</b> servers!".format("secure-core" if kwargs.get("update_to") == "True" else "non secure-core")
 
         self.queue.put(dict(action="update_dialog", label=display_message))
@@ -130,27 +132,13 @@ class DashboardPresenter:
 
         self.queue.put(dict(action="update_dialog", label=display_message))
 
-        update_labels_dict = {
-            "connection_labels": kwargs.get("connection_labels"),
-            "servers": False,
-            "disconnecting": False,
-            "conn_info": False
-        }
+        self.on_update_labels(kwargs.get("connection_labels"))
 
-        gobject.idle_add(self.update_labels_status, update_labels_dict)
-
-        gui_logger.debug(">>> Ended tasks in \"openvpn_connect\" thread.")
+        gui_logger.debug(">>> Ended tasks in \"openvpn_connect\" thread. Result: \"{0}\"".format(result))
 
     def on_custom_quick_connect(self, **kwargs):
         """Make a custom quick connection 
         """              
-        update_labels_dict = {
-            "connection_labels": kwargs.get("connection_labels"),
-            "servers": False,
-            "disconnecting": False,
-            "conn_info": False
-        }
-
         result = self.dashboard_service.custom_quick_connect(kwargs.get("user_selected_server"))
 
         display_message = result
@@ -161,23 +149,14 @@ class DashboardPresenter:
 
         self.queue.put(dict(action="update_dialog", label=display_message))
         
-        gui_logger.debug(">>> Result: \"{0}\"".format(result))
-        
-        gobject.idle_add(self.update_labels_status, update_labels_dict)
+        self.on_update_labels(kwargs.get("connection_labels"))
 
-        gui_logger.debug(">>> Ended tasks in \"custom_quick_connect\" thread.")
+        gui_logger.debug(">>> Ended tasks in \"custom_quick_connect\" thread. Result: \"{0}\"".format(result))
 
     def quick_connect(self, **kwargs):
         """Function that connects to the quickest server.
         """
         gui_logger.debug(">>> Running \"fastest\".")
-
-        update_labels_dict = {
-            "connection_labels": kwargs.get("connection_labels"),
-            "servers": False,
-            "disconnecting": False,
-            "conn_info": False
-        }
 
         result = self.dashboard_service.quick_connect()
 
@@ -188,24 +167,15 @@ class DashboardPresenter:
             display_message = "You are connected to <b>{}</b> via <b>{}</b>!".format(server_protocol[0], server_protocol[1].upper())
 
         self.queue.put(dict(action="update_dialog", label=display_message))
-
-        gui_logger.debug(">>> Result: \"{0}\"".format(result))
         
-        gobject.idle_add(self.update_labels_status, update_labels_dict)
+        self.on_update_labels(kwargs.get("connection_labels"))
 
-        gui_logger.debug(">>> Ended tasks in \"fastest\" thread.")
+        gui_logger.debug(">>> Ended tasks in \"fastest\" thread. Result: \"{0}\"".format(result))
 
     def on_last_connect(self, **kwargs):
         """Function that connects to the last connected server.
         """        
         gui_logger.debug(">>> Running \"reconnect\".")
-
-        update_labels_dict = {
-            "connection_labels": kwargs.get("connection_labels"),
-            "servers": False,
-            "disconnecting": False,
-            "conn_info": False
-        }
 
         result = self.dashboard_service.last_connect()
 
@@ -218,23 +188,14 @@ class DashboardPresenter:
 
         self.queue.put(dict(action="update_dialog", label=display_message))
 
-        gui_logger.debug(">>> Result: \"{0}\"".format(result))
+        self.on_update_labels(kwargs.get("connection_labels"))
 
-        gobject.idle_add(self.update_labels_status, update_labels_dict)
-
-        gui_logger.debug(">>> Ended tasks in \"reconnect\" thread.")
+        gui_logger.debug(">>> Ended tasks in \"reconnect\" thread. Result: \"{0}\"".format(result))
 
     def random_connect(self, **kwargs):
         """Function that connects to a random server.
         """
         gui_logger.debug(">>> Running \"reconnect\"")
-
-        update_labels_dict = {
-            "connection_labels": kwargs.get("connection_labels"),
-            "servers": False,
-            "disconnecting": False,
-            "conn_info": False
-        }
 
         result = self.dashboard_service.random_connect()
 
@@ -246,11 +207,9 @@ class DashboardPresenter:
 
         self.queue.put(dict(action="update_dialog", label=display_message))
 
-        gui_logger.debug(">>> Result: \"{0}\"".format(result))
+        self.on_update_labels(kwargs.get("connection_labels"))
 
-        gobject.idle_add(self.update_labels_status, update_labels_dict)
-
-        gui_logger.debug(">>> Ended tasks in \"random_c\" thread.")
+        gui_logger.debug(">>> Ended tasks in \"random_c\" thread. Result: \"{0}\"".format(result))
 
     def on_refresh_servers(self, **kwargs):
         """Function that reloads server list to either secure-core or non-secure-core.
@@ -259,18 +218,14 @@ class DashboardPresenter:
         # which makes the button "lag". Temporary solution.
         time.sleep(1)
         gui_logger.debug(">>> Running \"update_reload_secure_core_serverslabels_server_list\".")
-
+        
         return_val = False
-        populate_servers_dict = {
-            "tree_object": kwargs.get("tree_object"),
-            "servers": False
-        }
 
         self.queue.put(dict(action="hide_spinner"))
 
         conn = custom_get_ip_info()
         if conn and not conn is None:
-            gobject.idle_add(self.populate_server_list, populate_servers_dict)
+            self.on_update_server_list(kwargs.get("tree_object"))
             self.queue.put(dict(action="hide_dialog"))
             return_val = True
         else:
@@ -284,23 +239,14 @@ class DashboardPresenter:
         """Function that disconnects from the VPN.
         """
         gui_logger.debug(">>> Running \"disconnect\".")
-        
-        update_labels_dict = {
-            "connection_labels": kwargs.get("connection_labels"),
-            "servers": False,
-            "disconnecting": True,
-            "conn_info": False
-        }
 
         result = self.dashboard_service.disconnect()
 
         self.queue.put(dict(action="update_dialog", label=result))
 
-        gui_logger.debug(">>> Result: \"{0}\"".format(result))
+        self.on_update_labels(kwargs.get("connection_labels"), disconnect=True)
 
-        gobject.idle_add(self.update_labels_status, update_labels_dict)
-
-        gui_logger.debug(">>> Ended tasks in \"disconnect\" thread.")
+        gui_logger.debug(">>> Ended tasks in \"disconnect\" thread. Result: \"{0}\"".format(result))
 
     def on_check_for_updates(self):
         """Function that searches for existing updates by checking the latest releases on github.
@@ -357,60 +303,36 @@ class DashboardPresenter:
 
         self.queue.put(dict(action="update_dialog", label=result, sub_label="<b><u>Reccomendation:</u></b>\n<span>{recc}</span>".format(recc=reccomendation)))
 
-    def update_labels_server_list(self, object_dict, conn_info=False):
-        """Function that updates dashboard labels and server list.
-        """
-        gui_logger.debug(">>> Running \"update_labels_server_list\" getting servers.")
-
-        servers = get_servers()
-        if not servers:
-            servers = False
-            
-        update_labels_dict = {
-            "connection_labels": object_dict["connection_labels"],
-            "servers": servers,
-            "disconnecting": False,
-            "conn_info": conn_info if conn_info else False
-        }
-
-        populate_servers_dict = {
-            "tree_object": object_dict["server_tree_list"]["tree_object"],
-            "servers": servers
-        }
-
+    def on_update_labels(self, connection_labels_dict, disconnect=False):
         # Update labels
-        gobject.idle_add(self.update_labels_status, update_labels_dict)
+        gobject.idle_add(self.update_labels_status, connection_labels_dict, disconnect)
 
+    def on_update_server_list(self, tree_object):
         # Populate server list
-        gobject.idle_add(self.populate_server_list, populate_servers_dict)
+        gobject.idle_add(self.populate_server_list, tree_object)
 
-    def update_labels_status(self, update_labels_dict):
+    def update_labels_status(self, connection_labels_dict, disconnecting):
         """Function prepares data to update labels.
         """
         gui_logger.debug(">>> Running \"update_labels_status\" getting servers, is_connected and connected_server.")
+        
+        servers = get_servers()
 
-        if not update_labels_dict["servers"]:
-            servers = get_servers()
-        else:
-            servers = update_labels_dict["servers"]
-
-        disconnecting = update_labels_dict["disconnecting"]
-        conn_info = update_labels_dict["conn_info"]
         is_vpn_connected = True if is_connected() else False
         country_cc = False
         load = False
 
-        time_connected_label =      update_labels_dict["connection_labels"][0]["time_connected_label"]
-        protocol_label =            update_labels_dict["connection_labels"][0]["protocol_label"]
-        conn_disc_button_label =    update_labels_dict["connection_labels"][0]["conn_disc_button_label"]
-        ip_label =                  update_labels_dict["connection_labels"][0]["ip_label"]
-        server_load_label =         update_labels_dict["connection_labels"][0]["server_load_label"]
-        country_label =             update_labels_dict["connection_labels"][0]["country_label"]
-        isp_label    =              update_labels_dict["connection_labels"][0]["isp_label"]
-        data_received_label =       update_labels_dict["connection_labels"][0]["data_received_label"]
-        data_sent_label =           update_labels_dict["connection_labels"][0]["data_sent_label"]
-        background_large_flag =     update_labels_dict["connection_labels"][0]["background_large_flag"]
-        protonvpn_sign_green =      update_labels_dict["connection_labels"][0]["protonvpn_sign_green"]
+        time_connected_label =      connection_labels_dict[0]["time_connected_label"]
+        protocol_label =            connection_labels_dict[0]["protocol_label"]
+        conn_disc_button_label =    connection_labels_dict[0]["conn_disc_button_label"]
+        ip_label =                  connection_labels_dict[0]["ip_label"]
+        server_load_label =         connection_labels_dict[0]["server_load_label"]
+        country_label =             connection_labels_dict[0]["country_label"]
+        isp_label    =              connection_labels_dict[0]["isp_label"]
+        data_received_label =       connection_labels_dict[0]["data_received_label"]
+        data_sent_label =           connection_labels_dict[0]["data_sent_label"]
+        background_large_flag =     connection_labels_dict[0]["background_large_flag"]
+        protonvpn_sign_green =      connection_labels_dict[0]["protonvpn_sign_green"]
         
         try:
             connected_server = get_config_value("metadata", "connected_server")
@@ -427,17 +349,14 @@ class DashboardPresenter:
         server_load_label.set_markup('<span>{0}</span>'.format(load))
 
         # Get and set IP labels. Get also country and ISP
-        if not conn_info:
-            result = custom_get_ip_info()
-            if result:
-                ip, isp, country = result
-            else:
-                ip = "None"
-                isp = "None" 
-                country = "None"
+        result = custom_get_ip_info()
+        if result:
+            ip, isp, country = result
         else:
-            ip, isp, country = conn_info
-        
+            ip = "None"
+            isp = "None" 
+            country = "None"
+
         country = country.lower()
 
         for k,v in country_codes.items():
@@ -520,19 +439,17 @@ class DashboardPresenter:
 
         return True
 
-    def populate_server_list(self, populate_servers_dict):
+    def populate_server_list(self, tree_object):
         """Function that updates server list.
         """
         pull_server_data()
 
+        servers = get_servers()
+
         only_secure_core = True if get_gui_config("connections", "display_secure_core") == "True" else False
-        if not populate_servers_dict["servers"]:
-            servers = get_servers()
-        else:
-            servers = populate_servers_dict["servers"]
 
         if servers:
-            populate_servers_dict["tree_object"].clear()
+            tree_object.clear()
 
             country_servers = self.dashboard_service.get_country_servers(servers)
             images_dict = self.dashboard_service.create_features_img(GdkPixbuf)
@@ -558,16 +475,16 @@ class DashboardPresenter:
                     feature = images_dict["tor_pix"]
 
                 if country_feature == "secure-core" and only_secure_core:
-                    country_row = populate_servers_dict["tree_object"].append(None, [flag, country, plus_feature, feature, avrg_load])
+                    country_row = tree_object.append(None, [flag, country, plus_feature, feature, avrg_load])
                 elif not only_secure_core:
-                    country_row = populate_servers_dict["tree_object"].append(None, [flag, country, plus_feature, feature, avrg_load])
+                    country_row = tree_object.append(None, [flag, country, plus_feature, feature, avrg_load])
 
                 for servername in country_servers[country]:
                     servername, plus_feature, feature, load, secure_core  = self.dashboard_service.set_individual_server(servername, images_dict, servers, feature)
 
                     if secure_core and only_secure_core:
-                        populate_servers_dict["tree_object"].append(country_row, [images_dict["empty_pix"], servername, plus_feature, feature, load])
+                        tree_object.append(country_row, [images_dict["empty_pix"], servername, plus_feature, feature, load])
                     elif not secure_core and not only_secure_core:
-                        populate_servers_dict["tree_object"].append(country_row, [images_dict["empty_pix"], servername, plus_feature, feature, load])
+                        tree_object.append(country_row, [images_dict["empty_pix"], servername, plus_feature, feature, load])
 
        
