@@ -1,0 +1,485 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Generated with glade 3.22.2 
+
+Copyright (C) 
+
+This file is part of Protonvpn-linux-gui.
+
+Protonvpn-linux-gui is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Protonvpn-linux-gui is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Protonvpn-linux-gui.  If not, see <http://www.gnu.org/licenses/>.
+
+Author: Alexandru Cheltuitor
+
+-->
+<interface>
+  <requires lib="gtk+" version="3.20"/>
+  <!-- interface-license-type gplv3 -->
+  <!-- interface-name Protonvpn-linux-gui -->
+  <!-- interface-description Linux GUI for ProtonVPN users -->
+  <!-- interface-authors Alexandru Cheltuitor -->
+  <object class="GtkApplicationWindow" id="LoginWindow">
+    <property name="name">Main Window</property>
+    <property name="width_request">200</property>
+    <property name="can_focus">True</property>
+    <property name="is_focus">True</property>
+    <property name="title" translatable="yes">ProtonVPN GUI - Login</property>
+    <property name="window_position">center-always</property>
+    <property name="default_width">150</property>
+    <property name="default_height">250</property>
+    <property name="icon">../img/logo/protonvpn_logo.png</property>
+    <property name="gravity">center</property>
+    <property name="has_resize_grip">True</property>
+    <property name="show_menubar">False</property>
+    <child type="titlebar">
+      <object class="GtkHeaderBar">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="title" translatable="yes">ProtonVPN Linux GUI</property>
+        <property name="has_subtitle">False</property>
+        <property name="show_close_button">True</property>
+        <child>
+          <object class="GtkImage">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="pixbuf">../img/logo/protonvpn_sign_green.png</property>
+          </object>
+        </child>
+        <style>
+          <class name="overlay_background"/>
+        </style>
+      </object>
+    </child>
+    <child>
+      <object class="GtkGrid">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="halign">center</property>
+        <property name="valign">center</property>
+        <property name="margin_left">10</property>
+        <property name="margin_right">10</property>
+        <property name="margin_top">10</property>
+        <property name="margin_bottom">10</property>
+        <property name="hexpand">True</property>
+        <property name="vexpand">True</property>
+        <property name="row_spacing">5</property>
+        <child>
+          <object class="GtkGrid">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="halign">center</property>
+            <property name="margin_top">20</property>
+            <property name="margin_bottom">10</property>
+            <child>
+              <object class="GtkImage">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="margin_top">40</property>
+                <property name="margin_bottom">50</property>
+                <property name="pixbuf">../img/logo/protonvpn-logo-white.png</property>
+              </object>
+              <packing>
+                <property name="left_attach">0</property>
+                <property name="top_attach">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkLabel">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="margin_top">10</property>
+                <property name="margin_bottom">30</property>
+                <property name="label" translatable="yes">Unofficial ProtonVPN Linux GUI </property>
+                <property name="justify">fill</property>
+                <attributes>
+                  <attribute name="weight" value="bold"/>
+                  <attribute name="size" value="15000"/>
+                </attributes>
+              </object>
+              <packing>
+                <property name="left_attach">0</property>
+                <property name="top_attach">1</property>
+              </packing>
+            </child>
+            <style>
+              <class name="default_background"/>
+            </style>
+          </object>
+          <packing>
+            <property name="left_attach">0</property>
+            <property name="top_attach">0</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkGrid">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="margin_left">40</property>
+            <property name="margin_right">40</property>
+            <property name="margin_top">30</property>
+            <property name="margin_bottom">20</property>
+            <property name="row_homogeneous">True</property>
+            <property name="column_homogeneous">True</property>
+            <child>
+              <object class="GtkLabel">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="margin_top">10</property>
+                <property name="margin_bottom">10</property>
+                <property name="label" translatable="yes">ProtonVPN Plan</property>
+                <attributes>
+                  <attribute name="weight" value="bold"/>
+                  <attribute name="size" value="12000"/>
+                </attributes>
+              </object>
+              <packing>
+                <property name="left_attach">0</property>
+                <property name="top_attach">0</property>
+                <property name="width">4</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkRadioButton" id="member_free">
+                <property name="label" translatable="yes">Free</property>
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">False</property>
+                <property name="halign">start</property>
+                <property name="active">True</property>
+                <property name="draw_indicator">True</property>
+                <style>
+                  <class name="white_text"/>
+                </style>
+              </object>
+              <packing>
+                <property name="left_attach">0</property>
+                <property name="top_attach">1</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkRadioButton" id="member_basic">
+                <property name="label" translatable="yes">Basic</property>
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">False</property>
+                <property name="halign">center</property>
+                <property name="draw_indicator">True</property>
+                <property name="group">member_free</property>
+                <style>
+                  <class name="white_text"/>
+                </style>
+              </object>
+              <packing>
+                <property name="left_attach">1</property>
+                <property name="top_attach">1</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkRadioButton" id="member_plus">
+                <property name="label" translatable="yes">Plus</property>
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">False</property>
+                <property name="halign">center</property>
+                <property name="draw_indicator">True</property>
+                <property name="group">member_free</property>
+                <style>
+                  <class name="white_text"/>
+                </style>
+              </object>
+              <packing>
+                <property name="left_attach">2</property>
+                <property name="top_attach">1</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkRadioButton" id="member_visionary">
+                <property name="label" translatable="yes">Visionary</property>
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">False</property>
+                <property name="halign">baseline</property>
+                <property name="draw_indicator">True</property>
+                <property name="group">member_free</property>
+                <style>
+                  <class name="white_text"/>
+                </style>
+              </object>
+              <packing>
+                <property name="left_attach">3</property>
+                <property name="top_attach">1</property>
+              </packing>
+            </child>
+            <style>
+              <class name="default_background"/>
+            </style>
+          </object>
+          <packing>
+            <property name="left_attach">0</property>
+            <property name="top_attach">5</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkEntry" id="username_field">
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="margin_left">40</property>
+            <property name="margin_right">40</property>
+            <property name="margin_bottom">30</property>
+            <property name="hexpand">True</property>
+            <property name="has_frame">False</property>
+            <property name="invisible_char">*</property>
+            <property name="placeholder_text" translatable="yes">ProtonVPN (OpenVPN/IKEv2) Username</property>
+            <signal name="key-release-event" handler="login_username_entry_key_release" swapped="no"/>
+            <style>
+              <class name="default_style_entry"/>
+            </style>
+          </object>
+          <packing>
+            <property name="left_attach">0</property>
+            <property name="top_attach">2</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkEntry" id="password_field">
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="margin_left">40</property>
+            <property name="margin_right">40</property>
+            <property name="margin_bottom">20</property>
+            <property name="hexpand">True</property>
+            <property name="visibility">False</property>
+            <property name="has_frame">False</property>
+            <property name="invisible_char">*</property>
+            <property name="placeholder_text" translatable="yes">ProtonVPN (OpenVPN/IKEv2) Password</property>
+            <signal name="key-release-event" handler="login_password_entry_key_release" swapped="no"/>
+            <style>
+              <class name="default_style_entry"/>
+            </style>
+          </object>
+          <packing>
+            <property name="left_attach">0</property>
+            <property name="top_attach">4</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkGrid">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="halign">center</property>
+            <property name="margin_left">40</property>
+            <property name="margin_right">40</property>
+            <property name="margin_top">40</property>
+            <property name="margin_bottom">40</property>
+            <child>
+              <object class="GtkButton" id="login_button">
+                <property name="visible">True</property>
+                <property name="sensitive">False</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">True</property>
+                <property name="halign">center</property>
+                <property name="always_show_image">True</property>
+                <signal name="clicked" handler="on_login_button_clicked" swapped="no"/>
+                <child>
+                  <object class="GtkLabel">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="hexpand">True</property>
+                    <property name="vexpand">True</property>
+                    <property name="label" translatable="yes">Login</property>
+                    <attributes>
+                      <attribute name="weight" value="medium"/>
+                      <attribute name="size" value="12000"/>
+                    </attributes>
+                  </object>
+                </child>
+                <child internal-child="accessible">
+                  <object class="AtkObject" id="login_button-atkobject">
+                    <property name="AtkObject::accessible-role" translatable="yes">push-button</property>
+                  </object>
+                </child>
+                <style>
+                  <class name="default_style_btn"/>
+                </style>
+              </object>
+              <packing>
+                <property name="left_attach">0</property>
+                <property name="top_attach">0</property>
+              </packing>
+            </child>
+          </object>
+          <packing>
+            <property name="left_attach">0</property>
+            <property name="top_attach">6</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkGrid">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="margin_top">10</property>
+            <property name="margin_bottom">10</property>
+            <property name="column_homogeneous">True</property>
+            <child>
+              <object class="GtkLabel" id="need_help_link">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="label" translatable="yes">&lt;a href="#"&gt;Need Help?&lt;/a&gt;</property>
+                <property name="use_markup">True</property>
+                <signal name="activate-link" handler="need_help_link_activate" swapped="no"/>
+                <style>
+                  <class name="login_links"/>
+                </style>
+              </object>
+              <packing>
+                <property name="left_attach">1</property>
+                <property name="top_attach">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkLabel" id="create_account_link_label">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="label" translatable="yes">&lt;a href="https://account.protonvpn.com/signup"&gt;Create Account&lt;/a&gt;</property>
+                <property name="use_markup">True</property>
+                <property name="track_visited_links">False</property>
+                <style>
+                  <class name="login_links"/>
+                </style>
+              </object>
+              <packing>
+                <property name="left_attach">0</property>
+                <property name="top_attach">0</property>
+              </packing>
+            </child>
+          </object>
+          <packing>
+            <property name="left_attach">0</property>
+            <property name="top_attach">7</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkLabel" id="login_window_version_label">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="halign">end</property>
+            <property name="label" translatable="yes">v.2.0.5</property>
+            <style>
+              <class name="login_version_label"/>
+            </style>
+          </object>
+          <packing>
+            <property name="left_attach">0</property>
+            <property name="top_attach">8</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkLabel" id="login_username_label">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="halign">start</property>
+            <property name="margin_left">47</property>
+            <property name="margin_right">40</property>
+            <style>
+              <class name="login_labels"/>
+            </style>
+          </object>
+          <packing>
+            <property name="left_attach">0</property>
+            <property name="top_attach">1</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkLabel" id="login_password_label">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="halign">start</property>
+            <property name="margin_left">47</property>
+            <property name="margin_right">40</property>
+            <style>
+              <class name="login_labels"/>
+            </style>
+          </object>
+          <packing>
+            <property name="left_attach">0</property>
+            <property name="top_attach">3</property>
+          </packing>
+        </child>
+        <style>
+          <class name="default_background"/>
+        </style>
+      </object>
+    </child>
+    <style>
+      <class name="default_background"/>
+    </style>
+  </object>
+  <object class="GtkPopoverMenu" id="login_window_popover">
+    <property name="can_focus">False</property>
+    <property name="relative_to">need_help_link</property>
+    <child>
+      <object class="GtkBox" id="main">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="margin_left">10</property>
+        <property name="margin_right">10</property>
+        <property name="margin_top">10</property>
+        <property name="margin_bottom">10</property>
+        <property name="orientation">vertical</property>
+        <property name="spacing">15</property>
+        <child>
+          <object class="GtkLabel">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="halign">start</property>
+            <property name="label" translatable="yes">Reset Password: &lt;a href="#"&gt;https://account.protonvpn.com/reset-password&lt;/a&gt;</property>
+            <property name="use_markup">True</property>
+            <property name="selectable">True</property>
+            <style>
+              <class name="login_links"/>
+            </style>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">0</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkLabel">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="halign">start</property>
+            <property name="label" translatable="yes">Forgot Username: &lt;a href="#"&gt;https://account.protonvpn.com/forgot-username&lt;/a&gt;</property>
+            <property name="use_markup">True</property>
+            <property name="selectable">True</property>
+            <style>
+              <class name="login_links"/>
+            </style>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">2</property>
+          </packing>
+        </child>
+      </object>
+      <packing>
+        <property name="submenu">submenu1</property>
+        <property name="position">1</property>
+      </packing>
+    </child>
+    <style>
+      <class name="overlay_background"/>
+    </style>
+  </object>
+</interface>

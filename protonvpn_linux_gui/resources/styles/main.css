@@ -1,0 +1,29 @@
+@import "common.css";
+@import "headerbar.css";
+@import "dashboard.css";
+@import "settings.css";
+@import "login.css";
+
+.default_style_btn:hover, .main_connect_btn:hover, .delete_active_profile_btn:hover{
+    -gtk-icon-effect: none;
+    -gtk-icon-source: none;
+    outline: none;
+    box-shadow: none;
+    background-image: none;
+    text-shadow: none;
+
+    border-color: @def_green_color;
+    background-color: @def_green_color;
+}
+
+.server_list_bakground_row:hover, .default_style_combobox window menu menuitem:hover{
+    background-color: @def_green_color;
+}
+
+.remove_borders{
+    border: none;
+}
+
+.bottom_border{
+    border-bottom: 1px solid rgba(255,255,255, 0.3);
+}
