@@ -252,7 +252,7 @@ class ProtonVPNIndicator:
         sudo_type = "sudo"
         if check_polkit_exists() and get_gui_config("general_tab", "polkit_enabled") == "1":
             sudo_type = "pkexec"
-        
+        print(sudo_type)
         gui_logger.debug("TRAY >>> Starting to display GUI.")
         timeout = False
         no_policy = False
@@ -272,9 +272,7 @@ class ProtonVPNIndicator:
         outs = outs.decode().lower()
 
         if not "dismissed" in errs and not "connection refused" in errs and not timeout:
-            msg = "Was not dissmissed"
-            # if "connected" in outs:
-            #     msg = "Connected"
+            msg = "Unable to display GUI, make sure that the app has been given root privilege or support for PolKit is enabled"
         elif "connection refused" in errs:
             no_policy = True
             msg = "Policy was not added for ProtonVPN GUI, please visit https://github.com/ProtonVPN/linux-gui on how to add one"       
