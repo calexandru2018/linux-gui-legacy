@@ -252,7 +252,7 @@ class ProtonVPNIndicator:
         sudo_type = "sudo"
         if check_polkit_exists() and get_gui_config("general_tab", "polkit_enabled") == "1":
             sudo_type = "pkexec"
-        print(sudo_type)
+        
         gui_logger.debug("TRAY >>> Starting to display GUI.")
         timeout = False
         no_policy = False
