@@ -33,6 +33,7 @@
 
 
 <h3 align="center">Linux GUI for ProtonVPN, written in Python. Layout designed in Glade.</h3>
+<h3 align="center">Development Status: Beta</h3>
 
 Protonvpn-linux-gui works on top of <a href="https://github.com/ProtonVPN/protonvpn-cli-ng"><b>protonvpn-cli-ng</b></a>, making it a dependency. All local configurations are managed by the GUI (such as updating protocol, split tunneling, manage killswitch) while the connections are managed by the CLI. This way, you will be able to use the latest version of the CLI, while also being able to use the GUI.
 
@@ -60,7 +61,6 @@ Protonvpn-linux-gui works on top of <a href="https://github.com/ProtonVPN/proton
     - [ProtonVPN GUI](#protonvpn-gui-1)
     - [ProtonVPN Tray](#protonvpn-tray-1)
   - [Sudo/PolKit](#sudopolkit)
-- [Not yet implemented](#not-yet-implemented)
 - [GUI Layout](#gui-layout)
 
 # Installing and Updating
@@ -188,7 +188,7 @@ To create at <i>desktop</i> launcher with a .desktop file, follow the instructio
 
    You should get something like `Location: /usr/local/lib/<YOUR_PYTHON_VERSION>/dist-packages` , this is where your Python packages reside. **Note:** Based on your distro, your `Location` path may not look exactly like this one, so make sure to use your own and `Location` path.
 
-2. Based on previous information, the path to your icon should be `<PATH_DISPLAYED_IN_STEP_1>/linux_gui/resources/img/logo/protonvpn_logo.png`
+2. Based on previous information, the path to your icon should be `<PATH_DISPLAYED_IN_STEP_1>/protonvpn_linux_gui/resources/img/logo/protonvpn_logo.png`
 
 3. Create a `protonvpn-gui.desktop` file in `.local/share/applications/`, and paste in the following code. Remember to change the **`Icon`** path to your own path.
 
@@ -210,7 +210,7 @@ To create at <i>tray icon</i> launcher with a .desktop file, follow the instruct
 
    You should get something like `Location: /usr/local/lib/<YOUR_PYTHON_VERSION>/dist-packages` , this is where your Python packages reside. **Note:** Based on your distro, your `Location` path may not look exactly like this one, so make sure to use your own and `Location` path.
 
-2. Based on previous information, the path to your icon should be `<PATH_DISPLAYED_IN_STEP_1>/linux_gui/resources/img/logo/protonvpn_logo.png`
+2. Based on previous information, the path to your icon should be `<PATH_DISPLAYED_IN_STEP_1>/protonvpn_linux_gui/resources/img/logo/protonvpn_logo.png`
 
 3. Create a `protonvpn-tray.desktop` file in `.local/share/applications/`, and paste in the following code. Remember to change the **`Icon`** path to your own path.
 
