@@ -18,17 +18,14 @@
   <img alt="PyPI - Python Version" src="https://img.shields.io/pypi/pyversions/protonvpn-gui?color=Yellow&label=python&logo=Python&logoColor=Yellow">
 </p>
 <p align="center">
+    <a href="https://actions-badge.atrox.dev/ProtonVPN/protonvpn-gui/goto?ref=master">
+        <img alt="GitHub Workflow Status (branch)" src="https://img.shields.io/github/workflow/status/ProtonVPN/protonvpn-linux-gui/master flake8/master?label=master%20build">
+    </a>
+</p>
+<p align="center">
   <a href="https://github.com/ProtonVPN/protonvpn-linux-gui/blob/master/LICENSE">
     <img src="https://img.shields.io/pypi/l/protonvpn-gui?style=flat" alt="License"></img>
   </a>
-</p>
-<p align="center">
-    <a href="https://actions-badge.atrox.dev/ProtonVPN/protonvpn-gui/goto?ref=master">
-        <img alt="GitHub Workflow Status (branch)" src="https://img.shields.io/github/workflow/status/ProtonVPN/protonvpn-linux-gui/master flake8/master?label=master%20flake8">
-    </a>
-    <a href="https://actions-badge.atrox.dev/ProtonVPN/protonvpn-linux-gui/goto?ref=testing">
-      <img alt="GitHub Workflow Status (Testing)" src="https://img.shields.io/github/workflow/status/ProtonVPN/protonvpn-linux-gui/testing flake8/testing?label=testing%20flake8">
-    </a> 
 </p>
 
 
