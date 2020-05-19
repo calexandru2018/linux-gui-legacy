@@ -8,7 +8,7 @@ except KeyError:
     USER = cli_user
 
 
-VERSION = "2.0.7"
+VERSION = "2.1.0"
 GITHUB_URL_RELEASE = "https://github.com/ProtonVPN/protonvpn-linux-gui/releases/latest"
 
 # GUI configurations
