@@ -1,6 +1,6 @@
 <h1 align="center">ProtonVPN Linux GUI</h1>
 <p align="center">
-  <img src="./protonvpn_linux_gui/resources/img/logo/protonvpn_logo.png" alt="ProtonVPN Logo"></img>
+  <img src="./protonvpn_linux_gui/resources/img/protonvpn_readme_logo.png" alt="ProtonVPN Logo"></img>
 </p>
 
 <p align="center">
