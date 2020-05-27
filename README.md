@@ -30,9 +30,12 @@
 
 
 <h3 align="center">Linux GUI for ProtonVPN, written in Python. Layout designed in Glade.</h3>
-<h3 align="center">Development Status: Beta</h3>
+<h3 align="center">Development Status: <u>Beta</u></h3>
 
 The linux-gui works on top of <a href="https://github.com/ProtonVPN/linux-cli"><b>linux-cli</b></a>, making it a dependency. All local configurations are managed by the GUI (such as updating protocol, split tunneling, manage killswitch) while the connections are managed by the CLI. This way, you will be able to use the latest version of the CLI, while also being able to use the GUI.
+
+**Disclaimer:**
+The ProtonVPN GUI is currently still an <u>experimental interface</u>. It requires escalated privileges and might be somehow unstable. In the near future we plan to refactor the ProtonVPN CLI and GUI so that the part of the client that really requires being executed as root user is kept to a minimum.
 
 ## Table of Contents
 - [Installing and Updating](#installing-and-updating)
