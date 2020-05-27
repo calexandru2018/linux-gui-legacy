@@ -4,8 +4,8 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/ProtonVPN/protonvpn-linux-gui/releases/latest">
-      <img alt="Build Status" src="https://img.shields.io/github/release/ProtonVPN/protonvpn-linux-gui.svg?style=flat" />
+  <a href="https://github.com/ProtonVPN/protonvpn-gui/releases/latest">
+      <img alt="Build Status" src="https://img.shields.io/github/release/ProtonVPN/linux-gui.svg?style=flat" />
   </a>
   <a href="https://pepy.tech/project/protonvpn-gui">
     <img alt="Downloads" src="https://pepy.tech/badge/protonvpn-gui">
@@ -19,11 +19,11 @@
 </p>
 <p align="center">
     <a href="https://actions-badge.atrox.dev/ProtonVPN/protonvpn-gui/goto?ref=master">
-        <img alt="GitHub Workflow Status (branch)" src="https://img.shields.io/github/workflow/status/ProtonVPN/protonvpn-linux-gui/master flake8/master?label=master%20build">
+        <img alt="GitHub Workflow Status (branch)" src="https://img.shields.io/github/workflow/status/ProtonVPN/linux-gui/master flake8/master?label=master%20build">
     </a>
 </p>
 <p align="center">
-  <a href="https://github.com/ProtonVPN/protonvpn-linux-gui/blob/master/LICENSE">
+  <a href="https://github.com/ProtonVPN/linux-gui/blob/master/LICENSE">
     <img src="https://img.shields.io/pypi/l/protonvpn-gui?style=flat" alt="License"></img>
   </a>
 </p>
@@ -32,7 +32,7 @@
 <h3 align="center">Linux GUI for ProtonVPN, written in Python. Layout designed in Glade.</h3>
 <h3 align="center">Development Status: Beta</h3>
 
-Protonvpn-linux-gui works on top of <a href="https://github.com/ProtonVPN/protonvpn-cli-ng"><b>protonvpn-cli-ng</b></a>, making it a dependency. All local configurations are managed by the GUI (such as updating protocol, split tunneling, manage killswitch) while the connections are managed by the CLI. This way, you will be able to use the latest version of the CLI, while also being able to use the GUI.
+The linux-gui works on top of <a href="https://github.com/ProtonVPN/linux-cli"><b>linux-cli</b></a>, making it a dependency. All local configurations are managed by the GUI (such as updating protocol, split tunneling, manage killswitch) while the connections are managed by the CLI. This way, you will be able to use the latest version of the CLI, while also being able to use the GUI.
 
 ## Table of Contents
 - [Installing and Updating](#installing-and-updating)
@@ -44,7 +44,7 @@ Protonvpn-linux-gui works on top of <a href="https://github.com/ProtonVPN/proton
     - [ProtonVPN Tray dependencies](#protonvpn-tray-dependencies)
       - [Known Issues](#tray-known-issues)
         - [dbus-launch](#dbus-launch)
-  - [Installing protonvpn-linux-gui](#installing-protonvpn-linux-gui)
+  - [Installing ProtonVPN GUI](#installing-protonvpn-linux-gui)
     - [Distribution based](#distribution-based)
     - [PIP based](#pip-based)
       - [How to Update](#to-update-to-a-new-version) 
@@ -69,7 +69,7 @@ Protonvpn-linux-gui works on top of <a href="https://github.com/ProtonVPN/proton
 - requests >= 2.23.0
 - configparse >= 4.0.2
 - pip for python3 (pip3)
-- <a href="https://github.com/ProtonVPN/protonvpn-cli-ng"><b>protonvpn-cli-ng</b></a> >= 2.2.2
+- <a href="https://github.com/ProtonVPN/linux-cli"><b>linux-cli</b></a> >= 2.2.2
 - setuptools for python3 (python3-setuptools)
 
 #### ProtonVPN GUI dependencies
@@ -238,26 +238,26 @@ The instructions for seting up visudo are described below.
 
 # GUI Layout
 <p align="center">
-  <img src="https://i.imgur.com/ZmWlHV5.png" alt="Login"></img>
+  <img src="./protonvpn_linux_gui/resources/img/gui/intialize_profile.png" alt="Login"></img>
 </p>
 <p align="center">
-  <img src="https://i.imgur.com/aM9tTgd.png" alt="Dashboard"></img>
+  <img src="./protonvpn_linux_gui/resources/img/gui/dashboard.png" alt="Dashboard"></img>
 </p>
 
 <p align="center">
-  <img src="https://i.imgur.com/ScIcw10.png" alt="General Settings"></img>
+  <img src="./protonvpn_linux_gui/resources/img/gui/settings_general.png" alt="General Settings"></img>
 </p>
 <p align="center">
-  <img src="https://i.imgur.com/Nj0c5xf.png" alt="Tray Settings"></img>
+  <img src="./protonvpn_linux_gui/resources/img/gui/settings_tray.png" alt="Tray Settings"></img>
 </p> 
 <p align="center">
-  <img src="https://i.imgur.com/KMdDszk.png" alt="Connection Settings"></img>
+  <img src="./protonvpn_linux_gui/resources/img/gui/settings_connection.png" alt="Connection Settings"></img>
 </p>  
 <p align="center">
-  <img src="https://i.imgur.com/QkLbcuo.png" alt="Advanced Settings"></img>
+  <img src="./protonvpn_linux_gui/resources/img/gui/settings_advanced.png" alt="Advanced Settings"></img>
 </p> 
 
 <p align="center">
-  <img src="https://i.imgur.com/vXMSQ8z.png" alt="Diagnosis Tool"></img>
+  <img src="./protonvpn_linux_gui/resources/img/gui/diagnose_tool.png" alt="Diagnosis Tool"></img>
 </p> 
  
