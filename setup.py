@@ -14,7 +14,7 @@ except FileNotFoundError:
 
     For further information and a usage guide, please view the project page:
 
-    https://github.com/ProtonVPN/protonvpn-linux-gui
+    https://github.com/ProtonVPN/linux-gui
     """
 
 setup(
@@ -47,7 +47,7 @@ setup(
     author="Proton Technologies AG",
     author_email="contact@protonvpn.com",
     license="GPLv3",
-    url="https://github.com/ProtonVPN/protonvpn-linux-gui",
+    url="https://github.com/ProtonVPN/linux-gui",
     install_requires=[
         "protonvpn-cli>=2.2.2",
         "requests>=2.23.0",
