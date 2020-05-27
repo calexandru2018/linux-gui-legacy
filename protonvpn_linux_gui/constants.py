@@ -9,7 +9,7 @@ except KeyError:
 
 
 VERSION = "2.1.0"
-GITHUB_URL_RELEASE = "https://github.com/ProtonVPN/protonvpn-linux-gui/releases/latest"
+GITHUB_URL_RELEASE = "https://github.com/ProtonVPN/linux-gui/releases/latest"
 
 # GUI configurations
 GUI_CONFIG_DIR = os.path.join(os.path.expanduser("~{0}".format(USER)), ".pvpn-gui")
@@ -85,14 +85,14 @@ POLKIT_TEMPLATE = """
 </policyconfig>
 """
 CLI_ABSENCE_INFO = """
-<b>Could not find protonvpn-cli-ng installed on your system!</b>\t
-Original protonvpn-cli-ng is needed for the GUI to work.
+<b>Could not find linux-cli installed on your system!</b>\t
+Original linux-cli is needed for the GUI to work.
 
 <b>Install via pip:</b>
 sudo pip3 install protonvpn-cli
 
 <b>Install via Github:</b>
-git clone https://github.com/protonvpn/protonvpn-cli-ng
+git clone https://github.com/protonvpn/linux-cli
 cd protonvpn-cli-ng
 sudo python3 setup.py install
 """
