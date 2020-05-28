@@ -158,7 +158,14 @@ If you would like to use `pkexec` instead of `sudo` (unsure ? [Look here](#sudop
 
 ### Virtual environment
 
-If you would like to run the the GUI within a virtual environment (for either development purposes or other), then you can easily do that with the help of <a href="https://pipenv.readthedocs.io/en/latest/">pipenv</a>. Make sure to install pipenv beforehand following the next steps.
+If you would like to run the the GUI within a virtual environment (for either development purposes or other), then you can easily do that with the help of <a href="https://pipenv.readthedocs.io/en/latest/">pipenv</a>. Make sure to install pipenv and additional packages before following the next steps.
+
+| **Distro**                              | **Command**                                                                                                     |
+|:----------------------------------------|:----------------------------------------------------------------------------------------------------------------|
+|Fedora/CentOS/RHEL                       | `sudo dnf install cairo-devel cairo-gobject-devel gobject-introspection-devel pkg-config `                      |
+|Ubuntu/Linux Mint/Debian and derivatives | `sudo apt install libcairo2-dev libgirepository1.0-dev pkg-config`                                              |
+|OpenSUSE/SLES                            | `sudo zypper install cairo-devel gobject-introspection-devel python3-cairo-devel pkg-config`                    |
+|Arch Linux/Manjaro                       | `sudo pacman -S cairo base-devel gobject-introspection pkgconf`                                                 |
 
 1. `git clone https://github.com/ProtonVPN/linux-gui` 
 2. `cd linux-gui`
