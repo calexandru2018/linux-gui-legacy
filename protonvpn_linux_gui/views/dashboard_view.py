@@ -46,7 +46,7 @@ class DashboardView:
             "help_button_clicked": self.help_button_clicked,
             "AboutDialog_delete_event": self.AboutDialog_delete_event,
             "refresh_servers_button_clicked": self.refresh_servers_button_clicked,
-            
+            "exit_button_clicked": self.exit_button_clicked,
         })
 
     def display_window(self):
@@ -344,3 +344,6 @@ class DashboardView:
         if window.get_property("visible") is True:
             window.hide()
             return True    
+    
+    def exit_button_clicked(self, button):
+        self.gtk.main_quit()
