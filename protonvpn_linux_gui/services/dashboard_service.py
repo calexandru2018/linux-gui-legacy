@@ -133,7 +133,7 @@ class DashboardService:
         pip3_installed = False
 
         try:
-            is_pip3_installed = subprocess.run(["pip3", "show", "protonvpn-linux-gui-calexandru2018"],stdout=subprocess.PIPE) # nosec
+            is_pip3_installed = subprocess.run(["pip3", "show", "protonvpn-gui"],stdout=subprocess.PIPE) # nosec
         except:
             return False
 
