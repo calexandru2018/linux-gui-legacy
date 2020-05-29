@@ -88,17 +88,9 @@ class DashboardService:
         return result
     
     def random_connect(self):
-        try:
-            protocol = get_config_value("USER", "default_protocol")
-        except:
-            return False
-
-        try:
-            result = subprocess.run(["protonvpn", "connect", "--random", "-p", protocol], stdout=subprocess.PIPE, stderr=subprocess.PIPE).stdout.decode() # nosec
-        except:
-            return False
-
-        return result
+        command = ["protonvpn", "connect", "--random"]
+        bool_value, result =  self.root_command(command)
+        return self.get_display_message(bool_value, result)
 
     def disconnect(self):
         return self.root_command(["protonvpn", "disconnect"])
