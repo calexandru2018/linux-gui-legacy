@@ -9,7 +9,9 @@ from protonvpn_linux_gui.utils import set_gui_config, get_gui_config, check_inte
 from protonvpn_linux_gui.constants import GITHUB_URL_RELEASE, SMALL_FLAGS_BASE_PATH, FEATURES_BASE_PATH
 
 class DashboardService:
-    
+    # 30 seconds of timeout for all root necessary commands
+    timeout_value = 30
+
     def set_display_secure_core(self, update_to):
         try:
             set_gui_config("connections", "display_secure_core", update_to)
@@ -87,17 +89,8 @@ class DashboardService:
         return result
 
     def quick_connect(self):
-        try:
-            protocol = get_config_value("USER", "default_protocol")
-        except:
-            return False
-
-        try:
-            result = subprocess.run(["protonvpn", "connect", "--fastest", "-p", protocol], stdout=subprocess.PIPE, stderr=subprocess.PIPE).stdout.decode() # nosec
-        except:
-            return False
-
-        return result
+        command = ["protonvpn", "connect", "-f"]
+        return self.root_command(command)
 
     def last_connect(self):
         try:
@@ -121,12 +114,7 @@ class DashboardService:
         return result
 
     def disconnect(self):
-        try:
-            result = subprocess.run(["protonvpn", "disconnect"], stdout=subprocess.PIPE, stderr=subprocess.PIPE).stdout.decode() # nosec
-        except:
-            return False
-
-        return result
+        return self.root_command(["protonvpn", "disconnect"])
 
     def check_for_updates(self):
         latest_release = ''
@@ -155,6 +143,40 @@ class DashboardService:
             return False
 
         return (latest_release, pip3_installed)
+
+    def root_command(self, command_list):
+        # sudo_type should be fetched from GUI configurations file
+        sudo_type = "sudo"
+
+        # inject sudo_type from configurations
+        command_list.insert(0, sudo_type)
+
+        process = subprocess.Popen(command_list, stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
+        timeout = False
+
+        try:
+            outs, errs = process.communicate(timeout=self.timeout_value)
+        except subprocess.TimeoutExpired:
+            timeout = True
+            process.kill()
+            outs, errs = process.communicate()
+
+        errs = errs.decode().lower()
+        outs = outs.decode().lower()
+
+        if "dismissed" in errs and not timeout:
+            return (False, "Sudo access was dismissed.")
+        
+        if not "dismissed" in errs and timeout:
+            return (False, "Request timed out, either because of insufficient privileges\nor network/api issues.")
+
+        if "authentication failed" in outs:
+            return (False, "Authentication failed!\nPlease make sure that your username and password is correct.")
+
+        if "connected" in outs or "disconnected" in outs:
+            return (True, outs.upper())
+
+        return (False, errs)
 
     def diagnose(self):
         reccomendation = '' 
