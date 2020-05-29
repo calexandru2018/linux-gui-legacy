@@ -184,13 +184,12 @@ class DashboardPresenter:
         """
         gui_logger.debug(">>> Running \"disconnect\".")
 
-        result = self.dashboard_service.disconnect()
+        is_disconnected, display_message = self.dashboard_service.disconnect()
+        if is_disconnected:
+            display_message = "Disconnected from VPN!"
+            self.on_update_labels(kwargs.get("connection_labels"), disconnect=True)
 
-        self.queue.put(dict(action="update_dialog", label=result))
-
-        self.on_update_labels(kwargs.get("connection_labels"), disconnect=True)
-
-        gui_logger.debug(">>> Ended tasks in \"disconnect\" thread. Result: \"{0}\"".format(result))
+        self.queue.put(dict(action="update_dialog", label=display_message))
 
     def on_check_for_updates(self):
         """Function that searches for existing updates by checking the latest releases on github.

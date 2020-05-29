@@ -90,7 +90,9 @@ class DashboardService:
         return self.get_display_message(bool_value, result)
 
     def disconnect(self):
-        return self.root_command(["protonvpn", "disconnect"])
+        command = ["protonvpn", "disconnect"]
+        bool_value, result =  self.root_command(command)
+        return bool_value, self.get_display_message(bool_value, result)
 
     def check_for_updates(self):
         latest_release = ''
