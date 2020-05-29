@@ -10,45 +10,47 @@ try:
         long_descr = '\n' + f.read()
 except FileNotFoundError:
     long_descr = """
-    The Unofficial Linux GUI for ProtonVPN.
+    The Linux GUI for ProtonVPN.
 
     For further information and a usage guide, please view the project page:
 
-    https://github.com/calexandru2018/protonvpn-linux-gui
+    https://github.com/ProtonVPN/linux-gui
     """
 
-
-
 setup(
-    name="protonvpn-linux-gui-calexandru2018",
+    name="protonvpn-gui",
     packages=[
         "protonvpn_linux_gui",
+        "protonvpn_linux_gui.presenters",
+        "protonvpn_linux_gui.services",
+        "protonvpn_linux_gui.views",
         "protonvpn_linux_gui.resources",
         "protonvpn_linux_gui.resources.img.flags",
         "protonvpn_linux_gui.resources.img.flags.small",
         "protonvpn_linux_gui.resources.img.flags.large",
         "protonvpn_linux_gui.resources.img.logo",
         "protonvpn_linux_gui.resources.img.utils",
+        "protonvpn_linux_gui.resources.styles",
+        "protonvpn_linux_gui.resources.ui",
         ],
     entry_points={
             "console_scripts": [
-                "protonvpn-gui = protonvpn_linux_gui.gui:initialize_gui",
-                "protonvpn-tray = protonvpn_linux_gui.tray_icon:ProtonVPNIndicator",
+                "protonvpn-gui = protonvpn_linux_gui.protonvpn_gui:init",
+                "protonvpn-tray = protonvpn_linux_gui.indicator:ProtonVPNIndicator",
             ]
         },
     include_package_data=True,
     version=VERSION,
-    description="Unofficial Linux GUI client for ProtonVPN",
+    description="Linux GUI client for ProtonVPN",
     long_description=long_descr,
     long_description_content_type="text/markdown",
-    author="calexandru2018",
-    author_email="acrandom@pm.me",
+    author="Proton Technologies AG",
+    author_email="contact@protonvpn.com",
     license="GPLv3",
-    url="https://github.com/calexandru2018/protonvpn-linux-gui",
+    url="https://github.com/ProtonVPN/linux-gui",
     install_requires=[
         "protonvpn-cli>=2.2.2",
         "requests>=2.23.0",
-        "configparser>=4.0.2"
     ],
     python_requires=">=3.5",
     classifiers=[

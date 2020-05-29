@@ -1,0 +1,142 @@
+@define-color def_bg_color rgba(62, 68, 73, 1);
+@define-color overlay_color rgba(52, 58, 63, 1);
+@define-color def_green_color rgb(86, 179, 102);
+
+.white_text{
+    color: rgb(255,255,255);
+}
+
+label, entry{
+    text-shadow: none;
+}
+
+label selection{
+    background-color: @def_green_color;
+}
+
+/* Entry default style */
+entry.default_style_entry{
+    border-image:none;
+    outline: none;
+    box-shadow: none;
+    background-color: @def_bg_color;
+    color: rgb(255,255,255);
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    border-bottom: 1px solid rgba(255,255,255, 0.3);
+}
+entry.default_style_entry:focus{
+    border-image:none;
+    outline: none;
+    box-shadow: none;
+}
+/* Entry default style */
+
+.disabled_label, .disabled_label * {
+    color: rgb(157,157,157);
+}
+
+.default_background{
+    background-color: @def_bg_color;
+    color: rgb(255,255,255);
+}
+
+.overlay_background{
+    background-color: @overlay_color;
+    color: rgb(255,255,255);
+}
+
+.default_style_btn{
+    -gtk-icon-effect: none;
+    -gtk-icon-source: none;
+    outline: none;
+    box-shadow: none;
+    background-image: none;
+    text-shadow: none;
+    background-color: @def_bg_color;
+    color: rgb(255,255,255);
+    padding: 10px 50px;
+    border: 2px solid rgb(255,255,255);
+    border-radius: 20px;
+    transition: all .115s ease-in-out;
+}
+
+.default_style_switch{
+    background-color: @overlay_color;
+    border-color: @overlay_color;
+}
+
+.default_style_switch slider{
+	border: transparent;
+}
+
+.default_style_switch:checked{
+    background-color: @def_green_color;
+    border-color: @def_green_color;
+}
+
+.active_tab{
+    color: rgb(255,255,255);
+    background-color: @def_bg_color;
+}
+
+.inactive_tab{
+    background-color: rgba(55, 61, 66, 1);
+    color: gray;
+}
+
+.default_style_combobox{
+    -gtk-icon-effect: none;
+    -gtk-icon-source: none;
+    background-image: none;
+    text-shadow: none;
+    outline: none;
+    border-image-width: 0;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    border-bottom: 1px solid rgba(255,255,255, 0.3);
+}
+.default_style_combobox button{
+    -gtk-icon-effect: none;
+    -gtk-icon-source: none;
+    background-image: none;
+    text-shadow: none;
+    box-shadow: none;
+    outline: none;
+    border-image-width: 0;
+    background-color: @def_bg_color;
+    color: rgb(255,255,255);
+    border-radius: 0;
+    border: none;
+}
+
+.default_style_combobox button box arrow{
+    color: rgb(255,255,255);
+}
+
+.default_style_combobox button box cellview{
+    color: rgb(255,255,255);
+}
+
+.default_style_combobox button:focus{
+    -gtk-icon-effect: none;
+    -gtk-icon-source: none;
+}
+
+.default_style_combobox window menu{
+    border: none;
+    box-shadow: none;
+    border-radius: 0;
+    background-color: @def_bg_color;
+	color:rgb(255,255,255);
+}
+
+.default_style_combobox window menu menuitem cellview{
+	color:rgb(255,255,255);
+}
+
+.labels_with_info_tooltip_grid{
+    margin-right: 10px;
+}

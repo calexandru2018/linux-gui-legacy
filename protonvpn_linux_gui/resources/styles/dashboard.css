@@ -1,0 +1,119 @@
+notebook.dashboard_notebook_style{
+	outline:none;
+}
+
+notebook.dashboard_notebook_style header{
+	-gtk-icon-source: none;
+    background-image: none;
+	outline:none;
+	padding: 0;
+    background-color: @overlay_color;
+    border: none;
+}
+
+notebook.dashboard_notebook_style tabs{
+    -gtk-icon-source: none;
+    background-image: none;
+	outline:none;
+	padding: 0;
+    margin: 0;
+    border-bottom: 1px solid rgba(255,255,255, 0.3);
+    border: none;
+}
+
+notebook.dashboard_notebook_style tabs tab{
+	-gtk-icon-source: none;
+    background-image: none;
+    outline:none;
+    border-color: transparent;
+    box-shadow: none;
+	padding: 0;
+    margin: 0;
+    transition: all .115s ease-in-out;
+    border: none;
+}
+
+.default_main_tab_conf{
+    outline:none;
+    border: none;
+    box-shadow: none;
+    padding: 20px 70px;
+    color: rgb(255,255,255);
+    transition: all .115s ease-in-out;
+}
+
+.dashboard_left_tab{
+    border-top-right-radius: 80px;
+    margin-right: -10px;
+
+}
+.dashboard_right_tab{
+    border-top-left-radius: 80px;
+    margin-left: -10px;
+}
+
+.main_connect_btn{
+    -gtk-icon-effect: none;
+    -gtk-icon-source: none;
+    outline: none;
+    box-shadow: none;
+    background-image: none;
+    text-shadow: none;
+    color: rgb(255,255,255);
+    background-color: transparent;
+    border: 2px solid rgb(255,255,255);
+    padding: 10px 50px;
+    border-radius: 20px;
+    transition: all .115s ease-in-out;
+}
+
+.delete_active_profile_btn{
+    -gtk-icon-effect: none;
+    -gtk-icon-source: none;
+    outline: none;
+    box-shadow: none;
+    background-image: none;
+    text-shadow: none;
+    color: rgb(255,255,255);
+    background-color: transparent;
+    border: none;
+    border-radius: 5px;
+    transition: all .115s ease-in-out;
+}
+
+
+.countries_content_style{
+    padding: 5px 10px;
+    transition: all 5s ease-in-out;
+}
+
+.profiles_tab_content{
+    padding: 10px 15px;
+}
+
+.profile_grid{
+    padding: 20px;
+}
+
+.profile_style_btn{
+    -gtk-icon-effect: none;
+    -gtk-icon-source: none;
+    outline: none;
+    box-shadow: none;
+    background-image: none;
+    text-shadow: none;
+
+    padding: 5px;
+    background-color: transparent;
+    border: none;
+    border-radius: 0;
+    transition: all .115s ease-in;
+}
+.profile_style_btn:hover{
+    color: @def_green_color;
+    padding-left: 15px;
+    box-shadow: none;
+}
+.server_scroll_window{
+    border: none;
+}
