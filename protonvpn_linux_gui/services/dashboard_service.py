@@ -50,8 +50,6 @@ class DashboardService:
         return self.quick_connect()
 
     def custom_quick_connect(self, quick_conn_pref):
-        protocol = get_config_value("USER", "default_protocol")
-
         command = "--fastest"
         country = False
 
@@ -69,16 +67,12 @@ class DashboardService:
             command="--cc"
             country=quick_conn_pref.upper()
         
-        command_list = ["protonvpn", "connect", command, "-p" ,protocol]
+        command_list = ["protonvpn", "connect", command]
         if country:
-            command_list = ["protonvpn", "connect", command, country, "-p" ,protocol]
+            command_list = ["protonvpn", "connect", command, country]
         
-        try:
-            result = subprocess.run(command_list, stdout=subprocess.PIPE, stderr=subprocess.PIPE).stdout.decode()
-        except: 
-            return False
-        
-        return result
+        bool_value, result =  self.root_command(command_list)
+        return self.get_display_message(bool_value, result)
 
     def quick_connect(self):
         command = ["protonvpn", "connect", "-f"]
