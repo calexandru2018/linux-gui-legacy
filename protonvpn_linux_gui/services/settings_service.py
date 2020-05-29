@@ -78,35 +78,34 @@ class SettingsService:
     def set_autoconnect(self, update_to):
             # autoconnect_alternatives = ["dis", "fast", "rand", "p2p", "sc", "tor"]
             return_val = False
-            self.manage_autoconnect(mode="disable")
+            return_bool, return_msg = self.manage_autoconnect(mode="disable")
 
             if update_to == "dis":
-                return_val = True
                 pass
             elif update_to == "fast":
-                return_val = self.manage_autoconnect(mode="enable", command="connect -f")
+                return_bool, return_msg = self.manage_autoconnect(mode="enable", command="connect -f")
             elif update_to == "rand":
-                return_val = self.manage_autoconnect(mode="enable", command="connect -r")
+                return_bool, return_msg = self.manage_autoconnect(mode="enable", command="connect -r")
             elif update_to == "p2p":
-                return_val = self.manage_autoconnect(mode="enable", command="connect --p2p")
+                return_bool, return_msg = self.manage_autoconnect(mode="enable", command="connect --p2p")
             elif update_to == "sc":
-                return_val = self.manage_autoconnect(mode="enable", command="connect --sc")
+                return_bool, return_msg = self.manage_autoconnect(mode="enable", command="connect --sc")
             elif update_to == "tor":
-                return_val = self.manage_autoconnect(mode="enable", command="connect --tor")
+                return_bool, return_msg = self.manage_autoconnect(mode="enable", command="connect --tor")
             else:
                 # Connect to a specific country
                 if update_to in country_codes:
-                    return_val = self.manage_autoconnect(mode="enable", command="connect --cc " + update_to.upper())
+                    return_bool, return_msg = self.manage_autoconnect(mode="enable", command="connect --cc " + update_to.upper())
 
-            if not return_val:
-                return False
+            if not return_bool:
+                return False, return_msg
 
             try:
                 set_gui_config("conn_tab", "autoconnect", update_to)
             except:
-                return False
+                return False, "Unable to update autoconnect configurations although autoconnect should be enabled"
 
-            return True
+            return True, return_msg
 
     def set_quickconnect(self, update_to):
         return_val = False
@@ -217,118 +216,97 @@ class SettingsService:
     def manage_autoconnect(self, mode, command=False):
         """Function that manages autoconnect functionality. It takes a mode (enabled/disabled) and a command that is to be passed to the CLI.
         """
+        sudo_type = "pkexec"
 
-        if mode == 'enable':
-            if self.daemon_exists():
-                self.disable_autoconnect()
+        if mode == "enable":
+            return self.enable_autoconnect(command, sudo_type)
 
-            if not self.enable_autoconnect(command):
-                print("[!] Unable to enable autoconnect")
-                gui_logger.debug("[!] Unable to enable autoconnect.")
-                return False
+        if mode == "disable":
+            return self.disable_autoconnect(sudo_type)
 
-            print("Autoconnect on boot enabled")
-            gui_logger.debug(">>> Autoconnect on boot enabled")
-            return True
-
-        if mode == 'disable':
-            if self.daemon_exists():
-                if not self.disable_autoconnect():
-                    print("[!] Could not disable autoconnect")
-                    gui_logger.debug("[!] Could not disable autoconnect.")
-                    return False
-
-            print("Autoconnect on boot disabled")
-            gui_logger.debug(">>> Autoconnect on boot disabled")
-            return True
-
-    def enable_autoconnect(self, command):
+    def enable_autoconnect(self, command, sudo_type):
         """Function that enables autoconnect.
         """
+        timeout = False
         protonvpn_path = find_cli()
         if not protonvpn_path:
-            return False
+            return False, "Could not find path to CLI"
 
         # Injects CLIs start and stop path and username
         with_cli_path = TEMPLATE.replace("PATH", (protonvpn_path + " " + command))
         template = with_cli_path.replace("STOP", protonvpn_path + " disconnect")
         template = template.replace("=user", "="+USER)
+
+        generate_service_command = "cat > {0} <<EOF {1}\nEOF".format(PATH_AUTOCONNECT_SERVICE, template)
+        process = subprocess.Popen(sudo_type, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE, universal_newlines=True)
+
+        process.stdin.write("bash -c {}\n".format(generate_service_command))
+        process.stdin.write("systemctl enable {}\n".format(SERVICE_NAME))
+        process.stdin.write("systemctl daemon-reload\n")
+        process.stdin.flush()
+
+        try:
+            outs, errs = process.communicate(timeout=15)
+        except subprocess.TimeoutExpired:
+            timeout = True
+            process.kill()
+            outs, errs = process.communicate()
+
+        if "dismissed" in errs and not timeout:
+            return False, "Sudo access was dismissed."
         
-        if not self.generate_template(template):
-            return False
+        if not "dismissed" in errs and timeout:
+            return False, "Command timedout, perhaps due to insufficient privileges."
 
-        return self.enable_daemon() 
+        if not "created symlink" in errs.lower():
+            return False, "Unable to setup autoconnect!"
 
-    def disable_autoconnect(self, ):
+        if not self.daemon_exists():
+            return False, "Could not configure autoconnect!"
+
+        return True, "Autoconnect enabled!"
+        
+    def disable_autoconnect(self, sudo_type):
         """Function that disables autoconnect.
         """
-        if not self.stop_and_disable_daemon():
-            return False
-
-        if not self.remove_template():
-            return False
-
-        return True
-    
-    def generate_template(self, template):
-        """Function that generates the service file for autoconnect.
-        """
-        generate_service_command = "cat > {0} <<EOF {1}\nEOF".format(PATH_AUTOCONNECT_SERVICE, template)
-        gui_logger.debug(">>> Template:\n{}".format(generate_service_command))
-
-        resp = subprocess.run(["sudo", "bash", "-c", generate_service_command], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
-        if resp.returncode == 1:
-            gui_logger.debug("[!] Unable to generate template.\n{}".format(resp))
-            return False
-
-        return True
-
-    def remove_template(self):
-        """Function that removes the service file from /etc/systemd/system/.
-        """
-        resp = subprocess.run(["sudo", "rm", PATH_AUTOCONNECT_SERVICE], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
-        # If return code 1: File does not exist in path
-        # This is fired when a user wants to remove template a that does not exist
-        if resp.returncode == 1:
-            gui_logger.debug("[!] Could not remove .serivce file.\n{}".format(resp))
-
-        self.reload_daemon()
-        return True
-
-    def enable_daemon(self):
-        """Function that enables the autoconnect daemon service.
-        """
-        self.reload_daemon()
-
-        resp = subprocess.run(['sudo', 'systemctl', 'enable' , SERVICE_NAME], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
-        if resp.returncode == 1:
-            gui_logger.debug("[!] Unable to enable deamon.\n{}".format(resp))
-            return False
-
-        return True
-        
-    def stop_and_disable_daemon(self):
-        """Function that stops and disables the autoconnect daemon service.
-        """
+        timeout = False
         if not self.daemon_exists():
-            return True
+            return True, "Autoconnect disabled!"
 
-        resp_stop = subprocess.run(['sudo', 'systemctl', 'stop' , SERVICE_NAME], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
-        if resp_stop.returncode == 1:
-            gui_logger.debug("[!] Unable to stop deamon.\n{}".format(resp_stop))
-            return False
+        process = subprocess.Popen(sudo_type, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE, universal_newlines=True)
 
-        resp_disable = subprocess.run(['sudo', 'systemctl', 'disable' ,SERVICE_NAME], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
-        if resp_disable.returncode == 1:
-            gui_logger.debug("[!] Unable not disable daemon.\n{}".format(resp_disable))
-            return False
+        process.stdin.write("systemctl stop {}\n".format(SERVICE_NAME))
+        process.stdin.write("systemctl disable {}\n".format(SERVICE_NAME))
+        process.stdin.write("rm {}\n".format(PATH_AUTOCONNECT_SERVICE))
+        process.stdin.write("systemctl daemon-reload\n")
+        process.stdin.flush()
 
-        return True
+        try:
+            outs, errs = process.communicate(timeout=15)
+        except subprocess.TimeoutExpired:
+            timeout = True
+            process.kill()
+            outs, errs = process.communicate()
+
+        if "dismissed" in errs and not timeout:
+            return False, "Sudo access was dismissed."
+        
+        if not "dismissed" in errs and timeout:
+            return False, "Command timedout, perhaps due to insufficient privileges."
+
+        if not "removed" in errs.lower():
+            return False, "Unable to disable autoconnect!"
+
+        if self.daemon_exists():
+            return False, "Autoconnect configurations still exists!"
+
+        return True, "Autoconnect disabled!"
 
     def reload_daemon(self):
         """Function that reloads the autoconnect daemon service.
         """
-        resp = subprocess.run(['sudo', 'systemcl', 'daemon-reload'], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
+        print("Before reloading daemon")
+        resp = subprocess.run(["pkexec", "systemcl", "daemon-reload"], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
         if resp.returncode == 1:
             gui_logger.debug("[!] Unable to reload daemon.\n{}".format(resp))
             return False
@@ -340,7 +318,7 @@ class SettingsService:
         """
         # Return code 3: service exists
         # Return code 4: service could not be found
-        resp_stop = subprocess.run(['systemctl', 'status' , SERVICE_NAME], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
+        resp_stop = subprocess.run(["systemctl", "status" , SERVICE_NAME], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
         return_val = True
 
         if resp_stop.returncode == 4:
@@ -392,43 +370,10 @@ class SettingsService:
 
         return False
 
-    def root_commands(self, command_list):
-        # Should be fetched from file
-        sudo_type="root"
-
-        command_list.insert(0, sudo_type)
-
-        process = subprocess.Popen(command_list, stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
-        timeout = False
-
-        try:
-            outs, errs = process.communicate(timeout=self.timeout_value)
-        except subprocess.TimeoutExpired:
-            timeout = True
-            process.kill()
-            outs, errs = process.communicate()
-
-        errs = errs.decode().lower()
-        outs = outs.decode().lower()
-
-        if "dismissed" in errs and not timeout:
-            print("Dismissed")
-            return (False, "Sudo access was dismissed.")
-        
-        if not "dismissed" in errs and timeout:
-            print("Timed out")
-            return (False, "Request timed out, either because of insufficient privileges.")
-
-        print("errs: ", errs)
-        print()
-        print("outs: ", outs)
-
-        return (True, "ok")
-
     def get_gui_path(self):
         """Function that searches for the CLI. Returns CLIs path if it is found, otherwise it returns False.
         """
-        protonvpn_gui_path = subprocess.run(['which', 'protonvpn-gui'], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
+        protonvpn_gui_path = subprocess.run(["which", "protonvpn-gui"], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
         if protonvpn_gui_path.returncode == 1:
             gui_logger.debug("[!] Unable to run \"get_gui_path\" subprocess. Result: \"{}\"".format(protonvpn_gui_path))
             protonvpn_gui_path = False
