@@ -114,26 +114,15 @@ class DashboardPresenter:
         """     
         user_selected_server = kwargs.get("user_selected_server")
 
-        gui_logger.debug(">>> Running \"openvpn_connect\".")
-            
         # Check if it should connect to country or server
         if "#" in user_selected_server:
-            result = self.dashboard_service.connect_to_server(user_selected_server)
+            display_message = self.dashboard_service.connect_to_server(user_selected_server)
         else:
-            result = self.dashboard_service.connect_to_country(user_selected_server)
-
-
-        display_message = result
-        server_protocol = get_server_protocol_from_cli(result, True)
-
-        if server_protocol:
-            display_message = "You are connected to <b>{}</b> via <b>{}</b>!".format(server_protocol[0], server_protocol[1].upper())
+            display_message = self.dashboard_service.connect_to_country(user_selected_server)
 
         self.queue.put(dict(action="update_dialog", label=display_message))
 
         self.on_update_labels(kwargs.get("connection_labels"))
-
-        gui_logger.debug(">>> Ended tasks in \"openvpn_connect\" thread. Result: \"{0}\"".format(result))
 
     def quick_connect(self, **kwargs):
         """Function that connects to the quickest server.

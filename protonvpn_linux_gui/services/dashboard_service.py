@@ -21,13 +21,9 @@ class DashboardService:
         return True
 
     def connect_to_server(self, user_selected_server):
-        protocol = get_config_value("USER", "default_protocol")
-        try:
-            result = subprocess.run(["protonvpn", "connect", user_selected_server, "-p", protocol], stdout=subprocess.PIPE, stderr=subprocess.PIPE).stdout.decode() # nosec
-        except:
-            return False
-
-        return result
+        command = ["protonvpn", "connect", user_selected_server]
+        bool_value, result =  self.root_command(command)
+        return self.get_display_message(bool_value, result)
 
     def connect_to_country(self, user_selected_server):
         protocol = get_config_value("USER", "default_protocol")
