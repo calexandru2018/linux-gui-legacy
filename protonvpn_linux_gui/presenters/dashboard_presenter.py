@@ -144,14 +144,13 @@ class DashboardPresenter:
         if "profile_quick_connect" in kwargs:
             profile_quick_connect = True
 
-        result = self.dashboard_service.quick_connect_manager(profile_quick_connect)
+        bool_value, result = self.dashboard_service.quick_connect_manager(profile_quick_connect)
 
         display_message = result
-        server_protocol = get_server_protocol_from_cli(result, True)
-
-        if server_protocol:
-            display_message = "You are connected to <b>{}</b> via <b>{}</b>!".format(server_protocol[0], server_protocol[1].upper())
-
+        if bool_value:
+            server_name = get_server_protocol_from_cli(result)
+            display_message = "You are connected to <b>{}</b>!".format(server_name)
+        
         self.queue.put(dict(action="update_dialog", label=display_message))
         
         self.on_update_labels(kwargs.get("connection_labels"))
