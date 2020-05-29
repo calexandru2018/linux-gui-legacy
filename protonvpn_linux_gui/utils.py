@@ -105,16 +105,17 @@ def initialize_gui_config():
 def get_server_protocol_from_cli(raw_result, return_protocol=False):
     """Function that collects servername and protocol from CLI print statement after establishing connection.
     """
-    display_message = raw_result.split("\n")
-    display_message = display_message[-3:]
+    if type(raw_result) is not bool:
+        display_message = raw_result.split("\n")
+        display_message = display_message[-3:]
+        
+        server_name = [re.search("[A-Z-a-z]{1,7}#[0-9]{1,4}", text) for text in display_message]
 
-    server_name = [re.search("[A-Z-]{1,7}#[0-9]{1,4}", text) for text in display_message]
-
-    if any(server_name):
-        if return_protocol:
-            protocol = re.search("(UDP|TCP)", display_message[0])
-            return (server_name[0].group(), protocol.group())
-        return server_name[0].group()
+        if any(server_name):
+            if return_protocol:
+                protocol = re.search("(UDP|TCP)", display_message[0])
+                return (server_name[0].group(), protocol.group())
+            return server_name[0].group()
 
     return False
 
