@@ -80,12 +80,9 @@ class DashboardService:
         return self.get_display_message(bool_value, result)
 
     def last_connect(self):
-        try:
-            result = subprocess.run(["protonvpn", "reconnect"], stdout=subprocess.PIPE, stderr=subprocess.PIPE).stdout.decode() # nosec
-        except:
-            return False
-
-        return result
+        command = ["protonvpn", "reconnect"]
+        bool_value, result =  self.root_command(command)
+        return self.get_display_message(bool_value, result)
     
     def random_connect(self):
         command = ["protonvpn", "connect", "--random"]

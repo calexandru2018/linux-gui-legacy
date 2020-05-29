@@ -140,22 +140,11 @@ class DashboardPresenter:
     def on_last_connect(self, **kwargs):
         """Function that connects to the last connected server.
         """        
-        gui_logger.debug(">>> Running \"reconnect\".")
-
-        result = self.dashboard_service.last_connect()
-
-        server_protocol = get_server_protocol_from_cli(result, return_protocol=True)
-
-        display_message = result
-
-        if server_protocol:
-            display_message = "You are connected to <b>{}</b> via <b>{}</b>!".format(server_protocol[0], server_protocol[1].upper())
+        display_message = self.dashboard_service.last_connect()
 
         self.queue.put(dict(action="update_dialog", label=display_message))
 
         self.on_update_labels(kwargs.get("connection_labels"))
-
-        gui_logger.debug(">>> Ended tasks in \"reconnect\" thread. Result: \"{0}\"".format(result))
 
     def random_connect(self, **kwargs):
         """Function that connects to a random server.
