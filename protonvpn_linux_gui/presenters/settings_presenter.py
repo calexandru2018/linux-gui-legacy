@@ -109,14 +109,18 @@ class SettingsPresenter:
 
         gui_logger.debug(">>> Running \"update_connect_preference\".")
 
+        display_message = ""
         if not "quick_connect" in kwargs:
-            response = self.settings_service.set_autoconnect(active_choice)
+            response_bool, display_message = self.settings_service.set_autoconnect(active_choice)
         else:
-            response = self.settings_service.set_quickconnect(active_choice)
+            response_bool = self.settings_service.set_quickconnect(active_choice)
 
-        display_message = "Unable to update configuration!"
-        if response:
-            display_message = "{} setting updated to connect to <b>{}</b>!".format("Autoconnect" if not "quick_connect" in kwargs else "Quick connect", kwargs.get("country_display"))
+        
+        if response_bool:
+            if display_message:
+                display_message = display_message+"\n"
+
+            display_message = "{}{} setting updated to <b>{}</b>!".format(display_message, "Autoconnect" if not "quick_connect" in kwargs else "Quick connect", kwargs.get("country_display"))
             return_val = True
 
         self.queue.put(dict(action="update_dialog", label=display_message))
