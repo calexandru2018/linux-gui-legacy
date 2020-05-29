@@ -26,7 +26,6 @@ class DashboardService:
         return self.get_display_message(bool_value, result)
 
     def connect_to_country(self, user_selected_server):
-        protocol = get_config_value("USER", "default_protocol")
         try:
             for k, v in country_codes.items():
                 if v == user_selected_server:
@@ -35,12 +34,9 @@ class DashboardService:
         except:
             return False
 
-        try:
-            result = subprocess.run(["protonvpn", "connect", "--cc", selected_country, "-p", protocol], stdout=subprocess.PIPE, stderr=subprocess.PIPE).stdout.decode() # nosec
-        except:
-            return False
-
-        return result
+        command = ["protonvpn", "connect", "--cc", selected_country]
+        bool_value, result =  self.root_command(command)
+        return self.get_display_message(bool_value, result)
 
     def quick_connect_manager(self, profile_quick_connect):
         try:
