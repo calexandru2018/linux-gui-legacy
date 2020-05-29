@@ -392,6 +392,39 @@ class SettingsService:
 
         return False
 
+    def root_commands(self, command_list):
+        # Should be fetched from file
+        sudo_type="root"
+
+        command_list.insert(0, sudo_type)
+
+        process = subprocess.Popen(command_list, stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
+        timeout = False
+
+        try:
+            outs, errs = process.communicate(timeout=self.timeout_value)
+        except subprocess.TimeoutExpired:
+            timeout = True
+            process.kill()
+            outs, errs = process.communicate()
+
+        errs = errs.decode().lower()
+        outs = outs.decode().lower()
+
+        if "dismissed" in errs and not timeout:
+            print("Dismissed")
+            return (False, "Sudo access was dismissed.")
+        
+        if not "dismissed" in errs and timeout:
+            print("Timed out")
+            return (False, "Request timed out, either because of insufficient privileges.")
+
+        print("errs: ", errs)
+        print()
+        print("outs: ", outs)
+
+        return (True, "ok")
+
     def get_gui_path(self):
         """Function that searches for the CLI. Returns CLIs path if it is found, otherwise it returns False.
         """
