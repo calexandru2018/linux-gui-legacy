@@ -41,8 +41,6 @@ class DashboardPresenter:
     def on_load(self, objects_dict):
         """Calls load_on_start, which returns False if there is no internet connection, otherwise populates dashboard labels and server list
         """
-        gui_logger.debug(">>> Running \"load_on_start\".")
-        
         display_message = "Could not load necessary resources, there might be connectivity issues."
         time.sleep(2)
         self.queue.put(dict(action="hide_spinner"))
@@ -53,8 +51,6 @@ class DashboardPresenter:
             self.on_load_dashboard_content(objects_dict, conn)
         else:
             self.queue.put(dict(action="update_dialog", label=display_message, spinner=False))
-
-        gui_logger.debug(">>> Ended tasks in \"load_on_start\" thread.")  
 
     def on_load_dashboard_content(self, objects_dict, conn):
         # self.queue.put(dict(action="update_dialog", label="Populating dashboard...", hide_close_button=True))
@@ -68,7 +64,6 @@ class DashboardPresenter:
         
         # Loads the server list
         self.on_update_server_list(objects_dict["server_tree_list"]["tree_object"])
-
 
     def on_load_set_secure_core(self, secure_core_switch, secure_core_label):
         """Sets Secure-Core switch based on user setting.
@@ -92,8 +87,6 @@ class DashboardPresenter:
         # Sleep is needed because it takes a second to update the information,
         # which makes the button "lag". Temporary solution.
         time.sleep(1)
-        gui_logger.debug(">>> Running \"update_reload_secure_core_serverslabels_server_list\".")
-
         return_val = False
         display_message = "Unable to reload servers!"
 
@@ -104,10 +97,6 @@ class DashboardPresenter:
             display_message = "Displaying <b>{}</b> servers!".format("secure-core" if kwargs.get("update_to") == "True" else "non secure-core")
 
         self.queue.put(dict(action="update_dialog", label=display_message))
-
-        gui_logger.debug(">>> Ended tasks in \"reload_secure_core_servers\" thread.")
-
-        # return return_val
 
     def on_connect_user_selected(self, **kwargs):
         """Function that either connects by selected server or selected country.
@@ -161,8 +150,6 @@ class DashboardPresenter:
         # Sleep is needed because it takes a second to update the information,
         # which makes the button "lag". Temporary solution.
         time.sleep(1)
-        gui_logger.debug(">>> Running \"update_reload_secure_core_serverslabels_server_list\".")
-        
         return_val = False
 
         self.queue.put(dict(action="hide_spinner"))
@@ -175,15 +162,9 @@ class DashboardPresenter:
         else:
             self.queue.put(dict(action="update_dialog", label="Could not update servers!", spinner=False))
         
-        gui_logger.debug(">>> Ended tasks in \"reload_secure_core_servers\" thread.")
-
-        # return return_val
-
     def on_disconnect(self, **kwargs):
         """Function that disconnects from the VPN.
         """
-        gui_logger.debug(">>> Running \"disconnect\".")
-
         is_disconnected, display_message = self.dashboard_service.disconnect()
         if is_disconnected:
             display_message = "Disconnected from VPN!"
@@ -194,7 +175,6 @@ class DashboardPresenter:
     def on_check_for_updates(self):
         """Function that searches for existing updates by checking the latest releases on github.
         """
-        
         return_string = "Developer Mode."
         return_val = False
         
@@ -286,7 +266,7 @@ class DashboardPresenter:
         try:
             load = get_server_value(connected_server, "Load", servers)
         except (KeyError, IndexError):
-            gui_logger.debug("[!] Could not find server load information.")
+            gui_logger.debug("[!] Could not find \"server load\" information.")
             
         load = "{0}% Load".format(load) if load and is_vpn_connected else ""
         server_load_label.set_markup('<span>{0}</span>'.format(load))
