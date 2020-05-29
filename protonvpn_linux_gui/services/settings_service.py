@@ -27,15 +27,18 @@ from protonvpn_linux_gui.utils import (
 class SettingsService:
     
     def set_user_pass(self, username, password):
-        try:
-            set_config_value("USER", "username", username)
+        user_pass = "'{}\n{}'".format(username, password)
+        echo_to_passfile = "echo -e {} > {}".format(user_pass, PASSFILE)
 
-            with open(PASSFILE, "w") as f:
-                f.write("{0}\n{1}".format(username, password))
-                gui_logger.debug("Passfile updated")
-                os.chmod(PASSFILE, 0o600)
-        except: 
-            return False
+        # This should be fetched from config file
+        sudo_type = "sudo"
+
+        try:
+            # Either sudo or pkexec can be used
+            output = subprocess.check_output([sudo_type, "sh", "-c", echo_to_passfile], stderr=subprocess.STDOUT, timeout=8)
+            set_config_value("USER", "username", username)
+        except (subprocess.TimeoutExpired, subprocess.CalledProcessError):
+            return False            
 
         return True
 
