@@ -5,7 +5,7 @@ import collections
 from protonvpn_cli.country_codes import country_codes
 from protonvpn_cli.utils import get_config_value, set_config_value, is_connected, get_server_value, get_country_name
 
-from protonvpn_linux_gui.utils import set_gui_config, get_gui_config, check_internet_conn
+from protonvpn_linux_gui.utils import set_gui_config, get_gui_config, check_internet_conn, get_server_protocol_from_cli
 from protonvpn_linux_gui.constants import GITHUB_URL_RELEASE, SMALL_FLAGS_BASE_PATH, FEATURES_BASE_PATH
 
 class DashboardService:
@@ -90,7 +90,8 @@ class DashboardService:
 
     def quick_connect(self):
         command = ["protonvpn", "connect", "-f"]
-        return self.root_command(command)
+        bool_value, result =  self.root_command(command)
+        return self.get_display_message(bool_value, result)
 
     def last_connect(self):
         try:
@@ -143,6 +144,14 @@ class DashboardService:
             return False
 
         return (latest_release, pip3_installed)
+
+    def get_display_message(self, bool_value, result):
+        display_message = result
+        if bool_value:
+            server_name = get_server_protocol_from_cli(result)
+            display_message = "You are connected to <b>{}</b>!".format(server_name)
+
+        return display_message
 
     def root_command(self, command_list):
         # sudo_type should be fetched from GUI configurations file
