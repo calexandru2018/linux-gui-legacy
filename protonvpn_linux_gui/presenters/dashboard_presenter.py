@@ -137,25 +137,16 @@ class DashboardPresenter:
 
     def quick_connect(self, **kwargs):
         """Function that connects to the quickest server.
-        """
-        gui_logger.debug(">>> Running \"fastest\".")
-        
+        """      
         profile_quick_connect = False
         if "profile_quick_connect" in kwargs:
             profile_quick_connect = True
 
-        bool_value, result = self.dashboard_service.quick_connect_manager(profile_quick_connect)
-
-        display_message = result
-        if bool_value:
-            server_name = get_server_protocol_from_cli(result)
-            display_message = "You are connected to <b>{}</b>!".format(server_name)
+        display_message = self.dashboard_service.quick_connect_manager(profile_quick_connect)
         
         self.queue.put(dict(action="update_dialog", label=display_message))
         
         self.on_update_labels(kwargs.get("connection_labels"))
-
-        gui_logger.debug(">>> Ended tasks in \"fastest\" thread. Result: \"{0}\"".format(result))
 
     def on_last_connect(self, **kwargs):
         """Function that connects to the last connected server.
