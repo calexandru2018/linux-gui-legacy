@@ -170,7 +170,7 @@ If you would like to run the the GUI within a virtual environment (for either de
 3. `pipenv install` installs the virtual environment and all necessary dependencies from `Pipfile`.
 4. `pipenv shell` enters the virtual environment.
 5. `sudo pip install -e .` installs the GUI in your virtual environment. 
-6. `sudo protonvpn-gui` starts the GUI from within the virtual environment.
+6. `protonvpn-gui` starts the GUI from within the virtual environment.
 
 # How to use
 
