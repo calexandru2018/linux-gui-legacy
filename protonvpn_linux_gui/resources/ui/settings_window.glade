@@ -233,7 +233,7 @@ Author: Alexandru Cheltuitor
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
                             <property name="halign">start</property>
-                            <property name="label" translatable="yes">Username</property>
+                            <property name="label" translatable="yes">OpenVPN/IKEv2 Username</property>
                             <attributes>
                               <attribute name="weight" value="medium"/>
                               <attribute name="size" value="12000"/>
@@ -249,7 +249,7 @@ Author: Alexandru Cheltuitor
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
                             <property name="halign">start</property>
-                            <property name="label" translatable="yes">Password</property>
+                            <property name="label" translatable="yes">OpenVPN/IKEv2 Password</property>
                             <attributes>
                               <attribute name="weight" value="medium"/>
                               <attribute name="size" value="12000"/>
