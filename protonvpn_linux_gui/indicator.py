@@ -253,27 +253,11 @@ class ProtonVPNIndicator:
         timeout = False
         no_policy = False
         msg = "Root authorization was not given to display GUI"
-        self.notify.Notification.new(self.tray_title, "Calling for ProtonVPN GUI...", LOGO_PATH).show()
+        self.notify.Notification.new(self.tray_title, "Displaying ProtonVPN GUI", LOGO_PATH).show()
 
-        try:
-            process = subprocess.Popen([self.sudo_type, "protonvpn-gui"], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
-            outs, errs = process.communicate(timeout=7)
-        except:
-            msg = "Unable to display GUI, make sure that the app has been given root privilege"
-            timeout = True
-            # process.kill()
-            outs, errs = process.communicate()
-        
-        errs = errs.decode().lower()
-        outs = outs.decode().lower()
-
-        if not "dismissed" in errs and not "connection refused" in errs and not timeout:
-            msg = "Unable to display GUI, make sure that the app has been given root privilege or support for PolKit is enabled"
-        elif "connection refused" in errs:
-            no_policy = True
-            msg = "Policy was not added for ProtonVPN GUI, please visit https://github.com/ProtonVPN/linux-gui on how to add one"       
-
-        self.notify.Notification.new(self.tray_title, msg, LOGO_PATH).show()
+        process = subprocess.Popen(["protonvpn-gui"], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
+        outs, errs = process.communicate()
+      
         gui_logger.debug("TRAY >>> GUI display msg: {} --- response: {}<->{}".format(msg, outs, errs))
 
     def get_tray_settings(self):
