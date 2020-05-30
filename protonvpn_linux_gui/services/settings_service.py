@@ -31,11 +31,9 @@ class SettingsService:
         echo_to_passfile = "echo -e {} > {}".format(user_pass, PASSFILE)
 
         # This should be fetched from config file
-        sudo_type = "sudo"
-
         try:
             # Either sudo or pkexec can be used
-            output = subprocess.check_output([sudo_type, "sh", "-c", echo_to_passfile], stderr=subprocess.STDOUT, timeout=8)
+            output = subprocess.check_output([self.sudo_type, "bash", "-c", echo_to_passfile], stderr=subprocess.STDOUT, timeout=8)
             set_config_value("USER", "username", username)
         except (subprocess.TimeoutExpired, subprocess.CalledProcessError):
             return False            
@@ -192,9 +190,9 @@ class SettingsService:
         try:
             set_gui_config("general_tab", "polkit_enabled", update_to)
         except:
-            return False
+            return False, "Unable to update PolKit settings!"
 
-        return True
+        return True, ""
 
     def generate_autoconnect_list(self):
         countries = {}
@@ -216,15 +214,13 @@ class SettingsService:
     def manage_autoconnect(self, mode, command=False):
         """Function that manages autoconnect functionality. It takes a mode (enabled/disabled) and a command that is to be passed to the CLI.
         """
-        sudo_type = "pkexec"
-
         if mode == "enable":
-            return self.enable_autoconnect(command, sudo_type)
+            return self.enable_autoconnect(command)
 
         if mode == "disable":
-            return self.disable_autoconnect(sudo_type)
+            return self.disable_autoconnect()
 
-    def enable_autoconnect(self, command, sudo_type):
+    def enable_autoconnect(self, command):
         """Function that enables autoconnect.
         """
         timeout = False
@@ -238,7 +234,7 @@ class SettingsService:
         template = template.replace("=user", "="+USER)
 
         generate_service_command = "cat > {0} <<EOF {1}\nEOF".format(PATH_AUTOCONNECT_SERVICE, template)
-        process = subprocess.Popen(sudo_type, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE, universal_newlines=True)
+        process = subprocess.Popen(self.sudo_type, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE, universal_newlines=True)
 
         process.stdin.write("bash -c {}\n".format(generate_service_command))
         process.stdin.write("systemctl enable {}\n".format(SERVICE_NAME))
@@ -266,14 +262,14 @@ class SettingsService:
 
         return True, "Autoconnect enabled!"
         
-    def disable_autoconnect(self, sudo_type):
+    def disable_autoconnect(self):
         """Function that disables autoconnect.
         """
         timeout = False
         if not self.daemon_exists():
             return True, "Autoconnect disabled!"
 
-        process = subprocess.Popen(sudo_type, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE, universal_newlines=True)
+        process = subprocess.Popen(self.sudo_type, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE, universal_newlines=True)
 
         process.stdin.write("systemctl stop {}\n".format(SERVICE_NAME))
         process.stdin.write("systemctl disable {}\n".format(SERVICE_NAME))
@@ -302,17 +298,6 @@ class SettingsService:
 
         return True, "Autoconnect disabled!"
 
-    def reload_daemon(self):
-        """Function that reloads the autoconnect daemon service.
-        """
-        print("Before reloading daemon")
-        resp = subprocess.run(["pkexec", "systemcl", "daemon-reload"], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
-        if resp.returncode == 1:
-            gui_logger.debug("[!] Unable to reload daemon.\n{}".format(resp))
-            return False
-
-        return True
-
     def daemon_exists(self):
         """Function that checks if autoconnect daemon service exists.
         """
@@ -327,7 +312,6 @@ class SettingsService:
         return return_val
 
     def manage_polkit(self, mode):
-
         if mode == 1:
             return self.generate_polkit_template()
         else:
@@ -341,12 +325,12 @@ class SettingsService:
         template = POLKIT_TEMPLATE.replace("[PATH]", gui_path)
         generate_command = "cat > {0} <<EOF {1}\nEOF".format(POLKIT_PATH, template)
 
-        resp = subprocess.run(["sudo", "bash", "-c", generate_command], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
+        resp = subprocess.run([self.sudo_type, "bash", "-c", generate_command], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
         if resp.returncode == 1:
             gui_logger.debug("[!] Unable to generate policykit template.\n{}".format(resp))
-            return False
+            return False, "Unable to generate policy template."
 
-        return True
+        return True, "PolKit Support <b>enabled</b>!\nYou can now use \"pkexec\" command to start ProtonVPN GUI."
 
     def remove_polkit_template(self):
         try:
@@ -355,14 +339,14 @@ class SettingsService:
             polkit_enabled = 0
 
         if self.check_policy_exists():
-            resp = subprocess.run(["sudo", "rm", POLKIT_PATH], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
+            resp = subprocess.run([self.sudo_type, "rm", POLKIT_PATH], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
             # If return code 1: File does not exist in path
             # This is fired when a user wants to remove template a that does not exist
             if not polkit_enabled == 1 and resp.returncode == 1:
                 gui_logger.debug("[!] Could not remove .policy file. File might be non existent: \n{}".format(resp))
-                return False
+                return False, "Could not remove .policy template."
 
-        return True
+        return True, "\nPolKit Support <b>disabled</b>!"
     
     def check_policy_exists(self):
         if os.path.isfile(POLKIT_PATH):
@@ -379,4 +363,17 @@ class SettingsService:
             protonvpn_gui_path = False
 
         return protonvpn_gui_path.stdout.decode()[:-1] if (protonvpn_gui_path and protonvpn_gui_path.returncode == 0) else False
-       
+    
+    @property
+    def sudo_type(self):
+        try:
+            is_polkit_enabled =  int(get_gui_config("general_tab", "polkit_enabled"))
+        except (KeyError, NameError):
+            return "sudo"
+
+        return_val = "sudo"
+
+        if is_polkit_enabled == 1:
+            return_val = "pkexec"
+
+        return return_val 
