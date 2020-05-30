@@ -26,7 +26,7 @@ from protonvpn_linux_gui.utils import (
 
 class SettingsService:
     sudo_timeout = 10
-    
+
     def set_user_pass(self, username, password):
         user_pass = "'{}\n{}'".format(username, password)
         echo_to_passfile = "echo -e {} > {}".format(user_pass, PASSFILE)
@@ -253,7 +253,7 @@ class SettingsService:
             return False, "Sudo access was dismissed."
         
         if not "dismissed" in errs and timeout:
-            return False, "Command timedout, perhaps due to insufficient privileges."
+            return False, "Command timedout, perhaps due to insufficient privileges. Either enable PolKit or launch GUI from terminal."
 
         if not "created symlink" in errs.lower():
             return False, "Unable to setup autoconnect!"
