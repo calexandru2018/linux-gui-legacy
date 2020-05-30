@@ -1,6 +1,6 @@
 <h1 align="center">ProtonVPN Linux GUI</h1>
 <p align="center">
-  <img src="./protonvpn_linux_gui/resources/img/protonvpn_gui_banner.png" alt="ProtonVPN Banner"></img>
+  <img src="./linux_gui/resources/img/protonvpn_gui_banner.png" alt="ProtonVPN Banner"></img>
 </p>
 
 <p align="center">
@@ -193,7 +193,7 @@ To create at <i>desktop</i> launcher with a .desktop file, follow the instructio
 
    You should get something like `Location: /usr/local/lib/<YOUR_PYTHON_VERSION>/dist-packages` , this is where your Python packages reside. **Note:** Based on your distro, your `Location` path may not look exactly like this one, so make sure to use your own and `Location` path.
 
-2. Based on previous information, the path to your icon should be `<PATH_DISPLAYED_IN_STEP_1>/protonvpn_linux_gui/resources/img/logo/protonvpn_logo.png`
+2. Based on previous information, the path to your icon should be `<PATH_DISPLAYED_IN_STEP_1>/linux_gui/resources/img/logo/protonvpn_logo.png`
 
 3. Create a `protonvpn-gui.desktop` file in `.local/share/applications/`, and paste in the following code. Remember to change the **`Icon`** path to your own path.
 
@@ -215,7 +215,7 @@ To create at <i>tray icon</i> launcher with a .desktop file, follow the instruct
 
    You should get something like `Location: /usr/local/lib/<YOUR_PYTHON_VERSION>/dist-packages` , this is where your Python packages reside. **Note:** Based on your distro, your `Location` path may not look exactly like this one, so make sure to use your own and `Location` path.
 
-2. Based on previous information, the path to your icon should be `<PATH_DISPLAYED_IN_STEP_1>/protonvpn_linux_gui/resources/img/logo/protonvpn_logo.png`
+2. Based on previous information, the path to your icon should be `<PATH_DISPLAYED_IN_STEP_1>/linux_gui/resources/img/logo/protonvpn_logo.png`
 
 3. Create a `protonvpn-tray.desktop` file in `.local/share/applications/`, and paste in the following code. Remember to change the **`Icon`** path to your own path.
 
@@ -249,26 +249,26 @@ The instructions for seting up visudo are described below.
 
 # GUI Layout
 <p align="center">
-  <img src="./protonvpn_linux_gui/resources/img/gui/intialize_profile.png" alt="Login"></img>
+  <img src="./linux_gui/resources/img/gui/intialize_profile.png" alt="Login"></img>
 </p>
 <p align="center">
-  <img src="./protonvpn_linux_gui/resources/img/gui/dashboard.png" alt="Dashboard"></img>
+  <img src="./linux_gui/resources/img/gui/dashboard.png" alt="Dashboard"></img>
 </p>
 
 <p align="center">
-  <img src="./protonvpn_linux_gui/resources/img/gui/settings_general.png" alt="General Settings"></img>
+  <img src="./linux_gui/resources/img/gui/settings_general.png" alt="General Settings"></img>
 </p>
 <p align="center">
-  <img src="./protonvpn_linux_gui/resources/img/gui/settings_tray.png" alt="Tray Settings"></img>
+  <img src="./linux_gui/resources/img/gui/settings_tray.png" alt="Tray Settings"></img>
 </p> 
 <p align="center">
-  <img src="./protonvpn_linux_gui/resources/img/gui/settings_connection.png" alt="Connection Settings"></img>
+  <img src="./linux_gui/resources/img/gui/settings_connection.png" alt="Connection Settings"></img>
 </p>  
 <p align="center">
-  <img src="./protonvpn_linux_gui/resources/img/gui/settings_advanced.png" alt="Advanced Settings"></img>
+  <img src="./linux_gui/resources/img/gui/settings_advanced.png" alt="Advanced Settings"></img>
 </p> 
 
 <p align="center">
-  <img src="./protonvpn_linux_gui/resources/img/gui/diagnose_tool.png" alt="Diagnosis Tool"></img>
+  <img src="./linux_gui/resources/img/gui/diagnose_tool.png" alt="Diagnosis Tool"></img>
 </p> 
  
