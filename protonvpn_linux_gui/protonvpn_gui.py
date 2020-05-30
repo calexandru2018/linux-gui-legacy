@@ -49,18 +49,14 @@ from protonvpn_linux_gui.utils import (
 def init():
     """Initializes the GUI
     """
-    check_root()
+    # if len(get_gui_processes()) > 1:
+    #     gui_logger.debug("[!] Two running processes were found!")
 
-    change_file_owner(os.path.join(GUI_CONFIG_DIR, "protonvpn-gui.log"))
+    #     response = kill_duplicate_gui_process()
 
-    if len(get_gui_processes()) > 1:
-        gui_logger.debug("[!] Two running processes were found!")
-
-        response = kill_duplicate_gui_process()
-
-        if not response['success']:
-            gui_logger.debug("[!] Unable to end previous process: {}.".format(response['message']))
-            sys.exit(1)
+    #     if not response['success']:
+    #         gui_logger.debug("[!] Unable to end previous process: {}.".format(response['message']))
+    #         sys.exit(1)
 
     Gtk.init()
     queue = Queue()
@@ -84,10 +80,6 @@ def init():
 
         if not os.path.isfile(GUI_CONFIG_FILE):
             initialize_gui_config()
-        
-        cli_log_path = os.path.join(CONFIG_DIR, "pvpn-cli.log")
-        if os.path.isfile(cli_log_path):
-            change_file_owner(cli_log_path)
 
         if not os.path.isfile(CONFIG_FILE): 
             gui_logger.debug(">>> Loading LoginWindow")
