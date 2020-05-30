@@ -65,10 +65,10 @@ def test_connect_preference():
         [dict(user_choice="tor", country_display="TEST", quick_connect=True), True],
         [dict(user_choice="PT", country_display="TEST", quick_connect=True), True],
         [dict(user_choice="testing", country_display="TEST", quick_connect=True), False],
-        [dict(user_choice="PT", country_display="TEST"), True],
-        [dict(user_choice="ES", country_display="TEST"), True],
-        [dict(user_choice="SE", country_display="TEST"), True],
-        [dict(user_choice="testing", country_display="TEST"), False],
+        # [dict(user_choice="PT", country_display="TEST"), True],
+        # [dict(user_choice="ES", country_display="TEST"), True],
+        # [dict(user_choice="SE", country_display="TEST"), True],
+        # [dict(user_choice="testing", country_display="TEST"), False],
     ]
     for arg in list:
         assert settings_presenter.update_connect_preference(**arg[0]) == arg[1]
