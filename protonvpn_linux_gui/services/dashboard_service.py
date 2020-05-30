@@ -131,11 +131,8 @@ class DashboardService:
         return display_message
 
     def root_command(self, command_list):
-        # sudo_type should be fetched from GUI configurations file
-        sudo_type = "sudo"
-
         # inject sudo_type from configurations
-        command_list.insert(0, sudo_type)
+        command_list.insert(0, self.sudo_type)
 
         process = subprocess.Popen(command_list, stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
         timeout = False
@@ -151,7 +148,7 @@ class DashboardService:
         outs = outs.decode().lower()
 
         if "dismissed" in errs and not timeout:
-            return (False, "Sudo access was dismissed.")
+            return (False, "Privilege escalation was dismissed.")
         
         if not "dismissed" in errs and timeout:
             return (False, "Request timed out, either because of insufficient privileges\nor network/api issues.")
@@ -397,7 +394,7 @@ class DashboardService:
         # print(country,top_choice)
 
         return  (str(int(round(load_sum/count)))+"%", top_choice) 
-        
+
     @property
     def sudo_type(self):
         try:
