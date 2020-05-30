@@ -5,7 +5,7 @@ import configparser
 
 # Remote imports
 from protonvpn_cli.constants import CONFIG_FILE, CONFIG_DIR, PASSFILE #noqa
-from protonvpn_cli.utils import set_config_value, change_file_owner, pull_server_data, make_ovpn_template #noqa
+from protonvpn_cli.utils import set_config_value, change_file_owner, pull_server_data #noqa
 from protonvpn_cli.logger import logger
 
 # Local imports
@@ -52,7 +52,6 @@ class LoginService:
         user_protocol = user_data['openvpn_protocol']
 
         pull_server_data(force=True)
-        make_ovpn_template()
 
         if user_tier == 4:
             user_tier = 3
@@ -102,8 +101,6 @@ class LoginService:
         try:
             with open(CONFIG_FILE, "w") as f:
                 config.write(f)
-                
-            change_file_owner(CONFIG_FILE)
 
             gui_logger.debug("pvpn-cli.cfg initialized")
             logger.debug("pvpn-cli.cfg initialized")
