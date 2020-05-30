@@ -243,11 +243,6 @@ class SettingsPresenter:
     def on_polkit_change(self, update_to):
         result_bool, display_message = self.settings_service.manage_polkit(update_to)
 
-        if result_bool:
-            result_bool, _ = self.settings_service.set_polkit(update_to)
-            if not result_bool:
-                display_message = display_message+"\n"+_
-
         self.queue.put(dict(action="update_dialog", label=display_message))
 
     def purge_configurations(self):
