@@ -241,19 +241,14 @@ class SettingsPresenter:
         return return_val
 
     def on_polkit_change(self, update_to):
-        enabled_msg = "\nYou can now use \"pkexec\" command to start ProtonVPN GUI."
-        result = "PolKit Support <b>{}</b>!{}".format("disabled" if update_to == 0 else "enabled", enabled_msg if update_to == 1 else "")
-        update_polkit_status = self.settings_service.set_polkit(update_to)
+        result_bool, display_message = self.settings_service.manage_polkit(update_to)
 
-        if not update_polkit_status:
-            gui_logger.debug("[!] Unable to enable polkit.")  
-            result = "Unable to update PolKit settings!"
-        else:
-            if not self.settings_service.manage_polkit(update_to):
-                gui_logger.debug("[!] Unable to create .policy file.")   
-                result = "Unable to {} files!".format("remove" if update_to == 0 else "generate")
+        if result_bool:
+            result_bool, _ = self.settings_service.set_polkit(update_to)
+            if not result_bool:
+                display_message = display_message+"\n"+_
 
-        self.queue.put(dict(action="update_dialog", label=result))
+        self.queue.put(dict(action="update_dialog", label=display_message))
 
     def purge_configurations(self):
         """Function to purge all current configurations.
