@@ -31,15 +31,12 @@ class SettingsService:
         user_pass = "'{}\n{}'".format(username, password)
         echo_to_passfile = "echo -e {} > {}".format(user_pass, PASSFILE)
 
-        # This should be fetched from config file
-        try:
-            # Either sudo or pkexec can be used
-            output = subprocess.check_output([self.sudo_type, "bash", "-c", echo_to_passfile], stderr=subprocess.STDOUT, timeout=8)
-            set_config_value("USER", "username", username)
-        except (subprocess.TimeoutExpired, subprocess.CalledProcessError):
-            return False            
+        result_bool, display_message = self.root_command(["bash", "-c", echo_to_passfile])
 
-        return True
+        if not result_bool:
+            return result_bool, display_message
+
+        return result_bool, "Username and password <b>updated</b>!"
 
     def set_dns(self, dns_value):
         try:

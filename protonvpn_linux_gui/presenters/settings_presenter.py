@@ -38,20 +38,10 @@ class SettingsPresenter:
         """
         username = kwargs.get("username")
         password = kwargs.get("password")
-        return_val = False
-
-        gui_logger.debug(">>> Running \"set_username_password\".")
-
-        display_message = "Unable to update username and password!"
-        if self.settings_service.set_user_pass(username, password):
-            display_message = "Username and password <b>updated</b>!"
-            return_val = True
+        
+        result_bool, display_message = self.settings_service.set_user_pass(username, password)
 
         self.queue.put(dict(action="update_dialog", label=display_message))
-
-        gui_logger.debug(">>> Ended tasks in \"set_username_password\" thread.")
-
-        return return_val
 
     def update_dns(self, dns_value):
         """Function that updates DNS settings. It either enables or disables.
