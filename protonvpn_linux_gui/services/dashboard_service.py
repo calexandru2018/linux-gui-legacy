@@ -5,8 +5,8 @@ import collections
 from protonvpn_cli.country_codes import country_codes
 from protonvpn_cli.utils import get_config_value, set_config_value, is_connected, get_server_value, get_country_name
 
-from protonvpn_linux_gui.utils import set_gui_config, get_gui_config, check_internet_conn, get_server_protocol_from_cli
-from protonvpn_linux_gui.constants import GITHUB_URL_RELEASE, SMALL_FLAGS_BASE_PATH, FEATURES_BASE_PATH
+from ..utils import set_gui_config, get_gui_config, check_internet_conn, get_server_protocol_from_cli
+from ..constants import GITHUB_URL_RELEASE, SMALL_FLAGS_BASE_PATH, FEATURES_BASE_PATH
 
 class DashboardService:
     # 30 seconds of timeout for all root necessary commands

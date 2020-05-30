@@ -19,7 +19,7 @@ from protonvpn_cli.utils import (
 from protonvpn_cli.country_codes import country_codes
 from protonvpn_cli.constants import SPLIT_TUNNEL_FILE, USER
 
-from protonvpn_linux_gui.constants import (
+from .constants import (
     PATH_AUTOCONNECT_SERVICE, 
     TEMPLATE, 
     VERSION, 

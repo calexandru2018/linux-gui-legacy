@@ -12,8 +12,8 @@ from protonvpn_cli.connection import disconnect as pvpn_disconnect
 from protonvpn_cli.country_codes import country_codes
 
 # Local imports
-from protonvpn_linux_gui.gui_logger import gui_logger
-from protonvpn_linux_gui.constants import (
+from ..gui_logger import gui_logger
+from ..constants import (
     TRAY_CFG_DICT, 
     TEMPLATE,
     PATH_AUTOCONNECT_SERVICE,
@@ -21,7 +21,7 @@ from protonvpn_linux_gui.constants import (
     GUI_CONFIG_DIR,
     TRAY_SUDO_TYPES
 )
-from protonvpn_linux_gui.utils import (
+from ..utils import (
     set_gui_config,
     get_gui_config,
     find_cli,

@@ -8,8 +8,8 @@ from protonvpn_cli.utils import get_config_value, is_valid_ip, set_config_value,
 from protonvpn_cli.connection import disconnect as pvpn_disconnect
 from protonvpn_cli.country_codes import country_codes
 
-from protonvpn_linux_gui.gui_logger import gui_logger
-from protonvpn_linux_gui.constants import (
+from ..gui_logger import gui_logger
+from ..constants import (
     TRAY_CFG_DICT, 
     TEMPLATE,
     PATH_AUTOCONNECT_SERVICE,
@@ -18,7 +18,7 @@ from protonvpn_linux_gui.constants import (
     POLKIT_PATH,
     POLKIT_TEMPLATE,
 )
-from protonvpn_linux_gui.utils import (
+from ..utils import (
     set_gui_config,
     get_gui_config,
     find_cli,

@@ -23,15 +23,15 @@ from gi.repository import Notify
 from gi.repository import AppIndicator3 as appindicator
 
 # Local imports
-from protonvpn_linux_gui.gui_logger import gui_logger
-from protonvpn_linux_gui.constants import (
+from .gui_logger import gui_logger
+from .constants import (
     TRAY_CFG_SERVERLOAD, 
     TRAY_CFG_SERVENAME, 
     TRAY_CFG_DATA_TX, 
     TRAY_CFG_TIME_CONN, 
     CURRDIR,
 )
-from protonvpn_linux_gui.utils import get_gui_config, set_gui_config, check_polkit_exists
+from .utils import get_gui_config, set_gui_config, check_polkit_exists
 
 LOGO_PATH = os.path.join(CURRDIR, "resources/img/logo/protonvpn_logo.png")
 ALT_LOGO_PATH = os.path.join(CURRDIR, "resources/img/logo/protonvpn_logo_alt.png")

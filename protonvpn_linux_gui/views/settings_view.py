@@ -8,15 +8,15 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import GObject as gobject
 
 # Local imports
-from protonvpn_linux_gui.gui_logger import gui_logger
-from protonvpn_linux_gui.constants import (
+from ..gui_logger import gui_logger
+from ..constants import (
     TRAY_CFG_DICT, 
     TEMPLATE,
     PATH_AUTOCONNECT_SERVICE,
     SERVICE_NAME
 )
-from protonvpn_linux_gui.constants import UI_SETTINGS
-from protonvpn_linux_gui.utils import get_gui_config, tab_style_manager
+from ..constants import UI_SETTINGS
+from ..utils import get_gui_config, tab_style_manager
 
 class SettingsView: 
     def __init__(self, interface, Gtk, settings_presenter, queue): 

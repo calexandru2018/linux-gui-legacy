@@ -11,21 +11,21 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import  Gtk, Gdk
 
 # Local imports
-from protonvpn_linux_gui.views.login_view import LoginView
-from protonvpn_linux_gui.views.dashboard_view import DashboardView
-from protonvpn_linux_gui.views.settings_view import SettingsView
-from protonvpn_linux_gui.views.dialog_view import DialogView
+from .views.login_view import LoginView
+from .views.dashboard_view import DashboardView
+from .views.settings_view import SettingsView
+from .views.dialog_view import DialogView
 
-from protonvpn_linux_gui.presenters.login_presenter import LoginPresenter
-from protonvpn_linux_gui.presenters.dashboard_presenter import DashboardPresenter
-from protonvpn_linux_gui.presenters.settings_presenter import SettingsPresenter
+from .presenters.login_presenter import LoginPresenter
+from .presenters.dashboard_presenter import DashboardPresenter
+from .presenters.settings_presenter import SettingsPresenter
 
-from protonvpn_linux_gui.services.login_service import LoginService 
-from protonvpn_linux_gui.services.dashboard_service import DashboardService
-from protonvpn_linux_gui.services.settings_service import SettingsService
+from .services.login_service import LoginService 
+from .services.dashboard_service import DashboardService
+from .services.settings_service import SettingsService
 
-from protonvpn_linux_gui.gui_logger import gui_logger
-from protonvpn_linux_gui.constants import (
+from .gui_logger import gui_logger
+from .constants import (
     VERSION, 
     HELP_TEXT, 
     GUI_CONFIG_DIR, 
@@ -39,7 +39,7 @@ from protonvpn_linux_gui.constants import (
     CLI_ABSENCE_INFO
 )
 
-from protonvpn_linux_gui.utils import (
+from .utils import (
     get_gui_processes,
     find_cli,
     kill_duplicate_gui_process,

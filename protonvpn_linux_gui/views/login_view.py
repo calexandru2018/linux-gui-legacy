@@ -2,8 +2,8 @@ import time
 from threading import Thread
 from concurrent import futures
 
-from protonvpn_linux_gui.constants import UI_LOGIN, VERSION
-from protonvpn_linux_gui.gui_logger import gui_logger
+from ..constants import UI_LOGIN, VERSION
+from ..gui_logger import gui_logger
 
 class LoginView:
     def __init__(self, interface, Gtk, login_presenter, dashboard_view, queue):

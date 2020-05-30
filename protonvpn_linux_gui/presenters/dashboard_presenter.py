@@ -23,9 +23,9 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import GObject as gobject, GdkPixbuf
 
 # Local imports
-from protonvpn_linux_gui.gui_logger import gui_logger
-from protonvpn_linux_gui.constants import GITHUB_URL_RELEASE, VERSION, LARGE_FLAGS_BASE_PATH, SMALL_FLAGS_BASE_PATH, FEATURES_BASE_PATH
-from protonvpn_linux_gui.utils import (
+from ..gui_logger import gui_logger
+from ..constants import GITHUB_URL_RELEASE, VERSION, LARGE_FLAGS_BASE_PATH, SMALL_FLAGS_BASE_PATH, FEATURES_BASE_PATH
+from ..utils import (
     get_server_protocol_from_cli,
     get_gui_config,
     set_gui_config,

@@ -1,7 +1,7 @@
 from threading import Thread
 
-from protonvpn_linux_gui.gui_logger import gui_logger
-from protonvpn_linux_gui.constants import (
+from ..gui_logger import gui_logger
+from ..constants import (
     UI_DIALOG, 
 )
 

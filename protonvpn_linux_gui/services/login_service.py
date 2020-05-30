@@ -11,8 +11,8 @@ from protonvpn_cli.utils import set_config_value, pull_server_data #noqa
 from protonvpn_cli.logger import logger
 
 # Local imports
-from protonvpn_linux_gui.gui_logger import gui_logger
-from protonvpn_linux_gui.constants import (
+from ..gui_logger import gui_logger
+from ..constants import (
     TRAY_CFG_SERVERLOAD, 
     TRAY_CFG_SERVENAME, 
     TRAY_CFG_DATA_TX, 

@@ -5,7 +5,7 @@ from protonvpn_cli.utils import change_file_owner
 from protonvpn_cli.constants import CONFIG_DIR
 
 from logging.handlers import RotatingFileHandler
-from protonvpn_linux_gui.constants import GUI_CONFIG_DIR
+from .constants import GUI_CONFIG_DIR
 
 def get_logger():
     """Create the logger.
