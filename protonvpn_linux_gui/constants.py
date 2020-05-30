@@ -76,7 +76,7 @@ POLKIT_TEMPLATE = """
     <defaults>
       <allow_any>no</allow_any>
       <allow_inactive>no</allow_inactive>
-      <allow_active>auth_admin_keep</allow_active>
+      <allow_active>auth_admin</allow_active>
     </defaults>
     <annotate key="org.freedesktop.policykit.exec.path">[PATH]</annotate>
     <annotate key="org.freedesktop.policykit.exec.allow_gui">TRUE</annotate>
