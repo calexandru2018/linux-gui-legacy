@@ -75,7 +75,12 @@ class DashboardService:
         return self.get_display_message(bool_value, result)
 
     def quick_connect(self):
-        command = ["protonvpn", "connect", "-f"]
+        try:
+            secure_core = get_gui_config("connections", "display_secure_core")
+        except:
+            secure_core = False
+
+        command = ["protonvpn", "connect", ("-f" if secure_core == "False" else "--sc")]
         bool_value, result =  self.root_command(command)
         return self.get_display_message(bool_value, result)
 
