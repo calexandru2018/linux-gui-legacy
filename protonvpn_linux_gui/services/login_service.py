@@ -72,7 +72,6 @@ class LoginService:
         set_config_value("USER", "custom_dns", None)
         set_config_value("USER", "killswitch", 0)
         set_config_value("USER", "split_tunnel", 0)
-        set_config_value("USER", "autoconnect", "0")
 
         set_config_value("USER", "initialized", 1)
 
