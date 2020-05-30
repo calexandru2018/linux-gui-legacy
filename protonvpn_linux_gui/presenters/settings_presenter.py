@@ -300,7 +300,7 @@ class SettingsPresenter:
                 polkit_support_switch.set_state(True)
             
             polkit_support_switch.set_property('sensitive', True)
-            tooltip_msg = "Makes possible to call the GUI with \"pkexec protonvpn-gui\"."
+            tooltip_msg = "Allows to prompt for sudo password. This should be enabled if you don't want to use the GUI via the terminal. (Reccomended)\nYou will need to run the GUI from the terminal only once, to enable this feature."
 
         sudo_info_tooltip.set_tooltip_text(tooltip_msg)
 
