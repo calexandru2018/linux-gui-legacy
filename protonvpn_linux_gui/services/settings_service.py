@@ -4,7 +4,7 @@ import subprocess
 
 # Remote imports
 from protonvpn_cli.constants import CONFIG_DIR, PASSFILE, SPLIT_TUNNEL_FILE, USER #noqa
-from protonvpn_cli.utils import get_config_value, is_valid_ip, set_config_value, change_file_owner, get_servers, get_country_name #noqa
+from protonvpn_cli.utils import get_config_value, is_valid_ip, set_config_value, get_servers, get_country_name #noqa
 from protonvpn_cli.connection import disconnect as pvpn_disconnect
 from protonvpn_cli.country_codes import country_codes
 
@@ -152,7 +152,6 @@ class SettingsService:
             with open(SPLIT_TUNNEL_FILE, "w") as f:
                 for ip in ip_list:
                     f.write("\n{0}".format(ip))
-            change_file_owner(SPLIT_TUNNEL_FILE)
         except:
             set_config_value("USER", "split_tunnel", 0)
             return False

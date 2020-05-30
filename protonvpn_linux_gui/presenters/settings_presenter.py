@@ -7,7 +7,7 @@ import collections
 
 # Remote imports
 from protonvpn_cli.constants import CONFIG_DIR, PASSFILE, SPLIT_TUNNEL_FILE, USER #noqa
-from protonvpn_cli.utils import get_config_value, is_valid_ip, set_config_value, change_file_owner #noqa
+from protonvpn_cli.utils import get_config_value, is_valid_ip, set_config_value #noqa
 from protonvpn_cli.connection import disconnect as pvpn_disconnect
 from protonvpn_cli.country_codes import country_codes
 

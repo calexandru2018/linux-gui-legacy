@@ -5,7 +5,7 @@ import configparser
 
 # Remote imports
 from protonvpn_cli.constants import CONFIG_FILE, CONFIG_DIR, PASSFILE #noqa
-from protonvpn_cli.utils import set_config_value, change_file_owner, pull_server_data #noqa
+from protonvpn_cli.utils import set_config_value, pull_server_data #noqa
 
 # Local imports
 from protonvpn_linux_gui.gui_logger import gui_logger

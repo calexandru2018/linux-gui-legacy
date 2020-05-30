@@ -4,7 +4,7 @@ from queue import Queue
 
 # Remote imports
 from protonvpn_cli.constants import CONFIG_FILE, CONFIG_DIR #noqa
-from protonvpn_cli.utils import check_root, change_file_owner #noqa
+from protonvpn_cli.utils import check_root #noqa
 
 import gi
 gi.require_version('Gtk', '3.0')

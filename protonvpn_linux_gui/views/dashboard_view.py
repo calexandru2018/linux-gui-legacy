@@ -3,7 +3,6 @@ import time
 # Remote imports
 from protonvpn_cli.utils import(
     get_config_value, 
-    change_file_owner, 
     is_connected, 
     set_config_value #noqa
 )    

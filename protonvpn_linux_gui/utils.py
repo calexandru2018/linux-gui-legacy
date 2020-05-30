@@ -15,7 +15,6 @@ from protonvpn_cli.utils import (
     get_config_value,
     is_connected,
     get_transferred_data,
-    change_file_owner
 )
 from protonvpn_cli.country_codes import country_codes
 from protonvpn_cli.constants import SPLIT_TUNNEL_FILE, USER
@@ -92,8 +91,6 @@ def initialize_gui_config():
         with open(GUI_CONFIG_FILE, "w") as f:
             gui_config.write(f)
             gui_logger.debug("pvpn-gui.cfg initialized.")
-
-        change_file_owner(GUI_CONFIG_FILE)
 
         if not os.path.isfile(GUI_CONFIG_FILE):
             print("something")
