@@ -1,6 +1,8 @@
 import os
 import sys
 import time
+import shutil
+import subprocess
 import configparser
 
 # Remote imports
@@ -51,6 +53,12 @@ class LoginService:
         user_tier = user_data['protonvpn_plan']
         user_protocol = user_data['openvpn_protocol']
 
+        if not self.generate_user_pass_file(ovpn_username, ovpn_password):
+            shutil.rmtree(CONFIG_DIR)
+            return False
+
+        gui_logger.debug("Passfile created")
+        
         pull_server_data(force=True)
 
         if user_tier == 4:
@@ -66,11 +74,6 @@ class LoginService:
         set_config_value("USER", "split_tunnel", 0)
         set_config_value("USER", "autoconnect", "0")
 
-        with open(PASSFILE, "w") as f:
-            f.write("{0}\n{1}".format(ovpn_username, ovpn_password))
-            gui_logger.debug("Passfile created")
-            os.chmod(PASSFILE, 0o600)
-
         set_config_value("USER", "initialized", 1)
 
         return True
@@ -78,8 +81,6 @@ class LoginService:
     def intialize_cli_config(self):
         if not os.path.isdir(CONFIG_DIR):
             os.mkdir(CONFIG_DIR)
-
-        change_file_owner(CONFIG_DIR)
 
         config = configparser.ConfigParser()
         config["USER"] = {
@@ -92,6 +93,7 @@ class LoginService:
             "check_update_interval": "3",
             "killswitch": "0",
             "split_tunnel": "0",
+            "api_domain": "https://api.protonvpn.ch"
         }
         config["metadata"] = {
             "last_api_pull": "0",
@@ -105,10 +107,8 @@ class LoginService:
             gui_logger.debug("pvpn-cli.cfg initialized")
             logger.debug("pvpn-cli.cfg initialized")
 
-            cli_log_path = os.path.join(CONFIG_DIR, "pvpn-cli.log")
-            if os.path.isfile(cli_log_path):
-                change_file_owner(cli_log_path)
         except:
+            shutil.rmtree(CONFIG_DIR)
             return False
 
         return True
@@ -116,8 +116,6 @@ class LoginService:
     def initialize_gui_config(self):
         if not os.path.isdir(GUI_CONFIG_DIR):
             os.mkdir(GUI_CONFIG_DIR)
-
-        change_file_owner(GUI_CONFIG_DIR)
 
         gui_config = configparser.ConfigParser()
         gui_config["connections"] = {
@@ -144,10 +142,24 @@ class LoginService:
             gui_config.write(f)
             gui_logger.debug("pvpn-gui.cfg initialized.")
 
-        change_file_owner(GUI_CONFIG_FILE)
-
         if not os.path.isfile(GUI_CONFIG_FILE):
             gui_logger.debug("Unablt to initialize pvpn-gui.cfg. {}".format(Exception))
+            shutil.rmtree(CONFIG_DIR)
+            shutil.rmtree(GUI_CONFIG_DIR)
             return False
+
+        return True
+
+    def generate_user_pass_file(self, username, password):
+        user_pass = "'{}\n{}'".format(username, password)
+        echo_to_passfile = "echo -e {} > {}".format(user_pass, PASSFILE)
+
+        # This should be fetched from config file
+        try:
+            # Either sudo or pkexec can be used
+            output = subprocess.check_output(["sudo", "bash", "-c", echo_to_passfile], stderr=subprocess.STDOUT, timeout=8)
+            set_config_value("USER", "username", username)
+        except (subprocess.TimeoutExpired, subprocess.CalledProcessError):
+            return False            
 
         return True
