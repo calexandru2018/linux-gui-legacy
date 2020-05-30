@@ -2,13 +2,13 @@ import os
 import shutil
 from queue import Queue
 
-from protonvpn_linux_gui.presenters.login_presenter import LoginPresenter
-from protonvpn_linux_gui.presenters.settings_presenter import SettingsPresenter
+from linux_gui.presenters.login_presenter import LoginPresenter
+from linux_gui.presenters.settings_presenter import SettingsPresenter
 
-from protonvpn_linux_gui.services.login_service import LoginService
-from protonvpn_linux_gui.services.settings_service import SettingsService
+from linux_gui.services.login_service import LoginService
+from linux_gui.services.settings_service import SettingsService
 
-from protonvpn_linux_gui.constants import GUI_CONFIG_DIR
+from linux_gui.constants import GUI_CONFIG_DIR
 from protonvpn_cli.constants import CONFIG_DIR
 
 q = Queue()
