@@ -25,6 +25,7 @@ from protonvpn_linux_gui.utils import (
 )
 
 class SettingsService:
+    sudo_timeout = 10
     
     def set_user_pass(self, username, password):
         user_pass = "'{}\n{}'".format(username, password)
@@ -190,9 +191,9 @@ class SettingsService:
         try:
             set_gui_config("general_tab", "polkit_enabled", update_to)
         except:
-            return False, "Unable to update PolKit settings!"
+            return False
 
-        return True, ""
+        return True
 
     def generate_autoconnect_list(self):
         countries = {}
@@ -320,17 +321,17 @@ class SettingsService:
     def generate_polkit_template(self):
         gui_path = self.get_gui_path()
         if not gui_path:
-            return False
+            return False, "Could not find GUI path!"
 
         template = POLKIT_TEMPLATE.replace("[PATH]", gui_path)
         generate_command = "cat > {0} <<EOF {1}\nEOF".format(POLKIT_PATH, template)
 
-        resp = subprocess.run([self.sudo_type, "bash", "-c", generate_command], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
-        if resp.returncode == 1:
-            gui_logger.debug("[!] Unable to generate policykit template.\n{}".format(resp))
-            return False, "Unable to generate policy template."
-
-        return True, "PolKit Support <b>enabled</b>!\nYou can now use \"pkexec\" command to start ProtonVPN GUI."
+        result_bool, display_message = self.root_command(["bash", "-c", generate_command], True)
+        if result_bool:
+            if not self.set_polkit(1):
+                return False, "Unable to update PolKit settings to <b>enabled</b>, although policy template was generated!" 
+                
+        return result_bool, display_message
 
     def remove_polkit_template(self):
         try:
@@ -339,20 +340,47 @@ class SettingsService:
             polkit_enabled = 0
 
         if self.check_policy_exists():
-            resp = subprocess.run([self.sudo_type, "rm", POLKIT_PATH], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
-            # If return code 1: File does not exist in path
-            # This is fired when a user wants to remove template a that does not exist
-            if not polkit_enabled == 1 and resp.returncode == 1:
-                gui_logger.debug("[!] Could not remove .policy file. File might be non existent: \n{}".format(resp))
-                return False, "Could not remove .policy template."
-
-        return True, "\nPolKit Support <b>disabled</b>!"
+            result_bool, display_message = self.root_command(["rm", POLKIT_PATH])
+            if result_bool:
+                if not self.set_polkit(0):
+                    return "Unable to update PolKit settings to <b>disabled</b>, although policy template was removed!" 
+                
+            return result_bool, display_message
     
     def check_policy_exists(self):
         if os.path.isfile(POLKIT_PATH):
             return True
 
         return False
+
+    def root_command(self, command_list, enable=False):
+        return_on_sucess_message = "PolKit Support <b>disabled</b>!"
+        if enable:
+            return_on_sucess_message = "PolKit Support <b>enabled</b>!\nYou can now use \"pkexec\" command to start ProtonVPN GUI."
+        
+        command_list.insert(0, self.sudo_type)
+
+        process = subprocess.Popen(command_list, stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
+        timeout = False
+
+        try:
+            outs, errs = process.communicate(timeout=self.sudo_timeout)
+        except subprocess.TimeoutExpired:
+            timeout = True
+            process.kill()
+            outs, errs = process.communicate()
+
+        errs = errs.decode().lower()
+        outs = outs.decode().lower()
+
+        if "dismissed" in errs and not timeout:
+            return False, "Privilege escalation was dismissed."
+        
+        if not "dismissed" in errs and timeout:
+            return False, "Request timed out, probably because of insufficient privileges.\nPlease run the GUI from within a terminal to enable PolicyKit."
+
+        return True, return_on_sucess_message
+
 
     def get_gui_path(self):
         """Function that searches for the CLI. Returns CLIs path if it is found, otherwise it returns False.
