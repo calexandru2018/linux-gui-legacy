@@ -36,6 +36,8 @@ class SettingsService:
         if not result_bool:
             return result_bool, display_message
 
+        set_config_value("USER", "username", username)
+        
         return result_bool, "Username and password <b>updated</b>!"
 
     def set_dns(self, dns_value):
