@@ -115,6 +115,8 @@ class SettingsPresenter:
             display_message = "{}{} setting updated to <b>{}</b>!".format(display_message, "Autoconnect" if not "quick_connect" in kwargs else "Quick connect", kwargs.get("country_display"))
             return_val = True
 
+        gui_logger.debug(">>> Result: {} <-> {}".format(response_bool, display_message))
+
         self.queue.put(dict(action="update_dialog", label=display_message))
 
         gui_logger.debug(">>> Ended tasks in \"update_autoconnect\" thread.") 

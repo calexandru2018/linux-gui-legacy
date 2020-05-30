@@ -246,12 +246,15 @@ class SettingsService:
             outs, errs = process.communicate()
 
         if "dismissed" in errs and not timeout:
+            gui_logger.debug("errs: {}\nouts: {}".format(errs, outs))
             return False, "Sudo access was dismissed."
         
         if not "dismissed" in errs and timeout:
+            gui_logger.debug("errs: {}\nouts: {}".format(errs, outs))
             return False, "Command timedout, perhaps due to insufficient privileges. Either enable PolKit or launch GUI from terminal."
 
         if not "created symlink" in errs.lower():
+            gui_logger.debug("errs: {}\nouts: {}".format(errs, outs))
             return False, "Unable to setup autoconnect!"
 
         if not self.daemon_exists():
