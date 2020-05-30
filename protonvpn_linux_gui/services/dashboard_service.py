@@ -397,3 +397,17 @@ class DashboardService:
         # print(country,top_choice)
 
         return  (str(int(round(load_sum/count)))+"%", top_choice) 
+        
+    @property
+    def sudo_type(self):
+        try:
+            is_polkit_enabled =  int(get_gui_config("general_tab", "polkit_enabled"))
+        except (KeyError, NameError):
+            return "sudo"
+
+        return_val = "sudo"
+
+        if is_polkit_enabled == 1:
+            return_val = "pkexec"
+
+        return return_val
