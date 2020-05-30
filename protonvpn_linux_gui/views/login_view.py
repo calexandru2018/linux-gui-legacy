@@ -77,7 +77,6 @@ class LoginView:
     def login_button_clicked(self, button):
         """Button/Event handler to intialize user account. Calls populate_server_list(server_tree_store) to populate server list.
         """     
-
         # Queue has to be used
         self.queue.put(dict(action="display_dialog", label="Intializing profile...", spinner=True, hide_close_button=True))
         
@@ -92,9 +91,6 @@ class LoginView:
             )
             future = executor.submit(self.login_presenter.on_login, **var_dict)
             return_value = future.result()
-            
             if return_value:
                 self.login_view.hide()
                 self.dashboard_view.display_window()
-
-   
