@@ -40,8 +40,10 @@ class SettingsPresenter:
         password = kwargs.get("password")
         
         result_bool, display_message = self.settings_service.set_user_pass(username, password)
-
+        
         self.queue.put(dict(action="update_dialog", label=display_message))
+       
+        return result_bool
 
     def update_dns(self, dns_value):
         """Function that updates DNS settings. It either enables or disables.
