@@ -7,6 +7,7 @@ from protonvpn_cli.utils import get_config_value, set_config_value, is_connected
 
 from ..utils import set_gui_config, get_gui_config, check_internet_conn, get_server_protocol_from_cli
 from ..constants import GITHUB_URL_RELEASE, SMALL_FLAGS_BASE_PATH, FEATURES_BASE_PATH
+from ..gui_logger import gui_logger
 
 class DashboardService:
     # 30 seconds of timeout for all root necessary commands
@@ -151,7 +152,7 @@ class DashboardService:
 
         errs = errs.decode().lower()
         outs = outs.decode().lower()
-
+        gui_logger.debug("errs: {}\nouts: {}".format(errs, outs))
         if "dismissed" in errs and not timeout:
             return (False, "Privilege escalation was dismissed.")
         
