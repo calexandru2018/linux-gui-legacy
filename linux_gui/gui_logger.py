@@ -17,7 +17,7 @@ def get_logger():
         os.mkdir(GUI_CONFIG_DIR)
         
     formatter = logging.Formatter("%(asctime)s — %(name)s — %(levelname)s — %(funcName)s:%(lineno)d — %(message)s")
-    log = logging.getLogger("protonvpn-linux-gui")
+    log = logging.getLogger("linux-gui")
     log.setLevel(logging.DEBUG)
 
     #logging.basicConfig(filename=LOG_FILE, level=logging.DEBUG)
