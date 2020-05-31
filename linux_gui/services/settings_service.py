@@ -286,13 +286,20 @@ class SettingsService:
             process.kill()
             outs, errs = process.communicate()
 
+        errs = errs.lower()
+        outs = outs.lower()
+        gui_logger.debug("errs: {}\nouts: {}".format(errs, outs))
+
         if "dismissed" in errs and not timeout:
             return False, "Sudo access was dismissed."
         
         if not "dismissed" in errs and timeout:
             return False, "Command timedout, perhaps due to insufficient privileges."
 
-        if not "removed" in errs.lower():
+        if "does not exist." in errs:
+            return False, "Can't disable autoconnect since .service file does not exist.\nThis might be due to some misconfiguration in config file.\nPlease try to connect to another country, then disable it."
+       
+        if not "removed" in errs:
             return False, "Unable to disable autoconnect!"
 
         if self.daemon_exists():
@@ -307,8 +314,8 @@ class SettingsService:
         # Return code 4: service could not be found
         resp_stop = subprocess.run(["systemctl", "status" , SERVICE_NAME], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
         return_val = True
-
-        if resp_stop.returncode == 4:
+        gui_logger.debug(resp_stop)
+        if resp_stop.returncode == 4 and not resp_stop.returncode == 3:
             return_val = False
 
         return return_val
