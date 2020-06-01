@@ -141,6 +141,8 @@ If you would like to use `pkexec` instead of the terminal (or alter `visudo`), t
 
 ### Manual Installation
 
+**Note:** Before installing the GUI, make sure that you have previously installed the CLI, otherwise an error will be thrown.
+
 1. Clone this repository
 
     `git clone https://github.com/ProtonVPN/linux-gui`
@@ -151,7 +153,7 @@ If you would like to use `pkexec` instead of the terminal (or alter `visudo`), t
 
 3. Install
 
-    `sudo python3 setup.py install`
+    `sudo pip3 install -e .`
 
 ### Virtual environment
 
