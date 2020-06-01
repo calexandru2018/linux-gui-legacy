@@ -25,7 +25,7 @@ from ..utils import (
     set_gui_config,
     get_gui_config,
     find_cli,
-    check_polkit_exists
+    is_polkit_installed
 )
 
 class SettingsPresenter:
@@ -235,7 +235,7 @@ class SettingsPresenter:
         return return_val
 
     def on_polkit_change(self, update_to):
-        result_bool, display_message = self.settings_service.manage_polkit(update_to)
+        result_bool, display_message = self.settings_service.update_polkit(update_to)
 
         self.queue.put(dict(action="update_dialog", label=display_message))
 
@@ -280,8 +280,6 @@ class SettingsPresenter:
         sudo_info_tooltip = general_settings_dict["sudo_info_tooltip"]
         setter = 0
 
-        polkit_exists = check_polkit_exists()
-
         tooltip_msg = "Could not find PolKit installed on your system. For more information, please visit: \nhttps://github.com/ProtonVPN/linux-gui"
 
         username = get_config_value("USER", "username")
@@ -293,19 +291,15 @@ class SettingsPresenter:
         general_settings_dict["pvpn_plan_combobox"].set_active(tier)
 
         polkit_support_switch.set_property('sensitive', False)
-        try:
-            setter = int(get_gui_config("general_tab", "polkit_enabled"))
-        except KeyError:
-            gui_logger.debug("[!] Unable to find \"polkit_enabled\" key. Setting a default value.")
-            set_gui_config("general_tab", "polkit_enabled", 0)
 
-        if check_polkit_exists():
-            if setter == 1:
+        if is_polkit_installed():
+            if self.settings_service.polkit == 1:
                 polkit_support_switch.set_state(True)
             
             polkit_support_switch.set_property('sensitive', True)
-            tooltip_msg = "Allows to prompt for sudo password. This should be enabled if you don't want to use the GUI via the terminal. (Reccomended)\nYou will need to run the GUI from the terminal only once, to enable this feature."
-
+            use_cases = "\n-Update username and password (root protected file)\n-Enable/disable autoconnect (create/remove .service file)\n-Connect/disconnect to/from VPN (run CLI commands)"
+            tooltip_msg = "Displays a window to enter sudo password, which is needed for the following cases:{}\n\nIt is recommended to enabled this if you don't want to use the GUI via the terminal.".format(use_cases)
+        
         sudo_info_tooltip.set_tooltip_text(tooltip_msg)
 
     def load_tray_settings(self, display_dict):
