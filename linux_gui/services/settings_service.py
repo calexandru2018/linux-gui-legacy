@@ -15,8 +15,6 @@ from ..constants import (
     PATH_AUTOCONNECT_SERVICE,
     SERVICE_NAME,
     TRAY_SUDO_TYPES,
-    POLKIT_PATH,
-    POLKIT_TEMPLATE,
 )
 from ..utils import (
     set_gui_config,
@@ -185,13 +183,25 @@ class SettingsService:
 
         return True
     
-    def set_polkit(self, update_to):
+    def update_polkit(self, update_to):
+        changed_to_msg = "disabled" if update_to == 0 else "enabled"
         try:
-            set_gui_config("general_tab", "polkit_enabled", update_to)
-        except:
-            return False
+            self.polkit = update_to
+        except (KeyError, IOError) as e:
+            return False, "Unable <b>{}</b> to PolKit configuration!\nError: {}".format(changed_to_msg, e)
 
-        return True
+        return True, "Polkit Support <b>{}</b>".format(changed_to_msg)
+
+    @property
+    def polkit(self):
+        try:
+            return int(get_gui_config("general_tab", "polkit_enabled"))
+        except:
+            return 0
+
+    @polkit.setter
+    def polkit(self, update_to):
+        set_gui_config("general_tab", "polkit_enabled", update_to)
 
     def generate_autoconnect_list(self):
         countries = {}
@@ -319,47 +329,6 @@ class SettingsService:
             return_val = False
 
         return return_val
-
-    def manage_polkit(self, mode):
-        if mode == 1:
-            return self.generate_polkit_template()
-        else:
-            return self.remove_polkit_template()
-
-    def generate_polkit_template(self):
-        gui_path = self.get_gui_path()
-        if not gui_path:
-            return False, "Could not find GUI path!"
-
-        template = POLKIT_TEMPLATE.replace("[PATH]", gui_path)
-        generate_command = "cat > {0} <<EOF {1}\nEOF".format(POLKIT_PATH, template)
-
-        result_bool, display_message = self.root_command(["bash", "-c", generate_command], True)
-        if result_bool:
-            if not self.set_polkit(1):
-                return False, "Unable to update PolKit settings to <b>enabled</b>, although policy template was generated!" 
-                
-        return result_bool, display_message
-
-    def remove_polkit_template(self):
-        try:
-            polkit_enabled = int(get_gui_config("general_tab", "polkit_enabled"))
-        except KeyError:
-            polkit_enabled = 0
-
-        if self.check_policy_exists():
-            result_bool, display_message = self.root_command(["rm", POLKIT_PATH])
-            if result_bool:
-                if not self.set_polkit(0):
-                    return "Unable to update PolKit settings to <b>disabled</b>, although policy template was removed!" 
-                
-            return result_bool, display_message
-    
-    def check_policy_exists(self):
-        if os.path.isfile(POLKIT_PATH):
-            return True
-
-        return False
 
     def root_command(self, command_list, enable=False):
         return_on_sucess_message = "PolKit Support <b>disabled</b>!"
