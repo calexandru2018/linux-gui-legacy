@@ -1,12 +1,6 @@
 import os
-from protonvpn_cli.constants import VERSION as cli_version, USER as cli_user
-import pwd
-
-try:
-    USER = pwd.getpwuid(int(os.environ["PKEXEC_UID"])).pw_name
-except KeyError:
-    USER = cli_user
-
+import getpass
+USER = getpass.getuser()
 
 VERSION = "2.1.0"
 GITHUB_URL_RELEASE = "https://github.com/ProtonVPN/linux-gui/releases/latest"
