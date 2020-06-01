@@ -188,7 +188,7 @@ class SettingsService:
         try:
             self.polkit = update_to
         except (KeyError, IOError) as e:
-            return False, "Unable <b>{}</b> to PolKit configuration!\nError: {}".format(changed_to_msg, e)
+            return False, "Unable to <b>{}</b> PolKit configuration!\nError: {}".format(changed_to_msg, e)
 
         return True, "Polkit Support <b>{}</b>".format(changed_to_msg)
 
