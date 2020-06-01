@@ -31,7 +31,7 @@ from .constants import (
     TRAY_CFG_TIME_CONN, 
     CURRDIR,
 )
-from .utils import get_gui_config, set_gui_config, check_polkit_exists
+from .utils import get_gui_config, set_gui_config
 
 LOGO_PATH = os.path.join(CURRDIR, "resources/img/logo/protonvpn_logo.png")
 ALT_LOGO_PATH = os.path.join(CURRDIR, "resources/img/logo/protonvpn_logo_alt.png")
