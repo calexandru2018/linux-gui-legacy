@@ -235,7 +235,7 @@ def get_gui_processes():
 
     return processes
 
-def check_polkit_exists():
+def is_polkit_installed():
     """Checks for polkit/pkexec and sets to it if found.
     """
     process = subprocess.run(["which", "pkexec"], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
@@ -244,22 +244,6 @@ def check_polkit_exists():
     if process.returncode == 0 and process.stdout.decode().strip("\n").split("/")[-1:][0] == "pkexec":
         return_response = True
 
-    gui_logger.debug(">>> TRAY check_polkit_exists reponse: {}.".format(process))
+    gui_logger.debug(">>> {}.".format(process))
 
     return return_response
-
-    # sudo_type = "sudo"
-    # if process.returncode == 0 and process.stdout.decode().strip("\n").split("/")[-1:][0] == "pkexec":
-    #     gui_logger.debug(">>> TRAY PolKit/pkexec found.")
-    #     try:
-    #         sudo_type = get_gui_config("tray_tab", "run_commands_as")
-    #         if sudo_type == "1":
-    #             sudo_type = "pkexec"
-    #     except KeyError:
-    #         gui_logger.debug("[!] Could not get value from configurations file")
-
-    # return sudo_type
-
-
-
-    
