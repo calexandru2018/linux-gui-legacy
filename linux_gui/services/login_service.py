@@ -21,6 +21,7 @@ from ..constants import (
     GUI_CONFIG_DIR,
     TRAY_CFG_SUDO
 )
+from ..utils import is_polkit_installed
 
 class LoginService:
 
@@ -153,10 +154,10 @@ class LoginService:
         user_pass = "'{}\n{}'".format(username, password)
         echo_to_passfile = "echo -e {} > {}".format(user_pass, PASSFILE)
 
-        # This should be fetched from config file
+        sudo_type = "pkexec" if is_polkit_installed else "sudo"
+
         try:
-            # Either sudo or pkexec can be used
-            output = subprocess.check_output(["sudo", "bash", "-c", echo_to_passfile], stderr=subprocess.STDOUT, timeout=8)
+            output = subprocess.check_output([sudo_type, "bash", "-c", echo_to_passfile], stderr=subprocess.STDOUT, timeout=8)
             set_config_value("USER", "username", username)
         except (subprocess.TimeoutExpired, subprocess.CalledProcessError):
             return False            
