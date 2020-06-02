@@ -43,7 +43,7 @@ class SettingsService:
         try:
             set_config_value("USER", "dns_leak_protection", dns_value)
         except:
-            gui_logger.debug("Could not update DNS Protection settings")
+            gui_logger.debug("Could not update DNS Protection settings to: {}".format(dns_value))
             return False
 
         return True
@@ -61,7 +61,7 @@ class SettingsService:
         try:
             set_config_value("USER", "tier", str(protonvpn_plan))
         except:
-            gui_logger.debug("Could not update ProtonVPN Plan")
+            gui_logger.debug("Could not update ProtonVPN Plan to: {}".format(protonvpn_plan))
             return False
 
         return True
@@ -70,7 +70,7 @@ class SettingsService:
         try:
             set_config_value("USER", "default_protocol", protocol)
         except:
-            gui_logger.debug("Could not update default Protocol")
+            gui_logger.debug("Could not update default Protocol to: {}".format(protocol))
             return False
 
         return True
@@ -103,7 +103,7 @@ class SettingsService:
             try:
                 set_gui_config("conn_tab", "autoconnect", update_to)
             except:
-                gui_logger.debug("Could not update autoconnect in pvpn-gui.cfg")
+                gui_logger.debug("Could not update autoconnect in pvpn-gui.cfg to: {}".format(update_to))
                 return False, "Unable to update autoconnect configurations although autoconnect should be enabled"
 
             return True, return_msg
@@ -116,6 +116,7 @@ class SettingsService:
                 set_gui_config("conn_tab", "quick_connect", update_to)
                 return_val = True
             except:
+                gui_logger.debug("Could not update quickconnect to: {}".format(update_to))
                 return False
 
         return return_val
@@ -124,7 +125,7 @@ class SettingsService:
         try:
             set_config_value("USER", "killswitch", update_to)
         except:
-            gui_logger.debug("Could not update KillSwitch")
+            gui_logger.debug("Could not update KillSwitch to: {}".format(update_to))
             return False
 
         return True
@@ -141,11 +142,13 @@ class SettingsService:
             if int(get_config_value("USER", "killswitch")):
                 set_config_value("USER", "killswitch", 0)
         except:
+            gui_logger.debug("Could not disable KillSwitch")
             return False
 
         try:
             set_config_value("USER", "split_tunnel", update_to)
         except:
+            gui_logger.debug("Could not update split_tunnel to: {}".format(update_to))
             return False
 
     def set_split_tunneling_ips(self, ip_list):
