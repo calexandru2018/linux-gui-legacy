@@ -32,6 +32,7 @@ class SettingsService:
         result_bool, display_message = self.root_command(["bash", "-c", echo_to_passfile])
 
         if not result_bool:
+            gui_logger.debug("Could not update Passfile")
             return result_bool, display_message
 
         set_config_value("USER", "username", username)
@@ -42,6 +43,7 @@ class SettingsService:
         try:
             set_config_value("USER", "dns_leak_protection", dns_value)
         except:
+            gui_logger.debug("Could not update DNS Protection settings")
             return False
 
         return True
@@ -59,6 +61,7 @@ class SettingsService:
         try:
             set_config_value("USER", "tier", str(protonvpn_plan))
         except:
+            gui_logger.debug("Could not update ProtonVPN Plan")
             return False
 
         return True
@@ -67,6 +70,7 @@ class SettingsService:
         try:
             set_config_value("USER", "default_protocol", protocol)
         except:
+            gui_logger.debug("Could not update default Protocol")
             return False
 
         return True
@@ -99,6 +103,7 @@ class SettingsService:
             try:
                 set_gui_config("conn_tab", "autoconnect", update_to)
             except:
+                gui_logger.debug("Could not update autoconnect in pvpn-gui.cfg")
                 return False, "Unable to update autoconnect configurations although autoconnect should be enabled"
 
             return True, return_msg
@@ -119,6 +124,7 @@ class SettingsService:
         try:
             set_config_value("USER", "killswitch", update_to)
         except:
+            gui_logger.debug("Could not update KillSwitch")
             return False
 
         return True
@@ -179,6 +185,7 @@ class SettingsService:
         try:
             set_gui_config("tray_tab", TRAY_CFG_DICT[tray_display], tray_setting)
         except:
+            gui_logger.debug("Could not update tray configurations.\n Settings: {} --- {}".format(TRAY_CFG_DICT[tray_display], tray_setting))
             return False
 
         return True
@@ -188,6 +195,7 @@ class SettingsService:
         try:
             self.polkit = update_to
         except (KeyError, IOError) as e:
+            gui_logger.debug("Unable to update PolKit configuration: {}".format(e))
             return False, "Unable to <b>{}</b> PolKit configuration!\nError: {}".format(changed_to_msg, e)
 
         return True, "Polkit Support <b>{}</b>".format(changed_to_msg)
@@ -255,18 +263,18 @@ class SettingsService:
         except subprocess.TimeoutExpired:
             timeout = True
             process.kill()
-            outs, errs = process.communicate()
+
+        errs = errs.lower()
+        outs = outs.lower()
+        gui_logger.debug("errs: {}\nouts: {}".format(errs, outs))
 
         if "dismissed" in errs and not timeout:
-            gui_logger.debug("errs: {}\nouts: {}".format(errs, outs))
             return False, "Sudo access was dismissed."
         
         if not "dismissed" in errs and timeout:
-            gui_logger.debug("errs: {}\nouts: {}".format(errs, outs))
             return False, "Command timedout, perhaps due to insufficient privileges. Either enable PolKit or launch GUI from terminal."
 
         if not "created symlink" in errs.lower():
-            gui_logger.debug("errs: {}\nouts: {}".format(errs, outs))
             return False, "Unable to setup autoconnect!"
 
         if not self.daemon_exists():
@@ -349,6 +357,7 @@ class SettingsService:
 
         errs = errs.decode().lower()
         outs = outs.decode().lower()
+        gui_logger.debug("errs: {}\nouts: {}".format(errs, outs))
 
         if "dismissed" in errs and not timeout:
             return False, "Privilege escalation was dismissed."
