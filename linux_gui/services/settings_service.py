@@ -153,16 +153,11 @@ class SettingsService:
 
     def set_split_tunneling_ips(self, ip_list):
         try:
-            set_config_value("USER", "split_tunnel", 1)
-        except:
-            return False
-
-        try:
             with open(SPLIT_TUNNEL_FILE, "w") as f:
                 for ip in ip_list:
                     f.write("\n{0}".format(ip))
         except:
-            set_config_value("USER", "split_tunnel", 0)
+            gui_logger.debug("Could not update add IPs to file: {}".format(ip_list))
             return False
 
         return True
