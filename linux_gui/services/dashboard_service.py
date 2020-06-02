@@ -17,6 +17,7 @@ class DashboardService:
         try:
             set_gui_config("connections", "display_secure_core", update_to)
         except:
+            gui_logger.debug("Could not update display_secure_core to: {}".format(update_to))
             return False
 
         return True
@@ -267,7 +268,8 @@ class DashboardService:
     def check_split_tunneling(self):
         try:
             is_splitunn_enabled = True if get_config_value("USER", "split_tunnel") == "1" else False
-        except (KeyError, IndexError):
+        except (KeyError, IndexError) as e:
+            gui_logger.debug(e)
             return False
 
         return is_splitunn_enabled
