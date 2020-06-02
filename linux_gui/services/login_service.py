@@ -80,6 +80,7 @@ class LoginService:
 
     def intialize_cli_config(self):
         if not os.path.isdir(CONFIG_DIR):
+            gui_logger.debug("CLI config folder created.")
             os.mkdir(CONFIG_DIR)
 
         config = configparser.ConfigParser()
@@ -105,8 +106,6 @@ class LoginService:
                 config.write(f)
 
             gui_logger.debug("pvpn-cli.cfg initialized")
-            logger.debug("pvpn-cli.cfg initialized")
-
         except:
             shutil.rmtree(CONFIG_DIR)
             return False
@@ -115,6 +114,7 @@ class LoginService:
 
     def initialize_gui_config(self):
         if not os.path.isdir(GUI_CONFIG_DIR):
+            gui_logger.debug("GUI config folder created.")
             os.mkdir(GUI_CONFIG_DIR)
 
         gui_config = configparser.ConfigParser()
@@ -143,7 +143,7 @@ class LoginService:
             gui_logger.debug("pvpn-gui.cfg initialized.")
 
         if not os.path.isfile(GUI_CONFIG_FILE):
-            gui_logger.debug("Unablt to initialize pvpn-gui.cfg. {}".format(Exception))
+            gui_logger.debug("File not found: pvpn-gui.cfg")
             shutil.rmtree(CONFIG_DIR)
             shutil.rmtree(GUI_CONFIG_DIR)
             return False
@@ -159,7 +159,9 @@ class LoginService:
         try:
             output = subprocess.check_output([sudo_type, "bash", "-c", echo_to_passfile], stderr=subprocess.STDOUT, timeout=8)
             set_config_value("USER", "username", username)
-        except (subprocess.TimeoutExpired, subprocess.CalledProcessError):
-            return False            
+        except (subprocess.TimeoutExpired, subprocess.CalledProcessError) as e:
+            gui_logger.debug(e)
+            return False   
 
+        gui_logger.debug("Passfile generated")
         return True
