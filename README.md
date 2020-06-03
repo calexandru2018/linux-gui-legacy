@@ -158,7 +158,7 @@ If you would like to use `pkexec` instead of the terminal (or alter `visudo`), t
 
 ## Uninstalling ProtonVPN Linux GUI
 
-You have installed the GUI via PIP or by cloning this repo, then to uninstall it type in the following command:
+If you have installed the GUI via PIP or by cloning this repo, then to uninstall it type in the following command:
 
   `sudo pip3 uninstall protonvpn-gui`
 
@@ -240,12 +240,12 @@ To create at <i>tray icon</i> launcher with a .desktop file, follow the instruct
     ```
 
 ## Sudo/PolKit
-At the moment, since the CLI protects certain files using sudo and also manages killswitch and split tunneling, the GUI will also needs to have access to these sudo protected files and commands. Thus, as it is at the moment, the GUI needs to have certain root privileges. This though is subject to change. 
+At the moment, since the CLI protects certain files using sudo and also manages killswitch and split tunneling, the GUI will also need to have access to these sudo protected files. Thus, as it is at the moment, the GUI needs to have certain root privileges. This though is subject to change. 
 Nonetheless, if you would like to launch the GUI without having to type in your sudo password everytime, then you could add the executable file to `visudo`. 
 <br>
-Another alternative is enable PolKit Support from within the settings (`pkexec` commands). This displays a window for the user to type the sudo password, this way, a user won't have to type the password into the terminal. Whenver you want to connect/disconnect or make some important changes to files, a window prompt will appear for you to enter the sudo password.
+Another alternative is enable PolKit Support from within the settings (`pkexec` command). This displays a window for the user to type the sudo password, this way, a user won't have to type the password into the terminal. Whenever you want to connect/disconnect or make some important changes to files, a window prompt will appear for you to enter the sudo password.
 <br>
-**Note:** This feature needs to be enabled from within the GUI settings for it to be able to work. If you have not installed the necessary packages, then the feature will not work.
+**Note:** This feature needs to be enabled from within the GUI settings for it to be able to work. If you have not installed the necessary packages, then the this feature will not work.
 
 ### Visudo
 The instructions for seting up visudo are described below.
