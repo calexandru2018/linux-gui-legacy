@@ -7,13 +7,13 @@ import collections
 
 # Remote imports
 from protonvpn_cli.constants import CONFIG_DIR, PASSFILE, SPLIT_TUNNEL_FILE, USER #noqa
-from protonvpn_cli.utils import get_config_value, is_valid_ip, set_config_value, change_file_owner #noqa
+from protonvpn_cli.utils import get_config_value, is_valid_ip, set_config_value #noqa
 from protonvpn_cli.connection import disconnect as pvpn_disconnect
 from protonvpn_cli.country_codes import country_codes
 
 # Local imports
-from protonvpn_linux_gui.gui_logger import gui_logger
-from protonvpn_linux_gui.constants import (
+from ..gui_logger import gui_logger
+from ..constants import (
     TRAY_CFG_DICT, 
     TEMPLATE,
     PATH_AUTOCONNECT_SERVICE,
@@ -21,11 +21,11 @@ from protonvpn_linux_gui.constants import (
     GUI_CONFIG_DIR,
     TRAY_SUDO_TYPES
 )
-from protonvpn_linux_gui.utils import (
+from ..utils import (
     set_gui_config,
     get_gui_config,
     find_cli,
-    check_polkit_exists
+    is_polkit_installed
 )
 
 class SettingsPresenter:
@@ -38,20 +38,12 @@ class SettingsPresenter:
         """
         username = kwargs.get("username")
         password = kwargs.get("password")
-        return_val = False
-
-        gui_logger.debug(">>> Running \"set_username_password\".")
-
-        display_message = "Unable to update username and password!"
-        if self.settings_service.set_user_pass(username, password):
-            display_message = "Username and password <b>updated</b>!"
-            return_val = True
-
+        
+        result_bool, display_message = self.settings_service.set_user_pass(username, password)
+        
         self.queue.put(dict(action="update_dialog", label=display_message))
-
-        gui_logger.debug(">>> Ended tasks in \"set_username_password\" thread.")
-
-        return return_val
+       
+        return result_bool
 
     def update_dns(self, dns_value):
         """Function that updates DNS settings. It either enables or disables.
@@ -109,15 +101,21 @@ class SettingsPresenter:
 
         gui_logger.debug(">>> Running \"update_connect_preference\".")
 
+        display_message = ""
         if not "quick_connect" in kwargs:
-            response = self.settings_service.set_autoconnect(active_choice)
+            response_bool, display_message = self.settings_service.set_autoconnect(active_choice)
         else:
-            response = self.settings_service.set_quickconnect(active_choice)
+            response_bool = self.settings_service.set_quickconnect(active_choice)
 
-        display_message = "Unable to update configuration!"
-        if response:
-            display_message = "{} setting updated to connect to <b>{}</b>!".format("Autoconnect" if not "quick_connect" in kwargs else "Quick connect", kwargs.get("country_display"))
+        
+        if response_bool:
+            if display_message:
+                display_message = display_message+"\n"
+
+            display_message = "{}{} setting updated to <b>{}</b>!".format(display_message, "Autoconnect" if not "quick_connect" in kwargs else "Quick connect", kwargs.get("country_display"))
             return_val = True
+
+        gui_logger.debug(">>> Result: {} <-> {}".format(response_bool, display_message))
 
         self.queue.put(dict(action="update_dialog", label=display_message))
 
@@ -237,19 +235,9 @@ class SettingsPresenter:
         return return_val
 
     def on_polkit_change(self, update_to):
-        enabled_msg = "\nYou can now use \"pkexec\" command to start ProtonVPN GUI."
-        result = "PolKit Support <b>{}</b>!{}".format("disabled" if update_to == 0 else "enabled", enabled_msg if update_to == 1 else "")
-        update_polkit_status = self.settings_service.set_polkit(update_to)
+        result_bool, display_message = self.settings_service.update_polkit(update_to)
 
-        if not update_polkit_status:
-            gui_logger.debug("[!] Unable to enable polkit.")  
-            result = "Unable to update PolKit settings!"
-        else:
-            if not self.settings_service.manage_polkit(update_to):
-                gui_logger.debug("[!] Unable to create .policy file.")   
-                result = "Unable to {} files!".format("remove" if update_to == 0 else "generate")
-
-        self.queue.put(dict(action="update_dialog", label=result))
+        self.queue.put(dict(action="update_dialog", label=display_message))
 
     def purge_configurations(self):
         """Function to purge all current configurations.
@@ -292,8 +280,6 @@ class SettingsPresenter:
         sudo_info_tooltip = general_settings_dict["sudo_info_tooltip"]
         setter = 0
 
-        polkit_exists = check_polkit_exists()
-
         tooltip_msg = "Could not find PolKit installed on your system. For more information, please visit: \nhttps://github.com/ProtonVPN/linux-gui"
 
         username = get_config_value("USER", "username")
@@ -305,19 +291,15 @@ class SettingsPresenter:
         general_settings_dict["pvpn_plan_combobox"].set_active(tier)
 
         polkit_support_switch.set_property('sensitive', False)
-        try:
-            setter = int(get_gui_config("general_tab", "polkit_enabled"))
-        except KeyError:
-            gui_logger.debug("[!] Unable to find \"polkit_enabled\" key. Setting a default value.")
-            set_gui_config("general_tab", "polkit_enabled", 0)
 
-        if check_polkit_exists():
-            if setter == 1:
+        if is_polkit_installed():
+            if self.settings_service.polkit == 1:
                 polkit_support_switch.set_state(True)
             
             polkit_support_switch.set_property('sensitive', True)
-            tooltip_msg = "Makes possible to call the GUI with \"pkexec protonvpn-gui\"."
-
+            use_cases = "\n-Update username and password (root protected file)\n-Enable/disable autoconnect (create/remove .service file)\n-Connect/disconnect to/from VPN (run CLI commands)"
+            tooltip_msg = "Displays a window to enter sudo password, which is needed for the following cases:{}\n\nIt is recommended to enabled this if you don't want to use the GUI via the terminal.".format(use_cases)
+        
         sudo_info_tooltip.set_tooltip_text(tooltip_msg)
 
     def load_tray_settings(self, display_dict):

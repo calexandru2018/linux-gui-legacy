@@ -23,9 +23,9 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import GObject as gobject, GdkPixbuf
 
 # Local imports
-from protonvpn_linux_gui.gui_logger import gui_logger
-from protonvpn_linux_gui.constants import GITHUB_URL_RELEASE, VERSION, LARGE_FLAGS_BASE_PATH, SMALL_FLAGS_BASE_PATH, FEATURES_BASE_PATH
-from protonvpn_linux_gui.utils import (
+from ..gui_logger import gui_logger
+from ..constants import GITHUB_URL_RELEASE, VERSION, LARGE_FLAGS_BASE_PATH, SMALL_FLAGS_BASE_PATH, FEATURES_BASE_PATH
+from ..utils import (
     get_server_protocol_from_cli,
     get_gui_config,
     set_gui_config,
@@ -41,8 +41,6 @@ class DashboardPresenter:
     def on_load(self, objects_dict):
         """Calls load_on_start, which returns False if there is no internet connection, otherwise populates dashboard labels and server list
         """
-        gui_logger.debug(">>> Running \"load_on_start\".")
-        
         display_message = "Could not load necessary resources, there might be connectivity issues."
         time.sleep(2)
         self.queue.put(dict(action="hide_spinner"))
@@ -53,8 +51,6 @@ class DashboardPresenter:
             self.on_load_dashboard_content(objects_dict, conn)
         else:
             self.queue.put(dict(action="update_dialog", label=display_message, spinner=False))
-
-        gui_logger.debug(">>> Ended tasks in \"load_on_start\" thread.")  
 
     def on_load_dashboard_content(self, objects_dict, conn):
         # self.queue.put(dict(action="update_dialog", label="Populating dashboard...", hide_close_button=True))
@@ -68,7 +64,6 @@ class DashboardPresenter:
         
         # Loads the server list
         self.on_update_server_list(objects_dict["server_tree_list"]["tree_object"])
-
 
     def on_load_set_secure_core(self, secure_core_switch, secure_core_label):
         """Sets Secure-Core switch based on user setting.
@@ -92,8 +87,6 @@ class DashboardPresenter:
         # Sleep is needed because it takes a second to update the information,
         # which makes the button "lag". Temporary solution.
         time.sleep(1)
-        gui_logger.debug(">>> Running \"update_reload_secure_core_serverslabels_server_list\".")
-
         return_val = False
         display_message = "Unable to reload servers!"
 
@@ -105,97 +98,51 @@ class DashboardPresenter:
 
         self.queue.put(dict(action="update_dialog", label=display_message))
 
-        gui_logger.debug(">>> Ended tasks in \"reload_secure_core_servers\" thread.")
-
-        # return return_val
-
     def on_connect_user_selected(self, **kwargs):
         """Function that either connects by selected server or selected country.
         """     
         user_selected_server = kwargs.get("user_selected_server")
 
-        gui_logger.debug(">>> Running \"openvpn_connect\".")
-            
         # Check if it should connect to country or server
         if "#" in user_selected_server:
-            result = self.dashboard_service.connect_to_server(user_selected_server)
+            display_message = self.dashboard_service.connect_to_server(user_selected_server)
         else:
-            result = self.dashboard_service.connect_to_country(user_selected_server)
-
-
-        display_message = result
-        server_protocol = get_server_protocol_from_cli(result, True)
-
-        if server_protocol:
-            display_message = "You are connected to <b>{}</b> via <b>{}</b>!".format(server_protocol[0], server_protocol[1].upper())
+            display_message = self.dashboard_service.connect_to_country(user_selected_server)
 
         self.queue.put(dict(action="update_dialog", label=display_message))
 
         self.on_update_labels(kwargs.get("connection_labels"))
 
-        gui_logger.debug(">>> Ended tasks in \"openvpn_connect\" thread. Result: \"{0}\"".format(result))
-
     def quick_connect(self, **kwargs):
         """Function that connects to the quickest server.
-        """
-        gui_logger.debug(">>> Running \"fastest\".")
-        
+        """      
         profile_quick_connect = False
         if "profile_quick_connect" in kwargs:
             profile_quick_connect = True
 
-        result = self.dashboard_service.quick_connect_manager(profile_quick_connect)
-
-        display_message = result
-        server_protocol = get_server_protocol_from_cli(result, True)
-
-        if server_protocol:
-            display_message = "You are connected to <b>{}</b> via <b>{}</b>!".format(server_protocol[0], server_protocol[1].upper())
-
+        display_message = self.dashboard_service.quick_connect_manager(profile_quick_connect)
+        
         self.queue.put(dict(action="update_dialog", label=display_message))
         
         self.on_update_labels(kwargs.get("connection_labels"))
 
-        gui_logger.debug(">>> Ended tasks in \"fastest\" thread. Result: \"{0}\"".format(result))
-
     def on_last_connect(self, **kwargs):
         """Function that connects to the last connected server.
         """        
-        gui_logger.debug(">>> Running \"reconnect\".")
-
-        result = self.dashboard_service.last_connect()
-
-        server_protocol = get_server_protocol_from_cli(result, return_protocol=True)
-
-        display_message = result
-
-        if server_protocol:
-            display_message = "You are connected to <b>{}</b> via <b>{}</b>!".format(server_protocol[0], server_protocol[1].upper())
+        display_message = self.dashboard_service.last_connect()
 
         self.queue.put(dict(action="update_dialog", label=display_message))
 
         self.on_update_labels(kwargs.get("connection_labels"))
-
-        gui_logger.debug(">>> Ended tasks in \"reconnect\" thread. Result: \"{0}\"".format(result))
 
     def random_connect(self, **kwargs):
         """Function that connects to a random server.
         """
-        gui_logger.debug(">>> Running \"reconnect\"")
-
-        result = self.dashboard_service.random_connect()
-
-        display_message = result
-        server_protocol = get_server_protocol_from_cli(result, return_protocol=True)
-
-        if server_protocol:
-            display_message = "You are connected to <b>{}</b> via <b>{}</b>!".format(server_protocol[0], server_protocol[1].upper())
+        display_message = self.dashboard_service.random_connect()
 
         self.queue.put(dict(action="update_dialog", label=display_message))
 
         self.on_update_labels(kwargs.get("connection_labels"))
-
-        gui_logger.debug(">>> Ended tasks in \"random_c\" thread. Result: \"{0}\"".format(result))
 
     def on_refresh_servers(self, **kwargs):
         """Function that reloads server list to either secure-core or non-secure-core.
@@ -203,8 +150,6 @@ class DashboardPresenter:
         # Sleep is needed because it takes a second to update the information,
         # which makes the button "lag". Temporary solution.
         time.sleep(1)
-        gui_logger.debug(">>> Running \"update_reload_secure_core_serverslabels_server_list\".")
-        
         return_val = False
 
         self.queue.put(dict(action="hide_spinner"))
@@ -217,27 +162,19 @@ class DashboardPresenter:
         else:
             self.queue.put(dict(action="update_dialog", label="Could not update servers!", spinner=False))
         
-        gui_logger.debug(">>> Ended tasks in \"reload_secure_core_servers\" thread.")
-
-        # return return_val
-
     def on_disconnect(self, **kwargs):
         """Function that disconnects from the VPN.
         """
-        gui_logger.debug(">>> Running \"disconnect\".")
+        is_disconnected, display_message = self.dashboard_service.disconnect()
+        if is_disconnected:
+            display_message = "Disconnected from VPN!"
+            self.on_update_labels(kwargs.get("connection_labels"), disconnect=True)
 
-        result = self.dashboard_service.disconnect()
-
-        self.queue.put(dict(action="update_dialog", label=result))
-
-        self.on_update_labels(kwargs.get("connection_labels"), disconnect=True)
-
-        gui_logger.debug(">>> Ended tasks in \"disconnect\" thread. Result: \"{0}\"".format(result))
+        self.queue.put(dict(action="update_dialog", label=display_message))
 
     def on_check_for_updates(self):
         """Function that searches for existing updates by checking the latest releases on github.
         """
-        
         return_string = "Developer Mode."
         return_val = False
         
@@ -329,7 +266,7 @@ class DashboardPresenter:
         try:
             load = get_server_value(connected_server, "Load", servers)
         except (KeyError, IndexError):
-            gui_logger.debug("[!] Could not find server load information.")
+            gui_logger.debug("[!] Could not find \"server load\" information.")
             
         load = "{0}% Load".format(load) if load and is_vpn_connected else ""
         server_load_label.set_markup('<span>{0}</span>'.format(load))

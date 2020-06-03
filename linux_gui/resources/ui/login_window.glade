@@ -440,7 +440,7 @@ Author: Alexandru Cheltuitor
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <property name="halign">start</property>
-            <property name="label" translatable="yes">Reset Password: &lt;a href="#"&gt;https://account.protonvpn.com/reset-password&lt;/a&gt;</property>
+            <property name="label" translatable="yes">&lt;a href="https://account.protonvpn.com/reset-password"&gt;Reset Password&lt;/a&gt;</property>
             <property name="use_markup">True</property>
             <property name="selectable">True</property>
             <style>
@@ -458,7 +458,7 @@ Author: Alexandru Cheltuitor
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <property name="halign">start</property>
-            <property name="label" translatable="yes">Forgot Username: &lt;a href="#"&gt;https://account.protonvpn.com/forgot-username&lt;/a&gt;</property>
+            <property name="label" translatable="yes">&lt;a href="https://account.protonvpn.com/forgot-username"&gt;Forgot Username&lt;/a&gt;</property>
             <property name="use_markup">True</property>
             <property name="selectable">True</property>
             <style>

@@ -15,12 +15,11 @@ from protonvpn_cli.utils import (
     get_config_value,
     is_connected,
     get_transferred_data,
-    change_file_owner
 )
 from protonvpn_cli.country_codes import country_codes
 from protonvpn_cli.constants import SPLIT_TUNNEL_FILE, USER
 
-from protonvpn_linux_gui.constants import (
+from .constants import (
     PATH_AUTOCONNECT_SERVICE, 
     TEMPLATE, 
     VERSION, 
@@ -93,8 +92,6 @@ def initialize_gui_config():
             gui_config.write(f)
             gui_logger.debug("pvpn-gui.cfg initialized.")
 
-        change_file_owner(GUI_CONFIG_FILE)
-
         if not os.path.isfile(GUI_CONFIG_FILE):
             print("something")
             gui_logger.debug("Unablt to initialize pvpn-gui.cfg. {}".format(Exception))
@@ -105,16 +102,17 @@ def initialize_gui_config():
 def get_server_protocol_from_cli(raw_result, return_protocol=False):
     """Function that collects servername and protocol from CLI print statement after establishing connection.
     """
-    display_message = raw_result.split("\n")
-    display_message = display_message[-3:]
+    if type(raw_result) is not bool:
+        display_message = raw_result.split("\n")
+        display_message = display_message[-3:]
+        
+        server_name = [re.search("[A-Z-a-z]{1,7}#[0-9]{1,4}", text) for text in display_message]
 
-    server_name = [re.search("[A-Z-]{1,7}#[0-9]{1,4}", text) for text in display_message]
-
-    if any(server_name):
-        if return_protocol:
-            protocol = re.search("(UDP|TCP)", display_message[0])
-            return (server_name[0].group(), protocol.group())
-        return server_name[0].group()
+        if any(server_name):
+            if return_protocol:
+                protocol = re.search("(UDP|TCP)", display_message[0])
+                return (server_name[0].group(), protocol.group())
+            return server_name[0].group()
 
     return False
 
@@ -237,7 +235,7 @@ def get_gui_processes():
 
     return processes
 
-def check_polkit_exists():
+def is_polkit_installed():
     """Checks for polkit/pkexec and sets to it if found.
     """
     process = subprocess.run(["which", "pkexec"], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
@@ -246,22 +244,6 @@ def check_polkit_exists():
     if process.returncode == 0 and process.stdout.decode().strip("\n").split("/")[-1:][0] == "pkexec":
         return_response = True
 
-    gui_logger.debug(">>> TRAY check_polkit_exists reponse: {}.".format(process))
+    gui_logger.debug(">>> {}.".format(process))
 
     return return_response
-
-    # sudo_type = "sudo"
-    # if process.returncode == 0 and process.stdout.decode().strip("\n").split("/")[-1:][0] == "pkexec":
-    #     gui_logger.debug(">>> TRAY PolKit/pkexec found.")
-    #     try:
-    #         sudo_type = get_gui_config("tray_tab", "run_commands_as")
-    #         if sudo_type == "1":
-    #             sudo_type = "pkexec"
-    #     except KeyError:
-    #         gui_logger.debug("[!] Could not get value from configurations file")
-
-    # return sudo_type
-
-
-
-    

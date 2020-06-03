@@ -23,15 +23,15 @@ from gi.repository import Notify
 from gi.repository import AppIndicator3 as appindicator
 
 # Local imports
-from protonvpn_linux_gui.gui_logger import gui_logger
-from protonvpn_linux_gui.constants import (
+from .gui_logger import gui_logger
+from .constants import (
     TRAY_CFG_SERVERLOAD, 
     TRAY_CFG_SERVENAME, 
     TRAY_CFG_DATA_TX, 
     TRAY_CFG_TIME_CONN, 
     CURRDIR,
 )
-from protonvpn_linux_gui.utils import get_gui_config, set_gui_config, check_polkit_exists
+from .utils import get_gui_config, set_gui_config
 
 LOGO_PATH = os.path.join(CURRDIR, "resources/img/logo/protonvpn_logo.png")
 ALT_LOGO_PATH = os.path.join(CURRDIR, "resources/img/logo/protonvpn_logo_alt.png")
@@ -194,7 +194,7 @@ class ProtonVPNIndicator:
 
         self.notify.Notification.new(self.tray_title, "Starting quick connect...", LOGO_PATH).show()
 
-        process = subprocess.Popen(["sudo", "protonvpn", "connect", "-f"], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
+        process = subprocess.Popen([self.sudo_type, "protonvpn", "connect", "-f"], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
     
         try:
             outs, errs = process.communicate(timeout=20)
@@ -225,7 +225,7 @@ class ProtonVPNIndicator:
         timeout = False
         self.notify.Notification.new(self.tray_title, "Disconnecting from VPN...", LOGO_PATH).show()
         
-        process = subprocess.Popen(["sudo", "protonvpn", "disconnect"], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
+        process = subprocess.Popen([self.sudo_type, "protonvpn", "disconnect"], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
 
         try:
             outs, errs = process.communicate(timeout=7)
@@ -248,36 +248,16 @@ class ProtonVPNIndicator:
         gui_logger.debug("TRAY >>> Disconnect msg: {} --- response: {}<->{}".format(msg, outs, errs))
 
     def show_gui(self, _):
-        """Displays the GUI."""
-        sudo_type = "sudo"
-        if check_polkit_exists() and get_gui_config("general_tab", "polkit_enabled") == "1":
-            sudo_type = "pkexec"
-        
+        """Displays the GUI."""        
         gui_logger.debug("TRAY >>> Starting to display GUI.")
         timeout = False
         no_policy = False
         msg = "Root authorization was not given to display GUI"
-        self.notify.Notification.new(self.tray_title, "Calling for ProtonVPN GUI...", LOGO_PATH).show()
+        self.notify.Notification.new(self.tray_title, "Displaying ProtonVPN GUI", LOGO_PATH).show()
 
-        try:
-            process = subprocess.Popen([sudo_type, "protonvpn-gui"], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
-            outs, errs = process.communicate(timeout=7)
-        except:
-            msg = "Unable to display GUI, make sure that the app has been given root privilege"
-            timeout = True
-            # process.kill()
-            outs, errs = process.communicate()
-        
-        errs = errs.decode().lower()
-        outs = outs.decode().lower()
-
-        if not "dismissed" in errs and not "connection refused" in errs and not timeout:
-            msg = "Unable to display GUI, make sure that the app has been given root privilege or support for PolKit is enabled"
-        elif "connection refused" in errs:
-            no_policy = True
-            msg = "Policy was not added for ProtonVPN GUI, please visit https://github.com/ProtonVPN/linux-gui on how to add one"       
-
-        self.notify.Notification.new(self.tray_title, msg, LOGO_PATH).show()
+        process = subprocess.Popen(["protonvpn-gui"], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
+        outs, errs = process.communicate()
+      
         gui_logger.debug("TRAY >>> GUI display msg: {} --- response: {}<->{}".format(msg, outs, errs))
 
     def get_tray_settings(self):
@@ -381,6 +361,20 @@ class ProtonVPNIndicator:
         connection_time = connection_time if connection_time else ""
 
         return connection_time
+
+    @property
+    def sudo_type(self):
+        try:
+            is_polkit_enabled =  int(get_gui_config("general_tab", "polkit_enabled"))
+        except (KeyError, NameError):
+            return "sudo"
+
+        return_val = "sudo"
+
+        if is_polkit_enabled == 1:
+            return_val = "pkexec"
+
+        return return_val 
 
     def quit_indicator(self, _):
         """Quit/Stop the tray icon.

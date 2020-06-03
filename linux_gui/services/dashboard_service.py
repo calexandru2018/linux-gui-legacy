@@ -5,30 +5,29 @@ import collections
 from protonvpn_cli.country_codes import country_codes
 from protonvpn_cli.utils import get_config_value, set_config_value, is_connected, get_server_value, get_country_name
 
-from protonvpn_linux_gui.utils import set_gui_config, get_gui_config, check_internet_conn
-from protonvpn_linux_gui.constants import GITHUB_URL_RELEASE, SMALL_FLAGS_BASE_PATH, FEATURES_BASE_PATH
+from ..utils import set_gui_config, get_gui_config, check_internet_conn, get_server_protocol_from_cli
+from ..constants import GITHUB_URL_RELEASE, SMALL_FLAGS_BASE_PATH, FEATURES_BASE_PATH
+from ..gui_logger import gui_logger
 
 class DashboardService:
-    
+    # 30 seconds of timeout for all root necessary commands
+    timeout_value = 30
+
     def set_display_secure_core(self, update_to):
         try:
             set_gui_config("connections", "display_secure_core", update_to)
         except:
+            gui_logger.debug("Could not update display_secure_core to: {}".format(update_to))
             return False
 
         return True
 
     def connect_to_server(self, user_selected_server):
-        protocol = get_config_value("USER", "default_protocol")
-        try:
-            result = subprocess.run(["protonvpn", "connect", user_selected_server, "-p", protocol], stdout=subprocess.PIPE, stderr=subprocess.PIPE).stdout.decode() # nosec
-        except:
-            return False
-
-        return result
+        command = ["protonvpn", "connect", user_selected_server]
+        bool_value, result =  self.root_command(command)
+        return self.get_display_message(bool_value, result)
 
     def connect_to_country(self, user_selected_server):
-        protocol = get_config_value("USER", "default_protocol")
         try:
             for k, v in country_codes.items():
                 if v == user_selected_server:
@@ -37,12 +36,9 @@ class DashboardService:
         except:
             return False
 
-        try:
-            result = subprocess.run(["protonvpn", "connect", "--cc", selected_country, "-p", protocol], stdout=subprocess.PIPE, stderr=subprocess.PIPE).stdout.decode() # nosec
-        except:
-            return False
-
-        return result
+        command = ["protonvpn", "connect", "--cc", selected_country]
+        bool_value, result =  self.root_command(command)
+        return self.get_display_message(bool_value, result)
 
     def quick_connect_manager(self, profile_quick_connect):
         try:
@@ -56,8 +52,6 @@ class DashboardService:
         return self.quick_connect()
 
     def custom_quick_connect(self, quick_conn_pref):
-        protocol = get_config_value("USER", "default_protocol")
-
         command = "--fastest"
         country = False
 
@@ -75,58 +69,37 @@ class DashboardService:
             command="--cc"
             country=quick_conn_pref.upper()
         
-        command_list = ["protonvpn", "connect", command, "-p" ,protocol]
+        command_list = ["protonvpn", "connect", command]
         if country:
-            command_list = ["protonvpn", "connect", command, country, "-p" ,protocol]
+            command_list = ["protonvpn", "connect", command, country]
         
-        try:
-            result = subprocess.run(command_list, stdout=subprocess.PIPE, stderr=subprocess.PIPE).stdout.decode()
-        except: 
-            return False
-        
-        return result
+        bool_value, result =  self.root_command(command_list)
+        return self.get_display_message(bool_value, result)
 
     def quick_connect(self):
         try:
-            protocol = get_config_value("USER", "default_protocol")
+            secure_core = get_gui_config("connections", "display_secure_core")
         except:
-            return False
+            secure_core = False
 
-        try:
-            result = subprocess.run(["protonvpn", "connect", "--fastest", "-p", protocol], stdout=subprocess.PIPE, stderr=subprocess.PIPE).stdout.decode() # nosec
-        except:
-            return False
-
-        return result
+        command = ["protonvpn", "connect", ("-f" if secure_core == "False" else "--sc")]
+        bool_value, result =  self.root_command(command)
+        return self.get_display_message(bool_value, result)
 
     def last_connect(self):
-        try:
-            result = subprocess.run(["protonvpn", "reconnect"], stdout=subprocess.PIPE, stderr=subprocess.PIPE).stdout.decode() # nosec
-        except:
-            return False
-
-        return result
+        command = ["protonvpn", "reconnect"]
+        bool_value, result =  self.root_command(command)
+        return self.get_display_message(bool_value, result)
     
     def random_connect(self):
-        try:
-            protocol = get_config_value("USER", "default_protocol")
-        except:
-            return False
-
-        try:
-            result = subprocess.run(["protonvpn", "connect", "--random", "-p", protocol], stdout=subprocess.PIPE, stderr=subprocess.PIPE).stdout.decode() # nosec
-        except:
-            return False
-
-        return result
+        command = ["protonvpn", "connect", "--random"]
+        bool_value, result =  self.root_command(command)
+        return self.get_display_message(bool_value, result)
 
     def disconnect(self):
-        try:
-            result = subprocess.run(["protonvpn", "disconnect"], stdout=subprocess.PIPE, stderr=subprocess.PIPE).stdout.decode() # nosec
-        except:
-            return False
-
-        return result
+        command = ["protonvpn", "disconnect"]
+        bool_value, result =  self.root_command(command)
+        return bool_value, self.get_display_message(bool_value, result)
 
     def check_for_updates(self):
         latest_release = ''
@@ -155,6 +128,45 @@ class DashboardService:
             return False
 
         return (latest_release, pip3_installed)
+
+    def get_display_message(self, bool_value, result):
+        display_message = result
+        if bool_value:
+            server_name = get_server_protocol_from_cli(result)
+            display_message = "You are connected to <b>{}</b>!".format(server_name)
+
+        return display_message
+
+    def root_command(self, command_list):
+        # inject sudo_type from configurations
+        command_list.insert(0, self.sudo_type)
+
+        process = subprocess.Popen(command_list, stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
+        timeout = False
+
+        try:
+            outs, errs = process.communicate(timeout=self.timeout_value)
+        except subprocess.TimeoutExpired:
+            timeout = True
+            process.kill()
+            outs, errs = process.communicate()
+
+        errs = errs.decode().lower()
+        outs = outs.decode().lower()
+        gui_logger.debug("errs: {}\nouts: {}".format(errs, outs))
+        if "dismissed" in errs and not timeout:
+            return (False, "Privilege escalation was dismissed.")
+        
+        if not "dismissed" in errs and timeout:
+            return (False, "Request timed out, either because of insufficient privileges\nor network/api issues.")
+
+        if "authentication failed" in outs:
+            return (False, "Authentication failed!\nPlease make sure that your username and password is correct.")
+
+        if "connected" in outs or "disconnected" in outs:
+            return (True, outs.upper())
+
+        return (False, errs)
 
     def diagnose(self):
         reccomendation = '' 
@@ -256,7 +268,8 @@ class DashboardService:
     def check_split_tunneling(self):
         try:
             is_splitunn_enabled = True if get_config_value("USER", "split_tunnel") == "1" else False
-        except (KeyError, IndexError):
+        except (KeyError, IndexError) as e:
+            gui_logger.debug(e)
             return False
 
         return is_splitunn_enabled
@@ -389,3 +402,17 @@ class DashboardService:
         # print(country,top_choice)
 
         return  (str(int(round(load_sum/count)))+"%", top_choice) 
+
+    @property
+    def sudo_type(self):
+        try:
+            is_polkit_enabled =  int(get_gui_config("general_tab", "polkit_enabled"))
+        except (KeyError, NameError):
+            return "sudo"
+
+        return_val = "sudo"
+
+        if is_polkit_enabled == 1:
+            return_val = "pkexec"
+
+        return return_val

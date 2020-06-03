@@ -3,7 +3,6 @@ import time
 # Remote imports
 from protonvpn_cli.utils import(
     get_config_value, 
-    change_file_owner, 
     is_connected, 
     set_config_value #noqa
 )    
@@ -14,10 +13,10 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import GObject as gobject
 
 # Local imports
-from protonvpn_linux_gui.views.settings_view import SettingsView
-from protonvpn_linux_gui.gui_logger import gui_logger
-from protonvpn_linux_gui.constants import HELP_TEXT, UI_DASHBOARD, UI_SETTINGS, VERSION
-from protonvpn_linux_gui.utils import (
+from ..views.settings_view import SettingsView
+from ..gui_logger import gui_logger
+from ..constants import HELP_TEXT, UI_DASHBOARD, UI_SETTINGS, VERSION
+from ..utils import (
     get_gui_config,
     tab_style_manager,
 )

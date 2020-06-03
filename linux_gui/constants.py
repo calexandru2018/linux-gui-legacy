@@ -1,12 +1,6 @@
 import os
-from protonvpn_cli.constants import VERSION as cli_version, USER as cli_user
-import pwd
-
-try:
-    USER = pwd.getpwuid(int(os.environ["PKEXEC_UID"])).pw_name
-except KeyError:
-    USER = cli_user
-
+import getpass
+USER = getpass.getuser()
 
 VERSION = "2.1.0"
 GITHUB_URL_RELEASE = "https://github.com/ProtonVPN/linux-gui/releases/latest"
@@ -60,29 +54,6 @@ Environment=SUDO_USER=user
 
 [Install]
 WantedBy=multi-user.target
-"""
-POLKIT_PATH = "/usr/share/polkit-1/actions/org.freedesktop.protonvpn-gui.policy"
-POLKIT_TEMPLATE = """
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE policyconfig PUBLIC
- "-//freedesktop//DTD PolicyKit Policy Configuration 1.0//EN"
- "http://www.freedesktop.org/standards/PolicyKit/1/policyconfig.dtd">
-
-<policyconfig>
-
-  <action id="org.freedesktop.policykit.pkexec.run-ProtonVPN-GUI">
-    <description>Run ProtonVPN GUI</description>
-    <message>Authentication is required to run ProtonVPN</message>
-    <defaults>
-      <allow_any>no</allow_any>
-      <allow_inactive>no</allow_inactive>
-      <allow_active>auth_admin_keep</allow_active>
-    </defaults>
-    <annotate key="org.freedesktop.policykit.exec.path">[PATH]</annotate>
-    <annotate key="org.freedesktop.policykit.exec.allow_gui">TRUE</annotate>
-  </action>
-
-</policyconfig>
 """
 CLI_ABSENCE_INFO = """
 <b>Could not find linux-cli installed on your system!</b>\t
