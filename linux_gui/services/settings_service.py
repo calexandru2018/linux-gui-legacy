@@ -202,7 +202,8 @@ class SettingsService:
     def polkit(self):
         try:
             return int(get_gui_config("general_tab", "polkit_enabled"))
-        except:
+        except KeyError:
+            set_gui_config("general_tab", "polkit_enabled", 0)
             return 0
 
     @polkit.setter
