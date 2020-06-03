@@ -358,6 +358,9 @@ class SettingsService:
         outs = outs.decode().lower()
         gui_logger.debug("errs: {}\nouts: {}".format(errs, outs))
 
+        if "terminal is required" in errs:
+            return False, "Privilege escalation is required and PolKit Support is not enabled.\nPlease launch the app either from within a terminal or enable PolKit Support."
+
         if "dismissed" in errs and not timeout:
             return False, "Privilege escalation was dismissed."
         
