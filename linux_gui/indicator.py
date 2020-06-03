@@ -210,6 +210,8 @@ class ProtonVPNIndicator:
 
         if not "dismissed" in errs and not timeout:
             msg = "Unable to connect to VPN"
+            if "terminal is required" in errs:
+                msg = "Privilege escalation is needed to connect. Either enable PolKit Support from within the GUI or launch Tray App from terminal"
             if "connected" in outs:
                 msg = "Connected"
 
@@ -240,6 +242,8 @@ class ProtonVPNIndicator:
 
         if not "dismissed" in errs and not timeout:
             msg = "Unable to disconnect from VPN"
+            if "terminal is required" in errs:
+                msg = "Privilege escalation is needed to disconnect. Either enable PolKit Support from within the GUI or launch Tray App from terminal"
             if "disconnected" in outs:
                 msg = "Disconnected"
 
