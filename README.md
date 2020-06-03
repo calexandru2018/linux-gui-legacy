@@ -58,6 +58,7 @@ The ProtonVPN GUI is currently still an <u>experimental interface</u>. It requir
     - [Distribution based](#distribution-based)
     - [PIP based](#pip-based)
       - [How to Update](#to-update-to-a-new-version) 
+  - [Uninstalling ProtonVPN GUI](#uninstalling-protonvpn-linux-gui)
   - [Manual installation](#manual-installation)
   - [Virtual environment](#virtual-environment)
 - [How to use](#how-to-use)
@@ -155,6 +156,12 @@ If you would like to use `pkexec` instead of the terminal (or alter `visudo`), t
 
     `sudo pip3 install -e .`
 
+## Uninstalling ProtonVPN Linux GUI
+
+You have installed the GUI via PIP or by cloning this repo, then to uninstall it type in the following command:
+
+  `sudo pip3 uninstall protonvpn-gui`
+
 ### Virtual environment
 
 If you would like to run the the GUI within a virtual environment (for either development purposes or other), then you can easily do that with the help of <a href="https://pipenv.readthedocs.io/en/latest/">pipenv</a>. Make sure to install pipenv and additional packages before.
@@ -236,7 +243,7 @@ To create at <i>tray icon</i> launcher with a .desktop file, follow the instruct
 At the moment, since the CLI protects certain files using sudo and also manages killswitch and split tunneling, the GUI will also needs to have access to these sudo protected files and commands. Thus, as it is at the moment, the GUI needs to have certain root privileges. This though is subject to change. 
 Nonetheless, if you would like to launch the GUI without having to type in your sudo password everytime, then you could add the executable file to `visudo`. 
 <br>
-Another alternative is enable PolKit Support from within the settings (`pkexec` commands). This displays a window for the user to type the sudo password, this way, a user won't have to type the password into the terminal. Whenver you want to connect/disconnect or make some important changes to files, a window prompt will appear for you to enter the sudo password. **For this to work, you will need to launch the GUI from the terminal, so that you can enable PolKit and only once type the sudo password in the terminal.**
+Another alternative is enable PolKit Support from within the settings (`pkexec` commands). This displays a window for the user to type the sudo password, this way, a user won't have to type the password into the terminal. Whenver you want to connect/disconnect or make some important changes to files, a window prompt will appear for you to enter the sudo password.
 <br>
 **Note:** This feature needs to be enabled from within the GUI settings for it to be able to work. If you have not installed the necessary packages, then the feature will will not work.
 
