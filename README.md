@@ -245,7 +245,7 @@ Nonetheless, if you would like to launch the GUI without having to type in your 
 <br>
 Another alternative is enable PolKit Support from within the settings (`pkexec` commands). This displays a window for the user to type the sudo password, this way, a user won't have to type the password into the terminal. Whenver you want to connect/disconnect or make some important changes to files, a window prompt will appear for you to enter the sudo password.
 <br>
-**Note:** This feature needs to be enabled from within the GUI settings for it to be able to work. If you have not installed the necessary packages, then the feature will will not work.
+**Note:** This feature needs to be enabled from within the GUI settings for it to be able to work. If you have not installed the necessary packages, then the feature will not work.
 
 ### Visudo
 The instructions for seting up visudo are described below.
