@@ -189,7 +189,7 @@ class ProtonVPNIndicator:
         """Makes a quick connection by making a cli call to protonvpn-cli-ng"""
         gui_logger.debug("TRAY >>> Starting quick connect")
 
-        msg = "Root authorization was not given to make a quick connect"
+        msg = "Administrator access was not given to quick connect"
         timeout = False
 
         self.notify.Notification.new(self.tray_title, "Starting quick connect...", LOGO_PATH).show()
@@ -199,7 +199,7 @@ class ProtonVPNIndicator:
         try:
             outs, errs = process.communicate(timeout=20)
         except subprocess.TimeoutExpired:
-            msg = "Unable to connect, make sure that your connection is stable and that the you app has been given root privilege."
+            msg = "Unable to connect, make sure that your connection is stable and that the you app has been given administrator access"
             timeout = True
             # process.kill()
             outs, errs = process.communicate()
@@ -211,19 +211,19 @@ class ProtonVPNIndicator:
         if not "dismissed" in errs and not timeout:
             msg = "Unable to connect to VPN"
             if "terminal is required" in errs:
-                msg = "Privilege escalation is needed to connect. Either enable PolKit Support from within the GUI or launch Tray App from terminal"
+                msg = "Administrator access is needed to connect to VPN. Either enable PolKit Support from within the GUI or launch Tray App from terminal"
             if "connected" in outs:
                 msg = "Connected"
 
         self.notify.Notification.new(self.tray_title, msg, LOGO_PATH).show()
         
-        gui_logger.debug("TRAY >>> Connect msg: {} --- response: {}<->{}".format(msg, outs, errs))
+        gui_logger.debug("TRAY >>> errs: {}\nouts:{}".format(outs, errs))
 
     def disconnect(self, _):
         """Disconnects from a current vpn connection"""
         gui_logger.debug("TRAY >>> Starting disconnect.")
 
-        msg = "Root authorization was not given to disconnect"
+        msg = "Administrator access was not given to disconnect"
         timeout = False
         self.notify.Notification.new(self.tray_title, "Disconnecting from VPN...", LOGO_PATH).show()
         
@@ -232,7 +232,7 @@ class ProtonVPNIndicator:
         try:
             outs, errs = process.communicate(timeout=7)
         except subprocess.TimeoutExpired:
-            msg = "Unable to disconnect, make sure that the app has been given root privilege"
+            msg = "Unable to disconnect, make sure that the app has been given administrator access to do so"
             timeout = True
             # process.kill()
             outs, errs = process.communicate()
@@ -243,26 +243,24 @@ class ProtonVPNIndicator:
         if not "dismissed" in errs and not timeout:
             msg = "Unable to disconnect from VPN"
             if "terminal is required" in errs:
-                msg = "Privilege escalation is needed to disconnect. Either enable PolKit Support from within the GUI or launch Tray App from terminal"
+                msg = "Administrator access is needed to disconnect. Either enable PolKit Support from within the GUI or launch Tray App from within a terminal"
             if "disconnected" in outs:
                 msg = "Disconnected"
 
         self.notify.Notification.new(self.tray_title, msg, LOGO_PATH).show()
         
-        gui_logger.debug("TRAY >>> Disconnect msg: {} --- response: {}<->{}".format(msg, outs, errs))
+        gui_logger.debug("TRAY >>> errs: {}\nouts:{}".format(outs, errs))
 
     def show_gui(self, _):
         """Displays the GUI."""        
         gui_logger.debug("TRAY >>> Starting to display GUI.")
-        timeout = False
-        no_policy = False
-        msg = "Root authorization was not given to display GUI"
+
         self.notify.Notification.new(self.tray_title, "Displaying ProtonVPN GUI", LOGO_PATH).show()
 
         process = subprocess.Popen(["protonvpn-gui"], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
         outs, errs = process.communicate()
       
-        gui_logger.debug("TRAY >>> GUI display msg: {} --- response: {}<->{}".format(msg, outs, errs))
+        gui_logger.debug("TRAY >>> errs: {}\nouts:{}".format(outs, errs))
 
     def get_tray_settings(self):
         """Gets and returns tray settings from config file.
