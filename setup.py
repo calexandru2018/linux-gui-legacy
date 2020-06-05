@@ -3,7 +3,7 @@ import re
 import os
 from setuptools import setup
 
-from app.constants import VERSION
+from app.constants import VERSION, APP_NAME, GITHUB_URL
 
 try:
     with open(os.path.join(os.path.abspath(os.path.dirname(__file__)), 'README.md'), encoding='utf-8') as f:
@@ -14,11 +14,11 @@ except FileNotFoundError:
 
     For further information and a usage guide, please view the project page:
 
-    https://github.com/ProtonVPN/linux-app
-    """
+    {}
+    """.format(GITHUB_URL)
 
 setup(
-    name="protonvpn-gui",
+    name=APP_NAME,
     packages=[
         "app",
         "app.presenters",
@@ -47,7 +47,7 @@ setup(
     author="Proton Technologies AG",
     author_email="contact@protonvpn.com",
     license="GPLv3",
-    url="https://github.com/ProtonVPN/linux-app",
+    url=GITHUB_URL,
     install_requires=[
         "protonvpn-cli>=2.2.2",
         "requests>=2.23.0",
