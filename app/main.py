@@ -72,41 +72,27 @@ def init():
     )
 
     dialog_view = DialogView(interface, Gtk, queue)
-    
-    if not find_cli():
-        dialog_view.display_dialog(label=CLI_ABSENCE_INFO, spinner=False, hide_close_button=True)
-    else:
-        gui_logger.debug("\n______________________________________\n\n\tINITIALIZING NEW GUI WINDOW\n______________________________________\n")
 
-        if not os.path.isfile(GUI_CONFIG_FILE):
-            initialize_gui_config()
+    gui_logger.debug("\n______________________________________\n\n\tINITIALIZING NEW GUI WINDOW\n______________________________________\n")
 
-        if not os.path.isfile(CONFIG_FILE): 
-            gui_logger.debug(">>> Loading LoginWindow")
-            
-            settings_service = SettingsService()
-            settings_presenter = SettingsPresenter(settings_service, queue)
-            settings_view = SettingsView(interface, Gtk, settings_presenter, queue)
+    if not os.path.isfile(GUI_CONFIG_FILE):
+        initialize_gui_config()
 
-            dashboard_service = DashboardService()
-            dashboard_presenter = DashboardPresenter(dashboard_service, queue)
-            dashboard_view = DashboardView(interface, Gtk, dashboard_presenter, settings_view, queue)
+    settings_service = SettingsService()
+    settings_presenter = SettingsPresenter(settings_service, queue)
+    settings_view = SettingsView(interface, Gtk, settings_presenter, queue)
 
-            login_service = LoginService()
-            login_presenter = LoginPresenter(login_service, queue)
-            login_view = LoginView(interface, Gtk, login_presenter, dashboard_view, queue)
+    dashboard_service = DashboardService()
+    dashboard_presenter = DashboardPresenter(dashboard_service, queue)
+    window_view = DashboardView(interface, Gtk, dashboard_presenter, settings_view, queue)
 
-            login_view.display_window()
-        else:
-            gui_logger.debug(">>> Loading DashboardWindow")
-            settings_service = SettingsService()
-            settings_presenter = SettingsPresenter(settings_service, queue)
-            settings_view = SettingsView(interface, Gtk, settings_presenter, queue)
+    if not os.path.isfile(CONFIG_FILE): 
+        gui_logger.debug(">>> Loading LoginWindow")
+        login_service = LoginService()
+        login_presenter = LoginPresenter(login_service, queue)
+        window_view = LoginView(interface, Gtk, login_presenter, window_view, queue)
 
-            dashboard_service = DashboardService()
-            dashboard_presenter = DashboardPresenter(dashboard_service, queue)
-            dashboard_view = DashboardView(interface, Gtk, dashboard_presenter, settings_view, queue)
-            
-            dashboard_view.display_window()
+    window_view.display_window()
+
     Gtk.main()
 
