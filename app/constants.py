@@ -3,7 +3,9 @@ import getpass
 USER = getpass.getuser()
 
 VERSION = "2.1.0"
-GITHUB_URL_RELEASE = "https://github.com/ProtonVPN/linux-gui/releases/latest"
+APP_NAME = "protonvpn-app"
+GITHUB_URL = "https://github.com/ProtonVPN/linux-app"
+GITHUB_URL_RELEASE = GITHUB_URL+"/releases/latest"
 
 # GUI configurations
 GUI_CONFIG_DIR = os.path.join(os.path.expanduser("~{0}".format(USER)), ".pvpn-gui")
