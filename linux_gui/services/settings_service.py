@@ -268,10 +268,10 @@ class SettingsService:
         gui_logger.debug("errs: {}\nouts: {}".format(errs, outs))
 
         if "dismissed" in errs and not timeout:
-            return False, "Sudo access was dismissed."
+            return False, "Administrator access was dismissed."
         
         if not "dismissed" in errs and timeout:
-            return False, "Command timedout, perhaps due to insufficient privileges. Either enable PolKit or launch GUI from terminal."
+            return False, "Unable to process request. Administrator access has probably not been provided.\nTo do so, please run the GUI from within a terminal or enable PolKit Support from within the settings window."
 
         if not "created symlink" in errs.lower():
             return False, "Unable to setup autoconnect!"
@@ -308,10 +308,10 @@ class SettingsService:
         gui_logger.debug("errs: {}\nouts: {}".format(errs, outs))
 
         if "dismissed" in errs and not timeout:
-            return False, "Sudo access was dismissed."
+            return False, "Administrator access was dismissed."
         
         if not "dismissed" in errs and timeout:
-            return False, "Command timedout, perhaps due to insufficient privileges."
+            return False, "Unable to process request. Administrator access has probably not been provided."
 
         if "does not exist." in errs:
             return False, "Can't disable autoconnect since .service file does not exist.\nThis might be due to some misconfiguration in config file.\nPlease try to connect to another country, then disable it."
@@ -358,11 +358,14 @@ class SettingsService:
         outs = outs.decode().lower()
         gui_logger.debug("errs: {}\nouts: {}".format(errs, outs))
 
+        if "terminal is required" in errs:
+            return False, "Administrator access is required, and PolKit Support is not enabled.\nPlease launch the app either from within a terminal or enable PolKit Support."
+
         if "dismissed" in errs and not timeout:
-            return False, "Privilege escalation was dismissed."
+            return False, "Administrator access was dismissed."
         
         if not "dismissed" in errs and timeout:
-            return False, "Request timed out, probably because of insufficient privileges.\nPlease run the GUI from within a terminal to enable PolicyKit."
+            return False, "Unable to process request. Administrator access has probably not been provided.\nTo do so, please run the GUI from within a terminal or enable PolKit Support from within the settings window."
 
         return True, return_on_sucess_message
 
