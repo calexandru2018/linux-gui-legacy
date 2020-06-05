@@ -19,7 +19,8 @@ from ..constants import (
     PATH_AUTOCONNECT_SERVICE,
     SERVICE_NAME,
     GUI_CONFIG_DIR,
-    TRAY_SUDO_TYPES
+    TRAY_SUDO_TYPES,
+    GITHUB_URL
 )
 from ..utils import (
     set_gui_config,
@@ -280,7 +281,7 @@ class SettingsPresenter:
         sudo_info_tooltip = general_settings_dict["sudo_info_tooltip"]
         setter = 0
 
-        tooltip_msg = "Could not find PolKit installed on your system. For more information, please visit: \nhttps://github.com/ProtonVPN/linux-gui"
+        tooltip_msg = "Could not find PolKit installed on your system. For more information, please visit: \n"+GITHUB_URL
 
         username = get_config_value("USER", "username")
         tier = int(get_config_value("USER", "tier"))
@@ -298,7 +299,7 @@ class SettingsPresenter:
             
             polkit_support_switch.set_property('sensitive', True)
             use_cases = "\n-Update username and password (root protected file)\n-Enable/disable autoconnect (create/remove .service file)\n-Connect/disconnect to/from VPN (run CLI commands)"
-            tooltip_msg = "Displays a window to enter sudo password, which is needed for the following cases:{}\n\nIt is recommended to enabled this if you don't want to use the GUI via the terminal.".format(use_cases)
+            tooltip_msg = "Displays a window to enter sudo password, which is needed for the following cases:{}\n\nIt is recommended to enabled this if you don't want to use the app via terminal.".format(use_cases)
         
         sudo_info_tooltip.set_tooltip_text(tooltip_msg)
 
