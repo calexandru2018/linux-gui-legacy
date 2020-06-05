@@ -79,7 +79,6 @@ The ProtonVPN application is currently still an <u>experimental interface</u>. I
 - python >= 3.5
 - <a href="https://github.com/ProtonVPN/linux-cli"><b>linux-cli</b></a> >= 2.2.2
 - requests >= 2.23.0
-- configparse >= 4.0.2
 - pip for python3 (pip3)
 - setuptools for python3 (python3-setuptools)
 
