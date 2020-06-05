@@ -1,6 +1,6 @@
-<h1 align="center">ProtonVPN Linux GUI</h1>
+<h1 align="center">ProtonVPN Linux Application</h1>
 <p align="center">
-  <img src="./linux_gui/resources/img/protonvpn_gui_banner.png" alt="ProtonVPN Banner"></img>
+  <img src="./app/resources/img/protonvpn_gui_banner.png" alt="ProtonVPN Banner"></img>
 </p>
 
 <p align="center">
@@ -13,63 +13,63 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/ProtonVPN/protonvpn-gui/releases/latest">
-      <img alt="Build Status" src="https://img.shields.io/github/release/ProtonVPN/linux-gui.svg?style=flat" />
+  <a href="https://github.com/ProtonVPN/protonvpn-app/releases/latest">
+      <img alt="Build Status" src="https://img.shields.io/github/release/ProtonVPN/linux-app.svg?style=flat" />
   </a>
-  <a href="https://pepy.tech/project/protonvpn-gui">
-    <img alt="Downloads" src="https://pepy.tech/badge/protonvpn-gui">
+  <a href="https://pepy.tech/project/protonvpn-app">
+    <img alt="Downloads" src="https://pepy.tech/badge/protonvpn-app">
   </a>   
-    <a href="https://pepy.tech/project/protonvpn-gui/week">
-      <img alt="Downloads per Week" src="https://pepy.tech/badge/protonvpn-gui/week">
+    <a href="https://pepy.tech/project/protonvpn-app/week">
+      <img alt="Downloads per Week" src="https://pepy.tech/badge/protonvpn-app/week">
     </a>
 </p>
 <p align="center">
-  <img alt="PyPI - Python Version" src="https://img.shields.io/pypi/pyversions/protonvpn-gui?color=Yellow&label=python&logo=Python&logoColor=Yellow">
+  <img alt="PyPI - Python Version" src="https://img.shields.io/pypi/pyversions/protonvpn-app?color=Yellow&label=python&logo=Python&logoColor=Yellow">
 </p>
 <p align="center">
-    <a href="https://actions-badge.atrox.dev/ProtonVPN/protonvpn-gui/goto?ref=master">
-        <img alt="GitHub Workflow Status (branch)" src="https://img.shields.io/github/workflow/status/ProtonVPN/linux-gui/master flake8/master?label=master%20build">
+    <a href="https://actions-badge.atrox.dev/ProtonVPN/protonvpn-app/goto?ref=master">
+        <img alt="GitHub Workflow Status (branch)" src="https://img.shields.io/github/workflow/status/ProtonVPN/linux-app/master flake8/master?label=master%20build">
     </a>
 </p>
 <p align="center">
-  <a href="https://github.com/ProtonVPN/linux-gui/blob/master/LICENSE">
-    <img src="https://img.shields.io/pypi/l/protonvpn-gui?style=flat" alt="License"></img>
+  <a href="https://github.com/ProtonVPN/linux-app/blob/master/LICENSE">
+    <img src="https://img.shields.io/pypi/l/protonvpn-app?style=flat" alt="License"></img>
   </a>
 </p>
 
 
-<h3 align="center">Linux GUI for ProtonVPN, written in Python. Layout designed in Glade.</h3>
+<h3 align="center">Linux app for ProtonVPN, written in Python. Layout designed in Glade.</h3>
 <h3 align="center">Development Status: <u>Beta</u></h3>
 
-The linux-gui works on top of <a href="https://github.com/ProtonVPN/linux-cli"><b>linux-cli</b></a>, making it a dependency. All local configurations are managed by the GUI (such as updating protocol, split tunneling, manage killswitch) while the connections are managed by the CLI. This way, you will be able to use the latest version of the CLI, while also being able to use the GUI.
+This application works on top of <a href="https://github.com/ProtonVPN/linux-cli"><b>linux-cli</b></a>, making it a dependency. All local configurations are managed by the app (such as updating protocol, split tunneling, manage killswitch) while the connections are managed by the CLI. This way, you will be able to use the latest version of the CLI, while also being able to use the app.
 
 **Disclaimer:**
-The ProtonVPN GUI is currently still an <u>experimental interface</u>. It requires escalated privileges and might be somehow unstable. In the near future we plan to refactor the ProtonVPN CLI and GUI so that the part of the client that really requires being executed as root user is kept to a minimum.
+The ProtonVPN application is currently still an <u>experimental interface</u>. It requires escalated privileges and might be somehow unstable. In the near future we plan to refactor both the ProtonVPN CLI and the app, so that the part of the client that really requires being executed as root user is kept to a minimum.
 
 ## Table of Contents
 - [Installing and Updating](#installing-and-updating)
   - [Dependencies](#dependencies)
     - [Python dependencies](#python-dependencies)
-    - [ProtonVPN GUI dependencies](#protonvpn-gui-dependencies)
+    - [ProtonVPN App dependencies](#protonvpn-app-dependencies)
     - [ProtonVPN Tray dependencies](#protonvpn-tray-dependencies)
       - [Known Issues](#tray-known-issues)
         - [dbus-launch](#dbus-launch)
-  - [Installing ProtonVPN GUI](#installing-protonvpn-linux-gui)
+  - [Installing ProtonVPN App](#installing-protonvpn-app)
     - [Distribution based](#distribution-based)
     - [PIP based](#pip-based)
       - [How to Update](#to-update-to-a-new-version) 
-  - [Uninstalling ProtonVPN GUI](#uninstalling-protonvpn-linux-gui)
+  - [Uninstalling ProtonVPN App](#uninstalling-protonvpn-app)
   - [Manual installation](#manual-installation)
   - [Virtual environment](#virtual-environment)
 - [How to use](#how-to-use)
-   - [ProtonVPN GUI](#protonvpn-gui)
+   - [ProtonVPN App](#protonvpn-app)
    - [ProtonVPN Tray](#protonvpn-tray)
 - [Enhancements](#enhancements)
   - [Create .desktop file](#create-desktop-file)
-    - [ProtonVPN GUI](#protonvpn-gui-1)
+    - [ProtonVPN App](#protonvpn-app-1)
     - [ProtonVPN Tray](#protonvpn-tray-1)
   - [Sudo/PolKit](#sudopolkit)
-- [GUI Layout](#gui-layout)
+- [App Layout](#app-layout)
 
 # Installing and Updating
 
@@ -83,7 +83,7 @@ The ProtonVPN GUI is currently still an <u>experimental interface</u>. It requir
 - pip for python3 (pip3)
 - setuptools for python3 (python3-setuptools)
 
-#### ProtonVPN GUI dependencies
+#### ProtonVPN App dependencies
 
 | **Distro**                              | **Command**                                                                                                     |
 |:----------------------------------------|:----------------------------------------------------------------------------------------------------------------|
@@ -121,7 +121,7 @@ If you would like to use `pkexec` instead of the terminal (or alter `visudo`), t
 |OpenSUSE/SLES                            | `sudo zypper install polkit`                                                                                    |
 |Arch Linux/Manjaro                       | `sudo pacman -S polkit`                                                                                         |
 
-## Installing ProtonVPN Linux GUI
+## Installing ProtonVPN App
 
 ### Distribution based
 - Fedora/CentOS/RHEL: To-do
@@ -134,37 +134,37 @@ If you would like to use `pkexec` instead of the terminal (or alter `visudo`), t
 
 *Note: Make sure to run pip with sudo*
 
-`sudo pip3 install protonvpn-gui`
+`sudo pip3 install protonvpn-app`
 
 #### To update to a new version
 
-`sudo pip3 install protonvpn-gui --upgrade`
+`sudo pip3 install protonvpn-app --upgrade`
 
 ### Manual Installation
 
-**Note:** Before installing the GUI, make sure that you have previously installed the CLI, otherwise an error will be thrown.
+**Note:** Before installing the app, make sure that you have previously installed the CLI, otherwise an error will be thrown.
 
 1. Clone this repository
 
-    `git clone https://github.com/ProtonVPN/linux-gui`
+    `git clone https://github.com/ProtonVPN/linux-app`
 
 2. Step into the directory
 
-   `cd linux-gui`
+   `cd linux-app`
 
 3. Install
 
     `sudo pip3 install -e .`
 
-## Uninstalling ProtonVPN Linux GUI
+## Uninstalling ProtonVPN App
 
-If you have installed the GUI via PIP or by cloning this repo, then to uninstall it type in the following command:
+If you have installed the app via PIP or by cloning this repo, then to uninstall it type in the following command:
 
-  `sudo pip3 uninstall protonvpn-gui`
+  `sudo pip3 uninstall protonvpn-app`
 
 ### Virtual environment
 
-If you would like to run the the GUI within a virtual environment (for either development purposes or other), then you can easily do that with the help of <a href="https://pipenv.readthedocs.io/en/latest/">pipenv</a>. Make sure to install pipenv and additional packages before.
+If you would like to run the app within a virtual environment (for either development purposes or other), then you can easily do that with the help of <a href="https://pipenv.readthedocs.io/en/latest/">pipenv</a>. Make sure to install pipenv and additional packages before.
 **Note:** PolKit does not work within virtual environments.
 
 | **Distro**                              | **Command**                                                                                                     |
@@ -174,18 +174,18 @@ If you would like to run the the GUI within a virtual environment (for either de
 |OpenSUSE/SLES                            | `sudo zypper install cairo-devel gobject-introspection-devel python3-cairo-devel pkg-config`                    |
 |Arch Linux/Manjaro                       | `sudo pacman -S cairo base-devel gobject-introspection pkgconf`                                                 |
 
-1. `git clone https://github.com/ProtonVPN/linux-gui` 
-2. `cd linux-gui`
+1. `git clone https://github.com/ProtonVPN/linux-app` 
+2. `cd linux-app`
 3. `pipenv install` installs the virtual environment and all necessary dependencies from `Pipfile`.
 4. `pipenv shell` enters the virtual environment.
-5. `sudo pip install -e .` installs the GUI in your virtual environment. 
-6. `protonvpn-gui` starts the GUI from within the virtual environment.
+5. `sudo pip install -e .` installs the app in your virtual environment. 
+6. `protonvpn-app` starts the application from within the virtual environment.
 
 # How to use
 
-### ProtonVPN GUI
+### ProtonVPN App
 
- `protonvpn-gui`
+ `protonvpn-app`
 
 ### ProtonVPN Tray
 
@@ -195,22 +195,22 @@ If you would like to run the the GUI within a virtual environment (for either de
 
 ### Create .desktop file
 
-#### ProtonVPN GUI
+#### ProtonVPN App
 To create at <i>desktop</i> launcher with a .desktop file, follow the instructions below.
 
-1. Find the path to the package with `pip3 show protonvpn-gui`
+1. Find the path to the package with `pip3 show protonvpn-app`
 
    You should get something like `Location: /usr/local/lib/<YOUR_PYTHON_VERSION>/dist-packages` , this is where your Python packages reside. **Note:** Based on your distro, your `Location` path may not look exactly like this one, so make sure to use your own and `Location` path.
 
-2. Based on previous information, the path to your icon should be `<PATH_DISPLAYED_IN_STEP_1>/linux_gui/resources/img/logo/protonvpn_logo.png`
+2. Based on previous information, the path to your icon should be `<PATH_DISPLAYED_IN_STEP_1>/app/resources/img/logo/protonvpn_logo.png`
 
-3. Create a `protonvpn-gui.desktop` file in `.local/share/applications/`, and paste in the following code. Remember to change the **`Icon`** path to your own path.
+3. Create a `protonvpn-app.desktop` file in `.local/share/applications/`, and paste in the following code. Remember to change the **`Icon`** path to your own path.
 
     ```
     [Desktop Entry]
     Name=ProtonVPN
-    GenericName=ProtonVPN GUI
-    Exec=protonvpn-gui
+    GenericName=ProtonVPN App
+    Exec=protonvpn-app
     Icon=<YOUR_ICON_PATH>
     Type=Application
     Terminal=False
@@ -220,11 +220,11 @@ To create at <i>desktop</i> launcher with a .desktop file, follow the instructio
 #### ProtonVPN Tray
 To create at <i>tray icon</i> launcher with a .desktop file, follow the instructions below.
 
-1. Find the path to the package with `pip3 show protonvpn-gui`
+1. Find the path to the package with `pip3 show protonvpn-app`
 
    You should get something like `Location: /usr/local/lib/<YOUR_PYTHON_VERSION>/dist-packages` , this is where your Python packages reside. **Note:** Based on your distro, your `Location` path may not look exactly like this one, so make sure to use your own and `Location` path.
 
-2. Based on previous information, the path to your icon should be `<PATH_DISPLAYED_IN_STEP_1>/linux_gui/resources/img/logo/protonvpn_logo.png`
+2. Based on previous information, the path to your icon should be `<PATH_DISPLAYED_IN_STEP_1>/app/resources/img/logo/protonvpn_logo.png`
 
 3. Create a `protonvpn-tray.desktop` file in `.local/share/applications/`, and paste in the following code. Remember to change the **`Icon`** path to your own path.
 
@@ -240,44 +240,44 @@ To create at <i>tray icon</i> launcher with a .desktop file, follow the instruct
     ```
 
 ## Sudo/PolKit
-At the moment, since the CLI protects certain files using sudo and also manages killswitch and split tunneling, the GUI will also need to have access to these sudo protected files. Thus, as it is at the moment, the GUI needs to have certain root privileges. This though is subject to change. 
-Nonetheless, if you would like to launch the GUI without having to type in your sudo password everytime, then you could add the executable file to `visudo`. 
+At the moment, since the CLI protects certain files using sudo and also manages killswitch and split tunneling, the app will also need to have access to these sudo protected files. Thus, as it is at the moment, the app needs to have certain root privileges. This though is subject to change. 
+Nonetheless, if you would like to launch the app without having to type in your sudo password everytime, then you could add the executable file to `visudo`. 
 <br>
 Another alternative is enable PolKit Support from within the settings (`pkexec` command). This displays a window for the user to type the sudo password, this way, a user won't have to type the password into the terminal. Whenever you want to connect/disconnect or make some important changes to files, a window prompt will appear for you to enter the sudo password.
 <br>
-**Note:** This feature needs to be enabled from within the GUI settings for it to be able to work. If you have not installed the necessary packages, then the this feature will not work.
+**Note:** This feature needs to be enabled from within the app settings for it to be able to work. If you have not installed the necessary packages, then the this feature will not work.
 
 ### Visudo
 The instructions for seting up visudo are described below.
 
-1. First you will need the path to the GUI. This can be found by typing `which protonvpn-gui`. You should get something like this: `/usr/bin/protonvpn-gui`. Save it since you will need it later. **Note:** As previously mentioned, the path may look different for you, based on your distro.
+1. First you will need the path to the application. This can be found by typing `which protonvpn-app`. You should get something like this: `/usr/bin/protonvpn-app`. Save it since you will need it later. **Note:** As previously mentioned, the path may look different for you, based on your distro.
 2. Identify your username by typing `whoami`. Save it (or memorize it). 
 3. In another terminal, type in `sudo visudo`, and a window should pop-up, scroll to the very bottom of it.
 4. Once you are at the botton, type: `<YOUR_USERNAME_FROM_STEP2> ALL = (root) NOPASSWD: <YOUR_PATH_FROM_STEP1>`
 5. Exit and save! Have fun :)
 
-# GUI Layout
+# App Layout
 <p align="center">
-  <img src="./linux_gui/resources/img/gui/intialize_profile.png" alt="Login"></img>
+  <img src="./app/resources/img/gui/intialize_profile.png" alt="Login"></img>
 </p>
 <p align="center">
-  <img src="./linux_gui/resources/img/gui/dashboard.png" alt="Dashboard"></img>
+  <img src="./app/resources/img/gui/dashboard.png" alt="Dashboard"></img>
 </p>
 
 <p align="center">
-  <img src="./linux_gui/resources/img/gui/settings_general.png" alt="General Settings"></img>
+  <img src="./app/resources/img/gui/settings_general.png" alt="General Settings"></img>
 </p>
 <p align="center">
-  <img src="./linux_gui/resources/img/gui/settings_tray.png" alt="Tray Settings"></img>
+  <img src="./app/resources/img/gui/settings_tray.png" alt="Tray Settings"></img>
 </p> 
 <p align="center">
-  <img src="./linux_gui/resources/img/gui/settings_connection.png" alt="Connection Settings"></img>
+  <img src="./app/resources/img/gui/settings_connection.png" alt="Connection Settings"></img>
 </p>  
 <p align="center">
-  <img src="./linux_gui/resources/img/gui/settings_advanced.png" alt="Advanced Settings"></img>
+  <img src="./app/resources/img/gui/settings_advanced.png" alt="Advanced Settings"></img>
 </p> 
 
 <p align="center">
-  <img src="./linux_gui/resources/img/gui/diagnose_tool.png" alt="Diagnosis Tool"></img>
+  <img src="./app/resources/img/gui/diagnose_tool.png" alt="Diagnosis Tool"></img>
 </p> 
  
