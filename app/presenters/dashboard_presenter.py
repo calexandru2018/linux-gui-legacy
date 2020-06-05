@@ -24,7 +24,7 @@ from gi.repository import GObject as gobject, GdkPixbuf
 
 # Local imports
 from ..gui_logger import gui_logger
-from ..constants import GITHUB_URL_RELEASE, VERSION, LARGE_FLAGS_BASE_PATH, SMALL_FLAGS_BASE_PATH, FEATURES_BASE_PATH
+from ..constants import GITHUB_URL, GITHUB_URL_RELEASE, VERSION, LARGE_FLAGS_BASE_PATH, SMALL_FLAGS_BASE_PATH, FEATURES_BASE_PATH, APP_NAME
 from ..utils import (
     get_server_protocol_from_cli,
     get_gui_config,
@@ -193,9 +193,9 @@ class DashboardPresenter:
             if VERSION < latest_release:
                 return_string = "There is a newer release, you should upgrade to <b>v{0}</b>.\n\n".format(latest_release)
                 if pip3_installed:
-                    return_string = return_string + "You can upgrade with the following command:\n\n<b>sudo pip3 install protonvpn-linux-gui-calexandru2018 --upgrade</b>\n\n"
+                    return_string = return_string + "You can upgrade with the following command:\n\n<b>sudo pip3 install "+APP_NAME+" --upgrade</b>\n\n"
                 else:
-                    return_string = return_string + "You can upgrade by <b>first removing this version</b>, and then cloning the new one with the following commands:\n\n<b>git clone https://github.com/calexandru2018/protonvpn-linux-gui</b>\n\n<b>cd protonvpn-linux-gui</b>\n\n<b>sudo python3 setup.py install</b>"
+                    return_string = return_string + "You can upgrade by <b>first removing this version</b>, and then cloning the new one with the following commands:\n\n<b>git clone "+GITHUB_URL+"</b>\n\n<b>cd linux-app</b>\n\n<b>sudo pip install -e .</b>"
                 return_val = True
 
         self.queue.put(dict(action="update_dialog", label=return_string))
