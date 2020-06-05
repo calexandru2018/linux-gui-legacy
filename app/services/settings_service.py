@@ -24,6 +24,8 @@ from ..utils import (
 
 class SettingsService:
     sudo_timeout = 10
+    unable_to_process_request_info_msg = "Unable to process request. Administrator access has probably not been provided.\nTo do so, please run the app from within a terminal or enable PolKit Support from within the settings window."
+    admin_acess_dissmissed_info_msg = "Administrator access was dismissed."
 
     def set_user_pass(self, username, password):
         user_pass = "'{}\n{}'".format(username, password)
@@ -268,10 +270,10 @@ class SettingsService:
         gui_logger.debug("errs: {}\nouts: {}".format(errs, outs))
 
         if "dismissed" in errs and not timeout:
-            return False, "Administrator access was dismissed."
+            return False, admin_acess_dissmissed_info_msg
         
         if not "dismissed" in errs and timeout:
-            return False, "Unable to process request. Administrator access has probably not been provided.\nTo do so, please run the GUI from within a terminal or enable PolKit Support from within the settings window."
+            return False, unable_to_process_request_info_msg
 
         if not "created symlink" in errs.lower():
             return False, "Unable to setup autoconnect!"
@@ -308,7 +310,7 @@ class SettingsService:
         gui_logger.debug("errs: {}\nouts: {}".format(errs, outs))
 
         if "dismissed" in errs and not timeout:
-            return False, "Administrator access was dismissed."
+            return False, admin_acess_dissmissed_info_msg
         
         if not "dismissed" in errs and timeout:
             return False, "Unable to process request. Administrator access has probably not been provided."
@@ -362,10 +364,10 @@ class SettingsService:
             return False, "Administrator access is required, and PolKit Support is not enabled.\nPlease launch the app either from within a terminal or enable PolKit Support."
 
         if "dismissed" in errs and not timeout:
-            return False, "Administrator access was dismissed."
+            return False, admin_acess_dissmissed_info_msg
         
         if not "dismissed" in errs and timeout:
-            return False, "Unable to process request. Administrator access has probably not been provided.\nTo do so, please run the GUI from within a terminal or enable PolKit Support from within the settings window."
+            return False, unable_to_process_request_info_msg
 
         return True, return_on_sucess_message
 
