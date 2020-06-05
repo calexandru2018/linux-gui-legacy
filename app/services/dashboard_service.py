@@ -156,13 +156,13 @@ class DashboardService:
         gui_logger.debug("errs: {}\nouts: {}".format(errs, outs))
 
         if "terminal is required" in errs:
-            return (False, "Privilege escalation is required and PolKit Support is not enabled.\nPlease launch the app either from within a terminal or enable PolKit Support.")
+            return (False, "Administrator acess is required and PolKit Support is not enabled.\nPlease launch the app either from within a terminal or enable PolKit Support.")
 
         if "dismissed" in errs and not timeout:
-            return (False, "Privilege escalation was dismissed.")
+            return (False, "Administrator acess was dismissed.")
         
         if not "dismissed" in errs and timeout:
-            return (False, "Request timed out, either because of insufficient privileges\nor network/api issues.")
+            return (False, "Request timed out, either because of insufficient administrator acess\nor network/api issues.")
 
         if "authentication failed" in outs:
             return (False, "Authentication failed!\nPlease make sure that your username and password is correct.")
