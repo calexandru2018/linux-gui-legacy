@@ -270,10 +270,10 @@ class SettingsService:
         gui_logger.debug("errs: {}\nouts: {}".format(errs, outs))
 
         if "dismissed" in errs and not timeout:
-            return False, admin_acess_dissmissed_info_msg
+            return False, self.admin_acess_dissmissed_info_msg
         
         if not "dismissed" in errs and timeout:
-            return False, unable_to_process_request_info_msg
+            return False, self.unable_to_process_request_info_msg
 
         if not "created symlink" in errs.lower():
             return False, "Unable to setup autoconnect!"
@@ -310,7 +310,7 @@ class SettingsService:
         gui_logger.debug("errs: {}\nouts: {}".format(errs, outs))
 
         if "dismissed" in errs and not timeout:
-            return False, admin_acess_dissmissed_info_msg
+            return False, self.admin_acess_dissmissed_info_msg
         
         if not "dismissed" in errs and timeout:
             return False, "Unable to process request. Administrator access has probably not been provided."
@@ -364,10 +364,10 @@ class SettingsService:
             return False, "Administrator access is required, and PolKit Support is not enabled.\nPlease launch the app either from within a terminal or enable PolKit Support."
 
         if "dismissed" in errs and not timeout:
-            return False, admin_acess_dissmissed_info_msg
+            return False, self.admin_acess_dissmissed_info_msg
         
         if not "dismissed" in errs and timeout:
-            return False, unable_to_process_request_info_msg
+            return False, self.unable_to_process_request_info_msg
 
         return True, return_on_sucess_message
 
