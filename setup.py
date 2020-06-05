@@ -10,7 +10,7 @@ try:
         long_descr = '\n' + f.read()
 except FileNotFoundError:
     long_descr = """
-    The Linux GUI for ProtonVPN.
+    ProtonVPN Application for Linux based OSs.
 
     For further information and a usage guide, please view the project page:
 
