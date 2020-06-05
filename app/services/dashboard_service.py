@@ -6,7 +6,7 @@ from protonvpn_cli.country_codes import country_codes
 from protonvpn_cli.utils import get_config_value, set_config_value, is_connected, get_server_value, get_country_name
 
 from ..utils import set_gui_config, get_gui_config, check_internet_conn, get_server_protocol_from_cli
-from ..constants import GITHUB_URL_RELEASE, SMALL_FLAGS_BASE_PATH, FEATURES_BASE_PATH
+from ..constants import GITHUB_URL_RELEASE, SMALL_FLAGS_BASE_PATH, FEATURES_BASE_PATH, APP_NAME
 from ..gui_logger import gui_logger
 
 class DashboardService:
@@ -106,7 +106,7 @@ class DashboardService:
         pip3_installed = False
 
         try:
-            is_pip3_installed = subprocess.run(["pip3", "show", "protonvpn-gui"],stdout=subprocess.PIPE) # nosec
+            is_pip3_installed = subprocess.run(["pip3", "show", APP_NAME],stdout=subprocess.PIPE) # nosec
         except:
             return False
 
