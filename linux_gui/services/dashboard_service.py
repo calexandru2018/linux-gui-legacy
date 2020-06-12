@@ -48,7 +48,7 @@ class DashboardService:
 
         if user_selected_quick_connect and not user_selected_quick_connect == "dis" and not profile_quick_connect:
             return self.custom_quick_connect(user_selected_quick_connect)
-        
+
         return self.quick_connect()
 
     def custom_quick_connect(self, quick_conn_pref):
@@ -68,11 +68,11 @@ class DashboardService:
         else:
             command="--cc"
             country=quick_conn_pref.upper()
-        
+
         command_list = ["protonvpn", "connect", command]
         if country:
             command_list = ["protonvpn", "connect", command, country]
-        
+
         bool_value, result =  self.root_command(command_list)
         return self.get_display_message(bool_value, result)
 
@@ -90,7 +90,7 @@ class DashboardService:
         command = ["protonvpn", "reconnect"]
         bool_value, result =  self.root_command(command)
         return self.get_display_message(bool_value, result)
-    
+
     def random_connect(self):
         command = ["protonvpn", "connect", "--random"]
         bool_value, result =  self.root_command(command)
@@ -118,7 +118,7 @@ class DashboardService:
                     if not ".egg" in el[-1]:
                         pip3_installed = True
                         # print(".egg" in el[-1])
-                        break           
+                        break
 
         try:
             check_version = requests.get(GITHUB_URL_RELEASE, timeout=2)
@@ -160,7 +160,7 @@ class DashboardService:
 
         if "dismissed" in errs and not timeout:
             return (False, "Privilege escalation was dismissed.")
-        
+
         if not "dismissed" in errs and timeout:
             return (False, "Request timed out, either because of insufficient privileges\nor network/api issues.")
 
@@ -173,7 +173,7 @@ class DashboardService:
         return (False, errs)
 
     def diagnose(self):
-        reccomendation = '' 
+        recommendation = ''
         end_openvpn_process_guide = """\n
         sudo pkill openvpn\n
         or\n
@@ -192,40 +192,40 @@ class DashboardService:
         has_internet, is_killswitch_enabled, is_ovpnprocess_running, is_dns_protection_enabled = self.get_diagnose_settings()
         is_custom_resolv_conf = self.check_custom_dns()
         is_splitunn_enabled = self.check_split_tunneling()
-        
-        # Reccomendations based on known issues
+
+        # Recommendations based on known issues
         if not has_internet:
             if is_ovpnprocess_running:
-                reccomendation = reccomendation + "\nYou have no internet connection and a VPN process is running.\n"
-                reccomendation = reccomendation + "This might be due to a DNS misconfiguration or lack of internet connection. You can try to disconnecto from the VPN by clicking on \"Disconnect\" or following the instructions below.\n"
-                reccomendation = reccomendation + "<b>Warning:</b> By doing this you are ending your VPN process, which might end exposing your traffic upon reconnecting, do at your own risk." + end_openvpn_process_guide
+                recommendation = recommendation + "\nYou have no internet connection and a VPN process is running.\n"
+                recommendation = recommendation + "This might be due to a DNS misconfiguration or lack of internet connection. You can try to disconnecto from the VPN by clicking on \"Disconnect\" or following the instructions below.\n"
+                recommendation = recommendation + "<b>Warning:</b> By doing this you are ending your VPN process, which might end exposing your traffic upon reconnecting, do at your own risk." + end_openvpn_process_guide
             elif not is_ovpnprocess_running:
                 if is_killswitch_enabled:
-                    reccomendation = reccomendation + "\nYou Have killswitch enabled, which might be blocking your connection.\nTry to flush and then reconfigure your IP tables."
-                    reccomendation = reccomendation + "<b>Warning:</b> By doing this you are clearing all of your killswitch configurations. Do at your own risk." + restore_ip_tables_guide
+                    recommendation = recommendation + "\nYou Have killswitch enabled, which might be blocking your connection.\nTry to flush and then reconfigure your IP tables."
+                    recommendation = recommendation + "<b>Warning:</b> By doing this you are clearing all of your killswitch configurations. Do at your own risk." + restore_ip_tables_guide
                 elif is_custom_resolv_conf["logical"]:
-                    reccomendation = reccomendation + "\nCustom DNS is still present in resolv.conf even though you are not connected to a server. This might be blocking your from establishing a non-encrypted connection.\n"
-                    reccomendation = reccomendation + "Try to restart your network manager to restore default configurations:" + restart_netwman_guide
+                    recommendation = recommendation + "\nCustom DNS is still present in resolv.conf even though you are not connected to a server. This might be blocking your from establishing a non-encrypted connection.\n"
+                    recommendation = recommendation + "Try to restart your network manager to restore default configurations:" + restart_netwman_guide
                 elif is_custom_resolv_conf["logical"] is None:
-                    reccomendation = reccomendation + "\nNo running VPN process was found, though DNS configurations are lacking in resolv.conf.\n"
-                    reccomendation = reccomendation + "This might be due to some error or corruption during DNS restoration or lack of internet connection.\n"
-                    reccomendation = reccomendation + "Try to restart your network manager to restore default configurations, if it still does not work, then you probably experiencing some internet connection issues." + restart_netwman_guide
+                    recommendation = recommendation + "\nNo running VPN process was found, though DNS configurations are lacking in resolv.conf.\n"
+                    recommendation = recommendation + "This might be due to some error or corruption during DNS restoration or lack of internet connection.\n"
+                    recommendation = recommendation + "Try to restart your network manager to restore default configurations, if it still does not work, then you probably experiencing some internet connection issues." + restart_netwman_guide
                 else:
-                    reccomendation = "\nYou have no internet connection.\nTry to connect to a different nework to resolve the issue."
+                    recommendation = "\nYou have no internet connection.\nTry to connect to a different nework to resolve the issue."
             else:
-                reccomendation = "<b>Unkown problem!</b>"
+                recommendation = "<b>Unkown problem!</b>"
         else:
-            reccomendation = "\nYour system seems to be ok. There are no reccomendations at the moment."
+            recommendation = "\nYour system seems to be ok. There are no recommendations at the moment."
 
-        return (reccomendation, has_internet, is_custom_resolv_conf, 
-                is_killswitch_enabled, is_ovpnprocess_running, 
+        return (recommendation, has_internet, is_custom_resolv_conf,
+                is_killswitch_enabled, is_ovpnprocess_running,
                 is_dns_protection_enabled,is_splitunn_enabled)
 
     def get_diagnose_settings(self):
         # Check if there is internet connection
             # Depending on next questions, some actions might be suggested.
         has_internet = check_internet_conn(request_bool=True)
-        
+
         # Check if killswitch is enabled
             # Advice to restore IP tables manually and restart netowrk manager.
         is_killswitch_enabled = True if get_config_value("USER", "killswitch") == 1 else False
@@ -241,8 +241,8 @@ class DashboardService:
         return has_internet, is_killswitch_enabled, is_ovpnprocess_running, is_dns_protection_enabled
 
     def check_custom_dns(self):
-        """Check if custom DNS is being used. 
-        
+        """Check if custom DNS is being used.
+
         It might that the user has disabled the custom DNS settings but the file still resides in system settings.
         """
         is_custom_resolv_conf = {
@@ -285,17 +285,17 @@ class DashboardService:
         secure_core = False
 
         load = str(get_server_value(servername, "Load", servers)).rjust(3, " ")
-        load = load + "%"               
+        load = load + "%"
 
         tier = server_tiers[get_server_value(servername, "Tier", servers)]
-        
+
         if not "Plus/Visionary".lower() == tier.lower():
             plus_feature = images_dict["empty_pix"]
         else:
             plus_feature = images_dict["plus_pix"]
 
         server_feature = features[get_server_value(servername, 'Features', servers)].lower()
-        
+
         if server_feature == "Normal".lower():
             feature = images_dict["empty_pix"]
         elif server_feature == "P2P".lower():
@@ -326,7 +326,7 @@ class DashboardService:
                 countries[country] = []
             countries[country].append(server["Name"])
 
-        country_servers = {} 
+        country_servers = {}
         # Order server list by country alphabetically
         countries = collections.OrderedDict(sorted(countries.items()))
 
@@ -379,14 +379,14 @@ class DashboardService:
             # Get average per country
             load_sum = load_sum + int(str(get_server_value(servername, "Load", servers)).rjust(3, " "))
             count += 1
-            
+
             # Get features per country
             feature = features[get_server_value(servername, 'Features', servers)]
             features_per_country.add(feature)
-        
+
         # Convert set to list
         country_feature_list = list(features_per_country)
-        
+
         for feature in country_feature_list:
             for k,v in order_dict.items():
                 if feature.lower() == k.lower():
@@ -405,7 +405,7 @@ class DashboardService:
 
         # print(country,top_choice)
 
-        return  (str(int(round(load_sum/count)))+"%", top_choice) 
+        return  (str(int(round(load_sum/count)))+"%", top_choice)
 
     @property
     def sudo_type(self):

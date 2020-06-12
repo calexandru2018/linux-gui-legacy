@@ -7,11 +7,11 @@ import concurrent.futures
 
 # Remote imports
 from protonvpn_cli.utils import (
-    get_config_value, 
-    is_connected, 
-    get_servers, 
-    get_server_value, 
-    get_transferred_data, 
+    get_config_value,
+    is_connected,
+    get_servers,
+    get_server_value,
+    get_transferred_data,
     pull_server_data,
     get_country_name
 )
@@ -44,7 +44,7 @@ class DashboardPresenter:
         display_message = "Could not load necessary resources, there might be connectivity issues."
         time.sleep(2)
         self.queue.put(dict(action="hide_spinner"))
-        
+
         conn = custom_get_ip_info()
 
         if conn and not conn is None:
@@ -61,7 +61,7 @@ class DashboardPresenter:
 
         # Loads the labels
         self.on_update_labels(objects_dict["connection_labels"])
-        
+
         # Loads the server list
         self.on_update_server_list(objects_dict["server_tree_list"]["tree_object"])
 
@@ -73,7 +73,7 @@ class DashboardPresenter:
         except KeyError:
             display_secure_core = "False"
 
-        secure_core_label_style = secure_core_label.get_style_context() 
+        secure_core_label_style = secure_core_label.get_style_context()
 
         if display_secure_core == "True":
             secure_core_switch.set_state(True)
@@ -83,7 +83,7 @@ class DashboardPresenter:
 
     def reload_secure_core_servers(self, **kwargs):
         """Function that reloads server list to either secure-core or non-secure-core.
-        """  
+        """
         # Sleep is needed because it takes a second to update the information,
         # which makes the button "lag". Temporary solution.
         time.sleep(1)
@@ -100,7 +100,7 @@ class DashboardPresenter:
 
     def on_connect_user_selected(self, **kwargs):
         """Function that either connects by selected server or selected country.
-        """     
+        """
         user_selected_server = kwargs.get("user_selected_server")
 
         # Check if it should connect to country or server
@@ -115,20 +115,20 @@ class DashboardPresenter:
 
     def quick_connect(self, **kwargs):
         """Function that connects to the quickest server.
-        """      
+        """
         profile_quick_connect = False
         if "profile_quick_connect" in kwargs:
             profile_quick_connect = True
 
         display_message = self.dashboard_service.quick_connect_manager(profile_quick_connect)
-        
+
         self.queue.put(dict(action="update_dialog", label=display_message))
-        
+
         self.on_update_labels(kwargs.get("connection_labels"))
 
     def on_last_connect(self, **kwargs):
         """Function that connects to the last connected server.
-        """        
+        """
         display_message = self.dashboard_service.last_connect()
 
         self.queue.put(dict(action="update_dialog", label=display_message))
@@ -146,7 +146,7 @@ class DashboardPresenter:
 
     def on_refresh_servers(self, **kwargs):
         """Function that reloads server list to either secure-core or non-secure-core.
-        """  
+        """
         # Sleep is needed because it takes a second to update the information,
         # which makes the button "lag". Temporary solution.
         time.sleep(1)
@@ -161,7 +161,7 @@ class DashboardPresenter:
             return_val = True
         else:
             self.queue.put(dict(action="update_dialog", label="Could not update servers!", spinner=False))
-        
+
     def on_disconnect(self, **kwargs):
         """Function that disconnects from the VPN.
         """
@@ -177,13 +177,13 @@ class DashboardPresenter:
         """
         return_string = "Developer Mode."
         return_val = False
-        
+
         try:
             latest_release, pip3_installed = self.dashboard_service.check_for_updates()
         except:
             latest_release = False
 
-        if not latest_release:  
+        if not latest_release:
             return_string = "Failed to check for updates."
         else:
             if latest_release == VERSION:
@@ -205,7 +205,7 @@ class DashboardPresenter:
     def on_diagnose(self):
         """Multipurpose message dialog function.
         """
-        reccomendation, has_internet, is_custom_resolv_conf, is_killswitch_enabled, is_ovpnprocess_running, is_dns_protection_enabled,is_splitunn_enabled = self.dashboard_service.diagnose()
+        recommendation, has_internet, is_custom_resolv_conf, is_killswitch_enabled, is_ovpnprocess_running, is_dns_protection_enabled,is_splitunn_enabled = self.dashboard_service.diagnose()
 
         result = """
         Has internet:\t\t\t\t<b>{has_internet}</b>
@@ -218,13 +218,13 @@ class DashboardPresenter:
             has_internet= "Yes" if has_internet else "No",
             resolv_conf_status=is_custom_resolv_conf["display"],
             is_ks_enabled= "Yes" if is_killswitch_enabled else "No",
-            is_vpnprocess_running= "Yes" if is_ovpnprocess_running else "No", 
+            is_vpnprocess_running= "Yes" if is_ovpnprocess_running else "No",
             is_dns_enabled= "Yes" if is_dns_protection_enabled else "No",
             is_sp_enabled= "Yes" if is_splitunn_enabled else "No")
 
         gui_logger.debug(result)
 
-        self.queue.put(dict(action="update_dialog", label=result, sub_label="<b><u>Reccomendation:</u></b>\n<span>{recc}</span>".format(recc=reccomendation)))
+        self.queue.put(dict(action="update_dialog", label=result, sub_label="<b><u>Recommendation:</u></b>\n<span>{rec}</span>".format(rec=recommendation)))
 
     def on_update_labels(self, connection_labels_dict, disconnect=False):
         # Update labels
@@ -238,7 +238,7 @@ class DashboardPresenter:
         """Function prepares data to update labels.
         """
         gui_logger.debug(">>> Running \"update_labels_status\" getting servers, is_connected and connected_server.")
-        
+
         servers = get_servers()
 
         is_vpn_connected = True if is_connected() else False
@@ -256,7 +256,7 @@ class DashboardPresenter:
         data_sent_label =           connection_labels_dict[0]["data_sent_label"]
         background_large_flag =     connection_labels_dict[0]["background_large_flag"]
         protonvpn_sign_green =      connection_labels_dict[0]["protonvpn_sign_green"]
-        
+
         try:
             connected_server = get_config_value("metadata", "connected_server")
         except (KeyError, IndexError):
@@ -267,7 +267,7 @@ class DashboardPresenter:
             load = get_server_value(connected_server, "Load", servers)
         except (KeyError, IndexError):
             gui_logger.debug("[!] Could not find \"server load\" information.")
-            
+
         load = "{0}% Load".format(load) if load and is_vpn_connected else ""
         server_load_label.set_markup('<span>{0}</span>'.format(load))
 
@@ -277,7 +277,7 @@ class DashboardPresenter:
             ip, isp, country = result
         else:
             ip = "None"
-            isp = "None" 
+            isp = "None"
             country = "None"
 
         country = country.lower()
@@ -298,7 +298,7 @@ class DashboardPresenter:
         if is_vpn_connected:
             try:
                 country_server = country_server + " >> " + connected_server
-            except TypeError: 
+            except TypeError:
                 country_server = country_server + " >> "
 
             protonvpn_sign_green.show()
@@ -311,7 +311,7 @@ class DashboardPresenter:
 
         # Update sent and received data
         gobject.timeout_add_seconds(1, self.update_sent_received_data, {"is_vpn_connected": is_vpn_connected, "received_label": data_received_label, "sent_label": data_sent_label})
-        
+
         # Check and set VPN status label. Get also protocol status if vpn is connected
         protocol = "No VPN Connection"
         conn_disc_button = "Quick Connect"
@@ -337,18 +337,18 @@ class DashboardPresenter:
         tx_amount, rx_amount = get_transferred_data()
 
         rx_amount = rx_amount if dict_labels["is_vpn_connected"] else ""
-        
+
         dict_labels["received_label"].set_markup('<span>{0}</span>'.format(rx_amount))
 
         # Get and set sent data
         tx_amount = tx_amount if dict_labels["is_vpn_connected"] else ""
         dict_labels["sent_label"].set_markup('<span>{0}</span>'.format(tx_amount))
-        
+
         return True
 
     def update_connection_time(self, dict_data):
         connection_time = False
-        
+
         if dict_data["is_vpn_connected"]:
             try:
                 connected_time = get_config_value("metadata", "connected_time")
@@ -356,7 +356,7 @@ class DashboardPresenter:
                 connection_time = str(datetime.timedelta(seconds=connection_time)).split(".")[0]
             except (KeyError, IndexError):
                 connection_time = False
-        
+
         connection_time = connection_time if connection_time else ""
         dict_data["label"].set_markup('<span>{0}</span>'.format(connection_time))
 
@@ -382,7 +382,7 @@ class DashboardPresenter:
                 avrg_load, country_feature = self.dashboard_service.get_country_avrg_features(country, country_servers, servers, only_secure_core)
 
                 flag = GdkPixbuf.Pixbuf.new_from_file_at_size(self.dashboard_service.get_flag_path(country), 15,15)
-                
+
                 # Check plus servers
                 if country_feature == "normal" or country_feature == "p2p":
                     plus_feature = images_dict["empty_pix"]
@@ -410,4 +410,4 @@ class DashboardPresenter:
                     elif not secure_core and not only_secure_core:
                         tree_object.append(country_row, [images_dict["empty_pix"], servername, plus_feature, feature, load])
 
-       
+
