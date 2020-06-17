@@ -30,6 +30,7 @@ from .constants import (
     TRAY_CFG_DATA_TX, 
     TRAY_CFG_TIME_CONN, 
     CURRDIR,
+    APP_NAME
 )
 from .utils import get_gui_config, set_gui_config
 
@@ -257,7 +258,7 @@ class ProtonVPNIndicator:
 
         self.notify.Notification.new(self.tray_title, "Displaying ProtonVPN GUI", LOGO_PATH).show()
 
-        process = subprocess.Popen(["protonvpn-gui"], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
+        process = subprocess.Popen([APP_NAME], stdout=subprocess.PIPE, stderr=subprocess.PIPE) # nosec
         outs, errs = process.communicate()
       
         gui_logger.debug("TRAY >>> errs: {}\nouts:{}".format(outs, errs))
