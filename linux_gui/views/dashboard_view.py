@@ -197,7 +197,7 @@ class DashboardView:
             user_selected_server = model.get_value(tree_iter, 1)
 
         try:
-            self.conn_disc_button_label.set_markup("Connecto to {}".format(user_selected_server))
+            self.conn_disc_button_label.set_markup("Connect to {}".format(user_selected_server))
         except UnboundLocalError:
             self.conn_disc_button_label.set_markup("Quick Connect")
 
