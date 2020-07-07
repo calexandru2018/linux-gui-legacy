@@ -1,6 +1,6 @@
-include linux_gui/resources/ui/*.glade 
-include linux_gui/resources/styles/*.css 
-include linux_gui/resources/img/logo/*.png 
-include linux_gui/resources/img/utils/*.png 
-include linux_gui/resources/img/flags/large/*.jpg 
-include linux_gui/resources/img/flags/small/*.png 
+include linux_gui/resources/ui/*.glade
+include linux_gui/resources/styles/*.css
+include linux_gui/resources/img/logo/*.png
+include linux_gui/resources/img/utils/*.png
+include linux_gui/resources/img/flags/large/*.jpg
+include linux_gui/resources/img/flags/small/*.png
