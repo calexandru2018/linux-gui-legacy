@@ -2,7 +2,7 @@ import os
 import getpass
 USER = getpass.getuser()
 
-VERSION = "2.1.0"
+VERSION = "2.1.1"
 GITHUB_URL_RELEASE = "https://github.com/ProtonVPN/linux-gui/releases/latest"
 
 # GUI configurations
