@@ -74,6 +74,7 @@ The ProtonVPN GUI is currently still an <u>experimental interface</u>. It requir
 # Installing and Updating
 
 ### Dependencies
+- openvpn
 
 #### Python dependencies
 - python >= 3.5
@@ -94,12 +95,12 @@ The ProtonVPN GUI is currently still an <u>experimental interface</u>. It requir
 
 #### ProtonVPN Tray dependencies
 
-| **Distro**                              | **Command**                                                                                                     |
-|:----------------------------------------|:----------------------------------------------------------------------------------------------------------------|
-|Fedora/CentOS/RHEL                       | `sudo dnf install -y libappindicator-gtk3 libnotify`                                                                      |
-|Ubuntu/Linux Mint/Debian and derivatives | `sudo apt install -y gir1.2-appindicator3 libnotify-bin`                                                                       |
-|OpenSUSE/SLES                            | `sudo zypper install libappindicator-gtk3 libnotify`                                                                      |
-|Arch Linux/Manjaro                       | `sudo pacman -S libappindicator-gtk3 libnotify`                                                                           |
+| **Distro**                              | **Command**                                                   |
+|:----------------------------------------|:--------------------------------------------------------------|
+|Fedora/CentOS/RHEL                       | `sudo dnf install -y libappindicator-gtk3 libnotify`          |
+|Ubuntu/Linux Mint/Debian and derivatives | `sudo apt install -y gir1.2-appindicator3.0.1 libnotify-bin`  |
+|OpenSUSE/SLES                            | `sudo zypper install libappindicator-gtk3 libnotify`          |
+|Arch Linux/Manjaro                       | `sudo pacman -S libappindicator-gtk3 libnotify`               |
 
 **NOTE:**
 Gnome users will need to install an additional extension for this to work: <a href="https://extensions.gnome.org/extension/615/appindicator-support/"> KStatusNotifierItem/AppIndicator Support</a>
