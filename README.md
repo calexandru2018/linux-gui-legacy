@@ -91,15 +91,17 @@ The ProtonVPN GUI is currently still an <u>experimental interface</u>. It requir
 |Ubuntu/Linux Mint/Debian and derivatives | `sudo apt install -y python3-gi python3-gi-cairo gir1.2-gtk-3.0`                                                |
 |OpenSUSE/SLES                            | `sudo zypper install python3-gobject python3-gobject-Gdk typelib-1_0-Gtk-3_0 libgtk-3-0`                        |
 |Arch Linux/Manjaro                       | `sudo pacman -S python-gobject gtk3`                                                                            |
+|blackPanther OS                          | `autorequires via official rpm package (for devel:installing python3-gobject3 libgtk+3 lib64gtk-gir3.0)`        |
 
 #### ProtonVPN Tray dependencies
 
 | **Distro**                              | **Command**                                                                                                     |
 |:----------------------------------------|:----------------------------------------------------------------------------------------------------------------|
 |Fedora/CentOS/RHEL                       | `sudo dnf install -y libappindicator-gtk3 libnotify`                                                                      |
-|Ubuntu/Linux Mint/Debian and derivatives | `sudo apt install -y gir1.2-appindicator3 libnotify-bin`                                                                       |
+|Ubuntu/Linux Mint/Debian and derivatives | `sudo apt install -y gir1.2-appindicator3 libnotify-bin`                                                                  |
 |OpenSUSE/SLES                            | `sudo zypper install libappindicator-gtk3 libnotify`                                                                      |
 |Arch Linux/Manjaro                       | `sudo pacman -S libappindicator-gtk3 libnotify`                                                                           |
+|blackPanther OS                          | `autorequires via official rpm package (for devel:installing lib64appindicator3_1 lib64appindicator3-gir0.1)`             |
 
 **NOTE:**
 Gnome users will need to install an additional extension for this to work: <a href="https://extensions.gnome.org/extension/615/appindicator-support/"> KStatusNotifierItem/AppIndicator Support</a>
@@ -120,6 +122,7 @@ If you would like to use `pkexec` instead of the terminal (or alter `visudo`), t
 |Ubuntu/Linux Mint/Debian and derivatives | `sudo apt install -y libpolkit-agent-1-0`                                                                       |
 |OpenSUSE/SLES                            | `sudo zypper install polkit`                                                                                    |
 |Arch Linux/Manjaro                       | `sudo pacman -S polkit`                                                                                         |
+|blackPanther OS                          | `autorequires via official rpm package (for devel:installing polkit polkit-kde-agent)`                          |
 
 ## Installing ProtonVPN Linux GUI
 
@@ -128,7 +131,7 @@ If you would like to use `pkexec` instead of the terminal (or alter `visudo`), t
 - Ubuntu derivatives: To-do
 - OpenSUSE/SLES: To-do
 - Arch Linux/Manjaro: <a href="https://aur.archlinux.org/packages/protonvpn-linux-gui/" target="_blank">Available at AUR</a>
-
+- blackPanther OS : `installing protonvpn-gui` 
 
 ### PIP based
 
@@ -173,6 +176,7 @@ If you would like to run the the GUI within a virtual environment (for either de
 |Ubuntu/Linux Mint/Debian and derivatives | `sudo apt install libcairo2-dev libgirepository1.0-dev pkg-config`                                              |
 |OpenSUSE/SLES                            | `sudo zypper install cairo-devel gobject-introspection-devel python3-cairo-devel pkg-config`                    |
 |Arch Linux/Manjaro                       | `sudo pacman -S cairo base-devel gobject-introspection pkgconf`                                                 |
+|blackPanther OS                          | `installing cairo-devel python3-cairo-devel gobject-introspection pkgconf`                                      |
 
 1. `git clone https://github.com/ProtonVPN/linux-gui` 
 2. `cd linux-gui`
