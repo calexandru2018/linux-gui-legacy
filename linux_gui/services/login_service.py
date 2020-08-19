@@ -157,7 +157,7 @@ class LoginService:
         sudo_type = "pkexec" if is_polkit_installed else "sudo"
 
         try:
-            output = subprocess.check_output([sudo_type, "bash", "-c", echo_to_passfile], stderr=subprocess.STDOUT, timeout=8)
+            output = subprocess.check_output([sudo_type, "bash", "-c", echo_to_passfile], stderr=subprocess.STDOUT, timeout=30)
             set_config_value("USER", "username", username)
         except (subprocess.TimeoutExpired, subprocess.CalledProcessError) as e:
             gui_logger.debug(e)
