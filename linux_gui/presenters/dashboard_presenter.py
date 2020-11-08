@@ -373,7 +373,7 @@ class DashboardPresenter:
             flag = GdkPixbuf.Pixbuf.new_from_file_at_size(self.dashboard_service.get_flag_path(country), 15, 15)
         except gi.repository.GLib.Error:
             try:
-                flag = GdkPixbuf.Pixbuf.new_from_file_at_size(self.dashboard_service.get_flag_path(country), 15, 15)
+                flag = GdkPixbuf.Pixbuf.new_from_file_at_size(self.dashboard_service.get_flag_path(None), 15, 15)
             except gi.repository.GLib.Error:
                 flag = GdkPixbuf.Pixbuf.new(GdkPixbuf.Colorspace.RGB, True, 8, 15, 15)
                 flag.fill(0xffffffff)
